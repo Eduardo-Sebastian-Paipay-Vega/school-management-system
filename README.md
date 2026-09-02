@@ -209,7 +209,7 @@ El proyecto se ejecuta en **4 fases** utilizando metodologías ágiles (Scrum):
 | Paipay Vega, Eduardo Sebastian | Líder de Proyecto | [@Eduardo-Sebastian-Paipay-Vega](https://github.com/Eduardo-Sebastian-Paipay-Vega) |
 | Leon Reyna, Cesar Antonio | Desarrollador | [@cesarleon27-ai](https://github.com/cesarleon27-ai) |
 | Montero Gutiérrez, Brandon Fernando | Desarrollador | [@brandonmontero27-g](https://github.com/brandonmontero27-g) |
-| Ovalle Luyo, Steve Smith | Desarrollador | [@steveovalle27-lgtm](https://github.com/steveovalle27-lgtm) |
+| Ovalle Luyo, Steve Smith | Sub Líder | [@steveovalle27-lgtm](https://github.com/steveovalle27-lgtm) |
 | Rodríguez Quispe, Grissel Arascely | Desarrolladora | [@Arascely](https://github.com/Arascely) |
 
 **Institución Académica:** Universidad Nacional de San Cristóbal de Huamanga (UNSCH)

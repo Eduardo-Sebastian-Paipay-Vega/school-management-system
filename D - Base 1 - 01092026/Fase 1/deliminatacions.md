@@ -1,6 +1,4 @@
-Claro. Te lo dejo **limpio en formato Markdown (.md)**, manteniendo toda la estructura y contenido para que puedas copiarlo directamente a Visual Studio Code.
 
-```markdown
 # DELIMITACIONES DEL PROYECTO
 
 ## TÍTULO DEL PROYECTO

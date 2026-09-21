@@ -11,25 +11,30 @@
 
 El proyecto se delimita al diseño, desarrollo e implementación de una plataforma web orientada a la gestión académica y la información institucional en los **Planteles de Aplicación de la UNSCH**, incorporando:
 
-- Control de asistencia de estudiantes.
-- Control de asistencia de practicantes.
-- Control de asistencia de docentes contratados.
-- Flujo de notas en tiempo real.
-- Mapas de calor para visualizar rendimiento académico y asistencia.
-- Gestión de información institucional y académica.
-- Monitoreo del rendimiento académico.
+- Control de asistencia de estudiantes con Kiosco Offline-First y carné QR institucional.
+- Control de asistencia y cómputo de horas de practicantes preprofesionales.
+- Control de asistencia y cumplimiento horario de docentes contratados.
+- Flujo de notas en tiempo real con planilla ágil interactiva (Modo Excel) y asistente de conclusiones descriptivas CNEB.
+- Mapas de calor multidimensionales con navegación Drill-Down para rendimiento y asistencia.
+- Monitoreo del rendimiento académico mediante Ficha Escolar 360° del estudiante.
+- Generación de reportes oficiales con verificación documental criptográfica SHA-256 y QR público.
+- Dashboard de impacto social e institucional bajo lineamientos del SSU IS-480.
+- Plataforma web institucional y canal de difusión digital.
 
 La plataforma será concebida como un **producto general y escalable para instituciones educativas**, pero su primera implementación y validación se realizará en los Planteles de Aplicación de la UNSCH como piloto institucional.
 
 ### Incluye
 
-- Autenticación, usuarios, roles y permisos.
-- Gestión académica básica e intermedia.
-- Asistencia multiactor: estudiantes, practicantes y docentes contratados.
-- Flujo de notas en tiempo real.
-- Mapas de calor académicos y de asistencia.
-- Dashboards, reportes y auditoría.
-- Arquitectura preparada para escalar a otras instituciones.
+- Autenticación JWT, gestión de usuarios, roles (RBAC) y permisos.
+- Gestión académica básica e intermedia y parametrización institucional multi-tenant.
+- Asistencia multiactor: estudiantes (con Kiosco Offline-First y carnés QR), practicantes y docentes contratados.
+- Flujo de notas en tiempo real (Modo Excel, soporte CNEB y sugerencias de conclusiones).
+- Mapas de calor interactivos (Drill-Down multidimensional).
+- Dashboards analíticos por rol, Ficha 360° y módulo de métricas SSU IS-480.
+- Reportes institucionales en PDF/Excel con verificación documental QR y hash SHA-256.
+- Auditoría integral, trazabilidad y cumplimiento de la Ley N.° 29733.
+- Portal público institucional de difusión y transparencia digital.
+- Arquitectura escalable y multi-tenant aislada lógicamente por institución (`tenant_id`).
 
 ### No incluye
 
@@ -143,19 +148,19 @@ El proyecto se circunscribe inicialmente a los **Planteles de Aplicación de la 
 
 | Módulo | Funcionalidades incluidas |
 |---|---|
-| Autenticación | Inicio y cierre de sesión, recuperación de contraseña, sesiones seguras, roles y permisos. |
-| Usuarios | Registro, modificación, eliminación y consulta de usuarios. |
-| Administración institucional | Planteles, sedes, periodos académicos, niveles, grados, secciones, cursos y escalas. |
-| Gestión académica | Registro de estudiantes, docentes, practicantes, matrículas, evaluaciones y calificaciones. |
-| Asistencia de estudiantes | Registro, consulta, reportes y alertas de asistencia. |
-| Asistencia de practicantes | Registro, control, reportes y seguimiento de asistencia. |
-| Asistencia de docentes contratados | Registro, control, reportes y seguimiento del cumplimiento de asistencia. |
-| Flujo de notas en tiempo real | Registro, actualización, consolidación y visualización inmediata de calificaciones. |
-| Mapas de calor | Visualización del rendimiento académico y asistencia por estudiante, sección, curso, docente o periodo. |
-| Monitoreo | Dashboards por rol, indicadores, tendencias, comparativos y alertas tempranas. |
-| Reportes | Reportes institucionales, por estudiante, docente y asistencia, con exportación a PDF y Excel. |
-| Auditoría | Registro de eventos de autenticación, cambios críticos y consultas de logs. |
-| Escalabilidad | Arquitectura preparada para múltiples instituciones mediante `tenant_id`. |
+| Autenticación | Inicio y cierre de sesión, recuperación de contraseña, sesiones seguras JWT, roles RBAC y permisos granulares. |
+| Usuarios | Registro, modificación, desactivación lógica, búsqueda y consulta de usuarios multirrol. |
+| Administración institucional | Planteles, sedes, periodos académicos, niveles, grados, secciones, cursos, mallas y escalas vigentes. |
+| Gestión académica | Registro de estudiantes, docentes, practicantes, matrículas, asignación de carga lectiva y evaluaciones. |
+| Asistencia de estudiantes | Registro manual, Kiosco Offline-First para portería con sincronización automática y generación de Carnés QR institucionales. |
+| Asistencia de practicantes | Registro de entradas/salidas, geolocalización referencial, cómputo automatizado de horas acumuladas y reportes SSU. |
+| Asistencia de docentes contratados | Registro de sesiones, cumplimiento de horas lectivas según contrato y reprogramación de clases compensatorias. |
+| Flujo de notas en tiempo real | Registro ágil con planilla interactiva (Modo Excel con navegación por teclado/pegado), asistente de conclusiones descriptivas CNEB y consolidación instantánea. |
+| Mapas de calor | Visualización analítica del rendimiento académico y asistencia con navegación interactiva Drill-Down (Nivel -> Grado -> Sección -> Alumno). |
+| Monitoreo y Dashboards | Dashboards operativos por rol, Ficha Escolar 360° individual del estudiante y panel de impacto social/académico SSU IS-480. |
+| Reportes oficiales | Generador de reportes en PDF y Excel con verificación documental criptográfica (código QR público + hash SHA-256). |
+| Auditoría y Seguridad | Trazabilidad completa de accesos y modificaciones críticas, inmutabilidad de logs y cumplimiento estricto de la Ley N.° 29733. |
+| Plataforma de Difusión y Escalabilidad | Portal web institucional público, publicación de comunicados, transparencia y arquitectura multi-tenant aislada por `tenant_id`. |
 
 ### 6.2 Funcionalidades excluidas del piloto
 

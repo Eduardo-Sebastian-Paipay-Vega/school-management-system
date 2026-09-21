@@ -1,27 +1,30 @@
 # Fase 2: Diseño y Desarrollo de Software
 
-La especificación técnica formal y estructurada de los requisitos del sistema se encuentra disponible en:
+La documentación formal y estructurada de requisitos y casos de uso del sistema para la Fase II se encuentra organizada en tres documentos complementarios:
 
-👉 **[requisitos_funcionales_tecnicos.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md)**
+1. 📄 **[requisitos_funcionales.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md)**  
+   *Catálogo y Especificación Documental Formal (Estándar IEEE 830 / ISO 29148):* Enunciados normativos (*"El sistema deberá..."*), precondiciones, entradas, procesos, salidas, postcondiciones y criterios de aceptación para los **68 Requisitos Funcionales (`RF-01` al `RF-68`)**.
+
+2. 📄 **[requisitos_funcionales_tecnicos.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md)**  
+   *Especificación Técnica de Software (SRS Técnico):* Arquitectura Flutter Web + Backend REST + PostgreSQL Multi-Tenant + Redis + WebSockets, contratos JSON tipados de API, esquemas SQL, transacciones ACID, lógica Offline-First y verificación criptográfica SHA-256.
+
+3. 📄 **[Casos de uso/README.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Casos%20de%20uso/README.md)**  
+   *Catálogo Maestro de Casos de Uso (CU UML):* Trazabilidad de actores, flujos principales y alternativos para la ejecución de los 68 requisitos y las 8 innovaciones del sistema.
 
 ---
 
-## Contenido de la Especificación Técnica (SRS)
+## Módulos del Sistema y Capacidades de Innovación
 
-1. **Arquitectura Técnica de Referencia:** Flutter Web SPA, Backend RESTful API, PostgreSQL Relacional con particionado multi-tenant (`tenant_id`), Redis Caché / Tokens y WebSockets en tiempo real.
-2. **Estándares Técnicos Transversales:** Contratos de API, tokens JWT (HS256/RS256), esquema `ApiResponse<T>`, manejo de errores y rate limiting.
-3. **13 Módulos Técnicos Especificados:**
-   - Módulo 1: Servicios de Autenticación, JWT, RBAC y Sesiones (`RF-TEC-SEG`)
-   - Módulo 2: API de Gestión de Usuarios, Directorio y Cuentas (`RF-TEC-USU`)
-   - Módulo 3: API de Parametrización y Estructura Organizacional (`RF-TEC-ADM`)
-   - Módulo 4: API de Gestión Académica, Matrícula y Carga Lectiva (`RF-TEC-ACA`)
-   - Módulo 5: API de Asistencia Estudiantil y Servicio de Kiosco/Portería (`RF-TEC-AST`)
-   - Módulo 6: API de Asistencia y Cómputo de Horas de Practicantes (`RF-TEC-PRA`)
-   - Módulo 7: API de Control de Asistencia y Horas Docentes Contratados (`RF-TEC-DOC`)
-   - Módulo 8: Motor de Calificaciones en Tiempo Real y WebSockets (`RF-TEC-NOT`)
-   - Módulo 9: Motor de Generación y Agregación de Mapas de Calor (`RF-TEC-CAL`)
-   - Módulo 10: API de Tableros de Control, Métricas y Alertas Tempranas (`RF-TEC-MON`)
-   - Módulo 11: Servicio de Generación y Exportación de Reportes PDF/Excel (`RF-TEC-REP`)
-   - Módulo 12: Motor de Trazabilidad, Bitácora de Auditoría y Ley 29733 (`RF-TEC-AUD`)
-   - Módulo 13: API de Difusión Digital, Cartelera y Contenidos (`RF-TEC-DIF`)
-4. **Matriz Completa de Trazabilidad Técnica:** Cruce detallado entre los requerimientos de usuario de la Fase 1 y los contratos técnicos, endpoints, métodos HTTP, entidades de PostgreSQL y roles RBAC de la Fase 2.
+- **Módulo 1: Acceso, Autenticación JWT y RBAC** (`RF-01` al `RF-04`)
+- **Módulo 2: Administración de Usuarios y Directorio** (`RF-05` al `RF-09`)
+- **Módulo 3: Configuración Escolar, Periodos y Escalas** (`RF-10` al `RF-14`)
+- **Módulo 4: Gestión Académica, Matrícula y Carga Lectiva** (`RF-15` al `RF-19`)
+- **Módulo 5: Asistencia Estudiantil, Kiosco Offline-First y Carnés QR** (`RF-20` al `RF-26`)
+- **Módulo 6: Asistencia y Cómputo de Horas de Practicantes** (`RF-27` al `RF-30`)
+- **Módulo 7: Horas de Docentes Contratados y Reprogramación** (`RF-31` al `RF-34`)
+- **Módulo 8: Calificaciones en Tiempo Real, Modo Excel y Conclusiones** (`RF-35` al `RF-43`)
+- **Módulo 9: Mapas de Calor con Navegación Drill-Down** (`RF-44` al `RF-48`)
+- **Módulo 10: Dashboards, Ficha 360° del Alumno y Métricas SSU IS-480** (`RF-49` al `RF-55`)
+- **Módulo 11: Emisión de Reportes y Verificación Criptográfica QR** (`RF-56` al `RF-61`)
+- **Módulo 12: Trazabilidad, Auditoría y Protección de Datos (Ley 29733)** (`RF-62` al `RF-65`)
+- **Módulo 13: Plataforma de Difusión Digital y Portal Institucional** (`RF-66` al `RF-68`)

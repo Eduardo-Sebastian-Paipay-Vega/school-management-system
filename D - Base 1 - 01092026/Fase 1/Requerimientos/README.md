@@ -22,4 +22,4 @@ La especificación completa, extensa y no técnica de todos los **Requerimientos
 12. **MÓDULO 12: Trazabilidad, Seguridad y Auditoría Institucional** (`RF-AUD-01` al `RF-AUD-04`, conforme a Ley N.° 29733)
 13. **MÓDULO 13: Plataforma de Difusión Digital y Comunicación Institucional** (`RF-DIF-01` al `RF-DIF-03`)
 
-*Para revisar el detalle extenso (descripciones funcionales, actores, datos de entrada, reglas de negocio, flujos y criterios de aceptación de cada uno de los 60 requerimientos), consulte [requerimientos_funcionales.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%201/Requerimientos/requerimientos_funcionales.md).*
+*Para revisar el detalle extenso (descripciones funcionales, actores, datos de entrada, reglas de negocio, flujos y criterios de aceptación de cada uno de los 68 requerimientos), consulte [requerimientos_funcionales.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%201/Requerimientos/requerimientos_funcionales.md).*

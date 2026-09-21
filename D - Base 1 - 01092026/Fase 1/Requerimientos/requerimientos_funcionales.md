@@ -548,6 +548,32 @@ MÓDULO 5: CONTROL Y GESTIÓN DE ASISTENCIA DE ESTUDIANTES (RF-AST)
 
 ---
 
+### RF-AST-06: Modo Kiosco de Portería Resiliente y Sincronización Desconectada (Offline-First)
+- **Módulo:** Control y Gestión de Asistencia de Estudiantes
+- **Actores:** Personal de Portería y Vigilancia ("Wachiman"), Auxiliares.
+- **Prioridad:** Alta (Resiliencia Operativa).
+- **Descripción:** El sistema debe permitir registrar ingresos y salidas escolares en portería de manera ininterrumpida ante caídas o intermitencias en la conexión a internet. Los eventos de escaneo deben almacenarse localmente con marca temporal exacta y sincronizarse en segundo plano de manera automática al restablecerse la red.
+- **Entradas:** Escaneo de carné o ingreso de DNI sin conexión activa.
+- **Reglas de Negocio:** Ningún alumno puede quedar sin registrar por falta de internet; los eventos se despachan en orden cronológico al reconectar.
+- **Flujo Funcional:** El sistema detecta la falta de red, guarda en almacenamiento local del cliente y sincroniza transparentemente al volver la conectividad.
+- **Salidas:** Confirmación de marcaje local y notificación de sincronización completada.
+- **Criterios de Aceptación:** Registro y posterior sincronización exitosa de hasta 100 ingresos offline sin duplicados.
+
+---
+
+### RF-AST-07: Emisión Masiva de Carnés Escolares con Código QR y Código de Barras
+- **Módulo:** Control y Gestión de Asistencia de Estudiantes
+- **Actores:** Secretaría Académica, Personal de Portería.
+- **Prioridad:** Media.
+- **Descripción:** El sistema debe generar pliegos de carnés escolares en formato PDF estándar A4 listos para imprimir y enmicar, conteniendo fotografía, datos de filiación y código QR/Barras de alta legibilidad para el escáner de portería.
+- **Entradas:** Selección de sección y nómina de estudiantes matriculados.
+- **Reglas de Negocio:** Cada carné debe incluir un código QR unívoco con identificador cifrado del alumno.
+- **Flujo Funcional:** El operador selecciona el aula y presiona "Generar Carnés"; el sistema emite el archivo PDF listo para corte e impresión.
+- **Salidas:** Documento PDF con los carnés organizados en cuadrículas para impresión.
+- **Criterios de Aceptación:** Los códigos QR impresos son leídos por el lector de portería en menos de 0.5 segundos.
+
+---
+
 ```
 ========================================================================================
 MÓDULO 6: CONTROL DE ASISTENCIA Y CUMPLIMIENTO DE PRACTICANTES (RF-PRA)
@@ -842,6 +868,32 @@ MÓDULO 8: REGISTRO, FLUJO Y SEGUIMIENTO DE CALIFICACIONES EN TIEMPO REAL (RF-NO
 
 ---
 
+### RF-NOT-08: Planilla Ágil de Notas en Modo Matriz de Alta Velocidad ("Modo Excel")
+- **Módulo:** Registro, Flujo y Seguimiento de Calificaciones en Tiempo Real
+- **Actores:** Docentes Titulares y Contratados.
+- **Prioridad:** Alta (Eficiencia y Usabilidad Docente).
+- **Descripción:** El sistema debe proporcionar una interfaz de ingreso de notas optimizada para digitación rápida con teclado físico, permitiendo desplazarse con flechas (↑, ↓, ←, →), avanzar con Enter, autoguardar y pegar columnas completas copiadas desde Excel.
+- **Entradas:** Calificaciones digitadas con teclado o pegadas desde el portapapeles (`Ctrl + V`).
+- **Reglas de Negocio:** Al pegar datos, se valida que los valores correspondan al orden de la lista y a la escala permitida, bloqueando errores.
+- **Flujo Funcional:** El docente selecciona la celda inicial, pega la columna de notas y presiona guardar; el sistema valida y almacena los datos en segundos.
+- **Salidas:** Planilla completa registrada en tiempo récord con promedios actualizados.
+- **Criterios de Aceptación:** Llenado de 35 notas en menos de 1 minuto mediante navegación de teclado o pegado directo.
+
+---
+
+### RF-NOT-09: Asistente Pedagógico de Conclusiones Descriptivas Sugeridas (MINEDU)
+- **Módulo:** Registro, Flujo y Seguimiento de Calificaciones en Tiempo Real
+- **Actores:** Docentes Titulares del Curso.
+- **Prioridad:** Media.
+- **Descripción:** El sistema debe incorporar un catálogo de conclusiones descriptivas sugeridas para la escala cualitativa (AD, A, B, C), permitiendo al docente seleccionar con un clic una frase pedagógica estándar contextualizada a la competencia y personalizarla.
+- **Entradas:** Selección del nivel de logro del alumno y clic en "Sugerir Conclusión".
+- **Reglas de Negocio:** Las conclusiones sugeridas deben alinearse con las pautas formativas oficiales del MINEDU.
+- **Flujo Funcional:** El docente despliega las sugerencias para el nivel alcanzado, elige la más pertinente y la ajusta para el alumno.
+- **Salidas:** Conclusión descriptiva formal completada en la boleta del estudiante.
+- **Criterios de Aceptación:** Reducción de más del 70% en el tiempo de redacción manual de conclusiones.
+
+---
+
 ```
 ========================================================================================
 MÓDULO 9: MAPAS DE CALOR Y ANÁLISIS VISUAL DEL RENDIMIENTO Y ASISTENCIA (RF-CAL)
@@ -915,6 +967,19 @@ MÓDULO 9: MAPAS DE CALOR Y ANÁLISIS VISUAL DEL RENDIMIENTO Y ASISTENCIA (RF-CA
   2. El sistema compila todas las notas oficiales del periodo y despliega la matriz macro-institucional.
 - **Salidas:** Tablero térmico global con semaforización de asignaturas prioritarias de atención.
 - **Criterios de Aceptación:** Compilación visual de toda la institución en una pantalla intuitiva y sin sobrecarga visual.
+
+---
+
+### RF-CAL-05: Navegación Interactiva a Profundidad en Mapas de Calor (Drill-Down)
+- **Módulo:** Mapas de Calor y Análisis Visual del Rendimiento y Asistencia
+- **Actores:** Coordinación Académica, Dirección General.
+- **Prioridad:** Alta.
+- **Descripción:** El sistema debe permitir realizar una navegación a profundidad (*Drill-Down*) sobre los mapas de calor, de modo que al hacer clic en una celda roja o amarilla, se despliegue un panel con el desglose de competencias curriculares y evaluaciones donde se originó el bajo rendimiento.
+- **Entradas:** Clic sobre una celda del mapa de calor de rendimiento.
+- **Reglas de Negocio:** La vista detallada debe reflejar el desglose exacto de competencias de la materia seleccionada.
+- **Flujo Funcional:** El directivo hace clic en la celda crítica; el sistema abre la vista de diagnóstico con gráficos de barras por competencia.
+- **Salidas:** Panel de diagnóstico pedagógico pormenorizado en pantalla.
+- **Criterios de Aceptación:** Despliegue del diagnóstico en menos de 1 segundo tras el clic en la celda.
 
 ---
 
@@ -1010,6 +1075,32 @@ MÓDULO 10: MONITOREO INSTITUCIONAL, DASHBOARDS Y ALERTAS TEMPRANAS (RF-MON)
 
 ---
 
+### RF-MON-06: Radiografía Escolar y Ficha Integral 360° del Estudiante en 1 Clic
+- **Módulo:** Monitoreo Institucional, Dashboards y Alertas Tempranas
+- **Actores:** Dirección General, Coordinación Académica, Tutores.
+- **Prioridad:** Alta.
+- **Descripción:** El sistema debe proporcionar una vista unificada ("Ficha 360°") que consolide en una sola pantalla: foto, contacto, gráfico evolutivo de notas bimestrales, semáforo de asistencia mensual, mini mapa de calor de competencias y alertas de riesgo activas.
+- **Entradas:** Selección del estudiante desde cualquier listado o búsqueda rápida por DNI.
+- **Reglas de Negocio:** Debe consolidar la situación integral del alumno sin necesidad de abrir múltiples pantallas.
+- **Flujo Funcional:** El tutor pulsa "Ver Ficha 360°"; el sistema genera la radiografía completa lista para consulta o exportación en PDF.
+- **Salidas:** Panel integral 360° desplegado con opción de descarga en PDF.
+- **Criterios de Aceptación:** Despliegue de la ficha completa con todos sus gráficos en menos de 1.5 segundos.
+
+---
+
+### RF-MON-07: Tablero de Seguimiento, Impacto y Acreditación del Servicio Social (IS-480)
+- **Módulo:** Monitoreo Institucional, Dashboards y Alertas Tempranas
+- **Actores:** Docente Tutor SSU - UNSCH, Comisión Académica EPIS, Equipo Ejecutor.
+- **Prioridad:** Alta (Acreditación Académica).
+- **Descripción:** El sistema debe incorporar un tablero de impacto orientado al seguimiento del SSU IS-480, mostrando indicadores en tiempo real: tasa de adopción de la plataforma (meta ≥ 80%), horas de trabajo ahorradas al colegio y avance de las 96 horas de servicio por integrante.
+- **Entradas:** Acceso mediante credenciales de supervisión universitaria.
+- **Reglas de Negocio:** Calcula automáticamente los KPIs del plan de trabajo del SSU y genera los reportes para la sustentación.
+- **Flujo Funcional:** El tutor universitario ingresa al panel y verifica las métricas de impacto y el cumplimiento de metas del equipo.
+- **Salidas:** Tablero de impacto social y reporte consolidado para la sustentación final.
+- **Criterios de Aceptación:** Cálculo automático de métricas que respalda objetivamente la evaluación del proyecto.
+
+---
+
 ```
 ========================================================================================
 MÓDULO 11: EMISIÓN DE REPORTES, LIBRETAS Y DOCUMENTACIÓN ESCOLAR (RF-REP)
@@ -1101,6 +1192,19 @@ MÓDULO 11: EMISIÓN DE REPORTES, LIBRETAS Y DOCUMENTACIÓN ESCOLAR (RF-REP)
   3. El sistema procesa la información y descarga el archivo directamente en el navegador del usuario.
 - **Salidas:** Archivo descargado en la computadora o dispositivo del usuario en el formato elegido.
 - **Criterios de Aceptación:** Generación y descarga de archivos de hasta 5,000 registros en menos de 5 segundos.
+
+---
+
+### RF-REP-06: Verificación Pública y Criptográfica de Autenticidad Documental con Código QR
+- **Módulo:** Emisión de Reportes, Libretas y Documentación Escolar
+- **Actores:** Toda la comunidad, Instituciones externas, Público en general.
+- **Prioridad:** Alta (Seguridad y Fe Pública).
+- **Descripción:** El sistema debe estampar en el pie de página de toda boleta de calificaciones, constancia y certificado emitido en PDF un código QR asociado a una firma criptográfica (hash SHA-256), permitiendo a cualquier tercero escanear el papel y verificar en línea su autenticidad.
+- **Entradas:** Escaneo del código QR de la boleta impresa con la cámara de un celular.
+- **Reglas de Negocio:** El portal de verificación es público y muestra si el documento es auténtico y coincide con los registros oficiales.
+- **Flujo Funcional:** El usuario escanea el QR; el sistema consulta el hash y muestra pantalla verde de autenticidad o roja de invalidez.
+- **Salidas:** Pantalla oficial de validación de autenticidad documental.
+- **Criterios de Aceptación:** Verificación instantánea sin requerir que el verificador inicie sesión.
 
 ---
 
@@ -1266,6 +1370,8 @@ MÓDULO 13: PLATAFORMA DE DIFUSIÓN DIGITAL Y COMUNICACIÓN INSTITUCIONAL (RF-DI
 | | `RF-AST-03` | Registro y Justificación de Inasistencias y Tardanzas | Coordinación / Auxiliares | Media |
 | | `RF-AST-04` | Consolidación y Récord Histórico de Asistencias | Estudiantes / Docentes / Dirección | Alta |
 | | `RF-AST-05` | Detección y Notificación de Alertas por Inasistencia | Coordinación / Docentes Tutores | Alta |
+| | `RF-AST-06` | Modo Kiosco Resiliente Offline-First y Sincronización | Personal de Portería / Vigilancia | Alta |
+| | `RF-AST-07` | Emisión Masiva de Carnés Escolares con Código QR | Secretaría / Personal de Portería | Media |
 | **6. Asistencia de Practicantes** | `RF-PRA-01` | Registro Diario de Ingreso, Salida y Permanencia | Practicantes / Portería | Alta |
 | | `RF-PRA-02` | Cómputo Acumulativo de Horas Efectivas de Práctica | Practicantes / Coordinación | Alta |
 | | `RF-PRA-03` | Validación y Aprobación Periódica de Horas de Práctica | Docentes Tutores / Coordinación | Alta |
@@ -1281,20 +1387,26 @@ MÓDULO 13: PLATAFORMA DE DIFUSIÓN DIGITAL Y COMUNICACIÓN INSTITUCIONAL (RF-DI
 | | `RF-NOT-05` | Cierre Oficial de Periodo Académico y Bloqueo de Notas | Coordinación / Dirección | Alta |
 | | `RF-NOT-06` | Solicitud y Autorización de Rectificación de Notas | Docentes / Coordinación / Dirección | Media |
 | | `RF-NOT-07` | Consulta Transparente e Inmediata de Notas por Alumnos | Estudiantes | Alta |
+| | `RF-NOT-08` | Planilla Ágil de Notas en Modo Matriz ("Modo Excel") | Docentes Titulares y Contratados | Alta |
+| | `RF-NOT-09` | Asistente de Conclusiones Descriptivas Sugeridas | Docentes Titulares del Curso | Media |
 | **9. Mapas de Calor** | `RF-CAL-01` | Mapa de Calor de Rendimiento Académico por Sección | Dirección / Coordinación / Docentes | Alta |
 | | `RF-CAL-02` | Mapa de Calor de Asistencia y Puntualidad | Dirección / Coordinación / Auxiliares | Alta |
 | | `RF-CAL-03` | Comparativas Visuales de Rendimiento entre Secciones | Coordinación / Dirección | Media |
 | | `RF-CAL-04` | Detección Visual de Asignaturas con Alta Tasa de Riesgo | Dirección General / Coordinación | Media |
+| | `RF-CAL-05` | Navegación a Detalle en Mapas de Calor (Drill-Down) | Coordinación Académica / Dirección | Alta |
 | **10. Monitoreo y Dashboards** | `RF-MON-01` | Tablero de Control Ejecutivo para Dirección General | Dirección General | Alta |
 | | `RF-MON-02` | Tablero de Control y Monitoreo para Coordinación | Coordinación Académica | Alta |
 | | `RF-MON-03` | Tablero de Seguimiento Pedagógico para el Docente | Docentes Nombrados y Contratados | Alta |
 | | `RF-MON-04` | Panel de Resumen del Progreso para el Estudiante | Estudiantes | Alta |
 | | `RF-MON-05` | Alertas Preventivas de Deserción y Bajo Rendimiento | Coordinación / Docentes Tutores | Alta |
+| | `RF-MON-06` | Ficha Integral y Radiografía Escolar 360° del Alumno | Dirección / Tutores / Coordinación | Alta |
+| | `RF-MON-07` | Tablero de Impacto y Acreditación del SSU (IS-480) | Docente Tutor SSU / Comisión EPIS | Alta |
 | **11. Emisión de Reportes** | `RF-REP-01` | Generación de Boletas de Calificaciones / Libretas | Secretaría / Docentes / Alumnos | Alta |
 | | `RF-REP-02` | Generación del Cuadro de Mérito y Puestos Oficiales | Dirección / Coordinación / Secretaría | Media |
 | | `RF-REP-03` | Emisión del Registro Auxiliar y Actas Consolidadas | Docentes / Secretaría Académica | Alta |
 | | `RF-REP-04` | Reporte Consolidado de Asistencia Multiactor | Dirección / Coordinación / Secretaría | Media |
 | | `RF-REP-05` | Exportación de Reportes en Formatos Estándar (PDF y Excel) | Todos los usuarios autorizados | Alta |
+| | `RF-REP-06` | Verificación Pública Criptográfica con Código QR | Público General / Entidades Externas | Alta |
 | **12. Auditoría Institucional** | `RF-AUD-01` | Registro Cronológico de Eventos de Acceso y Sesión | Administrador TI / Dirección | Alta |
 | | `RF-AUD-02` | Auditoría de Modificaciones de Calificaciones y Faltas | Administrador / Dirección / Coord. | Alta |
 | | `RF-AUD-03` | Consulta y Filtrado de la Bitácora de Auditoría | Administrador TI / Dirección | Media |

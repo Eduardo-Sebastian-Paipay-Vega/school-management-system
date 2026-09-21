@@ -6,19 +6,20 @@
 - **Institución Beneficiaria:** Planteles de Aplicación "Guamán Poma de Ayala" – UNSCH (Ayacucho, Perú)
 - **Marco de Asignatura:** Servicio Social Universitario (IS-480) – Escuela Profesional de Ingeniería de Sistemas (EPIS-UNSCH)
 - **Fase del Proyecto:** Fase II – Diseño y Desarrollo de Software (Especificación SRS Técnica)
-- **Documento Fuente Base:** `Fase 1/Requerimientos/requerimientos_funcionales.md`
-- **Nivel de Abstracción:** Especificación Técnica de Software (Arquitectura, Contratos de API REST, Lógica de Base de Datos, Transaccionalidad, Flujo de Datos y Eventos en Tiempo Real).
+- **Documento Fuente Base:** `Fase 2/Requisitos Funcionales/requisitos_funcionales.md`
+- **Nivel de Abstracción:** Especificación Técnica de Software (Arquitectura, Contratos de API REST, Lógica de Base de Datos, Transaccionalidad, Flujo de Datos, Offline-First, WebSockets y Criptografía Documental).
 
 ---
 
 ## 1. INTRODUCCIÓN Y ARQUITECTURA TÉCNICA DE REFERENCIA
 
-El presente documento formaliza la **Especificación Técnica de los Requisitos Funcionales (RF-TEC)** para la plataforma web de gestión académica e información institucional. Mientras que la Fase I definió el comportamiento del sistema desde el punto de vista del negocio escolar y del usuario final, este documento de Fase II traduce cada requerimiento a especificaciones de ingeniería de software, detallando contratos de interfaz de programación (API RESTful), modelos de datos relacionales, transaccionalidad ACID, esquemas de seguridad de tokens, caché en memoria y canales de comunicación bidireccional en tiempo real.
+El presente documento formaliza la **Especificación Técnica de los Requisitos Funcionales (RF-TEC)** para la plataforma web de gestión académica e información institucional. Mientras que la Fase I definió el comportamiento del sistema desde el punto de vista del negocio escolar y del usuario final, este documento de Fase II traduce cada requerimiento a especificaciones de ingeniería de software, detallando contratos de interfaz de programación (API RESTful), modelos de datos relacionales, transaccionalidad ACID, esquemas de seguridad de tokens, caché en memoria, tolerancia a fallos offline-first, firma criptográfica y canales de comunicación bidireccional en tiempo real.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │                        CAPA DE CLIENTE / PRESENTACIÓN (FRONTEND)                       │
 │      Flutter Web / Desktop SPA (Dart 3.x / Material Design 3 / Responsive Layout)      │
+│     [Motor de Teclado "Modo Excel" │ Almacenamiento Local Offline (IndexedDB/Hive)]    │
 └───────────────────────────────────────────┬────────────────────────────────────────────┘
                                             │ HTTPS / WSS (JSON REST APIs & WebSockets)
 ┌───────────────────────────────────────────▼────────────────────────────────────────────┐
@@ -26,8 +27,9 @@ El presente documento formaliza la **Especificación Técnica de los Requisitos 
 │       API Gateway / Controladores RESTful / Middleware RBAC / JWT Auth Interceptors    │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │                       CAPA DE SERVICIOS Y LÓGICA DE DOMINIO                            │
-│  Servicio Autenticación │ Servicio Académico │ Servicio Asistencia │ Motor Calificaciones│
-│  Servicio Reportes PDF  │ Motor Mapas Calor  │ Gestor Auditoría    │ Servicio Difusión   │
+│  Servicio Autenticación │ Servicio Académico │ Kiosco Sync Worker  │ Motor Calificaciones│
+│  Servicio Reportes PDF  │ Motor Mapas Calor  │ Ficha 360° Engine   │ Validador Cripto QR │
+│  Gestor Conclusiones    │ Monitor SSU IS-480 │ Gestor Auditoría    │ Servicio Difusión   │
 ├───────────────────────────────────────────┬────────────────────────────────────────────┤
 │           CAPA DE CACHÉ Y TIEMPO REAL     │             CAPA DE PERSISTENCIA           │
 │        Redis (Tokens, Sesiones, Rate      │       PostgreSQL Relacional (Multi-Tenant  │
@@ -82,13 +84,13 @@ El presente documento formaliza la **Especificación Técnica de los Requisitos 
 - **MÓDULO TÉCNICO 2: API de Gestión de Usuarios, Directorio y Cuentas** (`RF-TEC-USU`)
 - **MÓDULO TÉCNICO 3: API de Parametrización y Estructura Organizacional Escolar** (`RF-TEC-ADM`)
 - **MÓDULO TÉCNICO 4: API de Gestión Académica, Matrícula y Carga Lectiva** (`RF-TEC-ACA`)
-- **MÓDULO TÉCNICO 5: API de Asistencia Estudiantil y Servicio de Kiosco/Portería** (`RF-TEC-AST`)
+- **MÓDULO TÉCNICO 5: API de Asistencia Estudiantil, Kiosco Offline-First y Carnés QR** (`RF-TEC-AST`)
 - **MÓDULO TÉCNICO 6: API de Asistencia y Cómputo de Horas de Practicantes** (`RF-TEC-PRA`)
 - **MÓDULO TÉCNICO 7: API de Control de Asistencia y Horas de Docentes Contratados** (`RF-TEC-DOC`)
-- **MÓDULO TÉCNICO 8: Motor de Calificaciones en Tiempo Real, WebSockets y Cierres** (`RF-TEC-NOT`)
-- **MÓDULO TÉCNICO 9: Motor de Generación y Agregación de Mapas de Calor** (`RF-TEC-CAL`)
-- **MÓDULO TÉCNICO 10: API de Tableros de Control, Métricas y Alertas Tempranas** (`RF-TEC-MON`)
-- **MÓDULO TÉCNICO 11: Servicio de Generación y Exportación de Reportes (PDF/Excel)** (`RF-TEC-REP`)
+- **MÓDULO TÉCNICO 8: Motor de Calificaciones en Tiempo Real, Modo Excel y Conclusiones** (`RF-TEC-NOT`)
+- **MÓDULO TÉCNICO 9: Motor de Generación de Mapas de Calor con Navegación Drill-Down** (`RF-TEC-CAL`)
+- **MÓDULO TÉCNICO 10: API de Tableros de Control, Ficha 360° y Métricas SSU (IS-480)** (`RF-TEC-MON`)
+- **MÓDULO TÉCNICO 11: Servicio de Generación de Reportes y Verificación Criptográfica QR** (`RF-TEC-REP`)
 - **MÓDULO TÉCNICO 12: Motor de Trazabilidad, Bitácora de Auditoría y Seguridad** (`RF-TEC-AUD`)
 - **MÓDULO TÉCNICO 13: API de Difusión Digital, Cartelera y Contenidos Institucionales** (`RF-TEC-DIF`)
 
@@ -103,7 +105,7 @@ MÓDULO TÉCNICO 1: SERVICIOS DE AUTENTICACIÓN, JWT, RBAC Y SESIONES (RF-TEC-SE
 ```
 
 ### RF-TEC-SEG-01: Servicio de Autenticación de Credenciales y Emisión de JWT
-- **Trazabilidad Fase 1:** `RF-SEG-01`
+- **Trazabilidad:** `RF-01`
 - **Capa / Componente:** `AuthController` → `AuthService` → `TokenService` → `UserRepository`
 - **Endpoint Principal:** `POST /api/v1/auth/login`
 - **Autenticación Requerida:** Pública (Sin token previo).
@@ -160,7 +162,7 @@ MÓDULO TÉCNICO 1: SERVICIOS DE AUTENTICACIÓN, JWT, RBAC Y SESIONES (RF-TEC-SE
 ---
 
 ### RF-TEC-SEG-02: Revocación de Tokens y Middleware de Control de Inactividad
-- **Trazabilidad Fase 1:** `RF-SEG-02`
+- **Trazabilidad:** `RF-02`
 - **Capa / Componente:** `AuthMiddleware` → `SessionManager` → `RedisTokenStore`
 - **Endpoints:**
   - `POST /api/v1/auth/logout` (Revocación activa)
@@ -183,7 +185,7 @@ MÓDULO TÉCNICO 1: SERVICIOS DE AUTENTICACIÓN, JWT, RBAC Y SESIONES (RF-TEC-SE
 ---
 
 ### RF-TEC-SEG-03: Servicio de Recuperación Asistida y Generación de Token Temporal
-- **Trazabilidad Fase 1:** `RF-SEG-03`
+- **Trazabilidad:** `RF-03`
 - **Capa / Componente:** `PasswordResetController` → `MailNotificationService` → `RedisTokenStore`
 - **Endpoints:**
   - `POST /api/v1/auth/forgot-password` (Solicitud de recuperación)
@@ -199,7 +201,7 @@ MÓDULO TÉCNICO 1: SERVICIOS DE AUTENTICACIÓN, JWT, RBAC Y SESIONES (RF-TEC-SE
 ---
 
 ### RF-TEC-SEG-04: Middleware de Autorización RBAC y Guardias de Privilegios Mínimos
-- **Trazabilidad Fase 1:** `RF-SEG-04`
+- **Trazabilidad:** `RF-04`
 - **Capa / Componente:** `RbacMiddleware` / `RoleGuard`
 - **Mecanismo Técnico:**
   1. Decorador / Middleware en cada ruta de la API: `@RequireRole(['ROLE_ADMIN', 'ROLE_DIRECTOR'])` o `@RequirePermission('grades:write')`.
@@ -216,7 +218,7 @@ MÓDULO TÉCNICO 2: API DE GESTIÓN DE USUARIOS, DIRECTORIO Y CUENTAS (RF-TEC-US
 ```
 
 ### RF-TEC-USU-01: API Transaccional de Alta y Aprovisionamiento de Usuarios
-- **Trazabilidad Fase 1:** `RF-USU-01`
+- **Trazabilidad:** `RF-05`
 - **Endpoint:** `POST /api/v1/users`
 - **Roles Autorizados:** `ROLE_ADMIN`, `ROLE_DIRECTOR`.
 - **Contrato de Entrada (JSON Body):**
@@ -236,13 +238,10 @@ MÓDULO TÉCNICO 2: API DE GESTIÓN DE USUARIOS, DIRECTORIO Y CUENTAS (RF-TEC-US
 - **Lógica de Persistencia y Transaccionalidad (PostgreSQL):**
   ```sql
   BEGIN;
-  -- 1. Validar unicidad de DNI y email dentro del tenant
   SELECT id FROM users WHERE (dni = :dni OR email = :email) AND tenant_id = :tenantId FOR UPDATE;
-  -- 2. Inserción del usuario con password hash inicial y flag de cambio obligatorio
   INSERT INTO users (id, tenant_id, dni, names, paternal_surname, maternal_surname, email, phone, role_id, employment_type, password_hash, status, must_change_password, created_at)
   VALUES (gen_random_uuid(), :tenantId, :dni, :names, :paternalSurname, :maternalSurname, :email, :phoneNumber, :roleId, :employmentType, :defaultHash, 'ACTIVE', true, NOW())
   RETURNING id;
-  -- 3. Inserción en bitácora de auditoría
   INSERT INTO audit_logs (id, tenant_id, user_id, action, entity, entity_id, new_values, created_at)
   VALUES (gen_random_uuid(), :tenantId, :authUserId, 'CREATE_USER', 'users', :newId, :jsonNewValues, NOW());
   COMMIT;
@@ -252,38 +251,19 @@ MÓDULO TÉCNICO 2: API DE GESTIÓN DE USUARIOS, DIRECTORIO Y CUENTAS (RF-TEC-US
 ---
 
 ### RF-TEC-USU-02: Endpoint de Actualización y Baja Lógica (Soft Delete)
-- **Trazabilidad Fase 1:** `RF-USU-02`
+- **Trazabilidad:** `RF-06`, `RF-07`
 - **Endpoints:**
-  - `PATCH /api/v1/users/:id` (Modificación de datos informativos)
+  - `PATCH /api/v1/users/:id` (Modificación de datos informativos o rol)
   - `DELETE /api/v1/users/:id` (Desactivación / Baja lógica)
-- **Lógica Técnica de Procesamiento:**
-  1. Para eliminación: ejecutar actualización `UPDATE users SET status = 'INACTIVE', is_deleted = true, deleted_at = NOW(), updated_at = NOW() WHERE id = :id AND tenant_id = :tenantId`.
-  2. Prohibición estricta de ejecución de `DELETE FROM users` mediante disparador (trigger) de base de datos que aborta si existen llaves foráneas activas en `grades` o `attendance_records`.
-  3. Inmediata revocación de todos los tokens activos del usuario en Redis (`DEL user_tokens:<userId>`).
-- **Contrato de Salida:** HTTP 200 OK con confirmación de estado inactivo.
+- **Lógica Técnica:** Actualización `UPDATE users SET status = 'INACTIVE', is_deleted = true, deleted_at = NOW() WHERE id = :id AND tenant_id = :tenantId`. Prohibición de `DELETE` físico mediante trigger ante registros históricos. Inmediata revocación de tokens en Redis (`DEL user_tokens:<userId>`).
 
 ---
 
 ### RF-TEC-USU-03: Endpoint de Búsqueda Indexada y Paginación del Directorio
-- **Trazabilidad Fase 1:** `RF-USU-04`
+- **Trazabilidad:** `RF-08`, `RF-09`
 - **Endpoint:** `GET /api/v1/users`
 - **Parámetros Query:** `?page=1&limit=20&search=flores&role=ROLE_TEACHER&status=ACTIVE&sortBy=paternalSurname&sortOrder=ASC`
-- **Lógica Técnica de Base de Datos:**
-  - Consulta con operador trigram / ILIKE para coincidencia parcial:
-    ```sql
-    SELECT u.id, u.dni, u.names, u.paternal_surname, u.maternal_surname, u.email, u.phone, r.name as role_name, u.employment_type, u.status
-    FROM users u
-    INNER JOIN roles r ON u.role_id = r.id
-    WHERE u.tenant_id = :tenantId
-      AND u.is_deleted = false
-      AND (:role IS NULL OR r.name = :role)
-      AND (:status IS NULL OR u.status = :status)
-      AND (:search IS NULL OR (u.dni ILIKE :searchPattern OR (u.paternal_surname || ' ' || u.maternal_surname || ' ' || u.names) ILIKE :searchPattern))
-    ORDER BY u.paternal_surname ASC
-    LIMIT :limit OFFSET :offset;
-    ```
-  - Headers de respuesta para paginación: `X-Total-Count`, `X-Total-Pages`, `X-Current-Page`.
-  - Latencia P95 optimizada mediante índice GIN: `CREATE INDEX idx_users_search ON users USING gin ((paternal_surname || ' ' || maternal_surname || ' ' || names) gin_trgm_ops)`.
+- **Lógica de Base de Datos:** Búsqueda mediante índice GIN Trigram (`idx_users_search`) sobre `(paternal_surname || ' ' || maternal_surname || ' ' || names)` con latencia P95 < 50 ms. Retorno de cabeceras de paginación `X-Total-Count`, `X-Total-Pages`.
 
 ---
 
@@ -293,41 +273,21 @@ MÓDULO TÉCNICO 3: API DE PARAMETRIZACIÓN Y ESTRUCTURA ORGANIZACIONAL (RF-TEC-
 ========================================================================================
 ```
 
-### RF-TEC-ADM-01: API de Parametrización Institucional y Almacenamiento de Activos
-- **Trazabilidad Fase 1:** `RF-ADM-01`
-- **Endpoints:**
-  - `GET /api/v1/institution/profile`
-  - `PUT /api/v1/institution/profile`
-  - `POST /api/v1/institution/logo` (Carga multipart/form-data)
-- **Lógica Técnica de Procesamiento:**
-  1. Validación del archivo de logotipo: formato MIME estricto (`image/png`, `image/jpeg`, `image/webp`), tamaño máximo 2 MB.
-  2. Procesamiento de imagen en memoria con librería de optimización: redimensionamiento automático a resolución estándar (512x512 px) y conversión a WebP para máxima velocidad de carga.
-  3. Carga hacia servicio de almacenamiento compatible con S3 (MinIO / AWS S3) con ACL privada y generación de URL institucional con CDN / Caché de 24 horas.
+### RF-TEC-ADM-01: API de Parametrización Institucional y Almacenamiento S3
+- **Trazabilidad:** `RF-10`
+- **Endpoints:** `GET /api/v1/institution/profile`, `PUT /api/v1/institution/profile`, `POST /api/v1/institution/logo` (Multipart).
+- **Lógica Técnica:** Validación de tipo MIME de imagen, compresión y conversión automática a WebP 512x512 px, almacenamiento en MinIO/S3 con CDN y TTL de caché de 24 horas.
 
 ---
 
-### RF-TEC-ADM-02: API de Gestión de Periodos Lectivos y Cierre Programado
-- **Trazabilidad Fase 1:** `RF-ADM-02`, `RF-ADM-03`, `RF-ADM-04`, `RF-ADM-05`
+### RF-TEC-ADM-02: API de Periodos, Estructura Curricular y Escalas
+- **Trazabilidad:** `RF-11`, `RF-12`, `RF-13`, `RF-14`
 - **Endpoints:**
-  - `POST /api/v1/academic-years` (Creación de Año Lectivo)
-  - `POST /api/v1/academic-periods` (Creación de Bimestres/Trimestres)
-  - `GET /api/v1/academic-periods/current`
-  - `POST /api/v1/curriculum/courses` (Alta de Asignaturas y Competencias)
-  - `POST /api/v1/curriculum/grading-scales` (Configuración de Escala Vigesimal / Literal)
-- **Restricciones de Integridad y Triggers de Base de Datos:**
-  - Invariante temporal: `CONSTRAINT check_period_dates CHECK (start_date < end_date AND grade_submission_deadline <= end_date)`.
-  - Invariante de escala evaluativa:
-    ```sql
-    CREATE TABLE grading_scales (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      tenant_id UUID NOT NULL,
-      type VARCHAR(20) NOT NULL CHECK (type IN ('NUMERIC_20', 'LITERAL_MINEDU')),
-      min_score NUMERIC(4,2) NOT NULL,
-      max_score NUMERIC(4,2) NOT NULL,
-      passing_score NUMERIC(4,2) NOT NULL,
-      scale_mapping JSONB NOT NULL -- Define equivalencias: [{"literal": "AD", "min": 18, "max": 20}, ...]
-    );
-    ```
+  - `POST /api/v1/academic-years`
+  - `POST /api/v1/academic-periods`
+  - `POST /api/v1/curriculum/courses`
+  - `POST /api/v1/curriculum/grading-scales`
+- **Integridad Referencial:** Invariantes de fechas (`start_date < end_date`), escalas mapeadas con estructura `JSONB` que definen equivalencias cualitativas/cuantitativas (`scale_mapping`).
 
 ---
 
@@ -337,160 +297,94 @@ MÓDULO TÉCNICO 4: API DE GESTIÓN ACADÉMICA, MATRÍCULA Y CARGA LECTIVA (RF-T
 ========================================================================================
 ```
 
-### RF-TEC-ACA-01: API de Registro y Matrícula Masiva Transaccional
-- **Trazabilidad Fase 1:** `RF-ACA-01`, `RF-ACA-02`
-- **Endpoints:**
-  - `POST /api/v1/students` (Registro individual de estudiante)
-  - `POST /api/v1/students/bulk-import` (Carga masiva desde archivo CSV/Excel)
-  - `POST /api/v1/enrollments` (Matrícula formal en sección)
-- **Lógica Técnica de Procesamiento y Validación de Aforos:**
-  1. La matrícula se ejecuta dentro de una transacción con bloqueo pesimista sobre la sección:
-     ```sql
-     BEGIN;
-     SELECT current_students, max_capacity FROM sections WHERE id = :sectionId FOR UPDATE;
-     -- Validar: IF current_students >= max_capacity THEN ROLLBACK y emitir HTTP 409 (SECTION_CAPACITY_EXCEEDED)
-     INSERT INTO enrollments (id, tenant_id, student_id, section_id, academic_year_id, status, enrolled_at)
-     VALUES (gen_random_uuid(), :tenantId, :studentId, :sectionId, :yearId, 'ENROLLED', NOW());
-     UPDATE sections SET current_students = current_students + 1 WHERE id = :sectionId;
-     COMMIT;
-     ```
-  2. Generación automática de credenciales de consulta para el estudiante: username = DNI, contraseña temporal generada, asignación de rol `ROLE_STUDENT`.
+### RF-TEC-ACA-01: API de Registro y Matrícula Masiva con Bloqueo Pesimista
+- **Trazabilidad:** `RF-15`, `RF-16`, `RF-19`
+- **Endpoints:** `POST /api/v1/students`, `POST /api/v1/students/bulk-import`, `POST /api/v1/enrollments`.
+- **Lógica Técnica:** Transacción con `SELECT current_students, max_capacity FROM sections WHERE id = :sectionId FOR UPDATE`. Si `current_students >= max_capacity` aborta con HTTP 409 (`SECTION_CAPACITY_EXCEEDED`). Generación automática de cuenta para el estudiante con rol `ROLE_STUDENT`.
 
 ---
 
 ### RF-TEC-ACA-02: API de Asignación y Control de Carga Lectiva Docente
-- **Trazabilidad Fase 1:** `RF-ACA-03`, `RF-ACA-04`
+- **Trazabilidad:** `RF-17`, `RF-18`
 - **Endpoint:** `POST /api/v1/academic/teaching-assignments`
-- **Contrato de Entrada (JSON Body):**
-  ```json
-  {
-    "teacherId": "uuid",
-    "courseId": "uuid",
-    "sectionId": "uuid",
-    "academicYearId": "uuid",
-    "weeklyHours": 4,
-    "assignedPractitionerId": "uuid (opcional)"
-  }
-  ```
-- **Validación de Integridad:** Clave única compuesta en base de datos: `UNIQUE (course_id, section_id, academic_year_id)` para prevenir la asignación duplicada de dos docentes titulares al mismo curso en la misma sección.
+- **Restricción:** Clave única compuesta en base de datos: `UNIQUE (course_id, section_id, academic_year_id)` que garantiza la asignación unívoca del docente titular.
 
 ---
 
 ```
 ========================================================================================
-MÓDULO TÉCNICO 5: ASISTENCIA ESTUDIANTIL Y SERVICIO DE KIOSCO/PORTERÍA (RF-TEC-AST)
+MÓDULO TÉCNICO 5: ASISTENCIA ESTUDIANTIL, KIOSCO OFFLINE-FIRST Y CARNÉS QR (RF-TEC-AST)
 ========================================================================================
 ```
 
 ### RF-TEC-AST-01: API de Registro Masivo de Asistencia en Aula (Batch Operation)
-- **Trazabilidad Fase 1:** `RF-AST-01`
+- **Trazabilidad:** `RF-20`, `RF-22`, `RF-23`, `RF-24`
 - **Endpoint:** `POST /api/v1/attendance/students/batch`
-- **Roles Autorizados:** `ROLE_TEACHER`, `ROLE_COORDINATOR`.
-- **Contrato de Entrada (JSON Body):**
-  ```json
-  {
-    "sectionId": "uuid",
-    "courseId": "uuid",
-    "sessionDate": "2026-09-21",
-    "blockNumber": 1,
-    "records": [
-      { "studentId": "uuid-1", "status": "PRESENT", "lateMinutes": 0, "remarks": null },
-      { "studentId": "uuid-2", "status": "LATE", "lateMinutes": 12, "remarks": "Llegó al segundo bloque" },
-      { "studentId": "uuid-3", "status": "ABSENT_UNJUSTIFIED", "lateMinutes": 0, "remarks": null }
-    ]
-  }
-  ```
-- **Lógica Técnica de Procesamiento:**
-  1. Comprobar que `sessionDate <= CURRENT_DATE` (bloquear fechas futuras).
-  2. Operación de persistencia con patrón `UPSERT` en PostgreSQL:
-     ```sql
-     INSERT INTO student_attendance (id, tenant_id, student_id, section_id, course_id, session_date, block_number, status, late_minutes, remarks, recorded_by, created_at)
-     VALUES (:id, :tenantId, :studentId, :sectionId, :courseId, :sessionDate, :blockNumber, :status, :lateMinutes, :remarks, :userId, NOW())
-     ON CONFLICT (student_id, course_id, session_date, block_number)
-     DO UPDATE SET status = EXCLUDED.status, late_minutes = EXCLUDED.late_minutes, remarks = EXCLUDED.remarks, updated_at = NOW()
-     WHERE student_attendance.is_locked = false;
-     ```
-  3. Disparo asíncrono de verificación de alertas: enviar mensaje al bus de eventos interno para evaluar si el alumno acumuló 3 faltas consecutivas y activar la alerta temprana (`RF-TEC-MON-05`).
+- **Lógica Técnica:** Inserción `UPSERT` en PostgreSQL (`ON CONFLICT (student_id, course_id, session_date, block_number) DO UPDATE...`) con verificación de candado `is_locked = false`. Emisión asíncrona de evento para cálculo de alertas tempranas si acumula 3 faltas.
 
 ---
 
 ### RF-TEC-AST-02: Micro-Servicio Kiosco de Control de Puerta y Portería ("Wachiman")
-- **Trazabilidad Fase 1:** `RF-AST-02`
+- **Trazabilidad:** `RF-21`
 - **Endpoint de Ultra-Baja Latencia:** `POST /api/v1/kiosk/gate-entry`
-- **Roles Autorizados:** `ROLE_SECURITY`, `ROLE_ADMIN`.
-- **Tiempo Objetivo de Respuesta:** P99 < 300 ms.
+- **Latencia Objetivo:** P99 < 300 ms.
+- **Lógica Técnica:** Búsqueda en Redis hash `student_gate_cache:<dni>` en 2 ms. Cálculo automático de minutos de tardanza contra las 07:30:00 (Tolerancia 10 min). Respuesta visual y auditiva inmediata.
+
+---
+
+### RF-TEC-AST-03: Arquitectura Resiliente de Sincronización Desconectada (Offline-First Kiosk)
+- **Trazabilidad:** `RF-25`
+- **Capa / Componente:** `KioskStorageService` (Frontend Flutter) → `IndexedDB` / `Hive` → `GateSyncWorker` (Background)
+- **Endpoint de Sincronización por Lote:** `POST /api/v1/kiosk/gate-entry/offline-batch-sync`
 - **Contrato de Entrada (JSON Body):**
   ```json
   {
-    "scanPayload": "string (DNI digitado de 8 dígitos o código de barras/QR escaneado)",
     "gateId": "PUERTA_PRINCIPAL",
-    "scanTimestamp": "2026-09-21T07:42:15.120Z"
+    "batchTimestamp": "2026-09-21T08:05:00.000Z",
+    "entries": [
+      { "dni": "72345678", "offlineTimestamp": "2026-09-21T07:35:12.450Z", "clientUuid": "c-98a1" },
+      { "dni": "74891234", "offlineTimestamp": "2026-09-21T07:44:02.100Z", "clientUuid": "c-98a2" }
+    ]
   }
   ```
-- **Lógica Técnica de Alto Rendimiento:**
-  1. Consulta optimizada en caché Redis con clave hash `student_gate_cache:<dni>`:
-     - Si está en caché: recuperar datos del estudiante en 2 ms (foto, nombres, sección, horario de entrada).
-     - Si no está en caché: buscar en PostgreSQL y poblar caché con TTL de 12 horas.
-  2. Evaluación de horario institucional:
-     - Horario parametrizado de entrada matutina: 07:30:00 (Tolerancia: 10 minutos hasta las 07:40:00).
-     - Si `scanTimestamp <= 07:40:00` → `status = "PUNCTUAL"`, `lateMinutes = 0`.
-     - Si `scanTimestamp > 07:40:00` → `status = "LATE"`, `lateMinutes = DATEDIFF(scanTimestamp - 07:30:00)`.
-  3. Inserción asíncrona no bloqueante (Write-Behind Cache / Queue) en la tabla `gate_access_logs`.
-- **Contrato de Salida Inmediato (HTTP 200 OK):**
+- **Lógica Técnica:**
+  1. El cliente Flutter monitorea el estado de conectividad mediante `connectivity_plus`. Al detectar fallo de red, conmuta a modo desconectado.
+  2. Los escaneos se persisten localmente en una base de datos local encriptada (`Hive` con cifrado AES-256).
+  3. Al restablecerse la conexión, el servicio `GateSyncWorker` despacha la cola acumulada al endpoint de sincronización.
+  4. En el backend: transacción idempotente basada en `clientUuid` para evitar duplicados. Cálculo de tardanzas según el `offlineTimestamp` capturado en portería.
+- **Contrato de Salida (HTTP 200 OK):**
   ```json
   {
     "success": true,
-    "status": "LATE",
-    "lateMinutes": 12,
-    "student": {
-      "fullName": "Quispe Gomez, Alexander",
-      "gradeSection": "4° B Secundaria",
-      "photoUrl": "https://cdn.planteles.unsch.edu.pe/photos/std-4102.webp"
-    },
-    "feedback": {
-      "color": "#F59E0B",
-      "sound": "ALERT_LATE",
-      "message": "Tardanza registrada (12 minutos)"
-    }
+    "synchronizedCount": 42,
+    "failedCount": 0,
+    "conflictsResolved": 0
   }
   ```
 
 ---
 
-```
-========================================================================================
-MÓDULO TÉCNICO 6: API DE ASISTENCIA Y HORAS DE PRACTICANTES (RF-TEC-PRA)
-========================================================================================
-```
-
-### RF-TEC-PRA-01: API de Marcaje Biométrico / Web y Cómputo de Horas Efectivas
-- **Trazabilidad Fase 1:** `RF-PRA-01`, `RF-PRA-02`
-- **Endpoints:**
-  - `POST /api/v1/practitioners/check-in` (Registro de entrada)
-  - `POST /api/v1/practitioners/check-out` (Registro de salida y cálculo)
-  - `GET /api/v1/practitioners/:id/hours-summary`
-- **Lógica Técnica de Procesamiento:**
-  1. Al registrar check-in: validar que no exista una entrada abierta sin salida en el día; guardar `check_in_time = NOW()`.
-  2. Al registrar check-out: validar existencia de check-in del mismo día; guardar `check_out_time = NOW()`.
-  3. Cálculo de duración en minutos: `duration_minutes = EXTRACT(EPOCH FROM (check_out_time - check_in_time))/60`.
-  4. Redondeo formal a horas pedagógicas o cronológicas según directiva universitaria (1 hora pedagógica = 45 minutos).
-  5. Registro con estado inicial `status = "PENDING_APPROVAL"`.
+### RF-TEC-AST-04: Motor de Maquetación y Emisión Masiva de Carnés Escolares QR en PDF
+- **Trazabilidad:** `RF-26`
+- **Endpoint:** `GET /api/v1/reports/student-id-cards?sectionId=uuid&format=pdf`
+- **Lógica Técnica de Renderizado:**
+  1. Extracción de los estudiantes matriculados en la sección con su fotografía en formato optimizado y datos de matrícula.
+  2. Generación programática de códigos QR en memoria utilizando algoritmo de corrección de errores nivel M (`QR_ECLEVEL_M`), codificando la cadena segura: `PLANTEL:UNSCH:STD:<dni>:<checksum>`.
+  3. Maquetación vectorial con motor PDF en cuadrículas estándar A4 (2 columnas x 5 filas = 10 carnés por hoja) con guías de corte (`crop marks`), respetando dimensiones estándar de carné escolar (8.5 cm x 5.4 cm).
+  4. Retorno mediante streaming de buffer en menos de 1.8 segundos por aula completa.
 
 ---
 
-### RF-TEC-PRA-02: Endpoint de Aprobación y Firma Digital del Docente Tutor
-- **Trazabilidad Fase 1:** `RF-PRA-03`, `RF-PRA-04`
-- **Endpoint:** `POST /api/v1/practitioners/sessions/batch-approve`
-- **Roles Autorizados:** `ROLE_TEACHER` (Tutor titular asignado), `ROLE_COORDINATOR`.
-- **Contrato de Entrada:**
-  ```json
-  {
-    "sessionIds": ["uuid-1", "uuid-2", "uuid-3"],
-    "action": "APPROVE",
-    "supervisorRemarks": "Cumplió satisfactoriamente con la sesión de apoyo pedagógico"
-  }
-  ```
-- **Lógica Técnica:** Transacción ACID que actualiza `status = 'APPROVED'`, asienta el `approved_by = req.user.id`, `approved_at = NOW()`, y suma las horas al total oficial acumulado del practicante en `practitioner_profiles.validated_hours`.
+```
+========================================================================================
+MÓDULO TÉCNICO 6: ASISTENCIA Y HORAS DE PRACTICANTES (RF-TEC-PRA)
+========================================================================================
+```
+
+### RF-TEC-PRA-01: API de Marcaje y Aprobación por Lotes de Horas de Prácticas
+- **Trazabilidad:** `RF-27`, `RF-28`, `RF-29`, `RF-30`
+- **Endpoints:** `POST /api/v1/practitioners/check-in`, `POST /api/v1/practitioners/check-out`, `POST /api/v1/practitioners/sessions/batch-approve`.
+- **Lógica:** Cómputo de minutos entre entrada y salida (`EXTRACT(EPOCH...)`), estado inicial `PENDING_APPROVAL`, y transición atómica a `APPROVED` firmada por el docente titular, alimentando el acumulador `practitioner_profiles.validated_hours`.
 
 ---
 
@@ -500,287 +394,223 @@ MÓDULO TÉCNICO 7: ASISTENCIA Y HORAS DE DOCENTES CONTRATADOS (RF-TEC-DOC)
 ========================================================================================
 ```
 
-### RF-TEC-DOC-01: API de Marcación y Cotejo Automatizado con Horario Lectivo
-- **Trazabilidad Fase 1:** `RF-DOC-01`, `RF-DOC-03`, `RF-DOC-04`
-- **Endpoints:**
-  - `POST /api/v1/attendance/contracted-teachers/mark`
-  - `GET /api/v1/attendance/contracted-teachers/monthly-summary?month=9&year=2026`
-- **Lógica Técnica de Base de Datos:**
-  - Cruce relacional automático entre el horario programado del docente (`teacher_schedules`) y el log de marcación (`teacher_attendance_logs`):
-    ```sql
-    SELECT 
-      ts.id as schedule_id,
-      ts.course_id,
-      ts.start_time,
-      ts.end_time,
-      tal.marked_at,
-      CASE 
-        WHEN tal.marked_at IS NULL THEN 'ABSENT'
-        WHEN tal.marked_at <= (ts.start_time + INTERVAL '10 minutes') THEN 'PUNCTUAL'
-        ELSE 'LATE'
-      END as attendance_status,
-      COALESCE(EXTRACT(EPOCH FROM (tal.marked_at - ts.start_time))/60, 0) as delay_minutes
-    FROM teacher_schedules ts
-    LEFT JOIN teacher_attendance_logs tal ON ts.id = tal.schedule_id AND tal.marked_date = CURRENT_DATE
-    WHERE ts.teacher_id = :teacherId AND ts.day_of_week = EXTRACT(DOW FROM CURRENT_DATE);
-    ```
+### RF-TEC-DOC-01: API de Marcación y Cruce Automatizado con Horario Lectivo
+- **Trazabilidad:** `RF-31`, `RF-32`, `RF-33`, `RF-34`
+- **Endpoints:** `POST /api/v1/attendance/contracted-teachers/mark`, `GET /api/v1/attendance/contracted-teachers/monthly-summary`.
+- **Lógica:** Cruce relacional SQL entre `teacher_schedules` y `teacher_attendance_logs`, evaluando puntualidad (tolerancia 10 min), consolidando horas pedagógicas mensuales de 45 minutos.
 
 ---
 
 ```
 ========================================================================================
-MÓDULO TÉCNICO 8: MOTOR DE CALIFICACIONES EN TIEMPO REAL Y WEBSOCKETS (RF-TEC-NOT)
+MÓDULO TÉCNICO 8: MOTOR DE CALIFICACIONES EN TIEMPO REAL, MODO EXCEL Y CONCLUSIONES (RF-TEC-NOT)
 ========================================================================================
 ```
 
 ### RF-TEC-NOT-01: API Transaccional de Registro y Modificación de Notas
-- **Trazabilidad Fase 1:** `RF-NOT-01`, `RF-NOT-02`
-- **Endpoint:** `POST /api/v1/grades/batch-upsert`
-- **Roles Autorizados:** `ROLE_TEACHER` (Titular del curso).
-- **Contrato de Entrada (JSON Body):**
+- **Trazabilidad:** `RF-35`, `RF-36`, `RF-40`, `RF-41`, `RF-42`, `RF-43`
+- **Endpoints:** `POST /api/v1/grades/batch-upsert`, `POST /api/v1/academic-periods/:id/close`.
+- **Lógica:** Verificación de periodo abierto, comprobación de titularidad docente, validación de escalas oficiales, registro de histórico en `grades_audit_history` y recálculo automático de promedios de competencia y periodo.
+
+---
+
+### RF-TEC-NOT-02: Servicio de Difusión en Tiempo Real mediante WebSockets
+- **Trazabilidad:** `RF-36`, `RF-43`
+- **Protocolo:** WebSocket Seguro (`wss://.../ws`) mediante Redis Pub/Sub en canal `channel:section:<sectionId>:grades`. Notificación instantánea a clientes conectados ante evento `GRADE_UPDATED`.
+
+---
+
+### RF-TEC-NOT-05: Controlador de Matriz de Teclado Rápido ("Modo Excel") y Parser de Portapapeles en Flutter
+- **Trazabilidad:** `RF-37`
+- **Capa / Componente:** `FastGradeMatrixWidget` (Frontend Flutter) → `FocusNodeMatrixController` → `ClipboardParserService`
+- **Lógica Técnica de Frontend:**
+  1. Implementación de matriz de `FocusNode` bidimensional `focusNodes[row][col]`.
+  2. Captura de eventos de hardware mediante `FocusScope` y escucha de teclas `HardwareKeyboard`:
+     - Flecha Arriba (`LogicalKeyboardKey.arrowUp`): `focusNodes[row - 1][col].requestFocus()`
+     - Flecha Abajo / Enter (`LogicalKeyboardKey.enter`): autoguardar y enfocar celda `[row + 1][col]`
+     - Flechas Izquierda / Derecha: navegación horizontal entre criterios evaluativos.
+  3. Intercepción del portapapeles (`Clipboard.getData(Clipboard.kTextPlain)`):
+     - Detección de cadenas tabuladas y saltos de línea (`\t` y `\n` o `\r\n`).
+     - Mapeo secuencial hacia los `TextEditingController` de la columna activa en orden alfabético.
+     - Ejecución de validaciones de rango por celda y activación de botón de guardado masivo en 1 clic.
+
+---
+
+### RF-TEC-NOT-06: API de Catálogo y Recomendación de Conclusiones Descriptivas por Competencia y Nivel
+- **Trazabilidad:** `RF-38`
+- **Endpoint:** `GET /api/v1/curriculum/competencies/:competencyId/descriptive-conclusions?level=B`
+- **Roles Autorizados:** `ROLE_TEACHER`, `ROLE_COORDINATOR`.
+- **Estructura de la Tabla de Catálogo Pedagógico (`descriptive_conclusion_bank`):**
+  ```sql
+  CREATE TABLE descriptive_conclusion_bank (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL,
+    competency_id UUID REFERENCES competencies(id),
+    achievement_level VARCHAR(5) NOT NULL CHECK (achievement_level IN ('AD', 'A', 'B', 'C')),
+    suggested_text TEXT NOT NULL,
+    tags TEXT[] -- Ej: ['analisis', 'comprension', 'geometria']
+  );
+  CREATE INDEX idx_conclusions_comp_level ON descriptive_conclusion_bank (competency_id, achievement_level);
+  ```
+- **Contrato de Salida (HTTP 200 OK):**
   ```json
   {
-    "courseId": "uuid",
-    "sectionId": "uuid",
-    "periodId": "uuid",
-    "evaluationCriteriaId": "uuid",
-    "grades": [
-      { "studentId": "uuid-1", "score": 17.5, "comments": "Excelente análisis" },
-      { "studentId": "uuid-2", "score": 11.0, "comments": null }
+    "success": true,
+    "data": [
+      {
+        "id": "uuid-1",
+        "text": "Demuestra comprensión básica de las propiedades de los números enteros, requiriendo mayor práctica en la resolución de problemas contextualizados."
+      },
+      {
+        "id": "uuid-2",
+        "text": "Se encuentra en proceso de interpretar diagramas estadísticos; se recomienda afianzar la formulación de conclusiones a partir de tablas de frecuencia."
+      }
     ]
   }
   ```
-- **Lógica Técnica Transaccional y Validaciones Críticas:**
-  1. Verificar estado del periodo académico:
-     `SELECT is_closed FROM academic_periods WHERE id = :periodId;` → Si es `true`, abortar con HTTP 403 (`PERIOD_CLOSED_FOR_EDITING`).
-  2. Validar que el usuario que ejecuta la petición sea el docente asignado a la asignatura y sección:
-     `SELECT id FROM teaching_assignments WHERE teacher_id = :userId AND course_id = :courseId AND section_id = :sectionId;` → Si no coincide, abortar con HTTP 403 (`FORBIDDEN_TEACHING_ASSIGNMENT`).
-  3. Validar rango de notas según la escala oficial configurada (`score BETWEEN min_score AND max_score`).
-  4. En una transacción `BEGIN ... COMMIT`:
-     - Para cada estudiante, capturar el valor anterior si existe:
-       `SELECT score FROM grades WHERE student_id = :sId AND evaluation_criteria_id = :ecId;`
-     - Asentar o actualizar la calificación en la tabla `grades`.
-     - Si la nota fue modificada, insertar en `grades_audit_history` el registro inalterable con `old_score`, `new_score`, `changed_by`, `timestamp`.
-  5. Ejecutar la función interna de cálculo de promedio de competencia y promedio de periodo (`RF-TEC-NOT-02`).
-
----
-
-### RF-TEC-NOT-02: Motor de Cálculo Automatizado de Promedios Ponderados
-- **Trazabilidad Fase 1:** `RF-NOT-04`
-- **Componente:** `GradingCalculationEngine` (Invocado síncronamente tras persistencia de notas).
-- **Fórmula de Promedio Ponderado de Competencia / Bimestre:**
-  $$\text{Promedio Competencia} = \frac{\sum_{i=1}^{n} (\text{Nota}_i \times \text{Peso}_i)}{\sum_{i=1}^{n} \text{Peso}_i}$$
-- **Lógica Técnica de Redondeo y Persistencia:**
-  - Los promedios parciales de evaluaciones intermedias se mantienen en formato numérico flotante con 2 decimales (`NUMERIC(4,2)`).
-  - El promedio final del periodo se procesa mediante regla institucional de redondeo simétrico (`ROUND(score, 0)` si escala es vigesimal, convirtiendo 10.5 a 11).
-  - Si la escala es literal (MINEDU), se aplica la matriz de decisión cualitativa oficial almacenada en la tabla `grading_scales.scale_mapping`.
-  - El resultado consolidado se persiste en la tabla resumen `student_period_summaries` con bloqueo optimista mediante columna `version`.
-
----
-
-### RF-TEC-NOT-03: Servicio de Difusión en Tiempo Real mediante WebSockets
-- **Trazabilidad Fase 1:** `RF-NOT-02`, `RF-NOT-07`
-- **Protocolo:** WebSocket Seguro (`wss://planteles.unsch.edu.pe/ws`)
-- **Gestor de Mensajería:** Redis Pub/Sub integrado con WebSocket Gateway.
-- **Flujo de Eventos en Tiempo Real:**
-  1. Tras completarse con éxito la transacción de notas en la API REST, el servicio emite un mensaje en el canal Redis `channel:section:<sectionId>:grades`.
-  2. El servidor WebSocket captura el evento y lo retransmite de inmediato a los sockets activos suscritos a esa sala.
-  3. **Payload del Evento WebSocket (`GRADE_UPDATED`):**
-     ```json
-     {
-       "event": "GRADE_UPDATED",
-       "timestamp": "2026-09-21T15:40:12.000Z",
-       "data": {
-         "courseId": "uuid",
-         "periodId": "uuid",
-         "studentId": "uuid-1",
-         "newAverage": 16.0,
-         "updatedBy": "Prof. Carlos Mendoza"
-       }
-     }
-     ```
-  4. En la interfaz cliente Flutter del estudiante y del coordinador, el componente de vista reacciona instantáneamente sin requerir que el usuario recargue manualmente el navegador web.
-
----
-
-### RF-TEC-NOT-04: API de Cierre Oficial de Periodo y Bloqueo Concurrente
-- **Trazabilidad Fase 1:** `RF-NOT-05`, `RF-NOT-06`
-- **Endpoints:**
-  - `POST /api/v1/academic-periods/:id/close` (Cierre masivo)
-  - `POST /api/v1/grades/rectification-requests` (Solicitud de rectificación)
-  - `POST /api/v1/grades/rectification-requests/:id/approve` (Aprobación directiva)
-- **Mecanismo de Bloqueo:**
-  - Al cerrar el periodo: `UPDATE academic_periods SET is_closed = true, closed_at = NOW(), closed_by = :userId WHERE id = :periodId`.
-  - Disparador (Trigger) a nivel de base de datos en PostgreSQL:
-    ```sql
-    CREATE OR REPLACE FUNCTION enforce_grade_period_lock() RETURNS TRIGGER AS $$
-    BEGIN
-      IF (SELECT is_closed FROM academic_periods WHERE id = NEW.period_id) = true AND (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-        IF NOT EXISTS (SELECT 1 FROM grade_rectifications WHERE grade_id = OLD.id AND status = 'APPROVED_BY_DIRECTOR' AND is_applied = false) THEN
-          RAISE EXCEPTION 'No se pueden modificar calificaciones de un periodo cerrado sin una rectificación formal aprobada.';
-        END IF;
-      END IF;
-      RETURN NEW;
-    END;
-    $$ LANGUAGE plpgsql;
-    ```
 
 ---
 
 ```
 ========================================================================================
-MÓDULO TÉCNICO 9: MOTOR DE GENERACIÓN Y AGREGACIÓN DE MAPAS DE CALOR (RF-TEC-CAL)
+MÓDULO TÉCNICO 9: MOTOR DE MAPAS DE CALOR CON NAVEGACIÓN DRILL-DOWN (RF-TEC-CAL)
 ========================================================================================
 ```
 
-### RF-TEC-CAL-01: Servicio de Agregación y Matriz Térmica de Rendimiento
-- **Trazabilidad Fase 1:** `RF-CAL-01`, `RF-CAL-03`, `RF-CAL-04`
-- **Endpoint:** `GET /api/v1/analytics/heatmaps/academic-performance`
-- **Parámetros Query:** `?periodId=uuid&sectionId=uuid&gradeId=uuid`
-- **Estructura de la Consulta de Agregación de Alto Rendimiento (SQL CTE):**
-  ```sql
-  WITH StudentCourseScores AS (
-    SELECT 
-      e.student_id,
-      u.paternal_surname || ' ' || u.maternal_surname || ', ' || u.names as student_name,
-      c.id as course_id,
-      c.name as course_name,
-      COALESCE(sps.final_score, 0) as score,
-      CASE 
-        WHEN sps.final_score >= 17 THEN 'LEVEL_OUTSTANDING'  -- Verde Intenso (#10B981)
-        WHEN sps.final_score >= 14 THEN 'LEVEL_EXPECTED'     -- Verde Claro (#34D399)
-        WHEN sps.final_score >= 11 THEN 'LEVEL_RISK_PASS'    -- Amarillo (#FBBF24)
-        ELSE 'LEVEL_FAILED'                                  -- Rojo (#EF4444)
-      END as heat_level
-    FROM enrollments e
-    JOIN users u ON e.student_id = u.id
-    JOIN sections sec ON e.section_id = sec.id
-    JOIN teaching_assignments ta ON ta.section_id = sec.id
-    JOIN courses c ON ta.course_id = c.id
-    LEFT JOIN student_period_summaries sps ON sps.student_id = e.student_id AND sps.course_id = c.id AND sps.period_id = :periodId
-    WHERE e.section_id = :sectionId AND e.status = 'ENROLLED'
-  )
-  SELECT json_build_object(
-    'sectionId', :sectionId,
-    'matrix', json_agg(StudentCourseScores)
-  ) FROM StudentCourseScores;
-  ```
-- **Optimización de Caché en Redis:**
-  - Clave en memoria: `heatmap:academic:<tenantId>:<periodId>:<sectionId>`.
-  - TTL: 1 hora, con invalidación inmediata ante cualquier emisión de evento `GRADE_UPDATED` sobre esa sección.
-  - Tiempo de respuesta de la API: menor a 40 ms cuando es servido desde caché Redis.
+### RF-TEC-CAL-01: Servicio de Agregación y Matriz Térmica de Rendimiento y Asistencia
+- **Trazabilidad:** `RF-44`, `RF-45`, `RF-47`, `RF-48`
+- **Endpoints:** `GET /api/v1/analytics/heatmaps/academic-performance`, `GET /api/v1/analytics/heatmaps/attendance`.
+- **Lógica:** Consultas SQL CTE agregadas con cálculo de niveles térmicos (`LEVEL_OUTSTANDING`, `LEVEL_EXPECTED`, `LEVEL_RISK_PASS`, `LEVEL_FAILED`) cacheadas en Redis con TTL de 1 hora.
 
 ---
 
-### RF-TEC-CAL-02: API de Mapa de Calor de Asistencia Temporal y Detección de Frecuencia
-- **Trazabilidad Fase 1:** `RF-CAL-02`
-- **Endpoint:** `GET /api/v1/analytics/heatmaps/attendance`
-- **Parámetros Query:** `?startDate=2026-09-01&endDate=2026-09-30&sectionId=uuid`
+### RF-TEC-CAL-03: API y Motor de Navegación Analítica a Detalle (Drill-Down de Competencias)
+- **Trazabilidad:** `RF-46`
+- **Endpoint:** `GET /api/v1/analytics/heatmaps/drill-down`
+- **Parámetros Query:** `?studentId=uuid&courseId=uuid&periodId=uuid` (o `?sectionId=uuid&courseId=uuid&periodId=uuid`)
 - **Lógica Técnica de Procesamiento:**
-  1. Generación de serie temporal continua de fechas lectivas (`generate_series(startDate, endDate, '1 day'::interval)`).
-  2. Cruce matricial con las inasistencias registradas para calcular el Coeficiente de Ausentismo Diario ($CAD$):
-     $$CAD = \frac{\text{Total Inasistencias del Día}}{\text{Total Alumnos Matriculados}} \times 100$$
-  3. Asignación de escala cromática térmica:
-     - 0% a 5% ausencias: Verde (`#10B981`)
-     - 6% a 15% ausencias: Amarillo (`#F59E0B`)
-     - 16% a 30% ausencias: Naranja (`#F97316`)
-     - > 30% ausencias: Rojo Crítico (`#DC2626`)
-  4. Retorno de la matriz formateada para el renderizado nativo en Canvas/CustomPainter de Flutter.
+  ```sql
+  SELECT 
+    c.id as competency_id,
+    c.name as competency_name,
+    AVG(g.score) as competency_average,
+    json_agg(json_build_object(
+      'evaluationCriteria', ec.name,
+      'weight', ec.weight,
+      'score', g.score,
+      'date', ec.evaluation_date
+    )) as evaluation_breakdown
+  FROM competencies c
+  JOIN evaluation_criteria ec ON ec.competency_id = c.id
+  JOIN grades g ON g.evaluation_criteria_id = ec.id
+  WHERE g.student_id = :studentId AND ec.course_id = :courseId AND ec.period_id = :periodId
+  GROUP BY c.id, c.name;
+  ```
+- **Contrato de Salida:** Estructura tipada con el desglose exacto de las competencias evaluadas, permitiendo que la interfaz Flutter pinte el gráfico modal explicativo de por qué la celda térmica es roja o amarilla.
 
 ---
 
 ```
 ========================================================================================
-MÓDULO TÉCNICO 10: TABLEROS DE CONTROL, MÉTRICAS Y ALERTAS TEMPRANAS (RF-TEC-MON)
+MÓDULO TÉCNICO 10: TABLEROS DE CONTROL, FICHA 360° Y MÉTRICAS SSU (RF-TEC-MON)
 ========================================================================================
 ```
 
-### RF-TEC-MON-01: API de Métricas Ejecutivas Consolidadas para Dashboards
-- **Trazabilidad Fase 1:** `RF-MON-01`, `RF-MON-02`, `RF-MON-03`, `RF-MON-04`
-- **Endpoints:**
-  - `GET /api/v1/dashboard/director-kpis`
-  - `GET /api/v1/dashboard/coordinator-status`
-  - `GET /api/v1/dashboard/teacher-summary`
-  - `GET /api/v1/dashboard/student-progress`
-- **Especificación del Contrato de Salida de KPIs Directivos:**
+### RF-TEC-MON-01: API de Métricas Ejecutivas y Worker de Alertas de Deserción
+- **Trazabilidad:** `RF-49`, `RF-50`, `RF-51`, `RF-52`, `RF-55`
+- **Endpoints:** `GET /api/v1/dashboard/director-kpis`, Worker `EarlyWarningWorker`.
+- **Lógica:** Procesamiento diario de reglas de riesgo (inasistencias $\ge 10\%$, desaprobación $\ge 3$ cursos) y emisión de alertas hacia la bandeja de tutoría.
+
+---
+
+### RF-TEC-MON-03: API de Agregación de Alto Rendimiento para la Ficha Escolar 360° del Estudiante
+- **Trazabilidad:** `RF-53`
+- **Endpoint:** `GET /api/v1/students/:id/profile-360`
+- **Roles Autorizados:** `ROLE_DIRECTOR`, `ROLE_COORDINATOR`, `ROLE_TEACHER` (Tutor).
+- **Lógica Técnica de Consulta Única (Aggregated Single-Query):**
+  - Recuperación en un solo viaje de ida y vuelta a la base de datos (Single Round-Trip) de:
+    1. Datos de matrícula y contacto del alumno.
+    2. Resumen bimestral de calificaciones con evolución cronológica de promedios.
+    3. Semáforo de asistencia (total presencias, tardanzas justificadas/injustificadas, faltas).
+    4. Mini mapa de calor individual de competencias.
+    5. Listado de alertas preventivas activas registradas en `early_warning_alerts`.
+- **Contrato de Salida (HTTP 200 OK):**
   ```json
   {
     "success": true,
     "data": {
-      "totalStudentsEnrolled": 1420,
-      "dailyAttendanceRate": 96.4,
-      "teachersPendingGradeSubmission": 3,
-      "globalPassingRate": 88.2,
-      "studentsAtRiskCount": 24,
-      "recentAuditAlertsCount": 2,
-      "gradeDistribution": {
-        "outstanding": 320,
-        "expected": 810,
-        "inProcess": 210,
-        "atRisk": 80
-      }
+      "student": { "id": "uuid", "fullName": "Quispe Gomez, Alexander", "grade": "4° B Sec" },
+      "academicProgression": [
+        { "period": "Bimestre I", "average": 14.5 },
+        { "period": "Bimestre II", "average": 12.0 }
+      ],
+      "attendanceStats": { "rate": 91.2, "lates": 4, "absences": 3, "semaphore": "YELLOW" },
+      "competencyHeatmap": [
+        { "area": "Matemática", "level": "LEVEL_RISK_PASS", "score": 11.0 },
+        { "area": "Comunicación", "level": "LEVEL_EXPECTED", "score": 15.0 }
+      ],
+      "activeAlerts": ["Inasistencias acumuladas superan el 8% en el periodo actual"]
     }
   }
   ```
-- **Estrategia de Actualización:** Cálculo en segundo plano programado cada 15 minutos mediante tarea programada (Cron Job) y persistido en tabla de agregados `dashboard_kpi_snapshots` para evitar consultas agregadas pesadas sobre la base de datos operativa.
 
 ---
 
-### RF-TEC-MON-02: Servicio Automatizado de Evaluación y Emisión de Alertas de Deserción
-- **Trazabilidad Fase 1:** `RF-MON-05`
-- **Componente:** `EarlyWarningWorker` (Servicio en segundo plano / Worker).
-- **Lógica Algorítmica de Clasificación de Riesgo:**
-  1. Se ejecuta diariamente a las 18:00 horas (al finalizar la jornada escolar).
-  2. Consulta de estudiantes que satisfacen las siguientes condiciones de regla de negocio:
-     - **Regla R1 (Inasistencia Crónica):** Inasistencias injustificadas acumuladas en el periodo $\ge 10\%$.
-     - **Regla R2 (Riesgo Académico Crítico):** Calificaciones desaprobatorias vigentes en 3 o más áreas curriculares.
-     - **Regla R3 (Tardanzas Reiteradas):** Más de 5 tardanzas injustificadas en los últimos 15 días calendario.
-  3. Puntuación de Riesgo Ponderada:
-     $$\text{RiskScore} = (R_1 \times 0.40) + (R_2 \times 0.45) + (R_3 \times 0.15)$$
-  4. Si $\text{RiskScore} \ge 0.60$, insertar registro en tabla `early_warning_alerts` con severidad `HIGH` y generar notificación interna hacia el Coordinador Académico y el Docente Tutor.
+### RF-TEC-MON-04: Motor y Tablero de Métricas de Impacto y Acreditación del SSU (IS-480)
+- **Trazabilidad:** `RF-54`
+- **Endpoint:** `GET /api/v1/ssu/impact-metrics`
+- **Roles Autorizados:** `ROLE_ADMIN`, Tutor SSU de la UNSCH (`ROLE_DIRECTOR`).
+- **Lógica Técnica de Agregación de Impacto:**
+  - Cálculo de KPIs del Servicio Social Universitario:
+    - $\text{KPI-1 (Tasa de Adopción)} = \frac{\text{Usuarios Activos en Últimos 14 Días}}{\text{Total Personal Registrado}} \times 100$
+    - $\text{KPI-5 (Eficiencia)} = \text{Total Registros Digitalizados} \times 0.25 \text{ horas ahorradas}$
+    - Cumplimiento de horas individuales por integrante del equipo (meta: 96 horas / integrante).
+- **Contrato de Salida:** Datos formateados para la generación del Informe Final de Proyecto del IS-480.
 
 ---
 
 ```
 ========================================================================================
-MÓDULO TÉCNICO 11: SERVICIO DE GENERACIÓN Y EXPORTACIÓN DE REPORTES (RF-TEC-REP)
+MÓDULO TÉCNICO 11: SERVICIO DE REPORTES Y VERIFICACIÓN CRIPTOGRÁFICA QR (RF-TEC-REP)
 ========================================================================================
 ```
 
-### RF-TEC-REP-01: Micro-Servicio de Compilación de Boletas y Registros en PDF
-- **Trazabilidad Fase 1:** `RF-REP-01`, `RF-REP-02`, `RF-REP-03`
+### RF-TEC-REP-01: Micro-Servicio de Compilación de Boletas y Exportación a Excel
+- **Trazabilidad:** `RF-56`, `RF-58`, `RF-59`, `RF-60`, `RF-61`
+- **Endpoints:** `GET /api/v1/reports/report-cards/:studentId`, `POST /api/v1/reports/export-excel`.
+- **Lógica:** Generación en streaming mediante Chromium Headless/PDFKit y ExcelJS para evitar saturación de memoria RAM.
+
+---
+
+### RF-TEC-REP-03: Servicio Criptográfico de Verificación Documental con Hash SHA-256 y Endpoint Público QR
+- **Trazabilidad:** `RF-57`
 - **Endpoints:**
-  - `GET /api/v1/reports/report-cards/:studentId?periodId=uuid` (Boleta individual PDF)
-  - `POST /api/v1/reports/report-cards/bulk-section` (Generación de lote completo de sección en ZIP/PDF concatenado)
-  - `GET /api/v1/reports/class-grade-book?courseId=uuid&sectionId=uuid` (Registro Auxiliar Oficial)
-- **Pipeline Técnico de Generación de Documentos:**
-  1. Extracción de datos enriquecidos en una sola consulta relacional optimizada (datos institucionales, estudiante, notas por competencia, asistencias, firmas).
-  2. Renderizado de plantilla con motor de renderizado HTML5/CSS3 desacoplado (Handlebars / Chromium Headless / PDFKit).
-  3. Inyección estricta de membrete institucional, logotipo en formato vectorial o WebP optimizado, marcas de agua y código QR de verificación de autenticidad documental que apunta a:
-     `https://planteles.unsch.edu.pe/verify-doc?code=<hashSha256>`.
-  4. Flujo de respuesta HTTP mediante Streaming (`Content-Type: application/pdf`, `Content-Disposition: inline; filename="Boleta_2026_4B_Quispe.pdf"`).
-  5. Tiempo de compilación P95: menor a 1.2 segundos por documento individual.
-
----
-
-### RF-TEC-REP-02: Motor de Exportación Dinámica a Hojas de Cálculo (Excel / CSV)
-- **Trazabilidad Fase 1:** `RF-REP-04`, `RF-REP-05`
-- **Endpoint:** `POST /api/v1/reports/export-excel`
-- **Contrato de Entrada:**
+  - `POST /api/v1/documents/seal-and-register` (Firma y registro del documento en la emisión)
+  - `GET /api/v1/public/verify-document` (Consulta pública no autenticada)
+- **Parámetros de Consulta Pública:** `?docHash=3f8a91c2d0...`
+- **Lógica Técnica Criptográfica:**
+  1. Al emitirse una boleta oficial: concatenar los datos inmutables del reporte:
+     $$\text{Payload} = \text{student\_id} + \text{period\_id} + \text{gpa} + \text{issued\_at} + \text{SECRET\_SALT}$$
+  2. Generar el resumen criptográfico SHA-256 (`crypto.createHash('sha256').update(Payload).digest('hex')`).
+  3. Almacenar el registro en la tabla `document_verification_registry` con el hash, fecha de emisión y resumen de notas.
+  4. Incrustar en el pie de página del PDF el código QR que apunta a:
+     `https://planteles.unsch.edu.pe/verificar?doc=<docHash>`.
+  5. Al consultar `/verify-document`: validar el hash en base de datos. Si coincide, retornar HTTP 200 con la confirmación de autenticidad y datos oficiales; si no existe, retornar HTTP 404 (`DOCUMENT_INVALID_OR_NOT_FOUND`).
+- **Contrato de Salida Público:**
   ```json
   {
-    "reportType": "CONSOLIDATED_ATTENDANCE_MONTHLY",
-    "filters": {
-      "month": 9,
-      "year": 2026,
-      "level": "SECONDARY"
+    "success": true,
+    "isAuthentic": true,
+    "document": {
+      "type": "BOLETA_OFICIAL_CALIFICACIONES",
+      "studentName": "Quispe Gomez, Alexander",
+      "academicYear": "2026",
+      "issuedAt": "2026-09-21T14:30:00.000Z",
+      "institution": "Planteles de Aplicación 'Guamán Poma de Ayala' - UNSCH",
+      "generalAverage": 15.0
     }
   }
   ```
-- **Lógica Técnica:**
-  1. Uso de librería de generación de hojas de cálculo basada en flujos de memoria (`ExcelJS` / streaming buffer), evitando saturación de memoria RAM ante reportes con más de 5,000 registros.
-  2. Tipado estricto de celdas (formato numérico con dos decimales para notas, fechas formateadas ISO, cadenas alfanuméricas para DNI preservando ceros iniciales).
-  3. Retorno mediante cabecera `Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`.
 
 ---
 
@@ -790,40 +620,9 @@ MÓDULO TÉCNICO 12: MOTOR DE TRAZABILIDAD Y AUDITORÍA INSTITUCIONAL (RF-TEC-AU
 ========================================================================================
 ```
 
-### RF-TEC-AUD-01: Middleware de Intercepción y Bitácora de Eventos Inmutable
-- **Trazabilidad Fase 1:** `RF-AUD-01`, `RF-AUD-02`, `RF-AUD-03`
-- **Componente:** `AuditInterceptorMiddleware` → `AuditLoggerService`
-- **Endpoints de Consulta:** `GET /api/v1/audit/logs?page=1&limit=50&action=UPDATE_GRADE`
-- **Estructura de la Tabla de Base de Datos Inmutable (`audit_logs`):**
-  ```sql
-  CREATE TABLE audit_logs (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    tenant_id UUID NOT NULL,
-    user_id UUID REFERENCES users(id),
-    action VARCHAR(50) NOT NULL, -- 'LOGIN_SUCCESS', 'LOGIN_FAILED', 'UPDATE_GRADE', 'RECTIFY_GRADE'
-    entity_name VARCHAR(50) NOT NULL, -- 'grades', 'users', 'student_attendance'
-    entity_id UUID NOT NULL,
-    old_values JSONB, -- Captura snapshot anterior completo
-    new_values JSONB, -- Captura snapshot nuevo completo
-    ip_address VARCHAR(45) NOT NULL,
-    user_agent TEXT NOT NULL,
-    severity VARCHAR(10) DEFAULT 'INFO' CHECK (severity IN ('INFO', 'WARN', 'CRITICAL')),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
-  );
-  -- Inmutabilidad técnica: regla que revoca permisos de UPDATE y DELETE sobre la tabla
-  REVOKE UPDATE, DELETE ON audit_logs FROM public, app_user;
-  CREATE INDEX idx_audit_logs_tenant_action ON audit_logs (tenant_id, action, created_at DESC);
-  ```
-
----
-
-### RF-TEC-AUD-02: Cumplimiento Técnico de Privacidad de Datos de Menores (Ley N.° 29733)
-- **Trazabilidad Fase 1:** `RF-AUD-04`
-- **Componente:** `DataSanitizerInterceptor` (Serializador de Respuestas de API).
-- **Mecanismos Técnicos de Protección:**
-  1. Encriptación en reposo (Encryption at Rest) de la base de datos PostgreSQL utilizando cifrado AES-256 (módulo `pgcrypto` o cifrado a nivel de volumen de almacenamiento VPS).
-  2. Enmascaramiento dinámico de datos: los endpoints públicos de la plataforma jamás serializan identificadores sensibles de menores ni libretas completas sin un token de sesión autenticado y validado contra el `student_id`.
-  3. Prevención de fugas de datos (DLP): eliminación de cualquier campo técnico interno (ej. contraseñas hasheadas, tokens, IPs internas) en las respuestas de la API mediante interceptores de serialización (`class-transformer` / esquemas DTO estrictos).
+### RF-TEC-AUD-01: Bitácora Inmutable y Enmascaramiento Dinámico (Ley N.° 29733)
+- **Trazabilidad:** `RF-62`, `RF-63`, `RF-64`, `RF-65`
+- **Lógica:** Interceptores de auditoría que capturan snapshots JSONB de `old_values` y `new_values`. Tabla `audit_logs` con permisos revocados de `UPDATE` y `DELETE`. Encriptación AES-256 en reposo y supresión de datos confidenciales de menores en endpoints abiertos.
 
 ---
 
@@ -833,66 +632,98 @@ MÓDULO TÉCNICO 13: DIFUSIÓN DIGITAL Y CONTENIDOS INSTITUCIONALES (RF-TEC-DIF)
 ========================================================================================
 ```
 
-### RF-TEC-DIF-01: API de Cartelera Digital, Circulares y Contenido Institucional
-- **Trazabilidad Fase 1:** `RF-DIF-01`, `RF-DIF-02`, `RF-DIF-03`
-- **Endpoints:**
-  - `GET /api/v1/public/announcements` (Avisos vigentes públicos)
-  - `POST /api/v1/admin/announcements` (Creación de avisos con adjuntos PDF)
-  - `GET /api/v1/public/academic-calendar` (Calendario cívico-escolar)
-  - `GET /api/v1/public/institutional-info` (Misión, visión, normas del plantel)
-- **Lógica Técnica:**
-  - Filtrado automático de vigencia en la consulta: `WHERE is_published = true AND (expires_at IS NULL OR expires_at >= CURRENT_DATE)`.
-  - Almacenamiento en caché pública de Redis de la información estática del plantel con TTL de 24 horas y revalidación bajo demanda ante modificaciones de la Dirección.
+### RF-TEC-DIF-01: API de Cartelera Digital, Calendario y Contenidos del Plantel
+- **Trazabilidad:** `RF-66`, `RF-67`, `RF-68`
+- **Endpoints:** `GET /api/v1/public/announcements`, `GET /api/v1/public/academic-calendar`, `GET /api/v1/public/institutional-info`.
+- **Lógica:** Respuestas cacheadas en Redis con revalidación ante modificaciones directivas.
 
 ---
 
-## 4. MATRIZ DE TRAZABILIDAD TÉCNICA (FASE 1 VS FASE 2)
+## 4. MATRIZ DE TRAZABILIDAD TÉCNICA INTEGRAL (RF-01 AL RF-68)
 
-| Requisito Fase 1 (Negocio) | Requisito Técnico Fase 2 | Endpoint / Servicio Principal | Método HTTP | Entidades de Base de Datos Principales | Roles de Acceso |
-|---|---|---|:---:|---|---|
-| `RF-SEG-01` | `RF-TEC-SEG-01` | `/api/v1/auth/login` | POST | `users`, `roles`, `audit_logs` | Público |
-| `RF-SEG-02` | `RF-TEC-SEG-02` | `/api/v1/auth/logout` | POST | Redis Denylist, `user_sessions` | Autenticado |
-| `RF-SEG-03` | `RF-TEC-SEG-03` | `/api/v1/auth/reset-password` | POST | `users`, Redis Reset Keys | Público / Admin |
-| `RF-SEG-04` | `RF-TEC-SEG-04` | Middleware RBAC | ALL | `roles`, `permissions`, `role_permissions` | Transversal |
-| `RF-USU-01` | `RF-TEC-USU-01` | `/api/v1/users` | POST | `users`, `audit_logs` | Admin, Director |
-| `RF-USU-02` | `RF-TEC-USU-02` | `/api/v1/users/:id` | DELETE | `users` (Soft Delete) | Admin |
-| `RF-USU-04` | `RF-TEC-USU-03` | `/api/v1/users` | GET | `users`, `roles` (Índice GIN Trigram) | Admin, Director, Coord |
-| `RF-ADM-01` | `RF-TEC-ADM-01` | `/api/v1/institution/profile` | PUT | `institution_profiles`, S3 Assets | Admin, Director |
-| `RF-ADM-02` | `RF-TEC-ADM-02` | `/api/v1/academic-periods` | POST | `academic_years`, `academic_periods` | Admin, Coordinación |
-| `RF-ADM-05` | `RF-TEC-ADM-02` | `/api/v1/curriculum/grading-scales`| POST | `grading_scales` | Admin, Coordinación |
-| `RF-ACA-01` | `RF-TEC-ACA-01` | `/api/v1/students` | POST | `students`, `users` | Secretaría, Admin |
-| `RF-ACA-02` | `RF-TEC-ACA-01` | `/api/v1/enrollments` | POST | `enrollments`, `sections` (Lock pesimista) | Secretaría, Coordinación |
-| `RF-ACA-03` | `RF-TEC-ACA-02` | `/api/v1/academic/teaching-assignments` | POST | `teaching_assignments` | Coordinación, Director |
-| `RF-AST-01` | `RF-TEC-AST-01` | `/api/v1/attendance/students/batch` | POST | `student_attendance` (Upsert SQL) | Docentes, Coord |
-| `RF-AST-02` | `RF-TEC-AST-02` | `/api/v1/kiosk/gate-entry` | POST | Redis Cache + `gate_access_logs` | Portería ("Wachiman") |
-| `RF-PRA-01` | `RF-TEC-PRA-01` | `/api/v1/practitioners/check-in` | POST | `practitioner_attendance_logs` | Practicantes |
-| `RF-PRA-03` | `RF-TEC-PRA-02` | `/api/v1/practitioners/sessions/batch-approve` | POST | `practitioner_attendance_logs` | Docentes Tutores, Coord |
-| `RF-DOC-01` | `RF-TEC-DOC-01` | `/api/v1/attendance/contracted-teachers/mark` | POST | `teacher_attendance_logs`, `schedules` | Docentes Contratados |
-| `RF-NOT-01` | `RF-TEC-NOT-01` | `/api/v1/grades/batch-upsert` | POST | `grades`, `evaluation_criteria` | Docentes Titulares |
-| `RF-NOT-04` | `RF-TEC-NOT-02` | `GradingCalculationEngine` | Lógica Interna | `student_period_summaries` | Transversal |
-| `RF-NOT-07` | `RF-TEC-NOT-03` | `wss://.../ws` (Evento `GRADE_UPDATED`) | WSS | Redis Pub/Sub, WebSockets | Estudiantes, Docentes |
-| `RF-NOT-05` | `RF-TEC-NOT-04` | `/api/v1/academic-periods/:id/close` | POST | `academic_periods`, Triggers de bloqueo | Coordinación, Director |
-| `RF-CAL-01` | `RF-TEC-CAL-01` | `/api/v1/analytics/heatmaps/academic-performance` | GET | SQL CTE Agregado + Redis Cache | Director, Coord, Docentes |
-| `RF-CAL-02` | `RF-TEC-CAL-02` | `/api/v1/analytics/heatmaps/attendance` | GET | `student_attendance` series temporales | Director, Coord, Auxiliares |
-| `RF-MON-01` | `RF-TEC-MON-01` | `/api/v1/dashboard/director-kpis` | GET | `dashboard_kpi_snapshots` | Director General |
-| `RF-MON-05` | `RF-TEC-MON-02` | `EarlyWarningWorker` | Worker / Cron | `early_warning_alerts` | Coordinación, Tutores |
-| `RF-REP-01` | `RF-TEC-REP-01` | `/api/v1/reports/report-cards/:id` | GET (Stream) | Chromium Headless / PDFKit Buffer | Secretaría, Alumnos |
-| `RF-REP-05` | `RF-TEC-REP-02` | `/api/v1/reports/export-excel` | POST (Stream) | ExcelJS Stream Engine | Usuarios Autorizados |
-| `RF-AUD-01` | `RF-TEC-AUD-01` | `AuditInterceptorMiddleware` | Middleware | `audit_logs` (Tabla inmutable) | Transversal |
-| `RF-AUD-04` | `RF-TEC-AUD-02` | `DataSanitizerInterceptor` | Interceptor | Cifrado AES-256 / DTO Sanitization | Transversal (Ley 29733) |
-| `RF-DIF-01` | `RF-TEC-DIF-01` | `/api/v1/public/announcements` | GET | `announcements`, S3 Storage | Toda la comunidad |
+| Requisito Documental | Requisito Técnico | Endpoint / Componente | Método HTTP | Tablas Principales | Rol Mínimo |
+|:---:|:---:|---|:---:|---|:---:|
+| `RF-01` | `RF-TEC-SEG-01` | `/api/v1/auth/login` | POST | `users`, `audit_logs` | Público |
+| `RF-02` | `RF-TEC-SEG-02` | `/api/v1/auth/logout` | POST | Redis Denylist | Autenticado |
+| `RF-03` | `RF-TEC-SEG-03` | `/api/v1/auth/reset-password` | POST | `users`, Redis Tokens | Público / Admin |
+| `RF-04` | `RF-TEC-SEG-04` | `RbacMiddleware` | ALL | `roles`, `permissions` | Transversal |
+| `RF-05` | `RF-TEC-USU-01` | `/api/v1/users` | POST | `users`, `audit_logs` | Admin, Director |
+| `RF-06` | `RF-TEC-USU-02` | `/api/v1/users/:id` | DELETE | `users` (Soft Delete) | Admin |
+| `RF-07` | `RF-TEC-USU-02` | `/api/v1/users/:id` | PATCH | `users`, `roles` | Admin, Director |
+| `RF-08` | `RF-TEC-USU-03` | `/api/v1/users` | GET | `users` (GIN Trigram) | Directivos |
+| `RF-09` | `RF-TEC-USU-03` | `/api/v1/profile` | PUT | `users` | Autenticado |
+| `RF-10` | `RF-TEC-ADM-01` | `/api/v1/institution/profile` | PUT | `institution_profiles` | Director, Admin |
+| `RF-11` | `RF-TEC-ADM-02` | `/api/v1/academic-periods` | POST | `academic_periods` | Coordinación |
+| `RF-12` | `RF-TEC-ADM-02` | `/api/v1/curriculum/sections` | POST | `sections` | Coordinación |
+| `RF-13` | `RF-TEC-ADM-02` | `/api/v1/curriculum/courses` | POST | `courses`, `competencies`| Coordinación |
+| `RF-14` | `RF-TEC-ADM-02` | `/api/v1/curriculum/grading-scales`| POST | `grading_scales` | Dirección |
+| `RF-15` | `RF-TEC-ACA-01` | `/api/v1/students` | POST | `students`, `users` | Secretaría |
+| `RF-16` | `RF-TEC-ACA-01` | `/api/v1/enrollments` | POST | `enrollments`, `sections` | Secretaría |
+| `RF-17` | `RF-TEC-ACA-02` | `/api/v1/academic/teaching-assignments`| POST | `teaching_assignments` | Coordinación |
+| `RF-18` | `RF-TEC-ACA-02` | `/api/v1/academic/teaching-assignments`| POST | `teaching_assignments` | Coordinación |
+| `RF-19` | `RF-TEC-ACA-01` | `/api/v1/sections/:id/roster` | GET | `enrollments`, `users` | Docentes |
+| `RF-20` | `RF-TEC-AST-01` | `/api/v1/attendance/students/batch` | POST | `student_attendance` | Docentes |
+| `RF-21` | `RF-TEC-AST-02` | `/api/v1/kiosk/gate-entry` | POST | Redis + `gate_access_logs`| Portería |
+| `RF-22` | `RF-TEC-AST-01` | `/api/v1/attendance/justifications` | POST | `attendance_justifications`| Coordinación |
+| `RF-23` | `RF-TEC-AST-01` | `/api/v1/attendance/students/:id` | GET | `student_attendance` | Alumnos, Docentes |
+| `RF-24` | `RF-TEC-AST-01` | `EarlyWarningWorker` | Worker | `early_warning_alerts` | Sistema |
+| **`RF-25`**| **`RF-TEC-AST-03`**| `/api/v1/kiosk/gate-entry/offline-batch-sync`| **POST** | **`gate_access_logs` (Sync)** | **Portería** |
+| **`RF-26`**| **`RF-TEC-AST-04`**| `/api/v1/reports/student-id-cards` | **GET** | **`enrollments` (PDF QR)** | **Secretaría** |
+| `RF-27` | `RF-TEC-PRA-01` | `/api/v1/practitioners/check-in` | POST | `practitioner_logs` | Practicantes |
+| `RF-28` | `RF-TEC-PRA-01` | `/api/v1/practitioners/:id/hours` | GET | `practitioner_profiles`| Practicantes |
+| `RF-29` | `RF-TEC-PRA-01` | `/api/v1/practitioners/batch-approve` | POST | `practitioner_logs` | Docentes Tutores |
+| `RF-30` | `RF-TEC-PRA-01` | `/api/v1/reports/practitioner-card` | GET | `practitioner_profiles`| Coordinación |
+| `RF-31` | `RF-TEC-DOC-01` | `/api/v1/attendance/contracted/mark` | POST | `teacher_logs` | Docentes Contratados|
+| `RF-32` | `RF-TEC-DOC-01` | `/api/v1/attendance/contracted/reschedule`| POST | `schedules` | Coordinación |
+| `RF-33` | `RF-TEC-DOC-01` | `/api/v1/attendance/contracted/monthly` | GET | `teacher_logs` | Secretaría |
+| `RF-34` | `RF-TEC-DOC-01` | `/api/v1/attendance/contracted/real-time`| GET | `teacher_logs` | Coordinación |
+| `RF-35` | `RF-TEC-NOT-01` | `/api/v1/evaluation-criteria` | POST | `evaluation_criteria` | Docentes Titulares |
+| `RF-36` | `RF-TEC-NOT-01` | `/api/v1/grades/batch-upsert` | POST | `grades`, `audit_history` | Docentes Titulares |
+| **`RF-37`**| **`RF-TEC-NOT-05`**| `FastGradeMatrixWidget` (Flutter) | **UI** | **Matrix Keyboard Parser** | **Docentes** |
+| **`RF-38`**| **`RF-TEC-NOT-06`**| `/api/v1/curriculum/competencies/:id/conclusions` | **GET** | **`descriptive_conclusion_bank`**| **Docentes** |
+| `RF-39` | `RF-TEC-NOT-01` | `/api/v1/grades/practitioner-proposals` | POST | `grade_proposals` | Practicantes |
+| `RF-40` | `RF-TEC-NOT-01` | `GradingCalculationEngine` | Lógica | `student_period_summaries` | Sistema |
+| `RF-41` | `RF-TEC-NOT-01` | `/api/v1/academic-periods/:id/close` | POST | `academic_periods` (Lock) | Coordinación |
+| `RF-42` | `RF-TEC-NOT-01` | `/api/v1/grades/rectifications` | POST | `grade_rectifications` | Dirección |
+| `RF-43` | `RF-TEC-NOT-02` | `wss://.../ws` (`GRADE_UPDATED`) | WSS | WebSockets Redis PubSub| Estudiantes |
+| `RF-44` | `RF-TEC-CAL-01` | `/api/v1/analytics/heatmaps/academic` | GET | SQL CTE + Redis Cache | Directivos, Docentes|
+| `RF-45` | `RF-TEC-CAL-01` | `/api/v1/analytics/heatmaps/attendance` | GET | `student_attendance` | Auxiliares |
+| **`RF-46`**| **`RF-TEC-CAL-03`**| `/api/v1/analytics/heatmaps/drill-down` | **GET** | **`competencies`, `grades`** | **Coordinación** |
+| `RF-47` | `RF-TEC-CAL-01` | `/api/v1/analytics/heatmaps/comparative` | GET | SQL Aggregation | Coordinación |
+| `RF-48` | `RF-TEC-CAL-01` | `/api/v1/analytics/heatmaps/risk-overview`| GET | SQL Aggregation | Dirección General |
+| `RF-49` | `RF-TEC-MON-01` | `/api/v1/dashboard/director-kpis` | GET | `dashboard_kpi_snapshots`| Dirección General |
+| `RF-50` | `RF-TEC-MON-01` | `/api/v1/dashboard/coordinator-status` | GET | `teaching_assignments` | Coordinación |
+| `RF-51` | `RF-TEC-MON-01` | `/api/v1/dashboard/teacher-summary` | GET | `schedules`, `grades` | Docentes |
+| `RF-52` | `RF-TEC-MON-01` | `/api/v1/dashboard/student-progress` | GET | `student_summaries` | Estudiantes |
+| **`RF-53`**| **`RF-TEC-MON-03`**| `/api/v1/students/:id/profile-360` | **GET** | **Holistic Aggregated SQL** | **Tutores, Director** |
+| **`RF-54`**| **`RF-TEC-MON-04`**| `/api/v1/ssu/impact-metrics` | **GET** | **SSU Project Audit Logs** | **Tutor SSU UNSCH** |
+| `RF-55` | `RF-TEC-MON-01` | `EarlyWarningWorker` | Worker | `early_warning_alerts` | Coordinación |
+| `RF-56` | `RF-TEC-REP-01` | `/api/v1/reports/report-cards/:id` | GET | PDFKit Buffer Stream | Secretaría |
+| **`RF-57`**| **`RF-TEC-REP-03`**| `/api/v1/public/verify-document` | **GET** | **`document_verification_registry`**| **Público General** |
+| `RF-58` | `RF-TEC-REP-01` | `/api/v1/reports/merit-roll` | GET | SQL Ranking Window Func| Dirección |
+| `RF-59` | `RF-TEC-REP-01` | `/api/v1/reports/class-grade-book` | GET | PDF Stream Engine | Docentes |
+| `RF-60` | `RF-TEC-REP-01` | `/api/v1/reports/attendance-consolidated`| GET | PDF/Excel Stream | Secretaría |
+| `RF-61` | `RF-TEC-REP-01` | `/api/v1/reports/export-excel` | POST | ExcelJS Stream Engine | Usuarios Autorizados|
+| `RF-62` | `RF-TEC-AUD-01` | `AuditInterceptorMiddleware` | ALL | `audit_logs` (Inmutable) | Administrador |
+| `RF-63` | `RF-TEC-AUD-01` | `/api/v1/audit/grades-history` | GET | `grades_audit_history` | Dirección |
+| `RF-64` | `RF-TEC-AUD-01` | `/api/v1/audit/logs` | GET | `audit_logs` | Administrador |
+| `RF-65` | `RF-TEC-AUD-01` | `DataSanitizerInterceptor` | ALL | Cifrado AES-256 | Transversal |
+| `RF-66` | `RF-TEC-DIF-01` | `/api/v1/public/announcements` | GET | `announcements`, S3 | Toda la comunidad |
+| `RF-67` | `RF-TEC-DIF-01` | `/api/v1/public/academic-calendar` | GET | `academic_events` | Toda la comunidad |
+| `RF-68` | `RF-TEC-DIF-01` | `/api/v1/public/institutional-info` | GET | `institutional_pages` | Público General |
 
 ---
 
 ## 5. CRITERIOS DE VERIFICACIÓN Y CALIDAD TÉCNICA (QA)
 
 1. **Rendimiento de Endpoints (SLA):**
-   - Endpoints de consulta y lectura simple: Tiempo de respuesta P95 < 150 ms.
-   - Microservicio de portería / kiosco (`RF-TEC-AST-02`): P99 < 300 ms.
-   - Generación de reportes PDF individuales: Menor a 1.5 segundos.
+   - Endpoints de consulta simple y Ficha 360°: Tiempo de respuesta P95 < 150 ms.
+   - Microservicio de portería / kiosco online: P99 < 300 ms.
+   - Sincronización en lote offline: hasta 100 registros en menos de 1 segundo.
+   - Verificación documental pública por QR: Menor a 100 ms.
 2. **Pruebas de Concurrencia:**
-   - La API debe mantener estabilidad sin errores 500 bajo una carga sostenida de 200 usuarios concurrentes simulados mediante herramientas de prueba de carga (k6 / Artillery).
+   - La API mantiene estabilidad sin errores 500 bajo carga sostenida de 200 usuarios concurrentes simulados con k6.
 3. **Idempotencia y Manejo de Concurrencia:**
-   - Todo endpoint de guardado masivo de notas y asistencias (`batch-upsert`) debe ser idempotente, evitando la creación de duplicados ante reenvíos de paquetes en conexiones inestables.
+   - Endpoints `batch-upsert` y `offline-batch-sync` son idempotentes mediante identificadores de transacción UUID.
 4. **Cobertura de Pruebas Automatizadas:**
-   - Cobertura mínima de código del 80% en pruebas unitarias para servicios de cálculo de notas y validaciones de acceso.
+   - Cobertura mínima de código del 80% en pruebas unitarias e integración en el cálculo de promedios, reglas de alerta temprana y firma criptográfica SHA-256.

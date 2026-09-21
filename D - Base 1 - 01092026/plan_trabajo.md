@@ -20,10 +20,19 @@
 
 ### In Scope (Incluido en el proyecto)
 
-- Levantamiento de requerimientos y diseño de la arquitectura del software.
-- Desarrollo del sistema (Frontend y Backend) orientado a la gestión administrativa.
+- Levantamiento, especificación formal y catálogo estructurado de **68 Requisitos Funcionales (`RF-01` al `RF-68`)** organizados en **13 módulos** operativos.
+- Diseño y desarrollo de la arquitectura de software: Frontend (Flutter Web), Backend (API REST), Base de Datos relacional (PostgreSQL Multi-Tenant), Caché (Redis) y Sockets en tiempo real.
+- Incorporación de **8 innovaciones institucionales de alto impacto**:
+  1. *Kiosco Offline-First de Asistencia* con buffer de contingencia local.
+  2. *Generación y Emisión de Carnés Institucionales con QR*.
+  3. *Planilla Rápida de Notas (Modo Excel)* con interacción por teclado y pegado matricial.
+  4. *Asistente y Banco Estructurado de Conclusiones Descriptivas CNEB/MINEDU*.
+  5. *Mapas de Calor Multidimensionales con navegación Drill-Down interactiva*.
+  6. *Ficha Escolar 360°* consolidada del estudiante (asistencia, calificaciones y alertas).
+  7. *Verificación Documental Criptográfica (SHA-256 + QR público)* para reportes oficiales.
+  8. *Dashboard de Impacto Social e Institucional* para trazabilidad del SSU IS-480.
 - Despliegue de la solución en un entorno Cloud (VPS) financiado para el primer año.
-- Capacitación básica al personal en ofimática y uso exclusivo de la nueva plataforma.
+- Capacitación al personal docente y administrativo en el uso integral de la plataforma.
 
 ### Out of Scope (Fuera del alcance del proyecto)
 
@@ -72,7 +81,7 @@ La asignatura se desarrolla en 16 semanas académicas, distribuidas para otorgar
 
 | Sem. | Actividades / Contenidos | Hrs. | Artefactos de Entrada | Artefactos de Salida | Producto Esperado |
 |:---:|---|:---:|---|---|---|
-| 4 | • Especificación de requisitos (SRS). • Diseño de arquitectura de software y BD. | 6 | Plan de Trabajo aprobado. | Documento SRS, Diagramas UML/MER. | Arquitectura del sistema. |
+| 4 | • Especificación formal de requisitos (SRS IEEE 830 - 68 RFs). • Diseño de arquitectura de software y BD multi-tenant. | 6 | Plan de Trabajo aprobado. | Documentos de Requisitos (Fase 1 y Fase 2: Funcionales y Técnicos), Diagramas UML/MER/C4. | Requisitos y Arquitectura formalizados. |
 | 5 | • Prototipado navegable UI/UX. • Aprobación del diseño por el cliente. | 6 | Documento SRS. | Wireframes, Prototipos de alta fidelidad (Mockups). | Prototipo validado. |
 | 6 | • Desarrollo del Frontend (interfaz de usuario). • Integración de estilos corporativos. | 6 | Prototipos de alta fidelidad. | Repositorio inicial, Código Frontend estructurado. | Avance Frontend. |
 | 7 | • Desarrollo del Backend (lógica de negocio). • Creación de APIs y conexión a Base de Datos. | 6 | Código Frontend estructurado. | Código Backend, Endpoints funcionales. | Avance Backend. |

@@ -50,8 +50,8 @@
 
 ## 5. LIMITACIONES TECNOLÓGICAS
 
-- El funcionamiento dependerá de una conexión estable a internet.
-- No se contemplará funcionamiento offline.
+- El funcionamiento de los módulos de gestión y administración dependerá de una conexión estable a internet.
+- No se contemplará funcionamiento offline para los módulos centrales (a excepción del Kiosco de Asistencia de Portería, que dispone de un buffer local de contingencia Offline-First mediante IndexedDB/Cache).
 - El sistema dependerá de navegadores web compatibles y actualizados.
 - La capacidad de infraestructura disponible puede limitar el rendimiento y crecimiento inicial del sistema.
 - No se implementará una arquitectura basada en microservicios durante el piloto.

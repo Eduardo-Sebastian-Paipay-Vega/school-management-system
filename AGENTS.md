@@ -44,3 +44,17 @@ Cuando se solicite crear, estructurar o revisar un **SDD (Documento de Diseño d
      * `flutter test` (todos los tests pasando).
 3. **Identidad Visual:**
    * Utilizar exclusivamente los tokens de diseño de [`lib/core/theme/app_theme.dart`](lib/core/theme/app_theme.dart) (Verde botella institucional, Azul UNSCH y colores oficiales CNEB).
+
+---
+
+## 4. Política de Ramas Git (GitFlow Ligero)
+
+1. **`main` (Blindada / Producción):**
+   * Contiene únicamente código estable, probado y listo para sustentaciones, demos o despliegue.
+   * Prohibido hacer push directo a `main`. Solo recibe merges desde `dev` tras alcanzar hitos validados.
+2. **`dev` (Integración Continua):**
+   * Rama base de desarrollo donde convergen los módulos de los 5 squads.
+   * Todos los Pull Requests de features se abren hacia `dev`.
+3. **`feature/squad-[X]-[nombre-funcionalidad]` (Desarrollo por Squad):**
+   * Ramas de trabajo individuales para cada desarrollador/squad (ej. `feature/squad-1-jwt-auth`, `feature/squad-2-kiosco-qr`).
+

@@ -198,6 +198,38 @@ flutter run -d chrome
 
 ---
 
+## 🌿 Estrategia de Ramas Git (GitFlow Ligero)
+
+Para coordinar el trabajo paralelo de los **5 Squads Técnicos** sin generar conflictos ni romper la estabilidad del sistema, seguimos la siguiente política de ramas:
+
+| Rama | Propósito | Regla de Oro |
+|---|---|---|
+| **`main`** | **Producción / Hitos Oficiales** | Solo código 100% probado y estable. Es la versión para sustentaciones y despliegue. **Prohibido push directo.** |
+| **`dev`** | **Integración Continua** | Punto de encuentro de los 5 squads. Todos los desarrollos se integran aquí antes de pasar a `main`. |
+| **`feature/squad-[X]-[nombre]`** | **Nuevas Funcionalidades** | Ramas temporales creadas desde `dev` para cada requerimiento funcional (RF). |
+
+### Flujo de Trabajo para Desarrolladores
+
+```bash
+# 1. Asegurarse de estar en 'dev' y tener lo último
+git checkout dev
+git pull origin dev
+
+# 2. Crear una rama para tu funcionalidad (ejemplo Squad 2)
+git checkout -b feature/squad-2-kiosco-qr
+
+# 3. Desarrollar, probar y commitear cambios
+git add .
+git commit -m "feat(squad-2): implementar lectura de qr para kiosco (RF-22)"
+
+# 4. Subir la rama a GitHub
+git push -u origin feature/squad-2-kiosco-qr
+
+# 5. Abrir un Pull Request (PR) en GitHub con destino hacia la rama 'dev'
+```
+
+---
+
 ## 🧪 Pruebas de Calidad y Verificación (QA)
 
 Antes de realizar cualquier commit o pull request, el código debe pasar limpiamente:

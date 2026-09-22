@@ -1,96 +1,54 @@
-# SQUAD 3: Evaluación Pedagógica, Planilla Rápida y Motor CNEB
+# Arquitectura Técnica: Planilla Matricial Modo Excel y Motor CNEB
 
-**Responsable Técnico:** Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`)  
-**Rol:** Sub Líder / UX & Real-Time Engine Specialist  
-**Rama Git Principal:** `feature/squad-3/gradebook-excel`  
-**Total de Requisitos:** **11 Requisitos Funcionales** *(Núcleo de Innovación y Máxima Usabilidad Docente)*  
-
----
+**Squad:** Squad 3 - Calificaciones y Modo Excel  
+**Líder Técnico:** Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`)  
+**Rama de Desarrollo:** `feature/squad-3/gradebook-excel`  
+**Requisitos Asociados:** [`Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/`](../../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/README.md) (`RF-36` al `RF-46`)  
 
 ---
 
-## 📁 Documentación y Alcance Técnico del Squad
+## 1. Patrones de Diseño y Decisiones Arquitectónicas (ADRs)
 
-1. 📄 **[Catálogo de Requisitos Funcionales del Squad](../../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/README.md)**: Especificación individual de los 11 Requisitos Funcionales asignados (ubicados en `Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/`).
-2. 🛠️ **[Diseño Técnico de Software](Diseno%20Tecnico/README.md)**: Arquitectura técnica interna, modelo de datos relacional (PostgreSQL), endpoints API REST, WebSockets y diseño de componentes Flutter.
-
-## 1. Módulos y Requisitos Asignados
-
-### Módulo 8: Calificaciones en Tiempo Real, Modo Excel, Auto-Guardado y Conversión CNEB (`RF-36` al `RF-46`)
-* `RF-36`: Configuración de Criterios y Rúbricas de Evaluación por Competencias y Capacidades curriculares.
-* `RF-37`: Registro de Calificaciones en Tiempo Real con cálculo inmediato de promedios ponderados y visuales de aprobación.
-* `RF-38` *(Innovación 4)*: **Planilla Rápida de Notas ("Modo Excel"):** Componente matricial de alta eficiencia en Flutter con navegación completa por teclado (flechas arriba/abajo/izquierda/derecha, tecla Tab para siguiente casilla, Enter para confirmar), edición inline ultra-ágil y pegado matricial masivo (Ctrl+V) desde Microsoft Excel o Google Sheets.
-* `RF-39` *(Innovación 5)*: **Asistente de Conclusiones Descriptivas CNEB/MINEDU:** Banco taxonómico estructurado de retroalimentaciones pedagógicas contextualmente sugeridas según el nivel de logro del estudiante (AD, A, B o C), con posibilidad de personalización docente en 1 clic.
-* `RF-40`: Soporte y Supervisión de Notas Registradas por Practicantes EPIS (requiere visto bueno o validación del docente titular).
-* `RF-41`: Ponderación y Cálculo Automatizado de Promedios Bimestrales / Trimestrales según fórmula configurada.
-* `RF-42`: Bloqueo y Cierre Formal de Periodo Académico (congelamiento de notas que impide modificaciones sin autorización de dirección).
-* `RF-43`: Consulta en Tiempo Real de Calificaciones para Estudiantes y Padres de Familia desde el portal/app.
-* `RF-44`: Historial de Modificaciones de Calificaciones (registro de docente, valor anterior, valor nuevo, motivo y fecha/hora).
-* `RF-45` *(Innovación 6)*: **Llenado Asistido con Auto-Guardado en Segundo Plano:** Persistencia transparente con temporizador `debounce` de 400 ms, sin botones de "Guardar" que interrumpan al docente, indicador visual de sincronización en tiempo real ("Guardando..." / "Guardado en la nube") y prevención de pérdidas ante cierres accidentales.
-* `RF-46` *(Innovación 7)*: **Motor de Conversión Dual Escala Vigesimal (0-20) a CNEB (AD, A, B, C):** Transformación algorítmica automatizada de valores numéricos a la escala cualitativa oficial del Ministerio de Educación, con almacenamiento dual en base de datos para preservar la precisión analítica y cumplir con el formato oficial del SIAGIE.
+1. **Componente Matricial Optimizado ("Modo Excel"):**
+   * Grid reactivo virtualizado en Flutter que renderiza únicamente las celdas visibles en pantalla.
+   * Manejador de focos customizado (`FocusNode`) que intercepta teclas de dirección (flechas), Tab y Enter para desplazamiento bidireccional instantáneo sin retrasos de renderizado.
+2. **Parser de Portapapeles para Pegado Masivo (Ctrl+V):**
+   * Intercepta la combinación de teclas en Flutter, extrae el texto del portapapeles del sistema operativo, parsea la matriz separada por tabulaciones (`\t`) y saltos de línea (`\n`), y mapea los valores masivamente sobre las filas de alumnos.
+3. **Auto-Guardado en Segundo Plano con Debounce (400 ms):**
+   * Cada digitación inicia un temporizador de 400 ms. Si el docente continúa digitando, el timer se reinicia.
+   * Al detenerse, emite una petición HTTP PATCH por lotes con bloqueo optimista (`version_lock`), cambiando el icono superior a verde: *"Guardado en la nube"*.
+4. **Motor de Conversión Dual Escala Vigesimal a Literal CNEB:**
+   * Persistencia dual en base de datos: columna numérica `nota_vigesimal` (NUMERIC(4,2)) para cálculos estadísticos y columna textual `nota_literal` (VARCHAR(2)) oficial MINEDU (AD, A, B, C).
 
 ---
 
-## 2. Arquitectura de la Planilla Rápida y Auto-Guardado Concurrente
+## 2. Diagrama de Secuencia: Auto-Guardado y Pegado Masivo
 
 ```mermaid
 sequenceDiagram
-    participant Docente as Teclado / Pantalla Docente
-    participant MatrixGrid as Componente Flutter (Modo Excel)
-    participant Debounce as Debounce Controller (400 ms)
-    participant Backend as GradesController / ConversionEngine
+    participant Docente as Teclado / Ctrl+V
+    participant Grid as ExcelGradebookGrid (Flutter)
+    participant Debounce as RxDebounce (400 ms)
+    participant Backend as GradesController (API)
+    participant Motor as CNEB Conversion Engine
     participant DB as PostgreSQL (calificaciones)
 
-    Docente->>MatrixGrid: Ingresa "16" y presiona Flecha Abajo o Enter
-    MatrixGrid->>MatrixGrid: Cálculo local inmediato de promedio en memoria
-    MatrixGrid->>MatrixGrid: Motor local asigna preview cualitativo "A"
-    MatrixGrid->>Debounce: Dispara evento onChange(estudiante_id, evaluacion_id, 16)
+    Docente->>Grid: Pega columna de 35 celdas (Ctrl+V)
+    Grid->>Grid: Parsea TSV y asigna a las 35 filas en memoria
+    Grid->>Grid: Recalcula promedios ponderados locales al instante
+    Grid->>Debounce: Dispara evento onBatchChanged(35 celdas)
     
-    Note over Debounce: Espera 400 ms sin nuevas pulsaciones
-    Debounce->>Backend: PATCH /grades/batch-save (optimistic lock, version: 3)
-    Backend->>Backend: Ejecuta Motor de Conversión: 16 -> Literal 'A'
-    Backend->>DB: UPDATE calificaciones SET vigesimal=16, literal='A', version=4
-    Backend-->>MatrixGrid: HTTP 200 OK { status: 'SAVED', new_version: 4 }
-    MatrixGrid-->>Docente: Icono cambia a verde ✓ "Guardado en la nube"
+    Note over Debounce: Espera 400 ms sin pulsaciones
+    Debounce->>Backend: PATCH /api/v1/grades/batch-save { items: [...] }
+    Backend->>Motor: Transforma cada vigesimal a CNEB (ej: 18 -> 'AD', 13 -> 'B')
+    Backend->>DB: Batch UPDATE con optimistic lock
+    DB-->>Backend: Registros actualizados
+    Backend-->>Grid: 200 OK { status: 'SAVED', newVersion: 4 }
+    Grid-->>Docente: Indicador visual verde: ✓ Guardado en la nube
 ```
 
 ---
 
-## 3. Modelo de Datos a Implementar (PostgreSQL)
-
-Tablas principales a estructurar en las migraciones:
-1. `evaluaciones` (`id`, `carga_docente_id`, `periodo_id`, `nombre`, `peso`, `fecha`, `cerrada`)
-2. `criterios_rubricas` (`id`, `evaluacion_id`, `descripcion`, `peso_porcentual`)
-3. `calificaciones` (`id`, `matricula_id`, `evaluacion_id`, `nota_vigesimal` NUMERIC(4,2), `nota_literal` VARCHAR(2), `version_lock` INT, `updated_at`, `updated_by`)
-4. `conclusiones_descriptivas` (`id`, `matricula_id`, `curso_id`, `periodo_id`, `texto_conclusion`, `es_sugerida_banco`)
-5. `banco_conclusiones_cneb` (`id`, `competencia_id`, `nivel_logro` ENUM('AD','A','B','C'), `texto_plantilla`)
-6. `historial_cambios_notas` (`id`, `calificacion_id`, `nota_antigua`, `nota_nueva`, `justificacion`, `autorizado_por`, `created_at`)
-
----
-
-## 4. Endpoints y Contratos API a Desarrollar
-
-* `GET  /api/v1/grades/matrix` (params: `cargaDocenteId`, `periodoId` -> devuelve matriz de estudiantes x evaluaciones)
-* `PATCH /api/v1/grades/batch-save` (body: array de `{ calificacionId, matriculaId, evaluacionId, nota, versionLock }`)
-* `POST /api/v1/grades/convert-scale` (validador y conversor vigesimal <-> CNEB)
-* `GET  /api/v1/cneb/conclusions-bank` (params: `competenciaId`, `nivelLogro` -> devuelve banco sugerido)
-* `POST /api/v1/grades/periods/:id/lock` (cierre formal de periodo con bloqueo de edición)
-* `GET  /api/v1/grades/student/:matriculaId/report` (vista de calificaciones para alumnos/apoderados)
-
----
-
-## 5. Componentes y Vistas Frontend (Flutter)
-
-* `lib/features/gradebook_excel/presentation/pages/excel_gradebook_screen.dart` (Planilla matricial completa con cabeceras de columnas congeladas y columna de estudiantes fija).
-* `lib/features/gradebook_excel/presentation/widgets/keyboard_accessible_cell.dart` (Celda con focus node personalizado para navegación por flechas de dirección, Tab y Enter).
-* `lib/features/gradebook_excel/presentation/widgets/clipboard_paste_handler.dart` (Parser de texto tabulado TSV/CSV para pegar rangos de celdas desde Excel).
-* `lib/features/gradebook_excel/presentation/widgets/conclusions_assistant_modal.dart` (Selector inteligente de frases CNEB clasificadas por nivel AD, A, B, C con inserción directa).
-* `lib/features/gradebook_excel/presentation/widgets/save_status_indicator.dart` (Indicador animado de estado de sincronización en la barra superior).
-
----
-
-## 6. Criterios de Aceptación (Definition of Done)
-1. Un docente puede llenar las notas de 35 estudiantes usando **exclusivamente el teclado** sin tocar el mouse.
-2. Al pegar una columna de 30 celdas copiadas de Excel (Ctrl+C / Ctrl+V), el componente las distribuye en las filas correctas y las guarda en segundo plano.
-3. El motor de conversión dual almacena con precisión tanto el número decimal como la letra correspondiente del MINEDU.
-4. Una vez cerrada el acta bimestral, las celdas se bloquean visualmente y el backend rechaza cualquier modificación.
+## 3. Artefactos Técnicos en este Directorio
+* 📄 **[esquema_datos.sql](esquema_datos.sql)**: DDL de evaluaciones, criterios de rúbricas, calificaciones duales y conclusiones descriptivas.
+* 📄 **[contratos_api.md](contratos_api.md)**: Endpoints de guardado por lotes, matriz de notas y banco taxonómico CNEB.

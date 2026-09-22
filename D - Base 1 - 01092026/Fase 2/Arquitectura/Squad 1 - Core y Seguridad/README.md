@@ -1,101 +1,89 @@
-# SQUAD 1: Core, Seguridad, Configuración Escolar y Auditoría
+# Arquitectura Técnica: Core, Seguridad, Multi-Tenant y Auditoría
 
-**Responsable Técnico:** Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`)  
-**Rol:** Backend & Database Lead / Security Engineer  
-**Rama Git Principal:** `feature/squad-1/auth-core`  
-**Total de Requisitos:** **18 Requisitos Funcionales**  
-
----
+**Squad:** Squad 1 - Core y Seguridad  
+**Líder Técnico:** Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`)  
+**Rama de Desarrollo:** `feature/squad-1/auth-core`  
+**Requisitos Asociados:** [`Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/`](../../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/README.md) (`RF-01` al `RF-14`, `RF-65` al `RF-68`)  
 
 ---
 
-## 📁 Documentación y Alcance Técnico del Squad
+## 1. Patrones de Diseño y Decisiones Arquitectónicas (ADRs)
 
-1. 📄 **[Catálogo de Requisitos Funcionales del Squad](../../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/README.md)**: Especificación individual de los 18 Requisitos Funcionales asignados (ubicados en `Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/`).
-2. 🛠️ **[Diseño Técnico de Software](Diseno%20Tecnico/README.md)**: Arquitectura técnica interna, modelo de datos relacional (PostgreSQL), endpoints API REST, WebSockets y diseño de componentes Flutter.
-
-## 1. Módulos y Requisitos Asignados
-
-### Módulo 1: Acceso, Autenticación JWT y RBAC (`RF-01` al `RF-04`)
-* `RF-01`: Inicio de Sesión Centralizado con JWT (Access Token 15 min + Refresh Token 7 días en HttpOnly Cookie).
-* `RF-02`: Control de Acceso Basado en Roles (RBAC) con 5 perfiles: SuperAdmin, Directivo, Docente, Estudiante/Apoderado, Portería/Auxiliar.
-* `RF-03`: Recuperación Segura de Contraseñas mediante token temporal firmado de un solo uso (vigencia 30 min).
-* `RF-04`: Cierre de Sesión Seguro y Revocación Activa de Tokens en lista negra (Redis Token Blacklist).
-
-### Módulo 2: Administración de Usuarios y Directorio Institucional (`RF-05` al `RF-09`)
-* `RF-05`: Gestión Integral de Usuarios (Alta, Baja lógica, Edición, Asignación de Roles y Sedes).
-* `RF-06`: Importación Masiva de Docentes, Personal y Estudiantes desde archivos Excel (.xlsx / .csv) con validación previa de duplicados y DNI.
-* `RF-07`: Gestión de Sedes y Planteles Escolares bajo esquema Multi-Tenant (aislamiento lógico por `tenant_id`).
-* `RF-08`: Directorio Escolar y Búsqueda Rápida con autocompletado y filtros por rol, nivel, grado y estado.
-* `RF-09`: Perfil de Usuario y Cambio Autónomo de Credenciales y Preferencias de Notificación.
-
-### Módulo 3: Configuración Escolar, Periodos y Escalas (`RF-10` al `RF-14`)
-* `RF-10`: Configuración del Año Lectivo Oficial y Calendario Escolar (fechas de inicio, término y recesos).
-* `RF-11`: Parametrización de Periodos Académicos (Bimestres / Trimestres) con fechas de apertura y cierre estricto de actas.
-* `RF-12`: Configuración de Turnos, Niveles (Inicial, Primaria, Secundaria) y Horarios de Ingreso/Salida con tolerancia de tardanzas.
-* `RF-13`: Definición de Escalas de Calificación Institucional (Dual: Vigesimal 0-20 y Cualitativa CNEB AD, A, B, C).
-* `RF-14`: Parámetros Globales del Sistema (Logo del colegio, lema oficial, datos del director para cabeceras de boletas).
-
-### Módulo 12: Trazabilidad, Auditoría Inmutable y Ley N.° 29733 (`RF-65` al `RF-68`)
-* `RF-65`: Registro Inmutable de Auditoría en Base de Datos (captura de `usuario_id`, `accion`, `tabla`, `registro_id`, `ip_origen`, `user_agent`, `payload_before`, `payload_after`, `timestamp`).
-* `RF-66`: Visor Directivo de Logs de Auditoría con filtros por fecha, usuario, módulo y tipo de acción con exportación en PDF no modificable.
-* `RF-67`: Cumplimiento de la Ley de Protección de Datos Personales (Ley N.° 29733): Encriptación en reposo de datos sensibles de menores (bcrypt para contraseñas, enmascaramiento de teléfonos y direcciones).
-* `RF-68`: Políticas de Retención, Respaldo Automatizado Diario y Bloqueo de Modificaciones a Registros Históricos cerrados.
+1. **Autenticación Dual-Token JWT (Access + Refresh):**
+   * *Access Token:* 15 minutos de vida útil, firmado con HMAC-SHA256, transportado en cabecera `Authorization: Bearer <token>`.
+   * *Refresh Token:* 7 días de vida útil, almacenado exclusivamente en una cookie `HttpOnly`, `Secure`, `SameSite=Strict` para mitigar ataques XSS y robo de tokens.
+2. **Revocación Activa de Sesiones con Redis Token Blacklist:**
+   * Al cerrar sesión o detectar anomalías, el JTI (JWT ID) se inserta en Redis con TTL igual al tiempo remanente del token, rechazando peticiones futuras en menos de 2 ms.
+3. **Aislamiento Multi-Tenant (Segregación Lógica):**
+   * Todas las entidades maestras y transaccionales incluyen la clave discriminadora `tenant_id` (asociada a la sede institucional).
+   * Un interceptor en el backend inyecta automáticamente la condición `WHERE tenant_id = :current_tenant` en todas las consultas del ORM.
+4. **Auditoría Inmutable (Ley N.° 29733):**
+   * Tabla `logs_auditoria` con reglas a nivel de motor PostgreSQL que revoca privilegios de `UPDATE` y `DELETE` para cualquier usuario, incluso el de la aplicación.
+   * Registro diferencial del payload (`before` y `after` en columnas `JSONB`).
 
 ---
 
-## 2. Arquitectura Técnica del Squad
+## 2. Diagrama de Componentes C4 (Seguridad y Core)
 
 ```mermaid
 graph TD
-    Client["Flutter Client (Web / Mobile)"] -->|POST /auth/login| Gateway["API Gateway / Middleware"]
-    Gateway -->|Valida IP / Rate Limit| RateLimit[(Redis Cache)]
-    Gateway -->|Verifica Token| JWT["JWT Guard + RBAC"]
-    JWT -->|Autorizado| Ctrl["AuthController / UsersController / AuditController"]
-    Ctrl -->|Transacción ACID| PG[(PostgreSQL: usuarios, roles, sedes, audit_logs)]
-    Ctrl -->|Escribe Log Inmutable| AuditLog["AuditInterceptor Middleware"]
-    AuditLog --> PG
+    Client["Flutter Client (Web / Desktop / Mobile)"] -->|HTTPS / REST| Nginx["Nginx Reverse Proxy + SSL"]
+    Nginx -->|Proxy Pass| RateLimiter["Rate Limiting Middleware (Redis)"]
+    RateLimiter -->|Valida IP / Conexiones| AuthMiddleware["Auth Interceptor (JWT Guard)"]
+    AuthMiddleware -->|Verifica Blacklist| Redis[(Redis: Session & Blacklist)]
+    AuthMiddleware -->|Valida Rol / Permiso| RBAC["RBAC Policy Enforcement"]
+    RBAC -->|Autorizado| Controllers["AuthController / UsersController / AdminController"]
+    Controllers --> Services["Domain Services (Bcrypt, TokenGenerator)"]
+    Services --> Repositories["PostgreSQL Repositories"]
+    Repositories --> DB[(PostgreSQL 16/18 Multi-Tenant)]
+    Controllers -.->|Captura Mutación| AuditInterceptor["Audit Trail Middleware"]
+    AuditInterceptor -->|INSERT INMUTABLE| DB
 ```
 
 ---
 
-## 3. Modelo de Datos a Implementar (PostgreSQL)
+## 3. Diagrama de Secuencia: Flujo de Autenticación y Rotación de Token
 
-Tablas principales a estructurar en las migraciones:
-1. `instituciones` (`id`, `nombre`, `codigo_modular`, `activo`, `created_at`)
-2. `usuarios` (`id`, `tenant_id`, `username`, `email`, `password_hash`, `dni`, `nombres`, `apellidos`, `telefono`, `estado`, `created_at`)
-3. `roles` (`id`, `codigo`, `nombre_legible`, `descripcion`)
-4. `usuario_roles` (`usuario_id`, `rol_id`)
-5. `anios_lectivos` (`id`, `tenant_id`, `anio`, `fecha_inicio`, `fecha_fin`, `estado_abierto`)
-6. `periodos_academicos` (`id`, `anio_lectivo_id`, `numero_periodo`, `tipo_periodo`, `fecha_inicio`, `fecha_fin`, `cerrado`)
-7. `logs_auditoria` (`id`, `tenant_id`, `usuario_id`, `accion`, `modulo`, `ip_address`, `detalles_json`, `created_at`)
+```mermaid
+sequenceDiagram
+    participant C as Flutter Client (Dio Interceptor)
+    participant G as API Gateway (JWT Middleware)
+    participant R as Redis (Token Blacklist)
+    participant B as Auth Service
+    participant DB as PostgreSQL (usuarios)
 
----
+    C->>G: POST /api/v1/auth/login { username, password }
+    G->>B: Ejecuta autenticación
+    B->>DB: SELECT * FROM usuarios WHERE username = ? AND tenant_id = ?
+    DB-->>B: Usuario encontrado + password_hash (bcrypt)
+    B->>B: Compara hash con bcrypt (cost factor 12)
+    B->>B: Genera Access Token (15 min) + Refresh Token (7 días)
+    B-->>C: 200 OK + Body { accessToken, user } + Set-Cookie: refreshToken (HttpOnly)
 
-## 4. Endpoints y Contratos API a Desarrollar
+    Note over C,G: Petición protegida posterior
+    C->>G: GET /api/v1/users (Authorization: Bearer <accessToken>)
+    G->>R: EXISTS blacklist:<jti>
+    R-->>G: 0 (No revocado)
+    G-->>C: 200 OK (Datos)
 
-* `POST /api/v1/auth/login` (body: `{ username, password }` -> returns `{ user, accessToken }` + set HttpOnly Cookie `refreshToken`)
-* `POST /api/v1/auth/refresh-token` (lee cookie -> retorna nuevo `accessToken`)
-* `POST /api/v1/auth/logout` (invalida token en Redis)
-* `GET  /api/v1/users` (filtros: `rol`, `estado`, `query`, paginación)
-* `POST /api/v1/users/import-excel` (subida multipart/form-data con procesamiento streaming)
-* `GET  /api/v1/academic-years/current` (retorna configuración activa del año y periodos)
-* `GET  /api/v1/audit/logs` (solo rol Directivo/SuperAdmin, paginado y exportable)
-
----
-
-## 5. Componentes y Vistas Frontend (Flutter)
-
-* `lib/features/auth/presentation/pages/login_page.dart` (Diseño limpio, validación reactiva, feedback de credenciales erróneas).
-* `lib/features/admin_config/presentation/pages/users_list_page.dart` (Tabla paginada con acciones rápidas, filtros por rol y botón de importación Excel).
-* `lib/features/admin_config/presentation/widgets/user_form_modal.dart` (Modal de creación/edición con asignación de roles y sedes).
-* `lib/features/admin_config/presentation/pages/academic_calendar_page.dart` (Configuración visual de bimestres y fechas de bloqueo).
-* `lib/features/admin_config/presentation/pages/audit_log_viewer_page.dart` (Visor forense de cambios con timeline y visor de payload JSON).
+    Note over C,G: Cuando el Access Token expira (HTTP 401)
+    C->>G: POST /api/v1/auth/refresh-token (con Cookie HttpOnly)
+    G->>B: Valida Refresh Token y emite nuevo par
+    B-->>C: 200 OK + nuevo accessToken
+```
 
 ---
 
-## 6. Criterios de Aceptación (Definition of Done)
-1. Autenticación con contraseñas cifradas en `bcrypt` (cost factor 10+) y tokens JWT expirables.
-2. Cada endpoint del sistema valida el rol del usuario mediante guardias RBAC antes de ejecutar cualquier lógica.
-3. Toda acción destructiva o modificación de notas/asistencias dispara automáticamente un registro en `logs_auditoria`.
-4. El importador de Excel rechaza registros con DNI inválido y muestra un resumen amigable de filas insertadas/fallidas.
+## 4. Arquitectura de Estado en Frontend (Flutter)
+
+* **Gestión de Estado:** `flutter_bloc` / BLoC Pattern.
+* **Módulos:**
+  * `lib/features/auth/domain/bloc/auth_bloc.dart`: Estados (`AuthInitial`, `AuthLoading`, `Authenticated`, `Unauthenticated`, `AuthError`).
+  * `lib/core/network/auth_interceptor.dart`: Interceptor de `Dio` que intercepta respuestas `401 Unauthorized`, pausa las peticiones en cola, llama al endpoint de refresh y reintenta la petición fallida sin intervención del usuario.
+  * `lib/core/storage/secure_storage_service.dart`: Encapsulamiento de `flutter_secure_storage` para el Access Token en memoria cifrada.
+
+---
+
+## 5. Artefactos Técnicos en este Directorio
+* 📄 **[esquema_datos.sql](esquema_datos.sql)**: Definición DDL formal de tablas, tipos ENUM, índices B-Tree y triggers de auditoría inmutable.
+* 📄 **[contratos_api.md](contratos_api.md)**: Especificación formal de endpoints REST, esquemas de DTO JSON y códigos de estado HTTP.

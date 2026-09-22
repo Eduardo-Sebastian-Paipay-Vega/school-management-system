@@ -1,84 +1,41 @@
-# SQUAD 4: Inteligencia de Datos, Mapas de Calor y Dashboards 360°
+# Arquitectura Técnica: Mapas de Calor Jerárquicos y Dashboards 360°
 
-**Responsable Técnico:** Grissel Arascely Rodríguez Quispe (`@Arascely`)  
-**Rol:** Frontend & Data Visualization Lead / UX Specialist  
-**Rama Git Principal:** `feature/squad-4/heatmaps-dashboards`  
-**Total de Requisitos:** **12 Requisitos Funcionales** *(Núcleo Analítico y Acreditación Universitaria)*  
-
----
+**Squad:** Squad 4 - Analitica y Dashboards  
+**Líder Técnico:** Grissel Arascely Rodríguez Quispe (`@Arascely`)  
+**Rama de Desarrollo:** `feature/squad-4/heatmaps-dashboards`  
+**Requisitos Asociados:** [`Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/`](../../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/README.md) (`RF-47` al `RF-58`)  
 
 ---
 
-## 📁 Documentación y Alcance Técnico del Squad
+## 1. Patrones de Diseño y Decisiones Arquitectónicas (ADRs)
 
-1. 📄 **[Catálogo de Requisitos Funcionales del Squad](../../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/README.md)**: Especificación individual de los 12 Requisitos Funcionales asignados (ubicados en `Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/`).
-2. 🛠️ **[Diseño Técnico de Software](Diseno%20Tecnico/README.md)**: Arquitectura técnica interna, modelo de datos relacional (PostgreSQL), endpoints API REST, WebSockets y diseño de componentes Flutter.
-
-## 1. Módulos y Requisitos Asignados
-
-### Módulo 9: Mapas de Calor con Navegación Drill-Down (`RF-47` al `RF-51`)
-* `RF-47`: Mapa de Calor Institucional de Rendimiento Académico (distribución cromática de promedios por áreas y bimestres: verde = logro destacado, amarillo = regular, rojo = en riesgo).
-* `RF-48`: Mapa de Calor de Asistencia Escolar e Inasistencias (patrones visuales por días de la semana, meses y horarios).
-* `RF-49` *(Innovación 8)*: **Mapas de Calor con Navegación Jerárquica Drill-Down:** Interfaz interactiva donde el director o coordinador hace clic en un bloque de calor para profundizar progresivamente: Nivel Institucional ➔ Nivel Primaria/Secundaria ➔ Grado ➔ Sección específica ➔ Lista detallada de estudiantes en riesgo.
-* `RF-50`: Comparativa Visual de Rendimiento entre Secciones paralelas (análisis de varianza y homogeneidad pedagógica).
-* `RF-51`: Exportación de Gráficos y Mapas Térmicos en formatos vectoriales e imágenes de alta resolución (PNG, PDF) para informes de gestión.
-
-### Módulo 10: Dashboards, Ficha 360° del Alumno y Métricas SSU IS-480 (`RF-52` al `RF-58`)
-* `RF-52`: Dashboard Ejecutivo para la Dirección General (KPIs globales de matrícula, asistencia del día, morosidad documental y estado de cierres).
-* `RF-53`: Dashboard Operativo para Docentes (resumen de sesiones del día, cursos a cargo, actas pendientes de firma).
-* `RF-54`: Dashboard Estudiantil / Padres de Familia (avance de notas, récord de asistencia, avisos escolares).
-* `RF-55`: Alertas Automatizadas y Predictivas de Deserción Escolar (motor de detección por combinación de inasistencias reiteradas y caídas abruptas de notas).
-* `RF-56` *(Innovación 9)*: **Ficha Escolar Integral y Radiografía 360° del Estudiante:** Vista consolidada del alumno que integra en un solo clic su historial académico completo, gráfica de radar de competencias CNEB, récord histórico de asistencia/tardanzas, observaciones de conducta y antecedentes de tutoría.
-* `RF-57` *(Innovación 10)*: **Tablero de Seguimiento, Impacto y Acreditación del Servicio Social Universitario (SSU - IS-480):** Panel exclusivo para el Docente Tutor de la UNSCH y la Comisión Académica de la EPIS que muestra en tiempo real los indicadores de acreditación: tasa de adopción de la plataforma en el colegio (meta ≥ 80%), horas de trabajo administrativo ahorradas, actas digitales generadas y el registro cronológico del cumplimiento de las 96 horas de servicio de los 5 integrantes del equipo.
-* `RF-58`: Generador de Reportes de Diagnóstico Integral para Consejos Académicos y Reuniones de Padres de Familia.
+1. **Navegación Interactiva Drill-Down por Niveles Jerárquicos:**
+   * La visualización térmica no recarga la página; mediante un gestor de estados jerárquico navega:
+     * **Nivel 1 (Macro):** Todo el colegio (Inicial / Primaria / Secundaria).
+     * **Nivel 2 (Meso):** Grado escolar (comparativa de rendimiento entre secciones A, B, C).
+     * **Nivel 3 (Micro):** Sección (mapa de calor por estudiante vs áreas curriculares).
+     * **Nivel 4 (Individual):** Ficha 360° del Estudiante con gráfico de radar de competencias CNEB.
+2. **Vistas Materializadas de Alto Rendimiento en PostgreSQL:**
+   * Las agregaciones estadísticas de notas y ausentismo se precalculan en vistas materializadas (`vm_rendimiento_seccion`, `vm_asistencia_mensual`) que se refrescan concurrentemente (`REFRESH MATERIALIZED VIEW CONCURRENTLY`) cada 30 minutos o al cierre de periodo.
+3. **Algoritmo Predictivo de Detección de Abandono Escolar:**
+   * Factor de riesgo normalizado de 0 a 100:  
+     $$R = (0.55 \cdot \% 	ext{Inasistencias}) + (0.35 \cdot \% 	ext{Cursos Desaprobados}) + (0.10 \cdot 	ext{Tardanzas})$$
+   * Si $R \ge 60$, el estudiante se cataloga automáticamente en **"Riesgo Crítico"** y se notifica al tutor.
 
 ---
 
-## 2. Arquitectura de Navegación Drill-Down y Agregaciones
+## 2. Diagrama de Flujo de Navegación Drill-Down
 
 ```mermaid
-graph TD
-    A["Nivel 1: Plantel General (KPIs Globales)"] -->|Clic en Primaria| B["Nivel 2: Nivel Educativo (Inicial / Primaria / Secundaria)"]
-    B -->|Clic en 5to Grado| C["Nivel 3: Grado Escolar (Comparativa Secciones A, B, C)"]
-    C -->|Clic en Sección B| D["Nivel 4: Sección (Matriz de Calificaciones / Asistencia)"]
-    D -->|Clic en Alumno Crítico| E["Nivel 5: Ficha Escolar 360° del Estudiante (Radar + Kardex)"]
+graph LR
+    L1["1. Plantel General<br>(Resumen Global)"] -->|Click en Secundaria| L2["2. Nivel Secundaria<br>(1° a 5° Grado)"]
+    L2 -->|Click en 3er Grado| L3["3. Grado 3°<br>(Secciones A, B, C)"]
+    L3 -->|Click en Sección B| L4["4. Matriz Sección B<br>(Estudiantes x Cursos)"]
+    L4 -->|Click en Estudiante Crítico| L5["5. Ficha Escolar 360°<br>(Radar CNEB + Kardex)"]
 ```
 
 ---
 
-## 3. Modelo de Datos a Implementar (PostgreSQL)
-
-Vistas materializadas y consultas analíticas de alto rendimiento:
-1. `vm_rendimiento_seccion` (cálculo preagregado de notas promedio por curso, sección y periodo).
-2. `vm_asistencia_mensual` (porcentajes de asistencia, tardanzas y faltas agrupadas por grado/sección).
-3. `vm_alertas_desercion` (cálculo de índice de riesgo $R = 0.6 \cdot (\% \text{faltas}) + 0.4 \cdot (\text{cursos desaprobados})$).
-4. `metricas_impacto_ssu` (`id`, `integrante_equipo`, `horas_acumuladas`, `modulo_contribuido`, `fecha_registro`, `evidencia_url`).
-5. `kpis_adopcion_colegio` (`id`, `fecha`, `docentes_activos`, `alumnos_consultados`, `boletas_emitidas`, `porcentaje_adopcion`).
-
----
-
-## 4. Endpoints y Contratos API a Desarrollar
-
-* `GET  /api/v1/analytics/heatmaps/grades` (params: `level`, `yearId`, `periodId` -> matriz de calor)
-* `GET  /api/v1/analytics/heatmaps/drilldown` (params: `scope`, `targetId` -> datos del siguiente nivel jerárquico)
-* `GET  /api/v1/students/:id/profile-360` (retorna kardex histórico, gráfico de radar CNEB y alertas)
-* `GET  /api/v1/analytics/early-warning/dropouts` (lista de estudiantes con factor de riesgo > umbral)
-* `GET  /api/v1/ssu-impact/accreditation-dashboard` (panel institucional de cumplimiento de las 96 horas y meta ≥ 80%)
-
----
-
-## 5. Componentes y Vistas Frontend (Flutter)
-
-* `lib/features/analytics_heatmaps/presentation/pages/heatmap_screen.dart` (Visualizador cromático interactivo con paleta accesible para daltonismo y transiciones animadas entre niveles).
-* `lib/features/dashboards_360/presentation/pages/student_360_page.dart` (Ficha integral del estudiante con gráfico de radar de competencias de Flutter Charts).
-* `lib/features/dashboards_360/presentation/pages/early_warning_page.dart` (Bandeja de alerta temprana con tarjetas semafóricas de estudiantes en riesgo).
-* `lib/features/dashboards_360/presentation/pages/ssu_accreditation_dashboard_page.dart` (Tablero institucional para la UNSCH con velocímetros de adopción y barras de horas acumuladas).
-* `lib/features/dashboards_360/presentation/widgets/kpi_card_widget.dart` (Tarjetas ejecutivas de resumen para dirección).
-
----
-
-## 6. Criterios de Aceptación (Definition of Done)
-1. Los mapas de calor responden a la interacción del usuario sin congelar la pantalla, navegando entre niveles en menos de 300 ms.
-2. La Ficha 360° consolida en una sola pantalla todos los datos académicos y de conducta del estudiante.
-3. El sistema identifica automáticamente a cualquier estudiante que supere el 20% de inasistencias o tenga más de 2 cursos en rojo.
-4. El Tablero SSU refleja fielmente las horas de trabajo del equipo y calcula el porcentaje de adopción escolar.
+## 3. Artefactos Técnicos en este Directorio
+* 📄 **[esquema_datos.sql](esquema_datos.sql)**: Vistas materializadas analíticas y tablas de seguimiento del SSU IS-480.
+* 📄 **[contratos_api.md](contratos_api.md)**: Endpoints para datos de mapas de calor, Ficha 360° y tablero SSU.

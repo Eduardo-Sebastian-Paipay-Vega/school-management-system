@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import 'sdd_viewer_screen.dart';
 
 /// Pantalla Principal del Squad 1: Core, Seguridad y Auditoría
 /// Responsable: Brandon Fernando Montero Gutiérrez (@brandonmontero27-g)
@@ -29,11 +30,38 @@ class _Squad1ScreenState extends State<Squad1Screen> {
       appBar: AppBar(
         title: const Text('Squad 1: Core y Seguridad'),
         backgroundColor: const Color(0xFF2C3E50),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.menu_book),
+            tooltip: 'Ver SDD Oficial (IEEE 1016)',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SddViewerScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           _buildSquadHeader(),
+          const SizedBox(height: 12),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SddViewerScreen()),
+              );
+            },
+            icon: const Icon(Icons.description, color: Colors.amber),
+            label: const Text('📄 Ver Documento de Diseño de Software (SDD - IEEE 1016)'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1A252F),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+          ),
           const SizedBox(height: 16),
           _buildAuthCard(),
           const SizedBox(height: 16),

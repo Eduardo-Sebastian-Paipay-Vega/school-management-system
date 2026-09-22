@@ -4,9 +4,11 @@ Esta carpeta contiene la **documentación de arquitectura técnica de software, 
 
 ---
 
-## 📄 Documento Maestro de Arquitectura (SAD)
+## 📄 Documento Maestro de Arquitectura (SAD) y Estándar SDD
 * **[arquitectura_sistema.md](arquitectura_sistema.md)**:  
   Documento maestro de arquitectura (SAD), diagramas de contexto y contenedores C4, principios Offline-First, WebSockets y matriz global de asignación de responsabilidades.
+* 🛠️ **Skill y Plantilla de Diseño SDD (IEEE 1016):**  
+  Para redactar el **Software Design Document (SDD)** de cualquier squad, activar la skill [`.agents/skills/sdd-authoring/`](../../../.agents/skills/sdd-authoring/SKILL.md) o usar directamente la plantilla canónica [`.agents/skills/sdd-authoring/resources/plantilla_sdd.md`](../../../.agents/skills/sdd-authoring/resources/plantilla_sdd.md).
 
 ---
 

@@ -32,23 +32,23 @@ Reducir la brecha digital y modernizar los procesos administrativos de la instit
 
 ---
 
-## Funcionalidades y Módulos del Sistema (68 Requisitos)
+## Funcionalidades y Módulos del Sistema (71 Requisitos)
 
-El sistema integra **13 módulos funcionales** con un total de **68 requerimientos normativos formalizados**, incorporando **8 innovaciones institucionales de alto impacto**:
+El sistema integra **13 módulos funcionales** con un total de **71 requerimientos normativos formalizados**, incorporando capacidades de innovación operativa y pedagógica de alto impacto:
 
 1. 🔐 **Módulo 1: Acceso, Autenticación JWT y RBAC** (`RF-01` al `RF-04`)
 2. 👥 **Módulo 2: Administración de Usuarios y Directorio** (`RF-05` al `RF-09`)
 3. 🏫 **Módulo 3: Configuración Escolar, Periodos y Escalas** (`RF-10` al `RF-14`)
 4. 📚 **Módulo 4: Gestión Académica, Matrícula y Carga Lectiva** (`RF-15` al `RF-19`)
-5. ⏱️ **Módulo 5: Asistencia Estudiantil, Kiosco Offline-First y Carnés QR** (`RF-20` al `RF-26`) — *[Innovación 1 y 2]*
-6. 🎓 **Módulo 6: Asistencia y Cómputo de Horas de Practicantes** (`RF-27` al `RF-30`)
-7. 👨‍🏫 **Módulo 7: Horas de Docentes Contratados y Reprogramación** (`RF-31` al `RF-34`)
-8. 📊 **Módulo 8: Calificaciones en Tiempo Real, Modo Excel y Conclusiones** (`RF-35` al `RF-43`) — *[Innovación 3 y 4]*
-9. 🗺️ **Módulo 9: Mapas de Calor con Navegación Drill-Down** (`RF-44` al `RF-48`) — *[Innovación 5]*
-10. 📈 **Módulo 10: Dashboards, Ficha 360° del Alumno y Métricas SSU IS-480** (`RF-49` al `RF-55`) — *[Innovación 6 y 8]*
-11. 📑 **Módulo 11: Emisión de Reportes y Verificación Criptográfica QR** (`RF-56` al `RF-61`) — *[Innovación 7]*
-12. 🛡️ **Módulo 12: Trazabilidad, Auditoría y Protección de Datos (Ley 29733)** (`RF-62` al `RF-65`)
-13. 🌐 **Módulo 13: Plataforma de Difusión Digital y Portal Institucional** (`RF-66` al `RF-68`)
+5. ⏱️ **Módulo 5: Asistencia Estudiantil, Kiosco Offline-First, App Rápida y Carnés QR** (`RF-20` al `RF-27`) — *[Innovación 1, 2 y 3]*
+6. 🎓 **Módulo 6: Asistencia y Cómputo de Horas de Practicantes** (`RF-28` al `RF-31`)
+7. 👨‍🏫 **Módulo 7: Horas de Docentes Contratados y Reprogramación** (`RF-32` al `RF-35`)
+8. 📊 **Módulo 8: Calificaciones en Tiempo Real, Modo Excel, Auto-Guardado y Conversión CNEB** (`RF-36` al `RF-46`) — *[Innovación 4, 5, 6 y 7]*
+9. 🗺️ **Módulo 9: Mapas de Calor con Navegación Drill-Down** (`RF-47` al `RF-51`) — *[Innovación 8]*
+10. 📈 **Módulo 10: Dashboards, Ficha 360° del Alumno y Métricas SSU IS-480** (`RF-52` al `RF-58`) — *[Innovación 9 y 10]*
+11. 📑 **Módulo 11: Emisión de Reportes y Verificación Criptográfica QR** (`RF-59` al `RF-64`) — *[Innovación 11]*
+12. 🛡️ **Módulo 12: Trazabilidad, Auditoría y Protección de Datos (Ley 29733)** (`RF-65` al `RF-68`)
+13. 🌐 **Módulo 13: Plataforma de Difusión Digital y Portal Institucional** (`RF-69` al `RF-71`)
 
 ---
 
@@ -58,12 +58,15 @@ El sistema integra **13 módulos funcionales** con un total de **68 requerimient
 |:---:|---|:---:|---|
 | 1 | **Kiosco de Portería Offline-First** | Módulo 5 (`RF-25`) | Registro de ingreso de alumnos sin caídas ante cortes de internet (buffer local IndexedDB con sync automática). |
 | 2 | **Emisión de Carnés Escolares con QR** | Módulo 5 (`RF-26`) | Carnés imprimibles en PDF A4 con código QR institucional de lectura instantánea. |
-| 3 | **Planilla Rápida de Notas (Modo Excel)** | Módulo 8 (`RF-42`) | Interfaz ultra-rápida con flechas de teclado, Tab, Enter y pegado matricial masivo desde hojas de cálculo. |
-| 4 | **Asistente de Conclusiones CNEB/MINEDU** | Módulo 8 (`RF-43`) | Banco taxonómico de retroalimentación pedagógica contextual según nivel de logro (AD, A, B, C). |
-| 5 | **Mapas de Calor con Navegación Drill-Down** | Módulo 9 (`RF-48`) | Análisis jerárquico interactivo por clics (Plantel -> Nivel -> Grado -> Sección -> Estudiante). |
-| 6 | **Ficha Escolar Integral 360° del Estudiante** | Módulo 10 (`RF-54`) | Perfil unificado con kardex de notas, asistencia, inasistencias y alertas tempranas en un solo clic. |
-| 7 | **Verificación Documental Criptográfica SHA-256 + QR** | Módulo 11 (`RF-61`) | Boletas y reportes inalterables verificables desde cualquier celular sin inicio de sesión. |
-| 8 | **Dashboard de Impacto Social SSU IS-480** | Módulo 10 (`RF-55`) | Monitoreo de KPIs de brecha digital, adopción y horas de servicio social universitario. |
+| 3 | **Toma Rápida de Asistencia Móvil (WebSockets)** | Módulo 5 (`RF-27`) | Marcación táctil ágil en aula en 1 toque con difusión en tiempo real a dirección (< 500 ms). |
+| 4 | **Planilla Rápida de Notas (Modo Excel)** | Módulo 8 (`RF-38`) | Interfaz ultra-rápida con flechas de teclado, Tab, Enter y pegado matricial masivo desde hojas de cálculo. |
+| 5 | **Asistente de Conclusiones CNEB/MINEDU** | Módulo 8 (`RF-39`) | Banco taxonómico de retroalimentación pedagógica contextual según nivel de logro (AD, A, B, C). |
+| 6 | **Auto-Guardado Conectado en Segundo Plano** | Módulo 8 (`RF-45`) | Registro transparente con debounce de 400 ms, sin bloqueos de pantalla ni pérdida de datos. |
+| 7 | **Motor de Conversión Dual (0-20 a Literal CNEB)**| Módulo 8 (`RF-46`) | Conversión automática de notas vigesimales a letras (AD, A, B, C) oficial MINEDU con persistencia dual. |
+| 8 | **Mapas de Calor con Navegación Drill-Down** | Módulo 9 (`RF-49`) | Análisis jerárquico interactivo por clics (Plantel -> Nivel -> Grado -> Sección -> Estudiante). |
+| 9 | **Ficha Escolar Integral 360° del Estudiante** | Módulo 10 (`RF-56`) | Perfil unificado con kardex de notas, asistencia, inasistencias y alertas tempranas en un solo clic. |
+| 10 | **Dashboard de Impacto Social SSU IS-480** | Módulo 10 (`RF-57`) | Monitoreo de KPIs de brecha digital, adopción y horas de servicio social universitario. |
+| 11 | **Verificación Documental Criptográfica SHA-256 + QR** | Módulo 11 (`RF-60`) | Boletas y reportes inalterables verificables desde cualquier celular sin inicio de sesión. |
 
 ---
 
@@ -251,8 +254,8 @@ El proyecto se ejecuta en **4 fases** utilizando metodologías ágiles (Scrum):
 | Fase / Artefacto | Descripción | Enlace |
 |---|---|---|
 | **Plan de Trabajo** | Programación completa de 16 semanas con artefactos, KPIs y entregables SSU. | [plan_trabajo.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/plan_trabajo.md) |
-| **Fase 1: Requerimientos de Usuario** | Especificación no técnica de necesidades para los 68 requerimientos y 13 módulos. | [requerimientos_funcionales.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%201/Requerimientos/requerimientos_funcionales.md) |
-| **Fase 2: Catálogo Documental IEEE 830** | Especificación formal y normativa de requisitos (`RF-01` al `RF-68`) con flujos y aceptación. | [requisitos_funcionales.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) |
+| **Fase 1: Requerimientos de Usuario** | Especificación no técnica de necesidades para los 71 requerimientos y 13 módulos. | [requerimientos_funcionales.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%201/Requerimientos/requerimientos_funcionales.md) |
+| **Fase 2: Catálogo Documental IEEE 830** | Especificación formal y normativa de requisitos (`RF-01` al `RF-71`) con flujos y aceptación. | [requisitos_funcionales.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) |
 | **Fase 2: SRS Técnico de Arquitectura** | Contratos de API REST, controladores Flutter, consultas PostgreSQL, Redis y WebSockets. | [requisitos_funcionales_tecnicos.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md) |
 | **Manuales de Usuario y Admin** | Guías de operación para personal docente, portería y dirección. | Programado para Semana 12 |
 

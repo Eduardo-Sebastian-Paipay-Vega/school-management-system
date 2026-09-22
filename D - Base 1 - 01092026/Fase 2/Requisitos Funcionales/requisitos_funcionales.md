@@ -19,7 +19,7 @@ El catálogo integra formalmente los **módulos de innovación operativa, pedag�
 
 ---
 
-## 2. TABLA MAESTRA Y LISTA ESTRUCTURADA DE REQUISITOS FUNCIONALES (68 RF)
+## 2. TABLA MAESTRA Y LISTA ESTRUCTURADA DE REQUISITOS FUNCIONALES (71 RF)
 
 | ID | Denominación Oficial del Requisito Funcional | Módulo de Trabajo | Actor Principal | Prioridad |
 |:---:|---|---|---|:---:|
@@ -49,48 +49,51 @@ El catálogo integra formalmente los **módulos de innovación operativa, pedag�
 | **RF-24** | Detección y Generación de Alertas por Ausentismo Crónico | M5: Asistencia Estudiantil | Coordinación Académica / Tutores | Esencial |
 | **RF-25** | Kiosco de Portería Resiliente con Modo Desconectado (Offline-First) | M5: Asistencia Estudiantil | Personal de Vigilancia / Portería | Esencial |
 | **RF-26** | Generación y Emisión Masiva de Carnés Escolares con Código QR/Barras| M5: Asistencia Estudiantil | Secretaría Académica / Dirección | Deseable |
-| **RF-27** | Registro Diario de Jornada y Permanencia de Practicantes | M6: Practicantes | Practicantes de Educación | Esencial |
-| **RF-28** | Cómputo Acumulado de Horas Efectivas de Prácticas Universitarias | M6: Practicantes | Practicantes / Coordinación / EPIS | Esencial |
-| **RF-29** | Conformidad y Validación Periódica de Horas por el Docente Tutor | M6: Practicantes | Docentes Tutores / Coordinación | Esencial |
-| **RF-30** | Emisión de Fichas Oficiales de Prácticas para la UNSCH | M6: Practicantes | Coordinación Académica / Practicantes| Deseable |
-| **RF-31** | Registro y Marcación de Horas Lectivas de Docentes Contratados | M7: Docentes Contratados | Docentes Contratados / Coordinación | Esencial |
-| **RF-32** | Registro de Justificaciones y Reprogramación de Clases Docentes | M7: Docentes Contratados | Docentes Contratados / Coordinación | Deseable |
-| **RF-33** | Consolidación Mensual de Cumplimiento de Horas Lectivas Dictadas | M7: Docentes Contratados | Coordinación / Secretaría / Dirección | Esencial |
-| **RF-34** | Supervisión y Monitoreo de Cobertura y Puntualidad de Clases | M7: Docentes Contratados | Coordinación Académica | Deseable |
-| **RF-35** | Parametrización de Rúbricas y Evaluaciones por Asignatura | M8: Calificaciones | Docentes Titulares del Curso | Esencial |
-| **RF-36** | Ingreso, Edición y Publicación de Calificaciones en Tiempo Real | M8: Calificaciones | Docentes Titulares del Curso | Esencial |
-| **RF-37** | Planilla Ágil de Notas en Modo Matriz Rápida ("Modo Excel / Teclado")| M8: Calificaciones | Docentes Titulares y Contratados | Esencial |
-| **RF-38** | Asistente de Conclusiones Descriptivas Sugeridas por Logro (MINEDU) | M8: Calificaciones | Docentes Titulares del Curso | Deseable |
-| **RF-39** | Colaboración Supervisada de Practicantes en el Registro de Notas | M8: Calificaciones | Practicantes / Docentes Tutores | Deseable |
-| **RF-40** | Cálculo Automatizado de Promedios Parciales, Bimestrales y Finales | M8: Calificaciones | Sistema / Coordinación Académica | Esencial |
-| **RF-41** | Cierre Oficial de Periodo Académico y Bloqueo de Modificación | M8: Calificaciones | Coordinación / Dirección General | Esencial |
-| **RF-42** | Flujo Extraordinario de Solicitud y Aprobación de Rectificación | M8: Calificaciones | Docentes / Coordinación / Dirección | Deseable |
-| **RF-43** | Consulta Inmediata y Transparente de Calificaciones para Estudiantes | M8: Calificaciones | Estudiantes del Plantel | Esencial |
-| **RF-44** | Generación de Mapa de Calor de Rendimiento Académico por Sección | M9: Mapas de Calor | Dirección / Coordinación / Docentes | Esencial |
-| **RF-45** | Generación de Mapa de Calor de Asistencia y Puntualidad | M9: Mapas de Calor | Dirección / Coordinación / Auxiliares | Esencial |
-| **RF-46** | Mapas de Calor Interactivos con Navegación a Detalle (Drill-Down) | M9: Mapas de Calor | Coordinación Académica / Dirección | Esencial |
-| **RF-47** | Análisis Gráfico Comparativo de Rendimiento entre Secciones | M9: Mapas de Calor | Coordinación Académica / Dirección | Deseable |
-| **RF-48** | Detección Visual de Asignaturas con Mayor Índice de Riesgo | M9: Mapas de Calor | Dirección General / Coordinación | Deseable |
-| **RF-49** | Tablero de Control Ejecutivo de Indicadores Clave para Dirección | M10: Monitoreo y Dashboards | Dirección General | Esencial |
-| **RF-50** | Tablero de Control Curricular y Cumplimiento para Coordinación | M10: Monitoreo y Dashboards | Coordinación Académica | Esencial |
-| **RF-51** | Tablero de Resumen Pedagógico y Clases Diarias para el Docente | M10: Monitoreo y Dashboards | Docentes Nombrados y Contratados | Esencial |
-| **RF-52** | Tablero de Resumen de Situación Escolar para el Estudiante | M10: Monitoreo y Dashboards | Estudiantes del Plantel | Esencial |
-| **RF-53** | Ficha Integral y Radiografía Escolar 360° del Estudiante en 1 Clic | M10: Monitoreo y Dashboards | Dirección / Coordinación / Tutores | Esencial |
-| **RF-54** | Tablero de Seguimiento, Impacto y Acreditación del SSU (IS-480) | M10: Monitoreo y Dashboards | Tutor SSU - UNSCH / Líder Proyecto | Esencial |
-| **RF-55** | Generación Automatizada de Alertas de Deserción y Repitencia | M10: Monitoreo y Dashboards | Coordinación Académica / Tutores | Esencial |
-| **RF-56** | Emisión Oficial de Boletas de Información Escolar / Libretas en PDF | M11: Reportes Oficiales | Secretaría / Docentes / Alumnos | Esencial |
-| **RF-57** | Verificación Pública Criptográfica de Documentos con Código QR | M11: Reportes Oficiales | Comunidad / Entidades Externas | Esencial |
-| **RF-58** | Generación del Cuadro de Mérito y Puestos de Honor Institucionales | M11: Reportes Oficiales | Dirección General / Coordinación | Deseable |
-| **RF-59** | Emisión y Descarga del Registro Auxiliar Oficial y Actas Finales | M11: Reportes Oficiales | Docentes / Secretaría Académica | Esencial |
-| **RF-60** | Reportes Consolidados de Asistencia Multiactor del Plantel | M11: Reportes Oficiales | Dirección / Coordinación / Secretaría | Deseable |
-| **RF-61** | Exportación de Datos en Formatos Estándar Abiertos (PDF y Excel) | M11: Reportes Oficiales | Toda la comunidad autorizada | Esencial |
-| **RF-62** | Registro Inmutable de Auditoría de Accesos y Eventos de Seguridad | M12: Auditoría y Seguridad | Administrador TI / Dirección | Esencial |
-| **RF-63** | Trazabilidad Histórica de Modificaciones en Notas y Asistencias | M12: Auditoría y Seguridad | Administrador TI / Dirección / Coord. | Esencial |
-| **RF-64** | Módulo de Búsqueda y Monitoreo de Bitácoras de Auditoría | M12: Auditoría y Seguridad | Administrador TI / Dirección | Deseable |
-| **RF-65** | Cumplimiento y Protección de Datos Personales (Ley N.° 29733) | M12: Auditoría y Seguridad | Toda la comunidad escolar | Esencial |
-| **RF-66** | Cartelera Digital y Publicación de Comunicados Institucionales | M13: Difusión Digital | Dirección / Toda la comunidad | Deseable |
-| **RF-67** | Publicación y Consulta del Calendario Cívico y Escolar Interactivo | M13: Difusión Digital | Toda la comunidad escolar | Deseable |
-| **RF-68** | Portal Informativo Institucional y Normas de Convivencia Escolar | M13: Difusión Digital | Toda la comunidad y público general | Opcional |
+| **RF-27** | Toma Rápida en App Móvil y Difusión en Tiempo Real (WebSockets) | M5: Asistencia Estudiantil | Docentes / Auxiliares / Dirección | Esencial |
+| **RF-28** | Registro Diario de Jornada y Permanencia de Practicantes | M6: Practicantes | Practicantes de Educación | Esencial |
+| **RF-29** | Cómputo Acumulado de Horas Efectivas de Prácticas Universitarias | M6: Practicantes | Practicantes / Coordinación / EPIS | Esencial |
+| **RF-30** | Conformidad y Validación Periódica de Horas por el Docente Tutor | M6: Practicantes | Docentes Tutores / Coordinación | Esencial |
+| **RF-31** | Emisión de Fichas Oficiales de Prácticas para la UNSCH | M6: Practicantes | Coordinación Académica / Practicantes| Deseable |
+| **RF-32** | Registro y Marcación de Horas Lectivas de Docentes Contratados | M7: Docentes Contratados | Docentes Contratados / Coordinación | Esencial |
+| **RF-33** | Registro de Justificaciones y Reprogramación de Clases Docentes | M7: Docentes Contratados | Docentes Contratados / Coordinación | Deseable |
+| **RF-34** | Consolidación Mensual de Cumplimiento de Horas Lectivas Dictadas | M7: Docentes Contratados | Coordinación / Secretaría / Dirección | Esencial |
+| **RF-35** | Supervisión y Monitoreo de Cobertura y Puntualidad de Clases | M7: Docentes Contratados | Coordinación Académica | Deseable |
+| **RF-36** | Parametrización de Rúbricas y Evaluaciones por Asignatura | M8: Calificaciones | Docentes Titulares del Curso | Esencial |
+| **RF-37** | Ingreso, Edición y Publicación de Calificaciones en Tiempo Real | M8: Calificaciones | Docentes Titulares del Curso | Esencial |
+| **RF-38** | Planilla Ágil de Notas en Modo Matriz Rápida ("Modo Excel / Teclado")| M8: Calificaciones | Docentes Titulares y Contratados | Esencial |
+| **RF-39** | Asistente de Conclusiones Descriptivas Sugeridas por Logro (MINEDU) | M8: Calificaciones | Docentes Titulares del Curso | Deseable |
+| **RF-40** | Colaboración Supervisada de Practicantes en el Registro de Notas | M8: Calificaciones | Practicantes / Docentes Tutores | Deseable |
+| **RF-41** | Cálculo Automatizado de Promedios Parciales, Bimestrales y Finales | M8: Calificaciones | Sistema / Coordinación Académica | Esencial |
+| **RF-42** | Cierre Oficial de Periodo Académico y Bloqueo de Modificación | M8: Calificaciones | Coordinación / Dirección General | Esencial |
+| **RF-43** | Flujo Extraordinario de Solicitud y Aprobación de Rectificación | M8: Calificaciones | Docentes / Coordinación / Dirección | Deseable |
+| **RF-44** | Consulta Inmediata y Transparente de Calificaciones para Estudiantes | M8: Calificaciones | Estudiantes del Plantel | Esencial |
+| **RF-45** | Llenado Asistido con Auto-Guardado y Conexión Automática | M8: Calificaciones | Docentes / Coordinación | Esencial |
+| **RF-46** | Motor de Conversión Escala Vigesimal (0-20) a Literal CNEB (AD, A, B, C) | M8: Calificaciones | Docentes / Dirección / Coordinación | Esencial |
+| **RF-47** | Generación de Mapa de Calor de Rendimiento Académico por Sección | M9: Mapas de Calor | Dirección / Coordinación / Docentes | Esencial |
+| **RF-48** | Generación de Mapa de Calor de Asistencia y Puntualidad | M9: Mapas de Calor | Dirección / Coordinación / Auxiliares | Esencial |
+| **RF-49** | Mapas de Calor Interactivos con Navegación a Detalle (Drill-Down) | M9: Mapas de Calor | Coordinación Académica / Dirección | Esencial |
+| **RF-50** | Análisis Gráfico Comparativo de Rendimiento entre Secciones | M9: Mapas de Calor | Coordinación Académica / Dirección | Deseable |
+| **RF-51** | Detección Visual de Asignaturas con Mayor Índice de Riesgo | M9: Mapas de Calor | Dirección General / Coordinación | Deseable |
+| **RF-52** | Tablero de Control Ejecutivo de Indicadores Clave para Dirección | M10: Monitoreo y Dashboards | Dirección General | Esencial |
+| **RF-53** | Tablero de Control Curricular y Cumplimiento para Coordinación | M10: Monitoreo y Dashboards | Coordinación Académica | Esencial |
+| **RF-54** | Tablero de Resumen Pedagógico y Clases Diarias para el Docente | M10: Monitoreo y Dashboards | Docentes Nombrados y Contratados | Esencial |
+| **RF-55** | Tablero de Resumen de Situación Escolar para el Estudiante | M10: Monitoreo y Dashboards | Estudiantes del Plantel | Esencial |
+| **RF-56** | Ficha Integral y Radiografía Escolar 360° del Estudiante en 1 Clic | M10: Monitoreo y Dashboards | Dirección / Coordinación / Tutores | Esencial |
+| **RF-57** | Tablero de Seguimiento, Impacto y Acreditación del SSU (IS-480) | M10: Monitoreo y Dashboards | Tutor SSU - UNSCH / Líder Proyecto | Esencial |
+| **RF-58** | Generación Automatizada de Alertas de Deserción y Repitencia | M10: Monitoreo y Dashboards | Coordinación Académica / Tutores | Esencial |
+| **RF-59** | Emisión Oficial de Boletas de Información Escolar / Libretas en PDF | M11: Reportes Oficiales | Secretaría / Docentes / Alumnos | Esencial |
+| **RF-60** | Verificación Pública Criptográfica de Documentos con Código QR | M11: Reportes Oficiales | Comunidad / Entidades Externas | Esencial |
+| **RF-61** | Generación del Cuadro de Mérito y Puestos de Honor Institucionales | M11: Reportes Oficiales | Dirección General / Coordinación | Deseable |
+| **RF-62** | Emisión y Descarga del Registro Auxiliar Oficial y Actas Finales | M11: Reportes Oficiales | Docentes / Secretaría Académica | Esencial |
+| **RF-63** | Reportes Consolidados de Asistencia Multiactor del Plantel | M11: Reportes Oficiales | Dirección / Coordinación / Secretaría | Deseable |
+| **RF-64** | Exportación de Datos en Formatos Estándar Abiertos (PDF y Excel) | M11: Reportes Oficiales | Toda la comunidad autorizada | Esencial |
+| **RF-65** | Registro Inmutable de Auditoría de Accesos y Eventos de Seguridad | M12: Auditoría y Seguridad | Administrador TI / Dirección | Esencial |
+| **RF-66** | Trazabilidad Histórica de Modificaciones en Notas y Asistencias | M12: Auditoría y Seguridad | Administrador TI / Dirección / Coord. | Esencial |
+| **RF-67** | Módulo de Búsqueda y Monitoreo de Bitácoras de Auditoría | M12: Auditoría y Seguridad | Administrador TI / Dirección | Deseable |
+| **RF-68** | Cumplimiento y Protección de Datos Personales (Ley N.° 29733) | M12: Auditoría y Seguridad | Toda la comunidad escolar | Esencial |
+| **RF-69** | Cartelera Digital y Publicación de Comunicados Institucionales | M13: Difusión Digital | Dirección / Toda la comunidad | Deseable |
+| **RF-70** | Publicación y Consulta del Calendario Cívico y Escolar Interactivo | M13: Difusión Digital | Toda la comunidad escolar | Deseable |
+| **RF-71** | Portal Informativo Institucional y Normas de Convivencia Escolar | M13: Difusión Digital | Toda la comunidad y público general | Opcional |
 
 ---
 
@@ -133,13 +136,29 @@ AMPLIACIÓN MÓDULO 5: CONTROL DE ASISTENCIA Y PORTERÍA INTELIGENTE
 
 ---
 
+### RF-27: Toma Rápida de Asistencia en Aula mediante Aplicación Móvil/Web y Difusión en Tiempo Real vía WebSockets
+- **Enunciado Normativo:** El sistema deberá proporcionar una interfaz de usuario optimizada para teléfonos móviles y tabletas que permita a los docentes y auxiliares pasar lista en el aula mediante toques táctiles ultra-rápidos (*"Fast-Tap"*), alternando el estado de cada estudiante (*Presente* $\rightarrow$ *Tardanza* $\rightarrow$ *Falta Injustificada*) con retroalimentación inmediata, y emitiendo los cambios al servidor en tiempo real. El sistema deberá difundir dichos eventos vía WebSockets / SSE a los tableros de supervisión de Dirección y Coordinación en un tiempo no mayor a 500 ms, permitiendo monitorear en vivo la asistencia de todo el plantel sin recargar pantallas.
+- **Precondiciones:** Docente autenticado desde dispositivo móvil o navegador de aula con sesión activa.
+- **Entradas:** Toques táctiles en la tarjeta del estudiante o escaneo con cámara móvil.
+- **Proceso / Comportamiento:**
+  1. La interfaz despliega la nómina del aula con estado por defecto "Todos Presentes".
+  2. El docente toca sobre los estudiantes que registran inasistencia o tardanza.
+  3. Al pulsar "Confirmar Asistencia", el cliente envía el paquete al endpoint `POST /api/v1/attendance/classroom/live-batch`.
+  4. El servidor persiste la transacción y emite un broadcast por el canal WebSocket `institution:{tenant_id}:attendance`.
+  5. Los tableros directivos reciben el payload y actualizan instantáneamente los medidores de puntualidad y ausentismo del turno.
+- **Salidas:** Pantalla de confirmación háptica en móvil y actualización en vivo en tableros directivos.
+- **Postcondiciones:** Asistencia consolidada en base de datos central y visible para todos los roles autorizados en tiempo real.
+- **Criterio de Aceptación:** Registro completo de un aula de 35 estudiantes en menos de 15 segundos y propagación del evento a la Dirección en menos de 500 ms.
+
+---
+
 ```
 ========================================================================================
 AMPLIACIÓN MÓDULO 8: CALIFICACIONES DE ALTA VELOCIDAD Y ASISTENCIA PEDAGÓGICA
 ========================================================================================
 ```
 
-### RF-37: Planilla Ágil de Notas en Modo Matriz Rápida ("Modo Hoja de Cálculo / Excel")
+### RF-38: Planilla Ágil de Notas en Modo Matriz Rápida ("Modo Hoja de Cálculo / Excel")
 - **Enunciado Normativo:** El sistema deberá proporcionar a los docentes una interfaz de ingreso de calificaciones optimizada para digitación rápida con el teclado físico, permitiendo desplazarse entre celdas mediante las teclas de dirección (flechas ↑, ↓, ←, →), avanzar al siguiente alumno con la tecla *Enter*, autoguardar cambios al perder el foco y admitir la operación de pegado masivo desde el portapapeles (copiar una columna de notas desde Excel y pegarla directamente en la planilla web).
 - **Precondiciones:** Docente autenticado en la planilla de calificaciones de su curso asignado.
 - **Entradas:** Calificaciones numéricas o cualitativas digitadas con teclado o pegadas desde el portapapeles del sistema operativo (`Ctrl + V`).
@@ -154,7 +173,7 @@ AMPLIACIÓN MÓDULO 8: CALIFICACIONES DE ALTA VELOCIDAD Y ASISTENCIA PEDAGÓGICA
 
 ---
 
-### RF-38: Asistente de Conclusiones Descriptivas Sugeridas por Nivel de Logro (MINEDU)
+### RF-39: Asistente de Conclusiones Descriptivas Sugeridas por Nivel de Logro (MINEDU)
 - **Enunciado Normativo:** El sistema deberá integrar un catálogo pedagógico de conclusiones descriptivas estándar sugeridas para la evaluación formativa y cualitativa (escala literal AD, A, B, C), permitiendo al docente seleccionar con un solo clic una frase pedagógica contextualizada a la competencia curricular evaluada y editarla o personalizarla para el estudiante según corresponda.
 - **Precondiciones:** Curso con escala cualitativa y competencias parametrizadas.
 - **Entradas:** Selección del nivel de logro del alumno (ejemplo: "B - En Proceso") y clic en "Sugerir Conclusión Descriptiva".
@@ -168,13 +187,48 @@ AMPLIACIÓN MÓDULO 8: CALIFICACIONES DE ALTA VELOCIDAD Y ASISTENCIA PEDAGÓGICA
 
 ---
 
+### RF-45: Asistencia Conectada de Llenado Eficiente con Auto-Guardado en Segundo Plano y Sincronización Automática de Evaluaciones
+- **Enunciado Normativo:** El sistema deberá incorporar un motor reactivo de asistencia de llenado que guarde automáticamente las notas en segundo plano (debounce de 400 ms) tras cada edición del docente, prescindiendo del clic repetitivo en botones manuales de guardado y evitando la pérdida accidental de datos por cortes de fluido eléctrico o desconexión fortuita. Asimismo, el sistema deberá mantener conectadas las evaluaciones parciales, tareas y rúbricas con las competencias oficiales, jalando y consolidando de manera automática el promedio de periodo en cascada en tiempo real.
+- **Precondiciones:** Docente autenticado con planilla de evaluación abierta.
+- **Entradas:** Modificación de cualquier celda de evaluación o rúbrica.
+- **Proceso / Comportamiento:**
+  1. El sistema detecta el cambio en la celda y activa un temporizador de debounce (400 ms).
+  2. Al cesar el tipeo, envía silenciosamente un requerimiento PATCH al backend (`/api/v1/grades/auto-save`).
+  3. Muestra un indicador sutil de estado (spinner $\rightarrow$ check verde "Guardado").
+  4. El backend computa en cascada los promedios ponderados de la competencia curricular y actualiza las columnas consolidadas automáticamente.
+- **Salidas:** Celda confirmada, indicador de auto-guardado en verde y promedios consolidados recalculados.
+- **Postcondiciones:** Información persistida íntegramente en base de datos relacional y cero pérdida de notas ante cierres de ventana.
+- **Criterio de Aceptación:** Guardado asíncrono comprobado en menos de 300 ms sin interrupción de la digitación del docente.
+
+---
+
+### RF-46: Motor de Conversión y Escala Dual Automatizada de Calificaciones Numéricas (0 a 20) a Escala Cualitativa Literal CNEB (AD, A, B, C)
+- **Enunciado Normativo:** El sistema deberá integrar un motor de conversión automática que permita a los docentes digitar o importar notas en la escala vigesimal tradicional (de 0 a 20 puntos) o puntajes de rúbricas, y el sistema automáticamente jalará, calculará y transformará el valor ingresado a la escala cualitativa oficial exigida por el Currículo Nacional de la Educación Básica (CNEB - MINEDU):
+  - **AD (Logro Destacado):** 18 a 20 puntos.
+  - **A (Logro Esperado):** 14 a 17 puntos.
+  - **B (En Proceso):** 11 a 13 puntos.
+  - **C (En Inicio):** 00 a 10 puntos.
+  El sistema deberá desplegar una visualización en **"Escala Dual"**, exhibiendo de manera simultánea la cifra numérica y la letra oficial asignada con su respectivo color distintivo (AD azul, A verde, B amarillo, C rojo). El sistema permitirá la entrada tanto en números (con autoconversión a letras) como directamente en letras (validando los niveles permitidos), y permitirá a la Coordinación Académica personalizar los umbrales de corte por nivel educativo.
+- **Precondiciones:** Periodo académico activo y escala dual configurada en la institución.
+- **Entradas:** Digitación de un valor numérico entre 0 y 20 o pegado de columnas de notas vigesimales.
+- **Proceso / Comportamiento:**
+  1. El docente ingresa un puntaje numérico (ejemplo: `15`).
+  2. El motor de equivalencias evalúa los umbrales paramétricos y asigna de inmediato el valor cualitativo `A`.
+  3. La celda muestra en pantalla la letra `A` con fondo verde claro y una pequeña etiqueta indicando `(15)`.
+  4. El sistema almacena ambos valores en la base de datos: el valor numérico para análisis estadístico interno y el valor literal para actas y boletas oficiales del MINEDU.
+- **Salidas:** Calificación asentada en escala cualitativa con respaldo cuantitativo.
+- **Postcondiciones:** Generación de boletas oficiales en letras sin que el docente tenga que realizar conversiones manuales.
+- **Criterio de Aceptación:** Conversión 100% precisa e instantánea sin retrasos en la interfaz y correspondencia exacta con las directivas del CNEB.
+
+---
+
 ```
 ========================================================================================
 AMPLIACIÓN MÓDULO 9: MAPAS DE CALOR ANALÍTICOS Y PROFUNDIZACIÓN PEDAGÓGICA
 ========================================================================================
 ```
 
-### RF-46: Mapas de Calor Interactivos con Navegación a Detalle (Drill-Down)
+### RF-49: Mapas de Calor Interactivos con Navegación a Detalle (Drill-Down)
 - **Enunciado Normativo:** El sistema deberá permitir a los directivos y coordinadores académicos realizar una navegación analítica a profundidad (*Drill-Down*) sobre los mapas de calor, de modo que al hacer clic en cualquier celda o indicador de alerta roja/amarilla (área crítica), el sistema despliegue una vista lateral o modal que desglosa el rendimiento por competencias específicas, evaluaciones parciales reprobadas y el historial de asistencia del alumno o sección analizada.
 - **Precondiciones:** Mapa de calor de rendimiento o asistencia generado en pantalla.
 - **Entradas:** Clic del usuario sobre una celda o asignatura en el mapa de calor.
@@ -194,7 +248,7 @@ AMPLIACIÓN MÓDULO 10: RADIOGRAFÍA 360° Y TABLERO DE IMPACTO SSU (IS-480)
 ========================================================================================
 ```
 
-### RF-53: Ficha Integral y Radiografía Escolar 360° del Estudiante en 1 Clic
+### RF-56: Ficha Integral y Radiografía Escolar 360° del Estudiante en 1 Clic
 - **Enunciado Normativo:** El sistema deberá proporcionar a la Dirección General, Coordinación Académica y Tutores una vista unificada denominada "Ficha 360° del Estudiante", que consolide en una única pantalla de alta legibilidad toda la información crítica del menor: fotografía y contacto, gráfico evolutivo de notas a lo largo de los bimestres, semáforo de asistencia y puntualidad del mes, mini mapa de calor de sus competencias y el listado de alertas de riesgo activas.
 - **Precondiciones:** Estudiante matriculado con registros en el año escolar vigente.
 - **Entradas:** Selección de un estudiante desde cualquier listado o búsqueda rápida por DNI/apellidos.
@@ -208,7 +262,7 @@ AMPLIACIÓN MÓDULO 10: RADIOGRAFÍA 360° Y TABLERO DE IMPACTO SSU (IS-480)
 
 ---
 
-### RF-54: Tablero de Seguimiento, Impacto y Acreditación del Servicio Social Universitario (SSU - IS-480)
+### RF-57: Tablero de Seguimiento, Impacto y Acreditación del Servicio Social Universitario (SSU - IS-480)
 - **Enunciado Normativo:** El sistema deberá incorporar un módulo de seguimiento institucional orientado a la supervisión del Servicio Social Universitario para el Docente Tutor de la UNSCH y la Comisión Académica de la EPIS, mostrando en tiempo real los indicadores de impacto y cumplimiento del proyecto: porcentaje de adopción de la plataforma en el colegio (meta ≥ 80%), horas de trabajo administrativo ahorradas, actas digitales generadas y el registro cronológico del cumplimiento de las 96 horas de servicio de los 5 integrantes del equipo ejecutor.
 - **Precondiciones:** Proyecto en ejecución en el semestre 2026-II.
 - **Entradas:** Acceso al módulo "Métricas SSU IS-480" mediante credenciales de supervisión universitaria.
@@ -228,7 +282,7 @@ AMPLIACIÓN MÓDULO 11: SEGURIDAD Y VERIFICACIÓN DOCUMENTAL CRIPTOGRÁFICA
 ========================================================================================
 ```
 
-### RF-57: Verificación Pública Criptográfica de Documentos Escolares mediante Código QR
+### RF-60: Verificación Pública Criptográfica de Documentos Escolares mediante Código QR
 - **Enunciado Normativo:** El sistema deberá incrustar en el pie de página de todas las Boletas de Calificaciones, Certificados y Constancias Oficiales de Notas emitidas en PDF un código QR único vinculado a un sello de firma criptográfica (hash SHA-256 inmutable), de tal modo que cualquier usuario externo o institución pueda escanear el papel impreso con la cámara de su teléfono móvil y verificar en una página pública del colegio si el documento es auténtico y coincide exactamente con las calificaciones oficiales registradas en el sistema.
 - **Precondiciones:** Documento oficial generado y registrado en el repositorio institucional.
 - **Entradas:** Escaneo del código QR impreso en la boleta desde cualquier dispositivo móvil con navegador web.
@@ -243,7 +297,7 @@ AMPLIACIÓN MÓDULO 11: SEGURIDAD Y VERIFICACIÓN DOCUMENTAL CRIPTOGRÁFICA
 
 ---
 
-## 4. MATRIZ DE TRAZABILIDAD DOCUMENTAL EXPANDIDA (RF-01 AL RF-68)
+## 4. MATRIZ DE TRAZABILIDAD DOCUMENTAL EXPANDIDA (RF-01 AL RF-71)
 
 | ID Fase II | Nombre Oficial del Requisito Funcional | Módulo | Actor Primario | Prioridad | Carácter de Innovación |
 |:---:|---|:---:|---|:---:|:---:|
@@ -254,21 +308,25 @@ AMPLIACIÓN MÓDULO 11: SEGURIDAD Y VERIFICACIÓN DOCUMENTAL CRIPTOGRÁFICA
 | `RF-20` a `RF-24` | Control de Asistencia Diaria y Alertas | M5 | Docentes / Coordinación | Esencial | Seguimiento Escolar |
 | **`RF-25`** | **Kiosco de Portería Resiliente Offline-First** | **M5** | **Portería ("Wachiman")** | **Esencial** | **Innovación Operativa** |
 | **`RF-26`** | **Generación Masiva de Carnés Escolares QR** | **M5** | **Secretaría / Portería** | **Deseable** | **Digitalización Física** |
-| `RF-27` a `RF-30` | Asistencia y Fichas de Practicantes | M6 | Practicantes / EPIS | Esencial | Convenio UNSCH |
-| `RF-31` a `RF-34` | Asistencia y Cumplimiento Docente Contratado| M7 | Docentes Contratados | Esencial | Sustento Laboral |
-| `RF-35` a `RF-36` | Rúbricas y Registro en Tiempo Real | M8 | Docentes Titulares | Esencial | Flujo en Vivo |
-| **`RF-37`** | **Planilla Rápida de Notas ("Modo Excel")** | **M8** | **Docentes del Plantel** | **Esencial** | **Alta Usabilidad UX** |
-| **`RF-38`** | **Asistente de Conclusiones Descriptivas** | **M8** | **Docentes Titulares** | **Deseable** | **Eficiencia Pedagógica** |
-| `RF-39` a `RF-43` | Practicantes, Promedios, Cierre y Consulta | M8 | Docentes / Alumnos | Esencial | Control de Notas |
-| `RF-44` a `RF-45` | Mapas de Calor de Rendimiento y Asistencia | M9 | Dirección / Coordinación | Esencial | Analítica Visual |
-| **`RF-46`** | **Mapas de Calor con Navegación Drill-Down** | **M9** | **Coordinación / Dirección**| **Esencial** | **Diagnóstico Profundo** |
-| `RF-47` a `RF-48` | Comparativas entre Secciones y Riesgo | M9 | Dirección General | Deseable | Macro-Diagnóstico |
-| `RF-49` a `RF-52` | Dashboards para Directivos, Docentes y Alumnos | M10 | Todos los estamentos | Esencial | Monitoreo Operativo |
-| **`RF-53`** | **Ficha Integral y Radiografía Escolar 360°** | **M10** | **Tutores / Directivos** | **Esencial** | **Visión Holística** |
-| **`RF-54`** | **Tablero de Impacto y Acreditación SSU** | **M10** | **Tutor SSU / Comisión** | **Esencial** | **Acreditación IS-480** |
-| `RF-55` | Alertas Automatizadas de Deserción Escolar | M10 | Coordinación / Tutores | Esencial | Prevención Temprana |
-| `RF-56` | Boletas de Calificaciones Oficiales PDF | M11 | Secretaría / Alumnos | Esencial | Documento Oficial |
-| **`RF-57`** | **Verificación Pública Criptográfica QR** | **M11** | **Público / Entidades** | **Esencial** | **Anti-Falsificación** |
-| `RF-58` a `RF-61` | Cuadro de Mérito, Actas y Exportación Excel | M11 | Secretaría / Dirección | Esencial | Gestión Documental |
-| `RF-62` a `RF-65` | Auditoría Inmutable y Ley N.° 29733 | M12 | Administrador / Legal | Esencial | Seguridad Jurídica |
-| `RF-66` a `RF-68` | Cartelera, Calendario Cívico y Portal Web | M13 | Toda la comunidad | Deseable | Difusión Digital |
+| **`RF-27`** | **Toma Rápida en App Móvil y Difusión en Tiempo Real** | **M5** | **Docentes / Auxiliares / Dirección** | **Esencial** | **Tiempo Real / WebSockets** |
+| `RF-28` a `RF-31` | Asistencia y Fichas de Practicantes | M6 | Practicantes / EPIS | Esencial | Convenio UNSCH |
+| `RF-32` a `RF-35` | Asistencia y Cumplimiento Docente Contratado| M7 | Docentes Contratados | Esencial | Sustento Laboral |
+| `RF-36` a `RF-37` | Rúbricas y Registro en Tiempo Real | M8 | Docentes Titulares | Esencial | Flujo en Vivo |
+| **`RF-38`** | **Planilla Rápida de Notas ("Modo Excel")** | **M8** | **Docentes del Plantel** | **Esencial** | **Alta Usabilidad UX** |
+| **`RF-39`** | **Asistente de Conclusiones Descriptivas** | **M8** | **Docentes Titulares** | **Deseable** | **Eficiencia Pedagógica** |
+| `RF-40` a `RF-44` | Practicantes, Promedios, Cierre y Consulta | M8 | Docentes / Alumnos | Esencial | Control de Notas |
+| **`RF-45`** | **Llenado Asistido con Auto-Guardado y Conexión Automática** | **M8** | **Docentes / Coordinación** | **Esencial** | **Productividad y Conexión** |
+| **`RF-46`** | **Motor Conversión Escala Vigesimal (0-20) a CNEB (AD, A, B, C)** | **M8** | **Docentes / Dirección** | **Esencial** | **Escala Dual Automatizada** |
+| `RF-47` a `RF-48` | Mapas de Calor de Rendimiento y Asistencia | M9 | Dirección / Coordinación | Esencial | Analítica Visual |
+| **`RF-49`** | **Mapas de Calor con Navegación Drill-Down** | **M9** | **Coordinación / Dirección**| **Esencial** | **Diagnóstico Profundo** |
+| `RF-50` a `RF-51` | Comparativas entre Secciones y Riesgo | M9 | Dirección General | Deseable | Macro-Diagnóstico |
+| `RF-52` a `RF-55` | Dashboards para Directivos, Docentes y Alumnos | M10 | Todos los estamentos | Esencial | Monitoreo Operativo |
+| **`RF-56`** | **Ficha Integral y Radiografía Escolar 360°** | **M10** | **Tutores / Directivos** | **Esencial** | **Visión Holística** |
+| **`RF-57`** | **Tablero de Impacto y Acreditación SSU** | **M10** | **Tutor SSU / Comisión** | **Esencial** | **Acreditación IS-480** |
+| `RF-58` | Alertas Automatizadas de Deserción Escolar | M10 | Coordinación / Tutores | Esencial | Prevención Temprana |
+| `RF-59` | Boletas de Calificaciones Oficiales PDF | M11 | Secretaría / Alumnos | Esencial | Documento Oficial |
+| **`RF-60`** | **Verificación Pública Criptográfica QR** | **M11** | **Público / Entidades** | **Esencial** | **Anti-Falsificación** |
+| `RF-61` a `RF-64` | Cuadro de Mérito, Actas y Exportación Excel | M11 | Secretaría / Dirección | Esencial | Gestión Documental |
+| `RF-65` a `RF-68` | Auditoría Inmutable y Ley N.° 29733 | M12 | Administrador / Legal | Esencial | Seguridad Jurídica |
+| `RF-69` a `RF-71` | Cartelera, Calendario Cívico y Portal Web | M13 | Toda la comunidad | Deseable | Difusión Digital |
+

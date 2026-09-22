@@ -574,6 +574,27 @@ MÓDULO 5: CONTROL Y GESTIÓN DE ASISTENCIA DE ESTUDIANTES (RF-AST)
 
 ---
 
+### RF-AST-08: Toma Rápida de Asistencia en Aula mediante Aplicación Móvil/Web y Difusión en Tiempo Real vía WebSockets
+- **Módulo:** Control y Gestión de Asistencia de Estudiantes
+- **Actores:** Docentes Titulares y Contratados, Auxiliares, Coordinación Académica, Dirección General.
+- **Prioridad:** Alta (Operatividad Ágil y Monitoreo en Vivo).
+- **Descripción:** El sistema debe proporcionar una interfaz web optimizada para dispositivos móviles (smartphones y tablets) con modalidad de marcación táctil ultra-rápida ("Fast-Tap"). El docente o auxiliar podrá pasar lista en el aula tocando la tarjeta o fila de cada estudiante para alternar cíclicamente su estado (Presente -> Tardanza -> Falta Injustificada) o mediante marcado masivo en menos de 15 segundos. Cada cambio o confirmación de asistencia se transmitirá inmediatamente al servidor y se difundirá en tiempo real mediante canales WebSockets / Server-Sent Events (SSE) hacia los tableros de control de la Dirección, Coordinación y pizarras de monitoreo escolar, permitiendo visualizar en vivo y sin recargar la pantalla qué aulas ya registraron asistencia, qué alumnos se encuentran ausentes y el porcentaje global de asistencia del turno.
+- **Entradas:** Toques táctiles de marcación rápida en la lista de alumnos o escaneo de carné con la cámara del dispositivo móvil.
+- **Reglas de Negocio:**
+  - La interfaz móvil debe responder al toque en menos de 100 ms con retroalimentación háptica/visual.
+  - La difusión en tiempo real debe emitir el evento a los tableros directivos conectados en un lapso no mayor a 500 ms.
+  - El sistema debe bloquear la edición una vez cerrado el bloque horario, notificando a Coordinación en caso de asistencias pendientes de registro.
+- **Flujo Funcional:**
+  1. El docente ingresa a la sesión desde su celular o tablet en el aula.
+  2. Toca rápidamente sobre los estudiantes que registran tardanza o falta (la lista inicia con todos presentes por defecto).
+  3. Presiona "Confirmar Asistencia".
+  4. El sistema transmite el paquete al backend y dispara el evento WebSocket `attendance:updated`.
+  5. En la oficina de Dirección y Coordinación, el panel general se actualiza instantáneamente en pantalla, mostrando el aula como "Asistencia Tomada" y sumando las faltas al consolidado del día.
+- **Salidas:** Registro de asistencia formalizado y actualización inmediata en vivo en los tableros de supervisión institucional.
+- **Criterios de Aceptación:** Registro completo de un aula de 35 estudiantes en menos de 15 segundos y visualización del cambio en el panel directivo en menos de 500 milisegundos.
+
+---
+
 ```
 ========================================================================================
 MÓDULO 6: CONTROL DE ASISTENCIA Y CUMPLIMIENTO DE PRACTICANTES (RF-PRA)
@@ -891,6 +912,50 @@ MÓDULO 8: REGISTRO, FLUJO Y SEGUIMIENTO DE CALIFICACIONES EN TIEMPO REAL (RF-NO
 - **Flujo Funcional:** El docente despliega las sugerencias para el nivel alcanzado, elige la más pertinente y la ajusta para el alumno.
 - **Salidas:** Conclusión descriptiva formal completada en la boleta del estudiante.
 - **Criterios de Aceptación:** Reducción de más del 70% en el tiempo de redacción manual de conclusiones.
+
+---
+
+### RF-NOT-10: Asistencia Conectada de Llenado Eficiente con Auto-Guardado en Segundo Plano y Sincronización Automática de Evaluaciones
+- **Módulo:** Registro, Flujo y Seguimiento de Calificaciones en Tiempo Real
+- **Actores:** Docentes Titulares y Contratados, Coordinación Académica.
+- **Prioridad:** Alta (Productividad Docente y Prevención de Pérdida de Datos).
+- **Descripción:** El sistema debe implementar un asistente reactivo y conectado para el llenado eficiente de calificaciones. A medida que el docente introduce o edita notas en cualquier celda de la planilla o desglose de criterios, el sistema debe ejecutar un guardado automático en segundo plano mediante debounce (400 ms), evitando que el docente tenga que hacer clic repetitivo en botones de guardado o sufra pérdidas de información por cortes de red o cierres accidentales de pestaña. Asimismo, el sistema debe estar conectado automáticamente con las evaluaciones intermedias (prácticas, tareas, exposiciones y rúbricas), de modo que al asentar una nota en una actividad específica, el sistema jale y compute automáticamente el promedio de la competencia curricular oficial y del periodo en tiempo real, sin requerir sincronizaciones manuales.
+- **Entradas:** Calificaciones digitadas o modificadas en las celdas de evaluación continua o rúbricas.
+- **Reglas de Negocio:**
+  - Cada modificación genera un indicador visual discreto de estado: "Guardando..." (spinner sutil) y "Guardado automáticamente" (check verde).
+  - Al detectarse desconexión momentánea, las notas se retienen en una cola local reactiva y se sincronizan apenas se restablece la conexión.
+  - Las notas parciales jalonean y recalculan inmediatamente las notas consolidadas de competencia sin alterar periodos bloqueados.
+- **Flujo Funcional:**
+  1. El docente digita notas en la columna de una evaluación parcial.
+  2. El sistema detecta la inactividad de tipeo (400 ms) y envía silenciosamente el cambio al backend.
+  3. El backend valida el valor, lo persiste y devuelve el recálculo consolidado de la competencia.
+  4. La interfaz actualiza la celda del promedio de competencia automáticamente en pantalla sin parpadeos.
+- **Salidas:** Persistencia continua en base de datos y actualización automática en cascada de promedios.
+- **Criterios de Aceptación:** Cero pérdida de calificaciones digitadas ante cierre imprevisto de ventana y sincronización automática del 100% de los criterios evaluativos asociados.
+
+---
+
+### RF-NOT-11: Motor de Conversión y Escala Dual Automatizada de Calificaciones Numéricas (0 a 20) a Escala Cualitativa Literal CNEB (AD, A, B, C)
+- **Módulo:** Registro, Flujo y Seguimiento de Calificaciones en Tiempo Real
+- **Actores:** Docentes Nombrados y Contratados, Coordinación Académica, Dirección General.
+- **Prioridad:** Alta (Cumplimiento Normativo MINEDU y Facilitación Docente).
+- **Descripción:** El sistema debe integrar un motor de equivalencia y conversión automática que permita a los docentes calificar exámenes, tareas o rúbricas en escala vigesimal tradicional (de 0 a 20 puntos) o numéricas, y el sistema automáticamente jalará, calculará y transformará dichos puntajes al estándar cualitativo oficial exigido por el Currículo Nacional de la Educación Básica (CNEB - MINEDU):
+  - **AD (Logro Destacado):** 18 a 20 puntos.
+  - **A (Logro Esperado):** 14 a 17 puntos.
+  - **B (En Proceso):** 11 a 13 puntos.
+  - **C (En Inicio):** 00 a 10 puntos.
+  La planilla de notas debe ofrecer un modo "Escala Dual", mostrando de forma simultánea e inmediata tanto el valor numérico digitado como la letra equivalente con su respectiva codificación cromática (AD azul, A verde, B ámbar, C rojo). El sistema permitirá ingresar notas tanto en números (con autoconversión instantánea a letras) como directamente en letras (validando los cuatro niveles normativos), y permitirá a la Coordinación Académica configurar los rangos y umbrales de corte por nivel educativo (Primaria y Secundaria).
+- **Entradas:** Digitación de nota numérica (0-20), selección de letra cualitativa (AD, A, B, C) o pegado masivo de notas vigesimales.
+- **Reglas de Negocio:**
+  - Si el docente digita un número entre 0 y 20, el sistema asigna la letra oficial CNEB de manera estricta e instantánea.
+  - La conversión opera en tiempo real al cambiar el foco de la celda o al pegar matrices de notas.
+  - El sistema almacena internamente tanto el puntaje cuantitativo exacto como el nivel cualitativo oficial, permitiendo generar boletas oficiales en letras según norma MINEDU y reportes analíticos cuantitativos para la Dirección.
+- **Flujo Funcional:**
+  1. El docente califica una prueba escrita sobre 20 y digita en la celda: "16".
+  2. Al presionar Enter o flecha abajo, el sistema jala el valor y automáticamente asienta "A" (Logro Esperado) con fondo verde suave, manteniendo el registro de "16".
+  3. En la boleta del estudiante y actas oficiales se proyecta la escala literal "A", mientras que en los reportes estadísticos internos se computa el promedio exacto.
+- **Salidas:** Calificaciones convertidas automáticamente a escala literal oficial y reflejadas en libretas, reportes y mapas de calor.
+- **Criterios de Aceptación:** Conversión instantánea y 100% precisa entre la escala vigesimal (0-20) y la escala CNEB (AD, A, B, C) sin intervención manual del usuario.
 
 ---
 
@@ -1372,6 +1437,7 @@ MÓDULO 13: PLATAFORMA DE DIFUSIÓN DIGITAL Y COMUNICACIÓN INSTITUCIONAL (RF-DI
 | | `RF-AST-05` | Detección y Notificación de Alertas por Inasistencia | Coordinación / Docentes Tutores | Alta |
 | | `RF-AST-06` | Modo Kiosco Resiliente Offline-First y Sincronización | Personal de Portería / Vigilancia | Alta |
 | | `RF-AST-07` | Emisión Masiva de Carnés Escolares con Código QR | Secretaría / Personal de Portería | Media |
+| | `RF-AST-08` | Toma Rápida en App Móvil y Difusión en Tiempo Real (WebSockets) | Docentes / Auxiliares / Dirección | Alta |
 | **6. Asistencia de Practicantes** | `RF-PRA-01` | Registro Diario de Ingreso, Salida y Permanencia | Practicantes / Portería | Alta |
 | | `RF-PRA-02` | Cómputo Acumulativo de Horas Efectivas de Práctica | Practicantes / Coordinación | Alta |
 | | `RF-PRA-03` | Validación y Aprobación Periódica de Horas de Práctica | Docentes Tutores / Coordinación | Alta |
@@ -1389,6 +1455,8 @@ MÓDULO 13: PLATAFORMA DE DIFUSIÓN DIGITAL Y COMUNICACIÓN INSTITUCIONAL (RF-DI
 | | `RF-NOT-07` | Consulta Transparente e Inmediata de Notas por Alumnos | Estudiantes | Alta |
 | | `RF-NOT-08` | Planilla Ágil de Notas en Modo Matriz ("Modo Excel") | Docentes Titulares y Contratados | Alta |
 | | `RF-NOT-09` | Asistente de Conclusiones Descriptivas Sugeridas | Docentes Titulares del Curso | Media |
+| | `RF-NOT-10` | Llenado Asistido con Auto-Guardado y Conexión Automática | Docentes / Coordinación | Alta |
+| | `RF-NOT-11` | Motor de Conversión Escala Vigesimal (0-20) a Literal CNEB | Docentes / Dirección / Coordinación | Alta |
 | **9. Mapas de Calor** | `RF-CAL-01` | Mapa de Calor de Rendimiento Académico por Sección | Dirección / Coordinación / Docentes | Alta |
 | | `RF-CAL-02` | Mapa de Calor de Asistencia y Puntualidad | Dirección / Coordinación / Auxiliares | Alta |
 | | `RF-CAL-03` | Comparativas Visuales de Rendimiento entre Secciones | Coordinación / Dirección | Media |

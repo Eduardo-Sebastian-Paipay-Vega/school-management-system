@@ -152,10 +152,10 @@ El proyecto se circunscribe inicialmente a los **Planteles de Aplicación de la 
 | Usuarios | Registro, modificación, desactivación lógica, búsqueda y consulta de usuarios multirrol. |
 | Administración institucional | Planteles, sedes, periodos académicos, niveles, grados, secciones, cursos, mallas y escalas vigentes. |
 | Gestión académica | Registro de estudiantes, docentes, practicantes, matrículas, asignación de carga lectiva y evaluaciones. |
-| Asistencia de estudiantes | Registro manual, Kiosco Offline-First para portería con sincronización automática y generación de Carnés QR institucionales. |
+| Asistencia de estudiantes | Registro manual, aplicación web móvil de toma rápida en aula con transmisión en tiempo real (WebSockets), Kiosco Offline-First para portería con sincronización automática y generación de Carnés QR institucionales. |
 | Asistencia de practicantes | Registro de entradas/salidas, geolocalización referencial, cómputo automatizado de horas acumuladas y reportes SSU. |
 | Asistencia de docentes contratados | Registro de sesiones, cumplimiento de horas lectivas según contrato y reprogramación de clases compensatorias. |
-| Flujo de notas en tiempo real | Registro ágil con planilla interactiva (Modo Excel con navegación por teclado/pegado), asistente de conclusiones descriptivas CNEB y consolidación instantánea. |
+| Flujo de notas en tiempo real | Registro ágil con planilla interactiva (Modo Excel con navegación por teclado/pegado), auto-guardado asistido con sincronización en segundo plano, motor de conversión y escala dual (0-20 a escala cualitativa oficial CNEB AD, A, B, C), asistente de conclusiones descriptivas y consolidación instantánea. |
 | Mapas de calor | Visualización analítica del rendimiento académico y asistencia con navegación interactiva Drill-Down (Nivel -> Grado -> Sección -> Alumno). |
 | Monitoreo y Dashboards | Dashboards operativos por rol, Ficha Escolar 360° individual del estudiante y panel de impacto social/académico SSU IS-480. |
 | Reportes oficiales | Generador de reportes en PDF y Excel con verificación documental criptográfica (código QR público + hash SHA-256). |

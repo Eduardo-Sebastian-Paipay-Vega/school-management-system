@@ -375,6 +375,42 @@ MÓDULO TÉCNICO 5: ASISTENCIA ESTUDIANTIL, KIOSCO OFFLINE-FIRST Y CARNÉS QR (R
 
 ---
 
+### RF-TEC-AST-05: API de Toma Rápida de Asistencia en Aula y Difusión WebSockets
+- **Trazabilidad:** `RF-27`
+- **Capa / Componente:** `AttendanceFastTapGrid` (Flutter Web / Mobile) → `LiveAttendanceController` → `WebsocketBroadcastService`
+- **Endpoint de Registro en Vivo:** `POST /api/v1/attendance/classroom/live-batch`
+- **Roles Autorizados:** `ROLE_TEACHER`, `ROLE_ASSISTANT`, `ROLE_COORDINATOR`.
+- **Contrato de Entrada (JSON Body):**
+  ```json
+  {
+    "sectionId": "uuid-seccion",
+    "courseId": "uuid-curso",
+    "sessionDate": "2026-09-21",
+    "blockNumber": 1,
+    "records": [
+      { "studentId": "uuid-alumno-1", "status": "PRESENT" },
+      { "studentId": "uuid-alumno-2", "status": "LATE", "minutesLate": 12 },
+      { "studentId": "uuid-alumno-3", "status": "UNEXCUSED_ABSENCE" }
+    ]
+  }
+  ```
+- **Lógica Técnica y Difusión en Tiempo Real:**
+  1. Ejecución de inserción en lote mediante transacción PostgreSQL (`UPSERT` con `ON CONFLICT DO UPDATE`).
+  2. Cálculo del resumen consolidado del aula: `% Asistencia`, `Total Presentes`, `Total Faltas`.
+  3. Publicación instantánea en Redis Pub/Sub canal `institution:{tenant_id}:live_attendance`:
+     ```json
+     {
+       "event": "ATTENDANCE_TAKEN",
+       "sectionName": "3° A Secundaria",
+       "takenBy": "Prof. Eduardo Paipay",
+       "timestamp": "2026-09-21T08:05:22Z",
+       "stats": { "present": 32, "late": 2, "absent": 1, "rate": 91.4 }
+     }
+     ```
+  4. La pasarela WebSocket difunde el paquete a todas las conexiones activas de Directores y Coordinadores, actualizando el tablero de supervisión del día en menos de 300 ms sin recarga de navegador.
+
+---
+
 ```
 ========================================================================================
 MÓDULO TÉCNICO 6: ASISTENCIA Y HORAS DE PRACTICANTES (RF-TEC-PRA)
@@ -382,7 +418,7 @@ MÓDULO TÉCNICO 6: ASISTENCIA Y HORAS DE PRACTICANTES (RF-TEC-PRA)
 ```
 
 ### RF-TEC-PRA-01: API de Marcaje y Aprobación por Lotes de Horas de Prácticas
-- **Trazabilidad:** `RF-27`, `RF-28`, `RF-29`, `RF-30`
+- **Trazabilidad:** `RF-28`, `RF-29`, `RF-30`, `RF-31`
 - **Endpoints:** `POST /api/v1/practitioners/check-in`, `POST /api/v1/practitioners/check-out`, `POST /api/v1/practitioners/sessions/batch-approve`.
 - **Lógica:** Cómputo de minutos entre entrada y salida (`EXTRACT(EPOCH...)`), estado inicial `PENDING_APPROVAL`, y transición atómica a `APPROVED` firmada por el docente titular, alimentando el acumulador `practitioner_profiles.validated_hours`.
 
@@ -395,7 +431,7 @@ MÓDULO TÉCNICO 7: ASISTENCIA Y HORAS DE DOCENTES CONTRATADOS (RF-TEC-DOC)
 ```
 
 ### RF-TEC-DOC-01: API de Marcación y Cruce Automatizado con Horario Lectivo
-- **Trazabilidad:** `RF-31`, `RF-32`, `RF-33`, `RF-34`
+- **Trazabilidad:** `RF-32`, `RF-33`, `RF-34`, `RF-35`
 - **Endpoints:** `POST /api/v1/attendance/contracted-teachers/mark`, `GET /api/v1/attendance/contracted-teachers/monthly-summary`.
 - **Lógica:** Cruce relacional SQL entre `teacher_schedules` y `teacher_attendance_logs`, evaluando puntualidad (tolerancia 10 min), consolidando horas pedagógicas mensuales de 45 minutos.
 
@@ -408,20 +444,20 @@ MÓDULO TÉCNICO 8: MOTOR DE CALIFICACIONES EN TIEMPO REAL, MODO EXCEL Y CONCLUS
 ```
 
 ### RF-TEC-NOT-01: API Transaccional de Registro y Modificación de Notas
-- **Trazabilidad:** `RF-35`, `RF-36`, `RF-40`, `RF-41`, `RF-42`, `RF-43`
+- **Trazabilidad:** `RF-36`, `RF-37`, `RF-40`, `RF-41`, `RF-42`, `RF-43`, `RF-44`
 - **Endpoints:** `POST /api/v1/grades/batch-upsert`, `POST /api/v1/academic-periods/:id/close`.
 - **Lógica:** Verificación de periodo abierto, comprobación de titularidad docente, validación de escalas oficiales, registro de histórico en `grades_audit_history` y recálculo automático de promedios de competencia y periodo.
 
 ---
 
 ### RF-TEC-NOT-02: Servicio de Difusión en Tiempo Real mediante WebSockets
-- **Trazabilidad:** `RF-36`, `RF-43`
+- **Trazabilidad:** `RF-37`, `RF-44`
 - **Protocolo:** WebSocket Seguro (`wss://.../ws`) mediante Redis Pub/Sub en canal `channel:section:<sectionId>:grades`. Notificación instantánea a clientes conectados ante evento `GRADE_UPDATED`.
 
 ---
 
 ### RF-TEC-NOT-05: Controlador de Matriz de Teclado Rápido ("Modo Excel") y Parser de Portapapeles en Flutter
-- **Trazabilidad:** `RF-37`
+- **Trazabilidad:** `RF-38`
 - **Capa / Componente:** `FastGradeMatrixWidget` (Frontend Flutter) → `FocusNodeMatrixController` → `ClipboardParserService`
 - **Lógica Técnica de Frontend:**
   1. Implementación de matriz de `FocusNode` bidimensional `focusNodes[row][col]`.
@@ -437,7 +473,7 @@ MÓDULO TÉCNICO 8: MOTOR DE CALIFICACIONES EN TIEMPO REAL, MODO EXCEL Y CONCLUS
 ---
 
 ### RF-TEC-NOT-06: API de Catálogo y Recomendación de Conclusiones Descriptivas por Competencia y Nivel
-- **Trazabilidad:** `RF-38`
+- **Trazabilidad:** `RF-39`
 - **Endpoint:** `GET /api/v1/curriculum/competencies/:competencyId/descriptive-conclusions?level=B`
 - **Roles Autorizados:** `ROLE_TEACHER`, `ROLE_COORDINATOR`.
 - **Estructura de la Tabla de Catálogo Pedagógico (`descriptive_conclusion_bank`):**
@@ -466,6 +502,79 @@ MÓDULO TÉCNICO 8: MOTOR DE CALIFICACIONES EN TIEMPO REAL, MODO EXCEL Y CONCLUS
         "text": "Se encuentra en proceso de interpretar diagramas estadísticos; se recomienda afianzar la formulación de conclusiones a partir de tablas de frecuencia."
       }
     ]
+  }
+  ```
+
+---
+
+### RF-TEC-NOT-07: Asistencia de Llenado con Auto-Guardado Silencioso (Debounce 400ms) y Sincronización en Cascada
+- **Trazabilidad:** `RF-45`
+- **Capa / Componente:** `GradeAutoSaveManager` (Flutter) → `PATCH /api/v1/grades/auto-save` → `GradeCalculationPipeline`
+- **Lógica Técnica de Auto-Guardado en Cliente:**
+  ```dart
+  Timer? _debounceTimer;
+  void onGradeChanged(String studentId, String criteriaId, dynamic newValue) {
+    state = state.updating(studentId, criteriaId, isSaving: true);
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 400), () async {
+      try {
+        final res = await apiClient.patch('/api/v1/grades/auto-save', data: {
+          'studentId': studentId,
+          'criteriaId': criteriaId,
+          'value': newValue,
+        });
+        state = state.updateSuccess(studentId, criteriaId, updatedCompetencyAvg: res.data['competencyAvg']);
+      } catch (err) {
+        state = state.updateError(studentId, criteriaId, error: err);
+      }
+    });
+  }
+  ```
+- **Lógica Backend en Cascada:**
+  1. Validación de valor y escala autorizada en menos de 5 ms.
+  2. Actualización en PostgreSQL de la fila de evaluación intermedia.
+  3. Ejecución inmediata de recálculo de promedio ponderado de la competencia (`competency_summary_scores`).
+  4. Retorno HTTP 200 con el nuevo promedio consolidado para actualización reactiva en pantalla sin recarga.
+
+---
+
+### RF-TEC-NOT-08: Motor de Equivalencia y Escala Dual Automatizada Vigesimal (0-20) a Literal CNEB (AD, A, B, C)
+- **Trazabilidad:** `RF-46`
+- **Capa / Componente:** `DualScaleConversionService` (Backend/Frontend) + PostgreSQL Trigger / Función
+- **Esquema de Base de Datos para Escala Dual (`grades`):**
+  ```sql
+  ALTER TABLE grades 
+    ADD COLUMN score_numeric NUMERIC(4,2) CHECK (score_numeric >= 0 AND score_numeric <= 20),
+    ADD COLUMN achievement_level VARCHAR(2) CHECK (achievement_level IN ('AD', 'A', 'B', 'C')),
+    ADD COLUMN input_scale_mode VARCHAR(15) DEFAULT 'DUAL_AUTO';
+
+  CREATE OR REPLACE FUNCTION fn_convert_vigesimal_to_cneb(score NUMERIC)
+  RETURNS VARCHAR(2) AS $$
+  BEGIN
+    IF score >= 17.50 THEN RETURN 'AD';
+    ELSIF score >= 13.50 THEN RETURN 'A';
+    ELSIF score >= 10.50 THEN RETURN 'B';
+    ELSE RETURN 'C';
+    END IF;
+  END;
+  $$ LANGUAGE plpgsql IMMUTABLE;
+  ```
+- **Lógica del Servicio de Conversión en Flutter / TypeScript:**
+  1. Si el usuario ingresa un valor numérico (ej. `16` o `16.5`):
+     - El servicio calcula instantáneamente: `achievement_level = 'A'`.
+     - Renderiza la celda con la insignia literal verde `A` y un subtexto cuantitativo gris `(16.5)`.
+  2. Si el usuario ingresa una letra directa (`AD`, `A`, `B`, `C`):
+     - Asigna el nivel literal y establece el `score_numeric` representativo medio para fines de ponderación analítica (`AD: 19.0`, `A: 15.0`, `B: 12.0`, `C: 08.0`).
+  3. Ambas representaciones quedan almacenadas en el registro para alimentar simultáneamente los reportes oficiales MINEDU (en letras) y los gráficos estadísticos y mapas de calor (en escala continua).
+- **Contrato de Salida (JSON):**
+  ```json
+  {
+    "gradeId": "uuid-grade",
+    "studentId": "uuid-student",
+    "scoreNumeric": 16.5,
+    "achievementLevel": "A",
+    "levelDescription": "Logro Esperado",
+    "colorHex": "#2E7D32"
   }
   ```
 
@@ -639,7 +748,7 @@ MÓDULO TÉCNICO 13: DIFUSIÓN DIGITAL Y CONTENIDOS INSTITUCIONALES (RF-TEC-DIF)
 
 ---
 
-## 4. MATRIZ DE TRAZABILIDAD TÉCNICA INTEGRAL (RF-01 AL RF-68)
+## 4. MATRIZ DE TRAZABILIDAD TÉCNICA INTEGRAL (RF-01 AL RF-71)
 
 | Requisito Documental | Requisito Técnico | Endpoint / Componente | Método HTTP | Tablas Principales | Rol Mínimo |
 |:---:|:---:|---|:---:|---|:---:|
@@ -669,48 +778,51 @@ MÓDULO TÉCNICO 13: DIFUSIÓN DIGITAL Y CONTENIDOS INSTITUCIONALES (RF-TEC-DIF)
 | `RF-24` | `RF-TEC-AST-01` | `EarlyWarningWorker` | Worker | `early_warning_alerts` | Sistema |
 | **`RF-25`**| **`RF-TEC-AST-03`**| `/api/v1/kiosk/gate-entry/offline-batch-sync`| **POST** | **`gate_access_logs` (Sync)** | **Portería** |
 | **`RF-26`**| **`RF-TEC-AST-04`**| `/api/v1/reports/student-id-cards` | **GET** | **`enrollments` (PDF QR)** | **Secretaría** |
-| `RF-27` | `RF-TEC-PRA-01` | `/api/v1/practitioners/check-in` | POST | `practitioner_logs` | Practicantes |
-| `RF-28` | `RF-TEC-PRA-01` | `/api/v1/practitioners/:id/hours` | GET | `practitioner_profiles`| Practicantes |
-| `RF-29` | `RF-TEC-PRA-01` | `/api/v1/practitioners/batch-approve` | POST | `practitioner_logs` | Docentes Tutores |
-| `RF-30` | `RF-TEC-PRA-01` | `/api/v1/reports/practitioner-card` | GET | `practitioner_profiles`| Coordinación |
-| `RF-31` | `RF-TEC-DOC-01` | `/api/v1/attendance/contracted/mark` | POST | `teacher_logs` | Docentes Contratados|
-| `RF-32` | `RF-TEC-DOC-01` | `/api/v1/attendance/contracted/reschedule`| POST | `schedules` | Coordinación |
-| `RF-33` | `RF-TEC-DOC-01` | `/api/v1/attendance/contracted/monthly` | GET | `teacher_logs` | Secretaría |
-| `RF-34` | `RF-TEC-DOC-01` | `/api/v1/attendance/contracted/real-time`| GET | `teacher_logs` | Coordinación |
-| `RF-35` | `RF-TEC-NOT-01` | `/api/v1/evaluation-criteria` | POST | `evaluation_criteria` | Docentes Titulares |
-| `RF-36` | `RF-TEC-NOT-01` | `/api/v1/grades/batch-upsert` | POST | `grades`, `audit_history` | Docentes Titulares |
-| **`RF-37`**| **`RF-TEC-NOT-05`**| `FastGradeMatrixWidget` (Flutter) | **UI** | **Matrix Keyboard Parser** | **Docentes** |
-| **`RF-38`**| **`RF-TEC-NOT-06`**| `/api/v1/curriculum/competencies/:id/conclusions` | **GET** | **`descriptive_conclusion_bank`**| **Docentes** |
-| `RF-39` | `RF-TEC-NOT-01` | `/api/v1/grades/practitioner-proposals` | POST | `grade_proposals` | Practicantes |
-| `RF-40` | `RF-TEC-NOT-01` | `GradingCalculationEngine` | Lógica | `student_period_summaries` | Sistema |
-| `RF-41` | `RF-TEC-NOT-01` | `/api/v1/academic-periods/:id/close` | POST | `academic_periods` (Lock) | Coordinación |
-| `RF-42` | `RF-TEC-NOT-01` | `/api/v1/grades/rectifications` | POST | `grade_rectifications` | Dirección |
-| `RF-43` | `RF-TEC-NOT-02` | `wss://.../ws` (`GRADE_UPDATED`) | WSS | WebSockets Redis PubSub| Estudiantes |
-| `RF-44` | `RF-TEC-CAL-01` | `/api/v1/analytics/heatmaps/academic` | GET | SQL CTE + Redis Cache | Directivos, Docentes|
-| `RF-45` | `RF-TEC-CAL-01` | `/api/v1/analytics/heatmaps/attendance` | GET | `student_attendance` | Auxiliares |
-| **`RF-46`**| **`RF-TEC-CAL-03`**| `/api/v1/analytics/heatmaps/drill-down` | **GET** | **`competencies`, `grades`** | **Coordinación** |
-| `RF-47` | `RF-TEC-CAL-01` | `/api/v1/analytics/heatmaps/comparative` | GET | SQL Aggregation | Coordinación |
-| `RF-48` | `RF-TEC-CAL-01` | `/api/v1/analytics/heatmaps/risk-overview`| GET | SQL Aggregation | Dirección General |
-| `RF-49` | `RF-TEC-MON-01` | `/api/v1/dashboard/director-kpis` | GET | `dashboard_kpi_snapshots`| Dirección General |
-| `RF-50` | `RF-TEC-MON-01` | `/api/v1/dashboard/coordinator-status` | GET | `teaching_assignments` | Coordinación |
-| `RF-51` | `RF-TEC-MON-01` | `/api/v1/dashboard/teacher-summary` | GET | `schedules`, `grades` | Docentes |
-| `RF-52` | `RF-TEC-MON-01` | `/api/v1/dashboard/student-progress` | GET | `student_summaries` | Estudiantes |
-| **`RF-53`**| **`RF-TEC-MON-03`**| `/api/v1/students/:id/profile-360` | **GET** | **Holistic Aggregated SQL** | **Tutores, Director** |
-| **`RF-54`**| **`RF-TEC-MON-04`**| `/api/v1/ssu/impact-metrics` | **GET** | **SSU Project Audit Logs** | **Tutor SSU UNSCH** |
-| `RF-55` | `RF-TEC-MON-01` | `EarlyWarningWorker` | Worker | `early_warning_alerts` | Coordinación |
-| `RF-56` | `RF-TEC-REP-01` | `/api/v1/reports/report-cards/:id` | GET | PDFKit Buffer Stream | Secretaría |
-| **`RF-57`**| **`RF-TEC-REP-03`**| `/api/v1/public/verify-document` | **GET** | **`document_verification_registry`**| **Público General** |
-| `RF-58` | `RF-TEC-REP-01` | `/api/v1/reports/merit-roll` | GET | SQL Ranking Window Func| Dirección |
-| `RF-59` | `RF-TEC-REP-01` | `/api/v1/reports/class-grade-book` | GET | PDF Stream Engine | Docentes |
-| `RF-60` | `RF-TEC-REP-01` | `/api/v1/reports/attendance-consolidated`| GET | PDF/Excel Stream | Secretaría |
-| `RF-61` | `RF-TEC-REP-01` | `/api/v1/reports/export-excel` | POST | ExcelJS Stream Engine | Usuarios Autorizados|
-| `RF-62` | `RF-TEC-AUD-01` | `AuditInterceptorMiddleware` | ALL | `audit_logs` (Inmutable) | Administrador |
-| `RF-63` | `RF-TEC-AUD-01` | `/api/v1/audit/grades-history` | GET | `grades_audit_history` | Dirección |
-| `RF-64` | `RF-TEC-AUD-01` | `/api/v1/audit/logs` | GET | `audit_logs` | Administrador |
-| `RF-65` | `RF-TEC-AUD-01` | `DataSanitizerInterceptor` | ALL | Cifrado AES-256 | Transversal |
-| `RF-66` | `RF-TEC-DIF-01` | `/api/v1/public/announcements` | GET | `announcements`, S3 | Toda la comunidad |
-| `RF-67` | `RF-TEC-DIF-01` | `/api/v1/public/academic-calendar` | GET | `academic_events` | Toda la comunidad |
-| `RF-68` | `RF-TEC-DIF-01` | `/api/v1/public/institutional-info` | GET | `institutional_pages` | Público General |
+| **`RF-27`**| **`RF-TEC-AST-05`**| `/api/v1/attendance/classroom/live-batch` | **POST** | **`student_attendance` + WSS** | **Docentes / Auxiliares** |
+| `RF-28` | `RF-TEC-PRA-01` | `/api/v1/practitioners/check-in` | POST | `practitioner_logs` | Practicantes |
+| `RF-29` | `RF-TEC-PRA-01` | `/api/v1/practitioners/:id/hours` | GET | `practitioner_profiles`| Practicantes |
+| `RF-30` | `RF-TEC-PRA-01` | `/api/v1/practitioners/batch-approve` | POST | `practitioner_logs` | Docentes Tutores |
+| `RF-31` | `RF-TEC-PRA-01` | `/api/v1/reports/practitioner-card` | GET | `practitioner_profiles`| Coordinación |
+| `RF-32` | `RF-TEC-DOC-01` | `/api/v1/attendance/contracted/mark` | POST | `teacher_logs` | Docentes Contratados|
+| `RF-33` | `RF-TEC-DOC-01` | `/api/v1/attendance/contracted/reschedule`| POST | `schedules` | Coordinación |
+| `RF-34` | `RF-TEC-DOC-01` | `/api/v1/attendance/contracted/monthly` | GET | `teacher_logs` | Secretaría |
+| `RF-35` | `RF-TEC-DOC-01` | `/api/v1/attendance/contracted/real-time`| GET | `teacher_logs` | Coordinación |
+| `RF-36` | `RF-TEC-NOT-01` | `/api/v1/evaluation-criteria` | POST | `evaluation_criteria` | Docentes Titulares |
+| `RF-37` | `RF-TEC-NOT-01` | `/api/v1/grades/batch-upsert` | POST | `grades`, `audit_history` | Docentes Titulares |
+| **`RF-38`**| **`RF-TEC-NOT-05`**| `FastGradeMatrixWidget` (Flutter) | **UI** | **Matrix Keyboard Parser** | **Docentes** |
+| **`RF-39`**| **`RF-TEC-NOT-06`**| `/api/v1/curriculum/competencies/:id/conclusions` | **GET** | **`descriptive_conclusion_bank`**| **Docentes** |
+| `RF-40` | `RF-TEC-NOT-01` | `/api/v1/grades/practitioner-proposals` | POST | `grade_proposals` | Practicantes |
+| `RF-41` | `RF-TEC-NOT-01` | `GradingCalculationEngine` | Lógica | `student_period_summaries` | Sistema |
+| `RF-42` | `RF-TEC-NOT-01` | `/api/v1/academic-periods/:id/close` | POST | `academic_periods` (Lock) | Coordinación |
+| `RF-43` | `RF-TEC-NOT-01` | `/api/v1/grades/rectifications` | POST | `grade_rectifications` | Dirección |
+| `RF-44` | `RF-TEC-NOT-02` | `wss://.../ws` (`GRADE_UPDATED`) | WSS | WebSockets Redis PubSub| Estudiantes |
+| **`RF-45`**| **`RF-TEC-NOT-07`**| `/api/v1/grades/auto-save` | **PATCH**| **`grades` (Auto-Save)** | **Docentes Titulares** |
+| **`RF-46`**| **`RF-TEC-NOT-08`**| `DualScaleConversionService` | **Service**| **`grades` (0-20 $\rightarrow$ AD/A/B/C)**| **Docentes Titulares** |
+| `RF-47` | `RF-TEC-CAL-01` | `/api/v1/analytics/heatmaps/academic` | GET | SQL CTE + Redis Cache | Directivos, Docentes|
+| `RF-48` | `RF-TEC-CAL-01` | `/api/v1/analytics/heatmaps/attendance` | GET | `student_attendance` | Auxiliares |
+| **`RF-49`**| **`RF-TEC-CAL-03`**| `/api/v1/analytics/heatmaps/drill-down` | **GET** | **`competencies`, `grades`** | **Coordinación** |
+| `RF-50` | `RF-TEC-CAL-01` | `/api/v1/analytics/heatmaps/comparative` | GET | SQL Aggregation | Coordinación |
+| `RF-51` | `RF-TEC-CAL-01` | `/api/v1/analytics/heatmaps/risk-overview`| GET | SQL Aggregation | Dirección General |
+| `RF-52` | `RF-TEC-MON-01` | `/api/v1/dashboard/director-kpis` | GET | `dashboard_kpi_snapshots`| Dirección General |
+| `RF-53` | `RF-TEC-MON-01` | `/api/v1/dashboard/coordinator-status` | GET | `teaching_assignments` | Coordinación |
+| `RF-54` | `RF-TEC-MON-01` | `/api/v1/dashboard/teacher-summary` | GET | `schedules`, `grades` | Docentes |
+| `RF-55` | `RF-TEC-MON-01` | `/api/v1/dashboard/student-progress` | GET | `student_summaries` | Estudiantes |
+| **`RF-56`**| **`RF-TEC-MON-03`**| `/api/v1/students/:id/profile-360` | **GET** | **Holistic Aggregated SQL** | **Tutores, Director** |
+| **`RF-57`**| **`RF-TEC-MON-04`**| `/api/v1/ssu/impact-metrics` | **GET** | **SSU Project Audit Logs** | **Tutor SSU UNSCH** |
+| `RF-58` | `RF-TEC-MON-01` | `EarlyWarningWorker` | Worker | `early_warning_alerts` | Coordinación |
+| `RF-59` | `RF-TEC-REP-01` | `/api/v1/reports/report-cards/:id` | GET | PDFKit Buffer Stream | Secretaría |
+| **`RF-60`**| **`RF-TEC-REP-03`**| `/api/v1/public/verify-document` | **GET** | **`document_verification_registry`**| **Público General** |
+| `RF-61` | `RF-TEC-REP-01` | `/api/v1/reports/merit-roll` | GET | SQL Ranking Window Func| Dirección |
+| `RF-62` | `RF-TEC-REP-01` | `/api/v1/reports/class-grade-book` | GET | PDF Stream Engine | Docentes |
+| `RF-63` | `RF-TEC-REP-01` | `/api/v1/reports/attendance-consolidated`| GET | PDF/Excel Stream | Secretaría |
+| `RF-64` | `RF-TEC-REP-01` | `/api/v1/reports/export-excel` | POST | ExcelJS Stream Engine | Usuarios Autorizados|
+| `RF-65` | `RF-TEC-AUD-01` | `AuditInterceptorMiddleware` | ALL | `audit_logs` (Inmutable) | Administrador |
+| `RF-66` | `RF-TEC-AUD-01` | `/api/v1/audit/grades-history` | GET | `grades_audit_history` | Dirección |
+| `RF-67` | `RF-TEC-AUD-01` | `/api/v1/audit/logs` | GET | `audit_logs` | Administrador |
+| `RF-68` | `RF-TEC-AUD-01` | `DataSanitizerInterceptor` | ALL | Cifrado AES-256 | Transversal |
+| `RF-69` | `RF-TEC-DIF-01` | `/api/v1/public/announcements` | GET | `announcements`, S3 | Toda la comunidad |
+| `RF-70` | `RF-TEC-DIF-01` | `/api/v1/public/academic-calendar` | GET | `academic_events` | Toda la comunidad |
+| `RF-71` | `RF-TEC-DIF-01` | `/api/v1/public/institutional-info` | GET | `institutional_pages` | Público General |
 
 ---
 

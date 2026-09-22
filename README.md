@@ -109,37 +109,75 @@ El proyecto sigue una arquitectura modular desarrollada con **Flutter** para gar
 
 ## Estructura del Proyecto
 
-```
+```text
 school-management-system/
-├── android/                    # Configuración Android
-├── ios/                        # Configuración iOS
-├── lib/                        # Código fuente principal (Dart/Flutter)
-│   └── main.dart               # Punto de entrada de la aplicación
-├── linux/                      # Configuración Linux
-├── macos/                      # Configuración macOS
-├── web/                        # Configuración Web
-├── windows/                    # Configuración Windows
-├── test/                       # Pruebas unitarias y de integración
-├── D - Base 1 - 01092026/     # Documentación del proyecto
-│   └── plan_trabajo.md         # Plan de trabajo y gestión (16 semanas)
+├── .agents/                    # Reglas, skills y plantilla canónica SDD (IEEE 1016)
+│   ├── rules/sdd_rules.md      # Reglas técnicas de arquitectura y diseño
+│   └── skills/sdd-authoring/   # Skill para elaboración paso a paso de SDDs
+├── AGENTS.md                   # Directivas y reglas obligatorias para agentes de IA
+├── lib/                        # Código fuente modular (Clean Architecture Feature-First)
+│   ├── main.dart               # Shell de navegación interactivo por Squads
+│   ├── core/                   # Módulos transversales compartidos
+│   │   ├── constants/          # Constantes globales, URLs base de API y metadatos
+│   │   ├── theme/              # Paleta oficial (Verde Guamán Poma, Azul UNSCH, escala CNEB)
+│   │   └── widgets/            # Tarjetas de squad y componentes reutilizables
+│   └── features/               # Módulos independientes asignados a los 5 Squads
+│       ├── squad_1_core_seguridad/        # Brandon Montero (JWT, RBAC, Auditoría)
+│       ├── squad_2_matricula_asistencia/  # Sebastian Paipay (Kiosco Offline, QR)
+│       ├── squad_3_calificaciones/        # Steve Ovalle (Modo Excel, CNEB 400ms)
+│       ├── squad_4_analitica_dashboards/  # Aracely Rodríguez (Drill-Down, Ficha 360°)
+│       └── squad_5_secretaria_portal/     # Cesar Leon (Libretas PDF, QR Público)
+├── web/                        # Configuración Web PWA (Metadatos y Branding Oficial)
+├── test/                       # Batería de pruebas unitarias y de widgets
+├── D - Base 1 - 01092026/     # Documentación técnica, RFs, CUs y Arquitectura
+│   └── Fase 2/
+│       ├── Requisitos Funcionales/ # 71 RFs organizados por Squad
+│       ├── Casos de uso/           # 71 CUs organizados por Squad
+│       └── Arquitectura/           # SAD maestro, DDLs, APIs y SDDs
 ├── pubspec.yaml                # Dependencias del proyecto
-├── analysis_options.yaml       # Reglas de análisis estático
-├── LICENSE                     # Licencia MIT
 └── README.md                   # Este archivo
 ```
 
 ---
 
-## Instalación
+## ⚡ Guía de Inicio Rápido (Quick Start Dev)
 
-### Requisitos previos
+### 1. Iniciar el Servidor de Desarrollo (Equivalente a `npm run dev`)
 
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) >= 3.9.2
-- [Dart SDK](https://dart.dev/get-dart) >= 3.9.2
-- [Git](https://git-scm.com/)
-- Un editor: [VS Code](https://code.visualstudio.com/), [Android Studio](https://developer.android.com/studio) o [Antigravity IDE](https://antigravity.dev)
+Para ejecutar la aplicación localmente y ver los cambios en vivo en el navegador o en el escritorio:
 
-### Pasos
+```bash
+# Iniciar en Google Chrome (Modo Web con Hot Reload) — RECOMENDADO
+flutter run -d chrome
+
+# Iniciar en Chrome fijando un puerto específico (ej. 3000)
+flutter run -d chrome --web-port 3000
+
+# Iniciar en Microsoft Edge
+flutter run -d edge
+
+# Iniciar como aplicación de escritorio nativa de Windows (.exe)
+flutter run -d windows
+```
+
+> 💡 **Con 1 Clic desde el Editor:** Puedes presionar la tecla **`F5`** (o *Run > Start Debugging*) en VS Code, Cursor o Antigravity IDE para lanzar la aplicación automáticamente.
+
+---
+
+### 2. Atajos de Desarrollo en Tiempo Real (Mientras corre la App)
+
+Mientras el comando `flutter run` se encuentra activo en tu terminal:
+
+| Tecla | Acción | ¿Para qué sirve? |
+|:---:|---|---|
+| **`r`** | **Hot Reload** | Aplica cambios visuales instantáneamente (< 1 seg) sin reiniciar la app ni perder el estado. |
+| **`R`** | **Hot Restart** | Reinicia la aplicación por completo recargando todos los estados. |
+| **`h`** | **Help** | Muestra la lista completa de comandos de depuración disponibles. |
+| **`q`** | **Quit** | Detiene el servidor de desarrollo y cierra la aplicación. |
+
+---
+
+### 3. Instalación Inicial desde Cero
 
 ```bash
 # 1. Clonar el repositorio
@@ -148,49 +186,43 @@ git clone https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-sys
 # 2. Acceder al directorio
 cd school-management-system
 
-# 3. Instalar dependencias
+# 3. Descargar dependencias de Flutter
 flutter pub get
 
-# 4. Verificar el entorno
+# 4. Verificar estado de herramientas
 flutter doctor
 
-# 5. Ejecutar la aplicación
-flutter run
-```
-
-### Ejecutar en plataformas específicas
-
-```bash
-# Android
-flutter run -d android
-
-# iOS (requiere macOS)
-flutter run -d ios
-
-# Web
+# 5. Ejecutar la app
 flutter run -d chrome
-
-# Windows
-flutter run -d windows
-
-# Linux
-flutter run -d linux
 ```
 
 ---
 
-## Testing
+## 🧪 Pruebas de Calidad y Verificación (QA)
+
+Antes de realizar cualquier commit o pull request, el código debe pasar limpiamente:
 
 ```bash
-# Ejecutar todas las pruebas
+# 1. Análisis estático de código (0 errores, 0 warnings requeridos)
+flutter analyze
+
+# 2. Ejecutar todas las pruebas automáticas
 flutter test
 
-# Ejecutar pruebas con cobertura
-flutter test --coverage
-
-# Analizar código estático
-flutter analyze
+# 3. Limpiar caché en caso de inconsistencias
+flutter clean && flutter pub get
 ```
+
+---
+
+## 📐 Documentos de Diseño de Software (SDD - IEEE 1016)
+
+Cada uno de los 5 Squads cuenta con herramientas estandarizadas para elaborar su diseño técnico:
+
+* 📖 **[Guía Rápida: ¿Cómo y Dónde se elabora el SDD?](D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/GUIA_RAPIDA_SDD.md)**
+* 📋 **[Plantilla Canónica SDD (IEEE 1016)](.agents/skills/sdd-authoring/resources/plantilla_sdd.md)**
+* 🌟 **[Ejemplo Modelo Completo: SDD Squad 1](D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/Squad%201%20-%20Core%20y%20Seguridad/sdd_squad_1.md)**
+* 🛠️ **Skill para Asistentes de IA:** Ubicada en [`.agents/skills/sdd-authoring/SKILL.md`](.agents/skills/sdd-authoring/SKILL.md).
 
 ---
 

@@ -7,6 +7,14 @@
 
 ---
 
+## 📁 Carpetas de Trabajo de este Squad
+
+Para organizar el desarrollo y la entrega técnica, este squad cuenta con dos carpetas operativas:
+
+1. 📄 **[Requisitos/](Requisitos/README.md)**: Contiene la **documentación individual en archivos .md de cada Requisito Funcional** asignado (enunciado normativo, entradas, procesos, salidas y criterios de aceptación Gherkin).
+2. 🛠️ **[Diseno Tecnico/](Diseno%20Tecnico/README.md)**: Contiene el **diseño técnico de software**, arquitectura de datos relacional (PostgreSQL), endpoints API REST, WebSockets y diseño de componentes Flutter.
+
+
 ## 1. Módulos y Requisitos Asignados
 
 ### Módulo 9: Mapas de Calor con Navegación Drill-Down (`RF-47` al `RF-51`)

@@ -11,6 +11,9 @@ La documentación formal y estructurada de requisitos y casos de uso del sistema
 3. 📄 **[Casos de uso/README.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Casos%20de%20uso/README.md)**  
    *Catálogo Maestro de Casos de Uso (CU UML):* Trazabilidad de actores, flujos principales y alternativos para la ejecución de los 71 requisitos y las capacidades de innovación del sistema.
 
+4. 📄 **[Arquitectura/arquitectura_sistema.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/arquitectura_sistema.md)**  
+   *Documento de Arquitectura de Software y Plan de Distribución Técnica:* Diagramas C4, Clean Architecture, estrategias Offline-First, WebSockets y la **matriz de asignación de los 71 RFs en 5 Squads técnicos especializados**.
+
 ---
 
 ## Módulos del Sistema y Capacidades de Innovación

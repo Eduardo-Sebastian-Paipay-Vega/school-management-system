@@ -205,8 +205,18 @@ Para coordinar el trabajo paralelo de los **5 Squads Técnicos** sin generar con
 | Rama | Propósito | Regla de Oro |
 |---|---|---|
 | **`main`** | **Producción / Hitos Oficiales** | Solo código 100% probado y estable. Es la versión para sustentaciones y despliegue. **Prohibido push directo.** |
-| **`dev`** | **Integración Continua** | Punto de encuentro de los 5 squads. Todos los desarrollos se integran aquí antes de pasar a `main`. |
-| **`feature/squad-[X]-[nombre]`** | **Nuevas Funcionalidades** | Ramas temporales creadas desde `dev` para cada requerimiento funcional (RF). |
+| **`dev`** | **Integración Continua (Default)** | Punto de encuentro de los 5 squads. Todos los desarrollos se integran aquí antes de pasar a `main`. |
+| **`feature/squad-[X]-[nombre]`** | **Ramas de los Squads** | Ramas oficiales de desarrollo para cada uno de los 5 equipos. |
+
+### 🚀 Ramas Oficiales Asignadas por Squad
+
+| Squad | Desarrollador Responsable | Rama Activa en GitHub | Comando para empezar |
+|---|---|---|---|
+| **Squad 1 - Core y Seguridad** | Brandon Montero (`@brandonmontero27-g`) | `feature/squad-1-core-seguridad` | `git checkout feature/squad-1-core-seguridad` |
+| **Squad 2 - Matrícula y Asistencia** | Sebastian Paipay (`@Eduardo-Sebastian-Paipay-Vega`) | `feature/squad-2-matricula-asistencia` | `git checkout feature/squad-2-matricula-asistencia` |
+| **Squad 3 - Calificaciones** | Steve Ovalle (`@steveovalle27-lgtm`) | `feature/squad-3-calificaciones` | `git checkout feature/squad-3-calificaciones` |
+| **Squad 4 - Analítica y Dashboards** | Aracely Rodríguez (`@Arascely`) | `feature/squad-4-analitica-dashboards` | `git checkout feature/squad-4-analitica-dashboards` |
+| **Squad 5 - Secretaría y Portal** | Cesar Leon (`@cesarleon27-ai`) | `feature/squad-5-secretaria-portal` | `git checkout feature/squad-5-secretaria-portal` |
 
 ### Flujo de Trabajo para Desarrolladores
 

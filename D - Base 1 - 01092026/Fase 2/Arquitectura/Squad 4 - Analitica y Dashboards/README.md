@@ -7,13 +7,12 @@
 
 ---
 
-## 📁 Carpetas de Trabajo de este Squad
+---
 
-Para organizar el desarrollo y la entrega técnica, este squad cuenta con dos carpetas operativas:
+## 📁 Documentación y Alcance Técnico del Squad
 
-1. 📄 **[Requisitos/](Requisitos/README.md)**: Contiene la **documentación individual en archivos .md de cada Requisito Funcional** asignado (enunciado normativo, entradas, procesos, salidas y criterios de aceptación Gherkin).
-2. 🛠️ **[Diseno Tecnico/](Diseno%20Tecnico/README.md)**: Contiene el **diseño técnico de software**, arquitectura de datos relacional (PostgreSQL), endpoints API REST, WebSockets y diseño de componentes Flutter.
-
+1. 📄 **[Catálogo de Requisitos Funcionales del Squad](../../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/README.md)**: Especificación individual de los 12 Requisitos Funcionales asignados (ubicados en `Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/`).
+2. 🛠️ **[Diseño Técnico de Software](Diseno%20Tecnico/README.md)**: Arquitectura técnica interna, modelo de datos relacional (PostgreSQL), endpoints API REST, WebSockets y diseño de componentes Flutter.
 
 ## 1. Módulos y Requisitos Asignados
 

@@ -1,40 +1,30 @@
-# Arquitectura del Sistema y Distribución por Squads
+# Arquitectura del Sistema y Diseño Técnico por Squads
 
-Esta carpeta contiene la documentación formal de la arquitectura de software, patrones de diseño, diagramas de componentes y las carpetas de trabajo técnico especializadas por cada **Squad** para los **Planteles de Aplicación "Guamán Poma de Ayala" - UNSCH**:
+Esta carpeta está dedicada exclusivamente a la **arquitectura de software, diagramas técnicos C4, patrones de diseño, esquemas de persistencia y contratos de implementación** de los **Planteles de Aplicación "Guamán Poma de Ayala" - UNSCH**:
 
 ---
 
 ## 📄 Documento Maestro de Arquitectura
-* **[arquitectura_sistema.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/arquitectura_sistema.md)**:  
+* **[arquitectura_sistema.md](arquitectura_sistema.md)**:  
   Documento maestro de arquitectura (SAD), diagramas C4 (Contexto, Contenedores, Componentes), Clean Architecture para Flutter y Backend, principios Offline-First, WebSockets, motor CNEB, y la matriz global de asignación de los 71 Requisitos Funcionales.
 
 ---
 
-## 📁 Carpetas de Trabajo por Squad
+## 📁 Espacios de Trabajo Técnico y Diseño por Squad
 
-Cada carpeta contiene el `README.md` con los requisitos funcionales detallados, modelo de datos relacional, endpoints API y componentes Flutter a cargo del responsable:
+Cada carpeta contiene el diseño técnico, esquemas relacionales, contratos de API y componentes a desarrollar por cada equipo técnico:
 
-1. 🔐 **[Squad 1 - Core y Seguridad/README.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/Squad%201%20-%20Core%20y%20Seguridad/README.md)**
-   * **Responsable:** Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`)
-   * **Módulos:** M1 (Auth JWT/RBAC), M2 (Usuarios/Directorio), M3 (Configuración Escolar), M12 (Auditoría Inmutable y Ley 29733).
-   * **Alcance:** `RF-01` al `RF-14`, `RF-65` al `RF-68` *(18 RFs)*.
+* 🏛️ **[Squad 1 - Core y Seguridad](Squad%201%20-%20Core%20y%20Seguridad/README.md)**: Squad 1: Core, Seguridad, Configuración y Auditoría  
+  *Líder Técnico:* **Brandon Fernando Montero Gutiérrez** (`@brandonmontero27-g`) | [Ver Requisitos Funcionales (RFs)](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/README.md) | [Ver Diseño Técnico](Squad%201%20-%20Core%20y%20Seguridad/Diseno%20Tecnico/README.md)
+* 🏛️ **[Squad 2 - Matricula y Asistencia](Squad%202%20-%20Matricula%20y%20Asistencia/README.md)**: Squad 2: Gestión Académica, Matrícula y Asistencia Offline-First  
+  *Líder Técnico:* **Eduardo Sebastian Paipay Vega** (`@Eduardo-Sebastian-Paipay-Vega`) | [Ver Requisitos Funcionales (RFs)](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/README.md) | [Ver Diseño Técnico](Squad%202%20-%20Matricula%20y%20Asistencia/Diseno%20Tecnico/README.md)
+* 🏛️ **[Squad 3 - Calificaciones y Modo Excel](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/README.md)**: Squad 3: Evaluación Pedagógica, Planilla Rápida y Motor CNEB  
+  *Líder Técnico:* **Steve Smith Ovalle Luyo** (`@steveovalle27-lgtm`) | [Ver Requisitos Funcionales (RFs)](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/README.md) | [Ver Diseño Técnico](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/Diseno%20Tecnico/README.md)
+* 🏛️ **[Squad 4 - Analitica y Dashboards](Squad%204%20-%20Analitica%20y%20Dashboards/README.md)**: Squad 4: Inteligencia de Datos, Mapas de Calor y Dashboards 360°  
+  *Líder Técnico:* **Grissel Arascely Rodríguez Quispe** (`@Arascely`) | [Ver Requisitos Funcionales (RFs)](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/README.md) | [Ver Diseño Técnico](Squad%204%20-%20Analitica%20y%20Dashboards/Diseno%20Tecnico/README.md)
+* 🏛️ **[Squad 5 - Secretaria y Portal Web](Squad%205%20-%20Secretaria%20y%20Portal%20Web/README.md)**: Squad 5: Secretaría Digital, Criptografía Documental y Portal Web  
+  *Líder Técnico:* **Cesar Antonio Leon Reyna** (`@cesarleon27-ai`) | [Ver Requisitos Funcionales (RFs)](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/README.md) | [Ver Diseño Técnico](Squad%205%20-%20Secretaria%20y%20Portal%20Web/Diseno%20Tecnico/README.md)
 
-2. ⏱️ **[Squad 2 - Matricula y Asistencia/README.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/Squad%202%20-%20Matricula%20y%20Asistencia/README.md)**
-   * **Responsable:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`)
-   * **Módulos:** M4 (Gestión Académica/Matrícula), M5 (Asistencia Kiosco Offline-First/Carnés QR), M6 (Practicantes EPIS), M7 (Docentes Contratados).
-   * **Alcance:** `RF-15` al `RF-35` *(21 RFs)*.
+---
 
-3. 📊 **[Squad 3 - Calificaciones y Modo Excel/README.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/README.md)**
-   * **Responsable:** Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`)
-   * **Módulos:** M8 (Planilla Rápida Modo Excel, Auto-guardado, Conversión Dual CNEB, Asistente de Conclusiones).
-   * **Alcance:** `RF-36` al `RF-46` *(11 RFs)*.
-
-4. 🗺️ **[Squad 4 - Analitica y Dashboards/README.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/Squad%204%20-%20Analitica%20y%20Dashboards/README.md)**
-   * **Responsable:** Grissel Arascely Rodríguez Quispe (`@Arascely`)
-   * **Módulos:** M9 (Mapas de Calor con Navegación Drill-Down), M10 (Dashboards, Ficha 360° del Alumno, Métricas SSU IS-480).
-   * **Alcance:** `RF-47` al `RF-58` *(12 RFs)*.
-
-5. 📑 **[Squad 5 - Secretaria y Portal Web/README.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/Squad%205%20-%20Secretaria%20y%20Portal%20Web/README.md)**
-   * **Responsable:** Cesar Antonio Leon Reyna (`@cesarleon27-ai`)
-   * **Módulos:** M11 (Boletas Oficiales PDF, Verificación Criptográfica QR SHA-256), M13 (Difusión Digital y Portal Web).
-   * **Alcance:** `RF-59` al `RF-64`, `RF-69` al `RF-71` *(9 RFs)*.
+> La documentación individual y normativa de los requisitos funcionales (`RF-01.md` al `RF-71.md`) se encuentra centralizada en **[Fase 2 / Requisitos Funcionales](../Requisitos%20Funcionales/README.md)**.

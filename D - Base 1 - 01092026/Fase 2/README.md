@@ -2,17 +2,20 @@
 
 La documentación formal y estructurada de requisitos y casos de uso del sistema para la Fase II se encuentra organizada en tres documentos complementarios:
 
-1. 📄 **[requisitos_funcionales.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md)**  
+1. 📄 **[Requisitos Funcionales/requisitos_funcionales.md](Requisitos%20Funcionales/requisitos_funcionales.md)**  
    *Catálogo y Especificación Documental Formal (Estándar IEEE 830 / ISO 29148):* Enunciados normativos (*"El sistema deberá..."*), precondiciones, entradas, procesos, salidas, postcondiciones y criterios de aceptación para los **71 Requisitos Funcionales (`RF-01` al `RF-71`)**.
 
-2. 📄 **[requisitos_funcionales_tecnicos.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md)**  
+2. 📄 **[Requisitos No Funcionales/requisitos_no_funcionales.md](Requisitos%20No%20Funcionales/requisitos_no_funcionales.md)**  
+   *Especificación Documental de Requisitos No Funcionales (Estándar ISO/IEC 25010):* 20 RNF cuantificables (Rendimiento, Seguridad JWT/RBAC/Ley 29733, Resiliencia Offline-First, WCAG 2.1 AA, Clean Architecture) asignados a los 5 Squads.
+
+3. 📄 **[Requisitos Funcionales/requisitos_funcionales_tecnicos.md](Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md)**  
    *Especificación Técnica de Software (SRS Técnico):* Arquitectura Flutter Web + Backend REST + PostgreSQL Multi-Tenant + Redis + WebSockets, contratos JSON tipados de API, esquemas SQL, transacciones ACID, lógica Offline-First y verificación criptográfica SHA-256.
 
-3. 📄 **[Casos de uso/README.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Casos%20de%20uso/README.md)**  
+4. 📄 **[Casos de uso/README.md](Casos%20de%20uso/README.md)**  
    *Catálogo Maestro de Casos de Uso (CU UML):* Trazabilidad de actores, flujos principales y alternativos para la ejecución de los 71 requisitos y las capacidades de innovación del sistema.
 
-4. 📄 **[Arquitectura/arquitectura_sistema.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/arquitectura_sistema.md)**  
-   *Documento de Arquitectura de Software y Plan de Distribución Técnica:* Diagramas C4, Clean Architecture, estrategias Offline-First, WebSockets y la **matriz de asignación de los 71 RFs en 5 Squads técnicos especializados**.
+5. 📄 **[Arquitectura/arquitectura_sistema.md](Arquitectura/arquitectura_sistema.md)**  
+   *Documento de Arquitectura de Software y Plan de Distribución Técnica:* Diagramas C4, Clean Architecture, estrategias Offline-First, WebSockets y la **matriz de asignación de los 71 RFs y 20 RNFs en 5 Squads técnicos especializados**.
 
 ---
 

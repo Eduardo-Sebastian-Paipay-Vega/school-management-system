@@ -198,6 +198,56 @@ flutter run -d chrome
 
 ---
 
+## 🧭 ¿Cómo Usar el Software y por Dónde Empezar? (Guía de Flujo y Fases)
+
+### 1. Punto de Partida al Iniciar la Aplicación
+
+Al ejecutar el comando `flutter run -d chrome`, se abrirá automáticamente en tu navegador el **Hub Central de Navegación del Sistema** (`lib/main.dart`):
+
+* **🎛️ Tarjetas Interactivas de los 5 Squads:** Cada tarjeta muestra los módulos funcionales, el responsable del equipo, sus requerimientos asignados (`RF` y `RNF`) y un botón para ingresar a la pantalla de trabajo del Squad.
+* **📄 Visor Interactivo de SDD:** En la barra superior (o en la tarjeta del Squad 1) puedes pulsar el botón **"Ver SDD Interactivo"** para consultar el Documento de Diseño de Software (IEEE 1016) renderizado en vivo dentro de la propia aplicación Flutter.
+
+---
+
+### 2. Ruta Lógica de Negocio: ¿Por qué Fase y Squad Empezar?
+
+Para ingresar datos o validar el software en orden coherente, se debe seguir la secuencia del ciclo académico escolar:
+
+```text
+   [1️⃣ Squad 1: Core y Configuración]
+         │  (Configura Año Lectivo 2026, Periodos, Grados y Usuarios JWT/RBAC)
+         ▼
+   [2️⃣ Squad 2: Matrícula y Asistencia]
+         │  (Matricula estudiantes en las secciones creadas, emite carnés QR y Kiosco Offline)
+         ▼
+   [3️⃣ Squad 3: Calificaciones y Modo Excel]
+         │  (Docentes asientan notas por competencias CNEB con autoguardado 400ms)
+         ▼
+   [4️⃣ Squad 4: Analítica y Dashboards]
+         │  (Dirección supervisa Mapas de Calor Drill-Down, Ficha 360° y Alertas de Deserción)
+         ▼
+   [5️⃣ Squad 5: Secretaría y Portal Web]
+            (Emisión masiva de Libretas PDF con QR SHA-256 y difusión en Portal Web)
+```
+
+1. **Fase 1 (Cimiento del Sistema) ➔ Squad 1 - Core y Seguridad:**
+   * **¿Por qué empezar aquí?:** Sin configuración del año escolar ni cuentas de usuario autenticadas con roles (RBAC), ningún otro módulo puede operar.
+   * **Qué hacer:** Configurar el Año Lectivo 2026, periodos bimestrales, escalas de calificación y registrar las cuentas de Directivos, Docentes y Auxiliares.
+2. **Fase 2 (Población Escolar) ➔ Squad 2 - Matrícula y Asistencia:**
+   * **¿Por qué sigue esto?:** Se requiere tener las secciones configuradas por el Squad 1 para poder matricular a los estudiantes.
+   * **Qué hacer:** Matricular alumnos en Inicial, Primaria y Secundaria, asignar carga horaria a docentes, generar los carnés escolares con código QR y registrar asistencia en el Kiosco Offline-First de portería.
+3. **Fase 3 (Operación Académica) ➔ Squad 3 - Calificaciones y Modo Excel:**
+   * **¿Por qué sigue esto?:** Los docentes necesitan que los alumnos ya estén matriculados en sus respectivas áreas para poder evaluarlos.
+   * **Qué hacer:** Ingresar a la planilla rápida "Modo Excel" (navegación 100% por teclado), registrar calificaciones por competencias CNEB y redactar conclusiones descriptivas con autoguardado de 400ms.
+4. **Fase 4 (Supervisión y Análisis) ➔ Squad 4 - Analítica y Dashboards:**
+   * **¿Por qué sigue esto?:** Se nutre de la asistencia acumulada (Squad 2) y las calificaciones registradas (Squad 3).
+   * **Qué hacer:** La Dirección analiza los Mapas de Calor con navegación Drill-Down (colegio ➔ grado ➔ sección ➔ alumno), consulta la Ficha 360° para alertas de deserción escolar y monitorea los indicadores del SSU IS-480.
+5. **Fase 5 (Salida Oficial y Cierre) ➔ Squad 5 - Secretaría y Portal Web:**
+   * **¿Por qué es la fase final?:** Requiere que las notas y asistencias estén consolidadas para emitir los reportes oficiales.
+   * **Qué hacer:** Emisión masiva de Libretas de Calificaciones en PDF con código QR firmado con hash SHA-256 (para verificación pública sin login) y publicación de novedades en el Portal Web Institucional.
+
+---
+
 ## 🌿 Estrategia de Ramas Git (GitFlow Ligero)
 
 Para coordinar el trabajo paralelo de los **5 Squads Técnicos** sin generar conflictos ni romper la estabilidad del sistema, seguimos la siguiente política de ramas:
@@ -257,14 +307,18 @@ flutter clean && flutter pub get
 
 ---
 
-## 📐 Documentos de Diseño de Software (SDD - IEEE 1016)
+## 📚 Especificación y Documentación Técnica (Fase 2)
 
-Cada uno de los 5 Squads cuenta con herramientas estandarizadas para elaborar su diseño técnico:
+El proyecto cuenta con documentación formal de ingeniería de software con trazabilidad bidireccional:
 
-* 📖 **[Guía Rápida: ¿Cómo y Dónde se elabora el SDD?](D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/GUIA_RAPIDA_SDD.md)**
-* 📋 **[Plantilla Canónica SDD (IEEE 1016)](.agents/skills/sdd-authoring/resources/plantilla_sdd.md)**
-* 🌟 **[Ejemplo Modelo Completo: SDD Squad 1](D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/Squad%201%20-%20Core%20y%20Seguridad/sdd_squad_1.md)**
-* 🛠️ **Skill para Asistentes de IA:** Ubicada en [`.agents/skills/sdd-authoring/SKILL.md`](.agents/skills/sdd-authoring/SKILL.md).
+* 📋 **Requisitos Funcionales (RF):** [Catálogo Maestro de 71 RFs (IEEE 830)](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) y [SRS Técnico con Contratos JSON](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md).
+* ⚙️ **Requisitos No Funcionales (RNF):** [Especificación de 20 RNFs Cuantificables (ISO/IEC 25010)](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20No%20Funcionales/requisitos_no_funcionales.md) y [Navegación por Squads](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20No%20Funcionales/README.md).
+* 🎭 **Casos de Uso UML (CU):** [Catálogo Maestro de 71 Casos de Uso por Squad](D%20-%20Base%201%20-%2001092026/Fase%202/Casos%20de%20uso/README.md).
+* 📐 **Diseño de Software (SDD - IEEE 1016):**
+  * 📖 **[Guía Rápida: ¿Cómo y Dónde se elabora el SDD?](D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/GUIA_RAPIDA_SDD.md)**
+  * 📋 **[Plantilla Canónica SDD (IEEE 1016)](.agents/skills/sdd-authoring/resources/plantilla_sdd.md)**
+  * 🌟 **[Ejemplo Modelo Completo: SDD Squad 1](D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/Squad%201%20-%20Core%20y%20Seguridad/sdd_squad_1.md)**
+  * 🛠️ **Skill para Asistentes de IA:** Ubicada en [`.agents/skills/sdd-authoring/SKILL.md`](.agents/skills/sdd-authoring/SKILL.md).
 
 ---
 

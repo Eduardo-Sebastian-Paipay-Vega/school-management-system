@@ -2,145 +2,148 @@
 
 ### Planteles de Aplicación "Guamán Poma de Ayala" — UNSCH (SSU IS-480)
 
-Este directorio documenta la especificación funcional basada en Casos de Uso (Use Cases - UML) que implementan los **68 Requisitos Funcionales (`RF-01` al `RF-68`)** formalizados en el [Catálogo Documental IEEE 830](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) y el [SRS Técnico](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md).
+Este directorio documenta la especificación formal de los **71 Casos de Uso del Sistema** que implementan la totalidad de los Requisitos Funcionales (`RF-01` al `RF-71`), organizados modularmente en **5 Squads Técnicos Especializados**.
 
 ---
 
-## 1. Matriz de Trazabilidad: Actores vs. Módulos
+## 1. Organización y Distribución por Squads de Trabajo
 
-| Actor | Responsabilidad Primaria | Módulos Asociados |
+| Squad | Responsable Técnico | Módulos a Cargo | Casos de Uso | Requisitos Trazables | Enfoque Principal |
+|---|---|---|---|---|---|
+| [**Squad 1: Core y Seguridad**](Squad%201%20-%20Core%20y%20Seguridad/README.md) | Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`) | M1, M2, M3, M12 | **18 CUs** (CU-SEG, CU-USR, CU-INS, CU-AUD) | `RF-01` al `RF-14`<br>`RF-65` al `RF-68` | Seguridad, JWT, RBAC, configuración escolar, multi-tenant y auditoría inmutable (Ley 29733). |
+| [**Squad 2: Matrícula y Asistencia**](Squad%202%20-%20Matricula%20y%20Asistencia/README.md) | Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`) | M4, M5, M6, M7 | **21 CUs** (CU-ACD, CU-AST, CU-PRA, CU-DOC) | `RF-15` al `RF-35` | Matrícula, Kiosco de portería Offline-First (IndexedDB/Hive), carnés QR, WebSockets y control de horas. |
+| [**Squad 3: Calificaciones y Modo Excel**](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/README.md) | Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`) | M8 | **11 CUs** (CU-NOT) | `RF-36` al `RF-46` | Planilla interactiva "Modo Excel", debounce 400ms, banco de conclusiones MINEDU y conversión dual. |
+| [**Squad 4: Analítica y Dashboards**](Squad%204%20-%20Analitica%20y%20Dashboards/README.md) | Grissel Arascely Rodríguez Quispe (`@Arascely`) | M9, M10 | **12 CUs** (CU-MAP, CU-DSH) | `RF-47` al `RF-58` | Mapas de calor con navegación Drill-Down, alertas de deserción, Ficha 360° y tablero SSU IS-480. |
+| [**Squad 5: Secretaría y Portal Web**](Squad%205%20-%20Secretaria%20y%20Portal%20Web/README.md) | Cesar Antonio Leon Reyna (`@cesarleon27-ai`) | M11, M13 | **9 CUs** (CU-REP, CU-PUB) | `RF-59` al `RF-64`<br>`RF-69` al `RF-71` | Libretas y actas en PDF, verificación criptográfica SHA-256 + QR público, cartelera y portal web. |
+
+---
+
+## 2. Matriz General de Actores del Sistema
+
+| Actor | Responsabilidad Primaria | Squads con los que Interactúa |
 |---|---|---|
-| **Superadmin / Admin** | Configuración general, gestión de usuarios, roles, periodos, mallas y auditoría. | Módulo 1, 2, 3, 4, 10, 11, 12, 13 |
-| **Director / Subdirector** | Aprobación de actas, supervisión integral, mapas de calor, reportes y métricas SSU. | Módulo 5, 6, 7, 8, 9, 10, 11, 12 |
-| **Docente (Nombrado/Contratado)** | Registro de notas (Modo Excel), conclusiones CNEB, asistencia en aula y reprogramación. | Módulo 5, 7, 8, 9, 10 |
-| **Practicante Preprofesional** | Marcación de jornada, justificación de inasistencias y seguimiento de horas acumuladas. | Módulo 6, 10 |
-| **Personal de Portería / Vigilancia** | Operación del Kiosco Offline-First de asistencia y validación de carnés con código QR. | Módulo 5 |
-| **Estudiante** | Consulta de notas consolidadas, historial de asistencia y carné escolar digital. | Módulo 5, 8, 10, 13 |
-| **Público General / Comunidad UNSCH** | Consulta del portal de difusión digital y verificación pública de documentos con QR. | Módulo 11, 13 |
+| **Superadmin / Administrador** | Configuración general, gestión de usuarios, roles, sedes, periodos y auditoría. | Squad 1, Squad 2, Squad 4, Squad 5 |
+| **Director / Subdirector** | Aprobación de actas, supervisión integral, mapas de calor, reportes y métricas SSU. | Squad 1, Squad 2, Squad 3, Squad 4, Squad 5 |
+| **Docente (Nombrado/Contratado)** | Registro de notas (Modo Excel), conclusiones CNEB, asistencia en aula y reprogramación. | Squad 2, Squad 3, Squad 4 |
+| **Practicante Preprofesional** | Marcación de jornada, registro asistido de notas y seguimiento de horas SSU IS-480. | Squad 2, Squad 3, Squad 4 |
+| **Personal de Portería ('Wachiman')** | Operación del Kiosco Offline-First de asistencia y validación de carnés con código QR. | Squad 2 |
+| **Estudiante** | Consulta de notas consolidadas, historial de asistencia y carné escolar digital. | Squad 2, Squad 3, Squad 4, Squad 5 |
+| **Público General / Comunidad UNSCH** | Consulta del portal de difusión digital y verificación pública de documentos con QR. | Squad 5 |
 
 ---
 
-## 2. Índice General de Casos de Uso por Módulo
+## 3. Catálogo Completo de Casos de Uso por Squad
 
-### Módulo 1: Acceso, Autenticación JWT y RBAC
-- **CU-SEG-01:** Iniciar Sesión en la Plataforma (`RF-01`)
-- **CU-SEG-02:** Recuperar Contraseña mediante Token Temporal (`RF-02`)
-- **CU-SEG-03:** Cerrar Sesión e Invalidar Tokens JWT (`RF-03`)
-- **CU-SEG-04:** Control de Acceso Basado en Roles y Permisos Granulares (`RF-04`)
+### [Squad 1: Core, Seguridad, Configuración y Auditoría](Squad%201%20-%20Core%20y%20Seguridad/README.md)
 
-### Módulo 2: Administración de Usuarios y Directorio
-- **CU-USR-01:** Registrar Usuario en el Directorio Institucional (`RF-05`)
-- **CU-USR-02:** Modificar Datos y Asignaciones de Usuario (`RF-06`)
-- **CU-USR-03:** Desactivar Lógicamente a un Usuario del Sistema (`RF-07`)
-- **CU-USR-04:** Consultar Directorio con Búsqueda Paginada y Filtros (`RF-08`)
-- **CU-USR-05:** Gestionar Roles Secundarios y Permisos Especiales (`RF-09`)
+**Responsable:** Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`) | **Total:** 18 Casos de Uso
 
-### Módulo 3: Configuración Escolar, Periodos y Escalas
-- **CU-INS-01:** Parametrizar Datos Institucionales y Sedes (`RF-10`)
-- **CU-INS-02:** Aperturar y Cerrar Años y Periodos Académicos (`RF-11`)
-- **CU-INS-03:** Configurar Niveles Educativos, Grados y Secciones (`RF-12`)
-- **CU-INS-04:** Administrar Planes de Estudio y Catálogo de Cursos (`RF-13`)
-- **CU-INS-05:** Configurar Escalas Oficiales de Calificación (CNEB y Vigesimal) (`RF-14`)
+| ID | Requisito | Título del Caso de Uso | Frecuencia |
+|---|---|---|---|
+| [CU-SEG-01](Squad%201%20-%20Core%20y%20Seguridad/CU-SEG-01.md) | [RF-01](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-01.md) | Iniciar Sesión en la Plataforma | Muy Alta (Múltiples veces por día) |
+| [CU-SEG-02](Squad%201%20-%20Core%20y%20Seguridad/CU-SEG-02.md) | [RF-02](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-02.md) | Cierre de Sesión Seguro y Terminación por Inactividad | Alta (Al finalizar la jornada o cambio de turno) |
+| [CU-SEG-03](Squad%201%20-%20Core%20y%20Seguridad/CU-SEG-03.md) | [RF-03](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-03.md) | Restablecimiento Asistido de Contraseñas de Acceso | Media |
+| [CU-SEG-04](Squad%201%20-%20Core%20y%20Seguridad/CU-SEG-04.md) | [RF-04](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-04.md) | Control de Privilegios y Acceso Basado en Roles (RBAC) | Baja (Configuración inicial o reasignaciones) |
+| [CU-USR-01](Squad%201%20-%20Core%20y%20Seguridad/CU-USR-01.md) | [RF-05](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-05.md) | Registro y Alta Formal de Personal Institucional | Media |
+| [CU-USR-02](Squad%201%20-%20Core%20y%20Seguridad/CU-USR-02.md) | [RF-06](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-06.md) | Importación Masiva de Usuarios desde Archivos Excel / CSV | Baja (Inicio de año o semestre) |
+| [CU-USR-03](Squad%201%20-%20Core%20y%20Seguridad/CU-USR-03.md) | [RF-07](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-07.md) | Gestión de Sedes y Planteles Escolares Multi-Tenant | Muy Baja (Configuración inicial) |
+| [CU-USR-04](Squad%201%20-%20Core%20y%20Seguridad/CU-USR-04.md) | [RF-08](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-08.md) | Directorio Escolar y Búsqueda Rápida de Personal | Alta |
+| [CU-USR-05](Squad%201%20-%20Core%20y%20Seguridad/CU-USR-05.md) | [RF-09](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-09.md) | Gestión de Perfil Personal y Cambio Autónomo de Credenciales | Baja |
+| [CU-INS-01](Squad%201%20-%20Core%20y%20Seguridad/CU-INS-01.md) | [RF-10](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-10.md) | Parametrización del Año Lectivo y Calendario Escolar | Baja (Anual) |
+| [CU-INS-02](Squad%201%20-%20Core%20y%20Seguridad/CU-INS-02.md) | [RF-11](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-11.md) | Apertura, Parametrización y Cierre de Periodos Académicos | Media (4 veces al año en régimen bimestral) |
+| [CU-INS-03](Squad%201%20-%20Core%20y%20Seguridad/CU-INS-03.md) | [RF-12](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-12.md) | Estructuración de Niveles Educativos, Grados y Secciones | Baja |
+| [CU-INS-04](Squad%201%20-%20Core%20y%20Seguridad/CU-INS-04.md) | [RF-13](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-13.md) | Definición de Escalas de Calificación Institucionales (Dual CNEB) | Muy Baja |
+| [CU-INS-05](Squad%201%20-%20Core%20y%20Seguridad/CU-INS-05.md) | [RF-14](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-14.md) | Parámetros Globales del Sistema y Membretes Institucionales | Baja |
+| [CU-AUD-01](Squad%201%20-%20Core%20y%20Seguridad/CU-AUD-01.md) | [RF-65](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-65.md) | Registro Inmutable de Auditoría de Eventos y Seguridad | Constante (En cada petición sensible) |
+| [CU-AUD-02](Squad%201%20-%20Core%20y%20Seguridad/CU-AUD-02.md) | [RF-66](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-66.md) | Trazabilidad Histórica de Modificaciones en Notas y Asistencias | Muy Alta (En cada guardado de notas o cambios de asistencia) |
+| [CU-AUD-03](Squad%201%20-%20Core%20y%20Seguridad/CU-AUD-03.md) | [RF-67](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-67.md) | Módulo de Búsqueda y Monitoreo de Bitácoras de Auditoría | Media |
+| [CU-AUD-04](Squad%201%20-%20Core%20y%20Seguridad/CU-AUD-04.md) | [RF-68](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-68.md) | Cumplimiento y Protección de Datos Personales (Ley N.° 29733) | Baja |
 
-### Módulo 4: Gestión Académica, Matrícula y Carga Lectiva
-- **CU-ACD-01:** Registrar y Actualizar Ficha de Estudiante (`RF-15`)
-- **CU-ACD-02:** Registrar y Asignar Carga a Docentes y Practicantes (`RF-16`)
-- **CU-ACD-03:** Matricular Estudiantes en Grado y Sección (`RF-17`)
-- **CU-ACD-04:** Asignar Carga Lectiva y Horarios a Docentes (`RF-18`)
-- **CU-ACD-05:** Consultar Nóminas de Matrícula Oficiales (`RF-19`)
+### [Squad 2: Gestión Académica, Matrícula y Asistencia Offline-First](Squad%202%20-%20Matricula%20y%20Asistencia/README.md)
 
-### Módulo 5: Asistencia Estudiantil, Kiosco Offline-First, Carnés QR y App Móvil
-- **CU-AST-01:** Registrar Asistencia Diaria en Aula (`RF-20`)
-- **CU-AST-02:** Registrar Ingreso Físico en Modo Kiosco de Portería ("Wachiman") (`RF-21`)
-- **CU-AST-03:** Justificar Inasistencias y Tardanzas con Evidencia (`RF-22`)
-- **CU-AST-04:** Consolidar y Consultar Récord de Asistencia por Estudiante (`RF-23`)
-- **CU-AST-05:** Detección de Alertas Preventivas por Ausentismo Crónico (`RF-24`)
-- **CU-AST-06:** **[Innovación 1]** Operar Kiosco de Portería en Modo Offline-First y Sincronización Diferida (`RF-25`)
-- **CU-AST-07:** **[Innovación 2]** Emitir e Imprimir Carnés Escolares Institucionales con Código QR Criptográfico (`RF-26`)
-- **CU-AST-08:** **[Innovación / Requisito Usuario]** Toma Rápida de Asistencia en Aula mediante Aplicación Móvil y Difusión en Tiempo Real vía WebSockets (`RF-27`)
+**Responsable:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`) | **Total:** 21 Casos de Uso
 
-### Módulo 6: Asistencia y Cómputo de Horas de Practicantes
-- **CU-PRA-01:** Registrar Marcación de Entrada y Salida con Geolocalización Referencial (`RF-28`)
-- **CU-PRA-02:** Calcular y Acumular Horas de Prácticas Preprofesionales Automáticamente (`RF-29`)
-- **CU-PRA-03:** Supervisar y Validar Asistencia de Practicantes por Coordinación (`RF-30`)
-- **CU-PRA-04:** Generar Constancia de Cumplimiento de Horas para el SSU IS-480 (`RF-31`)
+| ID | Requisito | Título del Caso de Uso | Frecuencia |
+|---|---|---|---|
+| [CU-ACD-01](Squad%202%20-%20Matricula%20y%20Asistencia/CU-ACD-01.md) | [RF-15](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-15.md) | Registro, Filiación y Actualización de Ficha de Estudiante | Alta (En periodos de inscripción) |
+| [CU-ACD-02](Squad%202%20-%20Matricula%20y%20Asistencia/CU-ACD-02.md) | [RF-16](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-16.md) | Matrícula Escolar y Asignación de Estudiantes a Secciones | Alta (Fase de matrícula) |
+| [CU-ACD-03](Squad%202%20-%20Matricula%20y%20Asistencia/CU-ACD-03.md) | [RF-17](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-17.md) | Catálogo Curricular y Planes de Estudio oficiales según CNEB | Baja |
+| [CU-ACD-04](Squad%202%20-%20Matricula%20y%20Asistencia/CU-ACD-04.md) | [RF-18](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-18.md) | Asignación y Distribución de Carga Lectiva Docente | Media |
+| [CU-ACD-05](Squad%202%20-%20Matricula%20y%20Asistencia/CU-ACD-05.md) | [RF-19](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-19.md) | Consulta y Generación de Nóminas Oficiales de Aula | Alta |
+| [CU-AST-01](Squad%202%20-%20Matricula%20y%20Asistencia/CU-AST-01.md) | [RF-20](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-20.md) | Registro Ordinario de Asistencia Escolar en el Aula | Diaria (Al inicio de cada jornada) |
+| [CU-AST-02](Squad%202%20-%20Matricula%20y%20Asistencia/CU-AST-02.md) | [RF-21](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-21.md) | Registro de Ingreso Físico en Modo Kiosco de Portería ('Wachiman') | Muy Alta (Pico de 7:15 AM a 8:00 AM) |
+| [CU-AST-03](Squad%202%20-%20Matricula%20y%20Asistencia/CU-AST-03.md) | [RF-22](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-22.md) | Gestión y Justificación Formal de Inasistencias y Tardanzas | Media |
+| [CU-AST-04](Squad%202%20-%20Matricula%20y%20Asistencia/CU-AST-04.md) | [RF-23](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-23.md) | Consolidación y Consulta del Récord de Asistencia por Estudiante | Alta |
+| [CU-AST-05](Squad%202%20-%20Matricula%20y%20Asistencia/CU-AST-05.md) | [RF-24](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-24.md) | Detección y Generación de Alertas por Ausentismo Crónico | Diaria (Al finalizar la toma de asistencia) |
+| [CU-AST-06](Squad%202%20-%20Matricula%20y%20Asistencia/CU-AST-06.md) | [RF-25](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-25.md) | Operar Kiosco de Portería en Modo Offline-First y Sincronización Diferida | Alta (En contingencias de corte de internet en portería) |
+| [CU-AST-07](Squad%202%20-%20Matricula%20y%20Asistencia/CU-AST-07.md) | [RF-26](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-26.md) | Generación y Emisión Masiva de Carnés Escolares con Código QR Criptográfico | Baja (Inicio de año escolar) |
+| [CU-AST-08](Squad%202%20-%20Matricula%20y%20Asistencia/CU-AST-08.md) | [RF-27](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-27.md) | Toma Rápida en App Móvil y Difusión en Tiempo Real vía WebSockets | Diaria (Primera hora de clases) |
+| [CU-PRA-01](Squad%202%20-%20Matricula%20y%20Asistencia/CU-PRA-01.md) | [RF-28](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-28.md) | Registro Diario de Jornada y Permanencia de Practicantes EPIS-UNSCH | Diaria (Entrada y Salida de turno) |
+| [CU-PRA-02](Squad%202%20-%20Matricula%20y%20Asistencia/CU-PRA-02.md) | [RF-29](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-29.md) | Asignación de Docente Guía y Asesor Institucional | Baja (Inicio de ciclo universitario) |
+| [CU-PRA-03](Squad%202%20-%20Matricula%20y%20Asistencia/CU-PRA-03.md) | [RF-30](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-30.md) | Cómputo Acumulado de Horas Efectivas de Prácticas Universitarias | Alta |
+| [CU-PRA-04](Squad%202%20-%20Matricula%20y%20Asistencia/CU-PRA-04.md) | [RF-31](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-31.md) | Emisión de Fichas Oficiales de Prácticas para la UNSCH | Baja (Cierre de ciclo universitario) |
+| [CU-DOC-01](Squad%202%20-%20Matricula%20y%20Asistencia/CU-DOC-01.md) | [RF-32](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-32.md) | Registro y Marcación de Horas Lectivas de Docentes Contratados | Diaria (Por cada bloque pedagógico) |
+| [CU-DOC-02](Squad%202%20-%20Matricula%20y%20Asistencia/CU-DOC-02.md) | [RF-33](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-33.md) | Registro de Justificaciones y Reprogramación de Clases Docentes | Media |
+| [CU-DOC-03](Squad%202%20-%20Matricula%20y%20Asistencia/CU-DOC-03.md) | [RF-34](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-34.md) | Consolidación Mensual de Cumplimiento de Horas Lectivas Dictadas | Mensual (Al cierre de cada mes) |
+| [CU-DOC-04](Squad%202%20-%20Matricula%20y%20Asistencia/CU-DOC-04.md) | [RF-35](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-35.md) | Supervisión y Monitoreo de Cobertura y Puntualidad de Clases | Diaria / Continua |
 
-### Módulo 7: Horas de Docentes Contratados y Reprogramación
-- **CU-DOC-01:** Registrar Asistencia de Docentes Contratados por Sesión (`RF-32`)
-- **CU-DOC-02:** Solicitar y Autorizar Reprogramación de Clases Docentes (`RF-33`)
-- **CU-DOC-03:** Consolidar Mensualmente el Cumplimiento de Horas Lectivas Dictadas (`RF-34`)
-- **CU-DOC-04:** Supervisar la Cobertura y Puntualidad Docente en Tiempo Real (`RF-35`)
+### [Squad 3: Evaluación Pedagógica, Planilla Rápida y Motor CNEB](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/README.md)
 
-### Módulo 8: Calificaciones en Tiempo Real, Modo Excel, Conclusiones, Llenado Asistido y Conversión CNEB
-- **CU-NOT-01:** Parametrizar Rúbricas y Evaluaciones por Asignatura (`RF-36`)
-- **CU-NOT-02:** Registrar, Editar y Publicar Calificaciones en Tiempo Real (`RF-37`)
-- **CU-NOT-03:** **[Innovación 3]** Ingreso Masivo y Rápido de Calificaciones en Planilla Interactiva "Modo Excel" (`RF-38`)
-- **CU-NOT-04:** **[Innovación 4]** Utilizar Asistente y Banco Estructurado de Conclusiones Descriptivas MINEDU (`RF-39`)
-- **CU-NOT-05:** Colaboración Supervisada de Practicantes en el Registro de Notas (`RF-40`)
-- **CU-NOT-06:** Cálculo Automatizado de Promedios Parciales, Bimestrales y Finales (`RF-41`)
-- **CU-NOT-07:** Cierre Oficial de Periodo Académico y Bloqueo de Modificación (`RF-42`)
-- **CU-NOT-08:** Flujo Extraordinario de Solicitud y Aprobación de Rectificación (`RF-43`)
-- **CU-NOT-09:** Consulta Inmediata y Transparente de Calificaciones para Estudiantes (`RF-44`)
-- **CU-NOT-10:** **[Innovación / Requisito Usuario]** Llenado Asistido con Auto-Guardado en Segundo Plano y Conexión Automática de Evaluaciones (`RF-45`)
-- **CU-NOT-11:** **[Innovación / Requisito Usuario]** Motor de Conversión y Escala Dual Automatizada de Calificaciones Numéricas (0 a 20) a Escala Cualitativa Literal CNEB (AD, A, B, C) (`RF-46`)
+**Responsable:** Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`) | **Total:** 11 Casos de Uso
 
-### Módulo 9: Mapas de Calor con Navegación Drill-Down
-- **CU-MAP-01:** Visualizar Mapa de Calor de Rendimiento Académico Institucional (`RF-47`)
-- **CU-MAP-02:** Visualizar Mapa de Calor de Asistencia y Puntualidad (`RF-48`)
-- **CU-MAP-03:** **[Innovación 5]** Navegar Interactivamente en Mapa de Calor mediante Zoom Jerárquico "Drill-Down" (`RF-49`)
-- **CU-MAP-04:** Comparativas Visuales de Rendimiento entre Secciones (`RF-50`)
-- **CU-MAP-05:** Detección Visual de Asignaturas con Mayor Índice de Riesgo (`RF-51`)
+| ID | Requisito | Título del Caso de Uso | Frecuencia |
+|---|---|---|---|
+| [CU-NOT-01](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-01.md) | [RF-36](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-36.md) | Parametrización de Rúbricas y Evaluaciones por Asignatura | Media (Al inicio de cada periodo) |
+| [CU-NOT-02](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-02.md) | [RF-37](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-37.md) | Ingreso, Edición y Publicación de Calificaciones en Tiempo Real | Muy Alta |
+| [CU-NOT-03](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-03.md) | [RF-38](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-38.md) | Planilla Ágil de Notas en Modo Matriz Rápida ('Modo Excel / Teclado') | Muy Alta (Cierre de evaluaciones) |
+| [CU-NOT-04](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-04.md) | [RF-39](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-39.md) | Asistente y Banco Estructurado de Conclusiones Descriptivas Sugeridas por Logro (MINEDU) | Alta (En cada cierre de bimestre) |
+| [CU-NOT-05](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-05.md) | [RF-40](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-40.md) | Colaboración Supervisada de Practicantes en el Registro de Notas | Media |
+| [CU-NOT-06](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-06.md) | [RF-41](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-41.md) | Cálculo Automatizado de Promedios Parciales, Bimestrales y Finales | Automática e Instantánea ante cualquier cambio |
+| [CU-NOT-07](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-07.md) | [RF-42](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-42.md) | Cierre Oficial de Periodo Académico y Bloqueo de Modificación | Media (4 veces al año) |
+| [CU-NOT-08](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-08.md) | [RF-43](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-43.md) | Flujo Extraordinario de Solicitud y Aprobación de Rectificación de Notas | Baja (Casos excepcionales) |
+| [CU-NOT-09](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-09.md) | [RF-44](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-44.md) | Consulta Inmediata y Transparente de Calificaciones para Estudiantes | Alta |
+| [CU-NOT-10](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-10.md) | [RF-45](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-45.md) | Llenado Asistido con Auto-Guardado en Segundo Plano (Debounce 400ms) | Constante durante la edición de notas |
+| [CU-NOT-11](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-11.md) | [RF-46](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-46.md) | Motor de Conversión Escala Vigesimal (0-20) a Literal CNEB (AD, A, B, C) | Muy Alta |
 
-### Módulo 10: Dashboards, Ficha 360° del Alumno y Métricas SSU IS-480
-- **CU-DSH-01:** Visualizar Dashboard Directivo Institucional (`RF-52`)
-- **CU-DSH-02:** Visualizar Dashboard Operativo de Coordinación (`RF-53`)
-- **CU-DSH-03:** Visualizar Dashboard Pedagógico del Docente (`RF-54`)
-- **CU-DSH-04:** Visualizar Dashboard Académico del Estudiante (`RF-55`)
-- **CU-DSH-05:** **[Innovación 6]** Consultar Ficha Escolar Integral 360° del Estudiante (`RF-56`)
-- **CU-DSH-06:** **[Innovación 8]** Monitorear Métricas de Impacto Institucional y Social SSU IS-480 (`RF-57`)
-- **CU-DSH-07:** Alertas Preventivas de Deserción y Repitencia Escolar (`RF-58`)
+### [Squad 4: Inteligencia de Datos, Mapas de Calor y Dashboards 360°](Squad%204%20-%20Analitica%20y%20Dashboards/README.md)
 
-### Módulo 11: Emisión de Reportes y Verificación Criptográfica QR
-- **CU-REP-01:** Generar Boletas de Notas Oficiales por Bimestre o Año (`RF-59`)
-- **CU-REP-02:** **[Innovación 7]** Generar y Verificar Autenticidad Documental Criptográfica mediante Hash SHA-256 y Código QR Público (`RF-60`)
-- **CU-REP-03:** Generar Cuadro de Mérito y Puestos de Honor Institucionales (`RF-61`)
-- **CU-REP-04:** Emitir y Descargar Registro Auxiliar Oficial y Actas Finales (`RF-62`)
-- **CU-REP-05:** Generar Reportes Consolidados de Asistencia Multiactor (`RF-63`)
-- **CU-REP-06:** Exportar Reportes Masivos a Formatos PDF y Hojas de Cálculo (`RF-64`)
+**Responsable:** Grissel Arascely Rodríguez Quispe (`@Arascely`) | **Total:** 12 Casos de Uso
 
-### Módulo 12: Trazabilidad, Auditoría y Protección de Datos (Ley 29733)
-- **CU-AUD-01:** Registrar Pista de Auditoría para Eventos de Autenticación y Seguridad (`RF-65`)
-- **CU-AUD-02:** Registrar Trazabilidad Inmutable de Modificaciones Críticas (`RF-66`)
-- **CU-AUD-03:** Consultar y Filtrar Registros de Auditoría por Administradores (`RF-67`)
-- **CU-AUD-04:** Garantizar Cumplimiento de Confidencialidad y Protección de Datos Personales (Ley N.° 29733) (`RF-68`)
+| ID | Requisito | Título del Caso de Uso | Frecuencia |
+|---|---|---|---|
+| [CU-MAP-01](Squad%204%20-%20Analitica%20y%20Dashboards/CU-MAP-01.md) | [RF-47](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-47.md) | Visualizar Mapa de Calor de Rendimiento Académico por Sección | Media (Cierre de bimestre y reuniones pedagógicas) |
+| [CU-MAP-02](Squad%204%20-%20Analitica%20y%20Dashboards/CU-MAP-02.md) | [RF-48](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-48.md) | Visualizar Mapa de Calor de Asistencia y Puntualidad | Semanal / Mensual |
+| [CU-MAP-03](Squad%204%20-%20Analitica%20y%20Dashboards/CU-MAP-03.md) | [RF-49](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-49.md) | Navegación Interactiva en Mapas de Calor con Zoom Jerárquico 'Drill-Down' | Alta durante análisis institucional |
+| [CU-MAP-04](Squad%204%20-%20Analitica%20y%20Dashboards/CU-MAP-04.md) | [RF-50](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-50.md) | Análisis Gráfico Comparativo de Rendimiento entre Secciones y Grados | Media |
+| [CU-MAP-05](Squad%204%20-%20Analitica%20y%20Dashboards/CU-MAP-05.md) | [RF-51](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-51.md) | Detección Visual de Asignaturas con Mayor Índice de Riesgo Académico | Media |
+| [CU-DSH-01](Squad%204%20-%20Analitica%20y%20Dashboards/CU-DSH-01.md) | [RF-52](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-52.md) | Tablero de Control Ejecutivo de Indicadores Clave para Dirección | Diaria |
+| [CU-DSH-02](Squad%204%20-%20Analitica%20y%20Dashboards/CU-DSH-02.md) | [RF-53](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-53.md) | Tablero de Control Curricular y Cumplimiento para Coordinación | Diaria / Semanal |
+| [CU-DSH-03](Squad%204%20-%20Analitica%20y%20Dashboards/CU-DSH-03.md) | [RF-54](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-54.md) | Tablero de Resumen Pedagógico y Clases Diarias para el Docente | Diaria (Al iniciar sesión) |
+| [CU-DSH-04](Squad%204%20-%20Analitica%20y%20Dashboards/CU-DSH-04.md) | [RF-55](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-55.md) | Generación Automatizada de Alertas de Deserción y Repitencia Escolar | Semanal / Al cierre de evaluaciones |
+| [CU-DSH-05](Squad%204%20-%20Analitica%20y%20Dashboards/CU-DSH-05.md) | [RF-56](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-56.md) | Ficha Integral y Radiografía Escolar 360° del Estudiante en 1 Clic | Alta durante atención a padres o consejos de grado |
+| [CU-DSH-06](Squad%204%20-%20Analitica%20y%20Dashboards/CU-DSH-06.md) | [RF-57](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-57.md) | Tablero de Seguimiento, Impacto y Acreditación del SSU (IS-480) | Semanal / Al cierre de ciclo |
+| [CU-DSH-07](Squad%204%20-%20Analitica%20y%20Dashboards/CU-DSH-07.md) | [RF-58](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-58.md) | Generador de Reportes de Diagnóstico Integral para Consejos Académicos | Bimestral |
 
-### Módulo 13: Plataforma de Difusión Digital y Portal Institucional
-- **CU-PUB-01:** Gestionar y Publicar Noticias, Comunicados y Circulares Institucionales (`RF-69`)
-- **CU-PUB-02:** Publicar Calendario de Actividades y Efemérides Escolares (`RF-70`)
-- **CU-PUB-03:** Navegación Pública en Portal Institucional Responsivo y Accesible (`RF-71`)
+### [Squad 5: Secretaría Digital, Criptografía Documental y Portal Web](Squad%205%20-%20Secretaria%20y%20Portal%20Web/README.md)
+
+**Responsable:** Cesar Antonio Leon Reyna (`@cesarleon27-ai`) | **Total:** 9 Casos de Uso
+
+| ID | Requisito | Título del Caso de Uso | Frecuencia |
+|---|---|---|---|
+| [CU-REP-01](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-REP-01.md) | [RF-59](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-59.md) | Emisión Oficial de Boletas de Información Escolar / Libretas en PDF | Bimestral / Anual |
+| [CU-REP-02](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-REP-02.md) | [RF-60](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-60.md) | Verificación Pública Criptográfica de Documentos mediante Hash SHA-256 y Código QR | Alta |
+| [CU-REP-03](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-REP-03.md) | [RF-61](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-61.md) | Generación del Cuadro de Mérito y Puestos de Honor Institucionales | Bimestral y Anual (Clausura escolar) |
+| [CU-REP-04](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-REP-04.md) | [RF-62](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-62.md) | Emisión y Descarga del Registro Auxiliar Oficial y Actas Finales | Bimestral / Fin de Año |
+| [CU-REP-05](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-REP-05.md) | [RF-63](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-63.md) | Reportes Consolidados de Asistencia Multiactor del Plantel | Mensual |
+| [CU-REP-06](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-REP-06.md) | [RF-64](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-64.md) | Exportación de Datos en Formatos Estándar Abiertos (PDF y Excel SIAGIE) | Media |
+| [CU-PUB-01](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-PUB-01.md) | [RF-69](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-69.md) | Cartelera Digital y Publicación de Comunicados Institucionales | Alta |
+| [CU-PUB-02](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-PUB-02.md) | [RF-70](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-70.md) | Publicación y Consulta del Calendario Cívico y Escolar Interactivo | Alta |
+| [CU-PUB-03](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-PUB-03.md) | [RF-71](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-71.md) | Navegación Pública en Portal Institucional Responsivo y Accesible | Muy Alta |
 
 ---
 
-## 3. Ejemplos de Especificación Detallada de Casos de Uso de Innovación
+## 4. Trazabilidad con Requisitos y Arquitectura
 
-### CU-AST-08: Toma Rápida de Asistencia en Aula con App Móvil y Transmisión en Tiempo Real
-- **Requisito Trazable:** `RF-27` (Fase 2) / `RF-AST-08` (Fase 1).
-- **Actor Primario:** Docente de Aula / Auxiliar de Educación.
-- **Flujo Principal:**
-  1. El docente accede a la sesión desde su smartphone o tableta en el salón de clases.
-  2. La app carga la lista del aula con estado "Todos Presentes".
-  3. El docente toca sobre los alumnos ausentes o retrasados: un toque = Tardanza (amarillo), dos toques = Falta (rojo).
-  4. Presiona "Confirmar Asistencia".
-  5. El sistema envía el lote al servidor y emite por WebSockets el evento `ATTENDANCE_TAKEN`.
-  6. En tiempo real (< 500 ms), el tablero de la Dirección y Coordinación refleja el aula como registrada y actualiza los indicadores de asistencia global del colegio.
-- **Postcondiciones:** Asistencia registrada sin demoras y visible en vivo para los directivos.
-
-### CU-NOT-11: Motor de Conversión y Escala Dual Automatizada Vigesimal (0 a 20) a Literal CNEB
-- **Requisito Trazable:** `RF-46` (Fase 2) / `RF-NOT-11` (Fase 1).
-- **Actor Primario:** Docente Titular del Curso.
-- **Flujo Principal:**
-  1. El docente califica un examen sobre 20 y digita en la celda: `16`.
-  2. El sistema detecta el valor numérico, evalúa la regla del CNEB (14 a 17 = A) y automáticamente despliega la insignia verde `A (Logro Esperado)` junto con el puntaje `(16)`.
-  3. Si el docente pega una columna completa de notas vigesimales desde Excel, el sistema convierte todas las filas a sus letras oficiales en menos de 1 segundo.
-  4. En las libretas y reportes para MINEDU se emite la escala literal (`A`), mientras que en los análisis internos de promedios se preserva el puntaje exacto.
-- **Postcondiciones:** Documentos escolares 100% alineados a la norma MINEDU sin esfuerzo manual de conversión docente.
+* 📁 [Requisitos Funcionales por Squads](../Requisitos%20Funcionales/)
+* 📁 [Arquitectura y Contratos API por Squads](../Arquitectura/)
+* 📄 [Documento Maestro de Arquitectura (SAD)](../Arquitectura/arquitectura_sistema.md)

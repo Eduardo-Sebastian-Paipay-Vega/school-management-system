@@ -77,7 +77,7 @@ pie title Distribución de los 71 Requisitos Funcionales
 ---
 
 ### SQUAD 1: Core, Autenticación, Configuración Institucional y Auditoría
-* **Líder Técnico:** Ovalle Luyo, Steve Smith (`@steveovalle27-lgtm`)
+* **Líder Técnico:** Montero Gutiérrez, Brandon Fernando (`@brandonmontero27-g`)
 * **Módulos a Cargo:** 
   * **Módulo 1:** Acceso, Autenticación JWT y RBAC (`RF-01` a `RF-04`)
   * **Módulo 2:** Administración de Usuarios y Directorio (`RF-05` a `RF-09`)
@@ -94,7 +94,7 @@ pie title Distribución de los 71 Requisitos Funcionales
 ---
 
 ### SQUAD 2: Gestión Académica, Matrícula y Asistencia Offline-First
-* **Líder Técnico:** Leon Reyna, Cesar Antonio (`@cesarleon27-ai`)
+* **Líder Técnico:** Paipay Vega, Eduardo Sebastian (`@Eduardo-Sebastian-Paipay-Vega`)
 * **Módulos a Cargo:**
   * **Módulo 4:** Gestión Académica, Matrícula y Carga Lectiva (`RF-15` a `RF-19`)
   * **Módulo 5:** Asistencia Estudiantil, Kiosco Offline-First, App Rápida y Carnés QR (`RF-20` a `RF-27`)
@@ -111,7 +111,7 @@ pie title Distribución de los 71 Requisitos Funcionales
 ---
 
 ### SQUAD 3: Evaluación Pedagógica, Planilla Rápida y Motor CNEB
-* **Líder Técnico:** Paipay Vega, Eduardo Sebastian (`@Eduardo-Sebastian-Paipay-Vega`)
+* **Líder Técnico:** Ovalle Luyo, Steve Smith (`@steveovalle27-lgtm`)
 * **Módulos a Cargo:**
   * **Módulo 8:** Calificaciones en Tiempo Real, Modo Excel, Auto-Guardado y Conversión CNEB (`RF-36` a `RF-46`)
 * **Total de Requisitos:** **11 RFs** *(Núcleo de Innovación y Alta Complejidad UX)*
@@ -125,7 +125,7 @@ pie title Distribución de los 71 Requisitos Funcionales
 ---
 
 ### SQUAD 4: Inteligencia de Datos, Mapas de Calor y Dashboards 360°
-* **Líder Técnico:** Montero Gutiérrez, Brandon Fernando (`@brandonmontero27-g`)
+* **Líder Técnico:** Rodríguez Quispe, Grissel Arascely (`@Arascely`)
 * **Módulos a Cargo:**
   * **Módulo 9:** Mapas de Calor con Navegación Drill-Down (`RF-47` a `RF-51`)
   * **Módulo 10:** Dashboards, Ficha 360° del Alumno y Métricas SSU IS-480 (`RF-52` a `RF-58`)
@@ -140,7 +140,7 @@ pie title Distribución de los 71 Requisitos Funcionales
 ---
 
 ### SQUAD 5: Secretaría Digital, Criptografía Documental y Portal Web
-* **Líder Técnico:** Rodríguez Quispe, Grissel Arascely (`@Arascely`)
+* **Líder Técnico:** Leon Reyna, Cesar Antonio (`@cesarleon27-ai`)
 * **Módulos a Cargo:**
   * **Módulo 11:** Emisión de Reportes y Verificación Criptográfica QR (`RF-59` a `RF-64`)
   * **Módulo 13:** Plataforma de Difusión Digital y Portal Institucional (`RF-69` a `RF-71`)
@@ -158,19 +158,19 @@ pie title Distribución de los 71 Requisitos Funcionales
 
 | Rango de RFs | Módulo | Squad Asignado | Responsable Principal |
 |:---:|---|:---:|---|
-| `RF-01` a `RF-04` | M1: Acceso, Autenticación y RBAC | **Squad 1** | Steve Smith Ovalle Luyo |
-| `RF-05` a `RF-09` | M2: Administración de Usuarios y Directorio | **Squad 1** | Steve Smith Ovalle Luyo |
-| `RF-10` a `RF-14` | M3: Configuración Escolar y Periodos | **Squad 1** | Steve Smith Ovalle Luyo |
-| `RF-15` a `RF-19` | M4: Gestión Académica y Matrícula | **Squad 2** | Cesar Antonio Leon Reyna |
-| `RF-20` a `RF-27` | M5: Asistencia, Kiosco Offline y Carnés QR | **Squad 2** | Cesar Antonio Leon Reyna |
-| `RF-28` a `RF-31` | M6: Asistencia de Practicantes EPIS | **Squad 2** | Cesar Antonio Leon Reyna |
-| `RF-32` a `RF-35` | M7: Horas Docentes Contratados | **Squad 2** | Cesar Antonio Leon Reyna |
-| `RF-36` a `RF-46` | M8: Notas en Tiempo Real, Modo Excel y CNEB | **Squad 3** | Eduardo Sebastian Paipay Vega |
-| `RF-47` a `RF-51` | M9: Mapas de Calor con Drill-Down | **Squad 4** | Brandon Fernando Montero Gutiérrez |
-| `RF-52` a `RF-58` | M10: Dashboards, Ficha 360° y Métricas SSU | **Squad 4** | Brandon Fernando Montero Gutiérrez |
-| `RF-59` a `RF-64` | M11: Reportes Oficiales y Criptografía QR | **Squad 5** | Grissel Arascely Rodríguez Quispe |
-| `RF-65` a `RF-68` | M12: Auditoría Inmutable y Ley 29733 | **Squad 1** | Steve Smith Ovalle Luyo |
-| `RF-69` a `RF-71` | M13: Difusión Digital y Portal Web | **Squad 5** | Grissel Arascely Rodríguez Quispe |
+| `RF-01` a `RF-04` | M1: Acceso, Autenticación y RBAC | **Squad 1** | Brandon Fernando Montero Gutiérrez |
+| `RF-05` a `RF-09` | M2: Administración de Usuarios y Directorio | **Squad 1** | Brandon Fernando Montero Gutiérrez |
+| `RF-10` a `RF-14` | M3: Configuración Escolar y Periodos | **Squad 1** | Brandon Fernando Montero Gutiérrez |
+| `RF-15` a `RF-19` | M4: Gestión Académica y Matrícula | **Squad 2** | Eduardo Sebastian Paipay Vega |
+| `RF-20` a `RF-27` | M5: Asistencia, Kiosco Offline y Carnés QR | **Squad 2** | Eduardo Sebastian Paipay Vega |
+| `RF-28` a `RF-31` | M6: Asistencia de Practicantes EPIS | **Squad 2** | Eduardo Sebastian Paipay Vega |
+| `RF-32` a `RF-35` | M7: Horas Docentes Contratados | **Squad 2** | Eduardo Sebastian Paipay Vega |
+| `RF-36` a `RF-46` | M8: Notas en Tiempo Real, Modo Excel y CNEB | **Squad 3** | Steve Smith Ovalle Luyo |
+| `RF-47` a `RF-51` | M9: Mapas de Calor con Drill-Down | **Squad 4** | Grissel Arascely Rodríguez Quispe |
+| `RF-52` a `RF-58` | M10: Dashboards, Ficha 360° y Métricas SSU | **Squad 4** | Grissel Arascely Rodríguez Quispe |
+| `RF-59` a `RF-64` | M11: Reportes Oficiales y Criptografía QR | **Squad 5** | Cesar Antonio Leon Reyna |
+| `RF-65` a `RF-68` | M12: Auditoría Inmutable y Ley 29733 | **Squad 1** | Brandon Fernando Montero Gutiérrez |
+| `RF-69` a `RF-71` | M13: Difusión Digital y Portal Web | **Squad 5** | Cesar Antonio Leon Reyna |
 
 ---
 

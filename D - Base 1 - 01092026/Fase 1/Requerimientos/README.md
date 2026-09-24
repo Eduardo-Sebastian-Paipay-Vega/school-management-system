@@ -1,12 +1,22 @@
-# Documento de Requerimientos Funcionales
+# Catálogo de Requerimientos de Software (Fase 1)
 
-La especificación completa, extensa y no técnica de todos los **Requerimientos Funcionales (RF)** preliminares del proyecto se encuentra disponible en el archivo oficial:
+### Sistema de Gestión Escolar — Planteles de Aplicación "Guamán Poma de Ayala" (UNSCH)
+**Servicio Social Universitario IS-480 (2026-II) — Fase I: Diagnóstico y Formulación**
 
-👉 **[requerimientos_funcionales.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%201/Requerimientos/requerimientos_funcionales.md)**
+Este directorio contiene las especificaciones completas de los requerimientos del sistema en su etapa inicial de diagnóstico, orientadas al modelado del negocio escolar y los atributos de calidad institucional:
 
 ---
 
-## Resumen de Módulos de Trabajo Especificados
+## 📚 Documentos Oficiales de Requerimientos
+
+| Documento | Enfoque Metodológico | Cobertura | Archivo Oficial |
+|---|---|---|:---:|
+| **Requerimientos Funcionales (RF)** | Necesidades operativas y reglas de negocio escolar (Enfoque No Técnico). | 71 RFs organizados en 13 módulos de trabajo. | 📋 **[requerimientos_funcionales.md](requerimientos_funcionales.md)** |
+| **Requerimientos No Funcionales (RNF)** | Atributos de calidad, restricciones y directivas de ingeniería (**ISO/IEC 25010**). | 28 RNFs clasificados en 6 dimensiones de calidad. | ⚙️ **[requerimientos_no_funcionales.md](requerimientos_no_funcionales.md)** |
+
+---
+
+## 1. Resumen de Módulos de Requerimientos Funcionales (71 RF)
 
 1. **MÓDULO 1: Control de Acceso, Autenticación y Gestión de Sesiones** (`RF-SEG-01` al `RF-SEG-04`)
 2. **MÓDULO 2: Administración de Usuarios y Directorio Institucional** (`RF-USU-01` al `RF-USU-05`)
@@ -22,4 +32,17 @@ La especificación completa, extensa y no técnica de todos los **Requerimientos
 12. **MÓDULO 12: Trazabilidad, Seguridad y Auditoría Institucional** (`RF-AUD-01` al `RF-AUD-04`, conforme a Ley N.° 29733)
 13. **MÓDULO 13: Plataforma de Difusión Digital y Comunicación Institucional** (`RF-DIF-01` al `RF-DIF-03`)
 
-*Para revisar el detalle extenso (descripciones funcionales, actores, datos de entrada, reglas de negocio, flujos y criterios de aceptación de cada uno de los 71 requerimientos), consulte [requerimientos_funcionales.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%201/Requerimientos/requerimientos_funcionales.md).*
+*Para revisar el detalle extenso (descripciones, actores, datos de entrada, reglas de negocio, flujos y criterios de aceptación de cada uno de los 71 requerimientos), consulte [requerimientos_funcionales.md](requerimientos_funcionales.md).*
+
+---
+
+## 2. Resumen de Dimensiones de Requerimientos No Funcionales (ISO/IEC 25010)
+
+1. **Eficiencia de Desempeño (`RNF-DES`):** Latencia UI < 1.5s, debounce de 400ms, decodificación en portería < 300ms, mapas de calor < 2.0s y soporte de 150 usuarios concurrentes.
+2. **Seguridad y Privacidad (`RNF-SEG`):** JWT dual (15m/7d), RBAC estricto, bcrypt cost 12, protección de menores (Ley 29733 con AES-256), verificación documental QR con SHA-256 y mitigación OWASP.
+3. **Fiabilidad y Resiliencia (`RNF-FIA`):** Alta disponibilidad lectiva 99.5%, kiosco de portería Offline-First (IndexedDB/Hive), consistencia transaccional ACID y copias de seguridad RPO < 24h / RTO < 2h.
+4. **Usabilidad y Accesibilidad (`RNF-USA`):** Diseño responsivo (360px a 1920px), navegación de planilla por teclado ("Modo Excel"), accesibilidad WCAG 2.1 AA y mitigación de brecha digital (< 30 min).
+5. **Mantenibilidad de Software (`RNF-MAN`):** Arquitectura Feature-First desacoplada por Squads, 0 errores/warnings en `flutter analyze`, suite automatizada `flutter test` y SDDs canónicos IEEE 1016.
+6. **Portabilidad y Conformidad (`RNF-POR`):** Flutter Web PWA y Windows Desktop, compatibilidad en navegadores modernos, localización regional `America/Lima` y normas pedagógicas CNEB/MINEDU.
+
+*Para revisar las fichas completas, métricas cuantificables y trazabilidad de los atributos de calidad, consulte [requerimientos_no_funcionales.md](requerimientos_no_funcionales.md).*

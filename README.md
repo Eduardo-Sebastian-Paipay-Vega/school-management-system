@@ -381,10 +381,12 @@ El proyecto se ejecuta en **4 fases** utilizando metodologías ágiles (Scrum):
 
 | Fase / Artefacto | Descripción | Enlace |
 |---|---|---|
-| **Plan de Trabajo** | Programación completa de 16 semanas con artefactos, KPIs y entregables SSU. | [plan_trabajo.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/plan_trabajo.md) |
-| **Fase 1: Requerimientos de Usuario** | Especificación no técnica de necesidades para los 71 requerimientos y 13 módulos. | [requerimientos_funcionales.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%201/Requerimientos/requerimientos_funcionales.md) |
-| **Fase 2: Catálogo Documental IEEE 830** | Especificación formal y normativa de requisitos (`RF-01` al `RF-71`) con flujos y aceptación. | [requisitos_funcionales.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) |
-| **Fase 2: SRS Técnico de Arquitectura** | Contratos de API REST, controladores Flutter, consultas PostgreSQL, Redis y WebSockets. | [requisitos_funcionales_tecnicos.md](file:///e:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md) |
+| **Plan de Trabajo** | Programación completa de 16 semanas con artefactos, KPIs y entregables SSU. | [plan_trabajo.md](D%20-%20Base%201%20-%2001092026/plan_trabajo.md) |
+| **Fase 1: Requerimientos de Usuario (RF)** | Especificación no técnica de necesidades para los 71 requerimientos y 13 módulos. | [requerimientos_funcionales.md](D%20-%20Base%201%20-%2001092026/Fase%201/Requerimientos/requerimientos_funcionales.md) |
+| **Fase 1: Requerimientos de Calidad (RNF)** | Atributos de calidad institucional, restricciones y normas (**ISO/IEC 25010**). | [requerimientos_no_funcionales.md](D%20-%20Base%201%20-%2001092026/Fase%201/Requerimientos/requerimientos_no_funcionales.md) |
+| **Fase 2: Catálogo Documental IEEE 830** | Especificación formal y normativa de requisitos (`RF-01` al `RF-71`) con flujos y aceptación. | [requisitos_funcionales.md](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) |
+| **Fase 2: Especificación RNF por Squads** | 20 RNFs técnicos cuantificables (JWT, Debounce 400ms, Kiosco Offline, WCAG AA). | [requisitos_no_funcionales.md](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20No%20Funcionales/requisitos_no_funcionales.md) |
+| **Fase 2: SRS Técnico de Arquitectura** | Contratos de API REST, controladores Flutter, consultas PostgreSQL, Redis y WebSockets. | [requisitos_funcionales_tecnicos.md](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md) |
 | **Manuales de Usuario y Admin** | Guías de operación para personal docente, portería y dirección. | Programado para Semana 12 |
 
 ---

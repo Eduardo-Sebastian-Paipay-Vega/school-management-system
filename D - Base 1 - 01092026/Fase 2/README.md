@@ -17,6 +17,12 @@ La documentación formal y estructurada de requisitos y casos de uso del sistema
 5. 📄 **[Arquitectura/arquitectura_sistema.md](Arquitectura/arquitectura_sistema.md)**  
    *Documento de Arquitectura de Software y Plan de Distribución Técnica:* Diagramas C4, Clean Architecture, estrategias Offline-First, WebSockets y la **matriz de asignación de los 71 RFs y 20 RNFs en 5 Squads técnicos especializados**.
 
+6. 📄 **[limites_y_alcance_proyecto.md](limites_y_alcance_proyecto.md)**  
+   *Fronteras y Límites Oficiales del Proyecto (Scope Freeze & Out-of-Scope):* Matriz de demarcación dentro vs. fuera de alcance, las 10 reglas de alto al alcance y criterios de parada técnica (Definition of Done) para no realizar tareas innecesarias.
+
+7. 📄 **[stack_tecnologico_proyecto.md](stack_tecnologico_proyecto.md)**  
+   *Especificación y Documentación del Stack Tecnológico:* Detalle exhaustivo de tecnologías de Frontend (Flutter 3.35, Dart 3.9, librerías, Offline-First Hive/IndexedDB, WebSockets), Backend (Node.js/TypeScript REST API, JWT/RBAC), Base de Datos (PostgreSQL Multi-Tenant, Redis), Criptografía SHA-256 y DevOps (Docker, GitFlow, CI/CD).
+
 ---
 
 ## Módulos del Sistema y Capacidades de Innovación

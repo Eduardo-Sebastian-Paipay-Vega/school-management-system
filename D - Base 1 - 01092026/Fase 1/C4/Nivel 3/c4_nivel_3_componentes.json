@@ -1,0 +1,335 @@
+{
+  "$schema": "https://raw.githubusercontent.com/structurizr/json/master/schema.json",
+  "c4Level": "Level 3: Components",
+  "title": "Sistema de Gestión Escolar Guamán Poma de Ayala (UNSCH)",
+  "containerTarget": "C-04: API Gateway & Application Server",
+  "scope": "Component Diagram",
+  "version": "1.0.0",
+  "academicFramework": "Servicio Social Universitario IS-480 (2026-II)",
+  "model": {
+    "components": [
+      {
+        "id": "CMP-01",
+        "name": "AuthController",
+        "layer": "API Controller",
+        "squad": "Squad 1: Core & Seguridad",
+        "technology": "TypeScript / Express / OpenAPI",
+        "description": "Endpoints /api/v1/auth/login, /refresh, /logout, /recover. Gestiona emisión y renovación de JWT.",
+        "rfTraceability": ["RF-01", "RF-02", "RF-03", "RF-04"]
+      },
+      {
+        "id": "CMP-02",
+        "name": "UserController",
+        "layer": "API Controller",
+        "squad": "Squad 1: Core & Seguridad",
+        "technology": "TypeScript / Express / OpenAPI",
+        "description": "Endpoints /api/v1/users. Controla altas, bajas lógicas, asignación de roles RBAC y directorio.",
+        "rfTraceability": ["RF-05", "RF-06", "RF-07", "RF-08", "RF-09"]
+      },
+      {
+        "id": "CMP-03",
+        "name": "SchoolConfigController",
+        "layer": "API Controller",
+        "squad": "Squad 1: Core & Seguridad",
+        "technology": "TypeScript / Express / OpenAPI",
+        "description": "Endpoints /api/v1/config/school. Parametriza sedes, periodos académicos, grados, secciones y escalas.",
+        "rfTraceability": ["RF-10", "RF-11", "RF-12", "RF-13", "RF-14"]
+      },
+      {
+        "id": "CMP-04",
+        "name": "AcademicController",
+        "layer": "API Controller",
+        "squad": "Squad 2: Matrícula & Asistencia",
+        "technology": "TypeScript / Express / OpenAPI",
+        "description": "Endpoints /api/v1/academic. Gestiona padrón de alumnos, matrícula escolar y asignación de carga lectiva.",
+        "rfTraceability": ["RF-15", "RF-16", "RF-17", "RF-18", "RF-19"]
+      },
+      {
+        "id": "CMP-05",
+        "name": "AttendanceController",
+        "layer": "API Controller",
+        "squad": "Squad 2: Matrícula & Asistencia",
+        "technology": "TypeScript / Express / OpenAPI",
+        "description": "Endpoints /api/v1/attendance. Marcación en aula, recepción de lotes del Kiosco y alertas de ausentismo.",
+        "rfTraceability": ["RF-20", "RF-21", "RF-22", "RF-23", "RF-24", "RF-25", "RF-26", "RF-27"]
+      },
+      {
+        "id": "CMP-06",
+        "name": "PractitionerController",
+        "layer": "API Controller",
+        "squad": "Squad 2: Matrícula & Asistencia",
+        "technology": "TypeScript / Express / OpenAPI",
+        "description": "Endpoints /api/v1/practitioners. Permanencia de practicantes, cómputo de horas y fichas oficiales para UNSCH.",
+        "rfTraceability": ["RF-28", "RF-29", "RF-30", "RF-31"]
+      },
+      {
+        "id": "CMP-07",
+        "name": "ContractedTeacherController",
+        "layer": "API Controller",
+        "squad": "Squad 2: Matrícula & Asistencia",
+        "technology": "TypeScript / Express / OpenAPI",
+        "description": "Endpoints /api/v1/teachers/contracted. Control de horas lectivas contratadas y reprogramaciones.",
+        "rfTraceability": ["RF-32", "RF-33", "RF-34", "RF-35"]
+      },
+      {
+        "id": "CMP-08",
+        "name": "GradesExcelController",
+        "layer": "API Controller",
+        "squad": "Squad 3: Calificaciones & Modo Excel",
+        "technology": "TypeScript / Express / OpenAPI",
+        "description": "Endpoints /api/v1/grades/spreadsheet. Planilla rápida Modo Excel, debounce 400ms y auto-guardado en cascada.",
+        "rfTraceability": ["RF-36", "RF-37", "RF-38", "RF-39", "RF-40", "RF-41", "RF-42", "RF-43", "RF-44", "RF-45", "RF-46"]
+      },
+      {
+        "id": "CMP-09",
+        "name": "HeatmapController",
+        "layer": "API Controller",
+        "squad": "Squad 4: Analítica & Dashboards",
+        "technology": "TypeScript / Express / OpenAPI",
+        "description": "Endpoints /api/v1/analytics/heatmaps. Matrices térmicas con navegación Drill-Down y comparativas.",
+        "rfTraceability": ["RF-47", "RF-48", "RF-49", "RF-50", "RF-51"]
+      },
+      {
+        "id": "CMP-10",
+        "name": "Dashboard360Controller",
+        "layer": "API Controller",
+        "squad": "Squad 4: Analítica & Dashboards",
+        "technology": "TypeScript / Express / OpenAPI",
+        "description": "Endpoints /api/v1/analytics/dashboards. Ficha Escolar 360°, alertas de deserción y tablero de impacto SSU.",
+        "rfTraceability": ["RF-52", "RF-53", "RF-54", "RF-55", "RF-56", "RF-57", "RF-58"]
+      },
+      {
+        "id": "CMP-11",
+        "name": "OfficialReportController",
+        "layer": "API Controller",
+        "squad": "Squad 5: Secretaría & Portal Web",
+        "technology": "TypeScript / Express / OpenAPI",
+        "description": "Endpoints /api/v1/reports. Emisión de boletas oficiales en PDF con sello SHA-256 y validador público QR.",
+        "rfTraceability": ["RF-59", "RF-60", "RF-61", "RF-62", "RF-63", "RF-64"]
+      },
+      {
+        "id": "CMP-12",
+        "name": "AuditLogController",
+        "layer": "API Controller",
+        "squad": "Squad 1: Core & Seguridad",
+        "technology": "TypeScript / Express / OpenAPI",
+        "description": "Endpoints /api/v1/audit/logs. Consulta directiva de la bitácora inmutable exigida por la Ley N.° 29733.",
+        "rfTraceability": ["RF-65", "RF-66", "RF-67", "RF-68"]
+      },
+      {
+        "id": "CMP-13",
+        "name": "PortalPublicController",
+        "layer": "API Controller",
+        "squad": "Squad 5: Secretaría & Portal Web",
+        "technology": "TypeScript / Express / OpenAPI",
+        "description": "Endpoints /api/v1/portal/public. Publicación de noticias, avisos escolares y calendario cívico.",
+        "rfTraceability": ["RF-69", "RF-70", "RF-71"]
+      },
+      {
+        "id": "SRV-01",
+        "name": "AuthService",
+        "layer": "Domain Service",
+        "technology": "TypeScript / jsonwebtoken / bcrypt",
+        "description": "Validación de credenciales, hashing bcrypt (12 rounds) y firma de Access/Refresh tokens.",
+        "rfTraceability": ["RF-01", "RF-02", "RF-03"]
+      },
+      {
+        "id": "SRV-02",
+        "name": "RBACGuard",
+        "layer": "Domain Service",
+        "technology": "TypeScript / Interceptor Middleware",
+        "description": "Verificación estricta de roles y privilegios granulares antes de la ejecución de cada endpoint.",
+        "rfTraceability": ["RF-04"]
+      },
+      {
+        "id": "SRV-03",
+        "name": "KioskSyncWorker",
+        "layer": "Domain Service",
+        "technology": "TypeScript / Transaction Manager",
+        "description": "Procesador de sincronización de lotes de asistencia con idempotencia y verificación de duplicados.",
+        "rfTraceability": ["RF-25"]
+      },
+      {
+        "id": "SRV-04",
+        "name": "WebSocketBroadcastGateway",
+        "layer": "Domain Service",
+        "technology": "TypeScript / Socket.io / Redis PubSub",
+        "description": "Servidor de WebSockets para propagar en vivo eventos de asistencia y alertas a pantallas conectadas.",
+        "rfTraceability": ["RF-27"]
+      },
+      {
+        "id": "SRV-05",
+        "name": "GradeExcelDebounceEngine",
+        "layer": "Domain Service",
+        "technology": "TypeScript / Reactive Stream Processor",
+        "description": "Recibe pulsaciones de notas con debounce 400ms, aplica auto-guardado y recalcula promedios en cascada.",
+        "rfTraceability": ["RF-38", "RF-45"]
+      },
+      {
+        "id": "SRV-06",
+        "name": "CNEBConversionEngine",
+        "layer": "Domain Service",
+        "technology": "TypeScript / Pedagogical Rules Engine",
+        "description": "Conversor matemático dual: traduce escalas vigesimales (0-20) a niveles CNEB (AD, A, B, C) oficiales.",
+        "rfTraceability": ["RF-46"]
+      },
+      {
+        "id": "SRV-07",
+        "name": "DescriptiveConclusionEngine",
+        "layer": "Domain Service",
+        "technology": "TypeScript / Template Engine",
+        "description": "Catálogo de conclusiones pedagógicas descriptivas sugeridas según nivel de competencia MINEDU.",
+        "rfTraceability": ["RF-39"]
+      },
+      {
+        "id": "SRV-08",
+        "name": "HeatmapDrillDownEngine",
+        "layer": "Domain Service",
+        "technology": "TypeScript / Aggregation Matrix",
+        "description": "Computa densidades térmicas de notas y asistencia para navegación interactiva jerárquica.",
+        "rfTraceability": ["RF-49"]
+      },
+      {
+        "id": "SRV-09",
+        "name": "Radar360Engine",
+        "layer": "Domain Service",
+        "technology": "TypeScript / Holistic Aggregator",
+        "description": "Compila métricas de rendimiento, asistencia y conducta para renderizar la Ficha Escolar 360°.",
+        "rfTraceability": ["RF-56"]
+      },
+      {
+        "id": "SRV-10",
+        "name": "SSUImpactCalculator",
+        "layer": "Domain Service",
+        "technology": "TypeScript / Metrics Evaluator",
+        "description": "Calcula horas acumuladas, docentes atendidos y metas sociales para acreditación del SSU IS-480.",
+        "rfTraceability": ["RF-57"]
+      },
+      {
+        "id": "SRV-11",
+        "name": "CryptoDocumentSigner",
+        "layer": "Domain Service",
+        "technology": "TypeScript / crypto (SHA-256)",
+        "description": "Genera el hash criptográfico SHA-256 inmutable de las boletas oficiales e incrusta el QR verificador.",
+        "rfTraceability": ["RF-59", "RF-60"]
+      },
+      {
+        "id": "SRV-12",
+        "name": "AuditLoggerService",
+        "layer": "Domain Service",
+        "technology": "TypeScript / Security Interceptor",
+        "description": "Auditoría inmutable de todas las operaciones sensibles en base de datos bajo la Ley N.° 29733.",
+        "rfTraceability": ["RF-65", "RF-66"]
+      },
+      {
+        "id": "INF-01",
+        "name": "PostgresRepository",
+        "layer": "Infrastructure",
+        "technology": "TypeScript / pg-pool / PostgreSQL 16",
+        "description": "Capa de persistencia SQL relacional con transacciones ACID y aislamiento multi-tenant tenant_id.",
+        "rfTraceability": ["All"]
+      },
+      {
+        "id": "INF-02",
+        "name": "RedisCacheClient",
+        "layer": "Infrastructure",
+        "technology": "TypeScript / ioredis / Redis 7",
+        "description": "Cliente en memoria para blacklist de JWT, rate limiting y canal Pub/Sub de WebSockets.",
+        "rfTraceability": ["RF-01", "RF-02", "RF-27"]
+      },
+      {
+        "id": "INF-03",
+        "name": "PdfKitReportRenderer",
+        "layer": "Infrastructure",
+        "technology": "TypeScript / PDFKit / Canvas",
+        "description": "Generador programático vectorial de boletas oficiales, actas consolidadas y carnés escolares QR.",
+        "rfTraceability": ["RF-26", "RF-59", "RF-61"]
+      },
+      {
+        "id": "INF-04",
+        "name": "SmtpEmailClient",
+        "layer": "Infrastructure",
+        "technology": "TypeScript / Nodemailer / SMTP",
+        "description": "Despachador asíncrono de correos electrónicos institucionales para recuperación de cuentas y alertas.",
+        "rfTraceability": ["RF-03", "RF-24"]
+      }
+    ],
+    "relationships": [
+      {
+        "sourceId": "CMP-01",
+        "targetId": "SRV-01",
+        "description": "Invoca autenticación y generación de JWT"
+      },
+      {
+        "sourceId": "CMP-01",
+        "targetId": "INF-02",
+        "description": "Revoca Refresh Token en Redis ante logout"
+      },
+      {
+        "sourceId": "CMP-05",
+        "targetId": "SRV-03",
+        "description": "Envía lote de marcaciones de portería para sincronización"
+      },
+      {
+        "sourceId": "CMP-05",
+        "targetId": "SRV-04",
+        "description": "Difunde actualización de asistencia en vivo vía WebSocket"
+      },
+      {
+        "sourceId": "CMP-08",
+        "targetId": "SRV-05",
+        "description": "Transmite nota con debounce de 400ms para auto-guardado"
+      },
+      {
+        "sourceId": "SRV-05",
+        "targetId": "SRV-06",
+        "description": "Convierte nota vigesimal a código literal CNEB"
+      },
+      {
+        "sourceId": "CMP-08",
+        "targetId": "SRV-07",
+        "description": "Solicita sugerencias de conclusiones descriptivas"
+      },
+      {
+        "sourceId": "CMP-09",
+        "targetId": "SRV-08",
+        "description": "Solicita matriz agregada de mapa de calor Drill-Down"
+      },
+      {
+        "sourceId": "CMP-10",
+        "targetId": "SRV-09",
+        "description": "Solicita métricas multidimensionales para Ficha 360°"
+      },
+      {
+        "sourceId": "CMP-10",
+        "targetId": "SRV-10",
+        "description": "Solicita cálculo de KPIs para acreditación SSU IS-480"
+      },
+      {
+        "sourceId": "CMP-11",
+        "targetId": "SRV-11",
+        "description": "Solicita generación de boleta firmada con hash SHA-256"
+      },
+      {
+        "sourceId": "SRV-11",
+        "targetId": "INF-03",
+        "description": "Renderiza el archivo PDF con código QR incrustado"
+      },
+      {
+        "sourceId": "SRV-01",
+        "targetId": "INF-01",
+        "description": "Consulta credenciales de usuario en PostgreSQL"
+      },
+      {
+        "sourceId": "SRV-05",
+        "targetId": "INF-01",
+        "description": "Persiste nota y promedio en transacción ACID"
+      },
+      {
+        "sourceId": "SRV-12",
+        "targetId": "INF-01",
+        "description": "Inserta registro inmutable en tabla logs_auditoria"
+      }
+    ]
+  }
+}

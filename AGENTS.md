@@ -4,6 +4,19 @@
 **Servicio Social Universitario IS-480 (2026-II)**  
 **Repositorio Oficial:** `https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system`
 
+## 0. Secuencia y Orden Obligatorio de Lectura (Para no perderse en el proyecto)
+
+> [!IMPORTANT]
+> Todo desarrollador, evaluador o agente de IA que interactúe con el repositorio **DEBE seguir la ruta de lectura ordenada** antes de realizar consultas complejas, modificar código o redactar documentación:
+> 1. **Consultar la regla de navegación:** [`.agents/rules/orden_lectura_obligatorio.md`](.agents/rules/orden_lectura_obligatorio.md).
+> 2. **Activar la skill de navegación:** [`.agents/skills/guia-lectura-proyecto/SKILL.md`](.agents/skills/guia-lectura-proyecto/SKILL.md).
+> 3. **Secuencia de 5 Fases:**
+>    * **Paso 0:** Límites y Out-of-Scope (`limites_y_alcance_proyecto.md`).
+>    * **Paso 1:** 71 Requisitos Funcionales (`requisitos_funcionales.md`) y 71 Casos de Uso.
+>    * **Paso 2:** Stack Tecnológico (`stack_tecnologico_proyecto.md`) y Arquitectura C4 (`arquitectura_sistema.md`).
+>    * **Paso 3:** Diseño de Detalle por Squad (Reglas SDD y SDD del Squad asignado).
+>    * **Paso 4:** Código en Flutter (`lib/core/theme/` y `lib/features/squad_[X]_[modulo]/`).
+
 ---
 
 ## 1. Contexto del Proyecto y Squads

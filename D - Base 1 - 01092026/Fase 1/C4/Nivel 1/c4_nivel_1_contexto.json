@@ -1,0 +1,233 @@
+{
+  "$schema": "https://raw.githubusercontent.com/structurizr/json/master/schema.json",
+  "c4Level": "Level 1: System Context",
+  "title": "Sistema de Gestión Escolar Guamán Poma de Ayala (UNSCH)",
+  "scope": "System Context",
+  "version": "1.0.0",
+  "academicFramework": "Servicio Social Universitario IS-480 (2026-II)",
+  "model": {
+    "softwareSystem": {
+      "id": "SYS-GP",
+      "name": "Sistema de Gestión Escolar Guamán Poma de Ayala",
+      "type": "SoftwareSystem",
+      "description": "Plataforma integral web y desktop modular para la gestión académica, asistencia con Kiosco Offline-First, calificaciones en Modo Excel, mapas de calor Drill-Down, Ficha 360° y verificación documental QR SHA-256.",
+      "tags": ["SistemaCentral", "InScope", "MultiTenant"],
+      "properties": {
+        "institution": "Planteles de Aplicación Guamán Poma de Ayala - UNSCH",
+        "location": "Ayacucho, Perú",
+        "technologyBase": "Flutter Web/Desktop + Node.js/TS + PostgreSQL + Redis"
+      }
+    },
+    "people": [
+      {
+        "id": "ACT-01",
+        "name": "Administrador de TI / Equipo SSU",
+        "type": "Person",
+        "location": "Internal",
+        "role": "ROLE_ADMIN",
+        "description": "Administra usuarios, asigna roles RBAC, configura periodos lectivos y audita la bitácora inmutable (Ley N.° 29733).",
+        "tags": ["InternalUser", "Admin"]
+      },
+      {
+        "id": "ACT-02",
+        "name": "Dirección General / Coordinación",
+        "type": "Person",
+        "location": "Internal",
+        "role": "ROLE_DIRECTOR / ROLE_COORDINATOR",
+        "description": "Supervisa métricas de rendimiento, mapas térmicos con Drill-Down, ausentismo y aprueba cierres de periodo.",
+        "tags": ["InternalUser", "Directive"]
+      },
+      {
+        "id": "ACT-03",
+        "name": "Docentes Titulares (Nombrados)",
+        "type": "Person",
+        "location": "Internal",
+        "role": "ROLE_TEACHER",
+        "description": "Registra notas en Modo Excel con auto-guardado (400ms), genera conclusiones descriptivas CNEB y toma asistencia.",
+        "tags": ["InternalUser", "Teacher"]
+      },
+      {
+        "id": "ACT-04",
+        "name": "Docentes Contratados",
+        "type": "Person",
+        "location": "Internal",
+        "role": "ROLE_TEACHER",
+        "description": "Marca cumplimiento de horas lectivas contratadas, reprograma sesiones compensatorias y registra calificaciones.",
+        "tags": ["InternalUser", "Teacher"]
+      },
+      {
+        "id": "ACT-05",
+        "name": "Practicantes de Educación (UNSCH)",
+        "type": "Person",
+        "location": "Internal",
+        "role": "ROLE_PRACTITIONER",
+        "description": "Registra horas de permanencia y genera ficha de conformidad validada por su docente tutor para la EPIS-UNSCH.",
+        "tags": ["InternalUser", "Practitioner"]
+      },
+      {
+        "id": "ACT-06",
+        "name": "Estudiantes",
+        "type": "Person",
+        "location": "Internal",
+        "role": "ROLE_STUDENT",
+        "description": "Consulta calificaciones en tiempo real, récord de asistencia, avisos escolares y Ficha 360° individual.",
+        "tags": ["InternalUser", "Student"]
+      },
+      {
+        "id": "ACT-07",
+        "name": "Personal de Portería / Vigilancia ('Wachiman')",
+        "type": "Person",
+        "location": "Internal",
+        "role": "ROLE_SECURITY",
+        "description": "Opera el Kiosco de asistencia física escaneando carnés escolares QR/Barras con resiliencia Offline-First.",
+        "tags": ["InternalUser", "Security"]
+      },
+      {
+        "id": "ACT-08",
+        "name": "Secretaría Académica",
+        "type": "Person",
+        "location": "Internal",
+        "role": "ROLE_SECRETARY",
+        "description": "Gestiona el padrón estudiantil, matrícula de alumnos, emisión masiva de carnés QR y boletas oficiales PDF.",
+        "tags": ["InternalUser", "Administrative"]
+      },
+      {
+        "id": "ACT-09",
+        "name": "Público General / Terceros Verificadores",
+        "type": "Person",
+        "location": "External",
+        "role": "ANONYMOUS",
+        "description": "Escanea el código QR de boletas de notas para constatar su autenticidad e inmutabilidad vía hash SHA-256.",
+        "tags": ["ExternalUser", "Verifier"]
+      }
+    ],
+    "externalSystems": [
+      {
+        "id": "EXT-01",
+        "name": "Servidor de Correo SMTP Institucional",
+        "type": "ExternalSystem",
+        "description": "Servidor de correo (UNSCH o relay institucional) para el despacho de enlaces de restablecimiento de contraseña y alertas.",
+        "tags": ["ExternalSystem", "Email"]
+      },
+      {
+        "id": "EXT-02",
+        "name": "Comisión y Tutoría SSU (EPIS - UNSCH)",
+        "type": "ExternalSystem",
+        "description": "Entidad académica receptora de los informes y métricas del Tablero de Impacto Social para la acreditación del IS-480.",
+        "tags": ["ExternalSystem", "AcademicAudit"]
+      },
+      {
+        "id": "EXT-03",
+        "name": "Dispositivos Periféricos (Hardware Óptico)",
+        "type": "ExternalSystem",
+        "description": "Lectores ópticos de código de barras/QR vía USB/Bluetooth e impresoras de carnés y boletas de calificaciones.",
+        "tags": ["ExternalHardware", "Scanner"]
+      },
+      {
+        "id": "EXT-04",
+        "name": "Navegadores Web Estándar (Entorno Cliente)",
+        "type": "ExternalSystem",
+        "description": "Google Chrome, Microsoft Edge, Firefox o Safari donde se renderiza la Progressive Web App (PWA).",
+        "tags": ["ClientPlatform", "Browser"]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "REL-01",
+        "sourceId": "ACT-01",
+        "targetId": "SYS-GP",
+        "description": "Configura sistema, administra usuarios y consulta logs de auditoría inmutables",
+        "technology": "HTTPS / TLS 1.3",
+        "protocol": "REST API"
+      },
+      {
+        "id": "REL-02",
+        "sourceId": "ACT-02",
+        "targetId": "SYS-GP",
+        "description": "Supervisa mapas de calor Drill-Down, alertas de deserción y aprueba actas",
+        "technology": "HTTPS / TLS 1.3",
+        "protocol": "REST API"
+      },
+      {
+        "id": "REL-03",
+        "sourceId": "ACT-03",
+        "targetId": "SYS-GP",
+        "description": "Registra notas en Modo Excel con auto-guardado de 400ms y toma asistencia",
+        "technology": "HTTPS / WSS",
+        "protocol": "REST / WebSockets"
+      },
+      {
+        "id": "REL-04",
+        "sourceId": "ACT-04",
+        "targetId": "SYS-GP",
+        "description": "Marca cumplimiento de horas lectivas y reprogramaciones",
+        "technology": "HTTPS / TLS 1.3",
+        "protocol": "REST API"
+      },
+      {
+        "id": "REL-05",
+        "sourceId": "ACT-05",
+        "targetId": "SYS-GP",
+        "description": "Marca asistencia de permanencia y emite ficha de prácticas SSU",
+        "technology": "HTTPS / TLS 1.3",
+        "protocol": "REST API"
+      },
+      {
+        "id": "REL-06",
+        "sourceId": "ACT-06",
+        "targetId": "SYS-GP",
+        "description": "Consulta calificaciones en vivo, récord de asistencias y Ficha 360°",
+        "technology": "HTTPS / TLS 1.3",
+        "protocol": "REST API"
+      },
+      {
+        "id": "REL-07",
+        "sourceId": "ACT-07",
+        "targetId": "SYS-GP",
+        "description": "Escanea carnés escolares QR en portería con resiliencia Offline-First",
+        "technology": "Local I/O / HTTPS",
+        "protocol": "Batch Sync / JSON"
+      },
+      {
+        "id": "REL-08",
+        "sourceId": "ACT-08",
+        "targetId": "SYS-GP",
+        "description": "Matricula alumnos, emite masivamente carnés QR y boletas oficiales PDF",
+        "technology": "HTTPS / TLS 1.3",
+        "protocol": "REST API"
+      },
+      {
+        "id": "REL-09",
+        "sourceId": "ACT-09",
+        "targetId": "SYS-GP",
+        "description": "Valida públicamente autenticidad de boletas escaneando código QR (hash SHA-256)",
+        "technology": "HTTPS Público",
+        "protocol": "Web URI / GET"
+      },
+      {
+        "id": "REL-10",
+        "sourceId": "SYS-GP",
+        "targetId": "EXT-01",
+        "description": "Envía correos para restablecimiento de contraseñas y alertas críticas",
+        "technology": "SMTPS / TLS",
+        "protocol": "SMTP (465/587)"
+      },
+      {
+        "id": "REL-11",
+        "sourceId": "SYS-GP",
+        "targetId": "EXT-02",
+        "description": "Exporta métricas del Tablero de Impacto Social para acreditación de la asignatura",
+        "technology": "HTTPS / Export",
+        "protocol": "PDF / Excel"
+      },
+      {
+        "id": "REL-12",
+        "sourceId": "EXT-03",
+        "targetId": "SYS-GP",
+        "description": "Transmite cadena escaneada del código QR del carné a la interfaz de portería",
+        "technology": "USB HID / Serial",
+        "protocol": "Keyboard Emulation"
+      }
+    ]
+  }
+}

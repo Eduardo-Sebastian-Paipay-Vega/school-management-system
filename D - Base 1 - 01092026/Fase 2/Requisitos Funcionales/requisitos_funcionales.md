@@ -330,3 +330,61 @@ AMPLIACIÓN MÓDULO 11: SEGURIDAD Y VERIFICACIÓN DOCUMENTAL CRIPTOGRÁFICA
 | `RF-65` a `RF-68` | Auditoría Inmutable y Ley N.° 29733 | M12 | Administrador / Legal | Esencial | Seguridad Jurídica |
 | `RF-69` a `RF-71` | Cartelera, Calendario Cívico y Portal Web | M13 | Toda la comunidad | Deseable | Difusión Digital |
 
+---
+
+## 5. DELIMITACIÓN Y FRONTERAS DEFINITIVAS DEL PROYECTO (DÓNDE ACABA EL PROYECTO)
+
+Para evitar el desvío del alcance (*scope creep*) y garantizar la culminación exitosa en los plazos fijados para el **Servicio Social Universitario (SSU IS-480 2026-II)**, se establece de manera categórica, taxativa e inapelable la **frontera final del sistema**.
+
+> [!IMPORTANT]
+> **REGLA DE ORO DE PARADA TÉCNICA:**  
+> El proyecto concluye de forma estricta y definitiva cuando los **71 Requisitos Funcionales (`RF-01` al `RF-71`)** y los **20 Requisitos No Funcionales (RNF)** estén implementados, integrados y aprobados según sus criterios de aceptación. **Queda terminantemente prohibido incorporar cualquier funcionalidad que no esté catalogada en esta especificación.**
+
+---
+
+### 5.1 Matriz de Demarcación: Dentro del Alcance vs. Fuera del Alcance (Out-of-Scope)
+
+| Dimensión | DENTRO DEL ALCANCE (El Proyecto Termina Aquí) | FUERA DEL ALCANCE (ESTRICTAMENTE PROHIBIDO / NO SE HARÁ) |
+|---|---|---|
+| **1. Módulos Financieros y Contables** | • Ninguno. | ❌ **PROHIBIDO:** Pasarelas de pago, cobranza de pensiones, caja chica, facturación electrónica SUNAT, boletas de venta, contabilidad general y planillas de sueldos docentes. |
+| **2. Servicios Complementarios de Bienestar** | • Ninguno. | ❌ **PROHIBIDO:** Gestión de biblioteca escolar (préstamo de libros), control de comedor/cafetería escolar, control de transporte y rutas escolares, tópico de salud y fichas psicológicas clínicas. |
+| **3. Canales de Notificación Externa** | • Visualización de alertas en pantalla y panel web en tiempo real (WebSockets). | ❌ **PROHIBIDO:** Integración con API oficial de WhatsApp Business (Meta), pasarelas de SMS masivo tarifadas o servicios de telefonía IVR. |
+| **4. Inteligencia Artificial y Modelos Predictivos** | • Asistente de conclusiones descriptivas basado en reglas y plantillas oficiales CNEB.<br>• Mapas de calor descriptivos (notas y asistencia). | ❌ **PROHIBIDO:** Modelos de Machine Learning predictivo de deserción escolar con redes neuronales, bots generativos de conversación (LLMs externos de pago) o visión por computadora para reconocimiento facial. |
+| **5. Plataformas y Dispositivos de Despliegue** | • Plataforma Web Responsive (Flutter Web) accesible desde navegadores modernos (PC, laptops, tablets y móviles) y soporte PWA. | ❌ **PROHIBIDO:** Desarrollo y publicación de aplicaciones móviles nativas independientes en Kotlin/Swift para Google Play Store o Apple App Store. |
+| **6. Identificación y Control Físico de Asistencia** | • Kiosco de portería Offline-First con lector de código de barras/QR.<br>• Carnés escolares generados en PDF con código QR institucional. | ❌ **PROHIBIDO:** Lectores de huellas dactilares biométricas, reconocimiento facial con cámaras biométricas, torniquetes mecánicos motorizados o tarjetas RFID/NFC con hardware dedicado. |
+| **7. Integraciones Gubernamentales y Externas** | • Generación de nóminas, actas y consolidados exportables en formato oficial Excel/PDF según directivas MINEDU. | ❌ **PROHIBIDO:** Conexión vía WebServices directos o integración API bidireccional en tiempo real con las plataformas centrales del MINEDU (SIAGIE) o bases de datos de la RENIEC. |
+| **8. Actores y Tipos de Usuarios** | • Administrador de TI del Plantel.<br>• Dirección General y Coordinación Académica.<br>• Docentes nombrados y docentes contratados.<br>• Practicantes preprofesionales de Educación.<br>• Estudiantes (para consulta de notas, récord de asistencia y ficha 360°). | ❌ **PROHIBIDO:** Acceso a Padres de Familia / Apoderados durante la fase piloto (no hay portal de apoderados), personal administrativo no académico y superadministrador multi-institucional nacional. |
+| **9. Firma y Verificación de Documentos** | • Verificación pública anti-falsificación mediante código QR con sello criptográfico SHA-256 e identificador único en base de datos. | ❌ **PROHIBIDO:** Firma digital avanzada con certificados digitales PKI de pago emitidos por entidades de certificación acreditadas o tokens criptográficos físicos. |
+| **10. Ámbito Geográfico y Multi-Inquilinato** | • Piloto exclusivo en los Planteles de Aplicación "Guamán Poma de Ayala" (UNSCH), Ayacucho.<br>• Preparación arquitectónica mediante columna `tenant_id` para aislamiento lógico futuro. | ❌ **PROHIBIDO:** Despliegue simultáneo, soporte operativo o administración activa de otros colegios externos durante la ejecución de esta fase. |
+
+---
+
+### 5.2 Las 10 Reglas de "Alto al Alcance" (Límites Infranqueables)
+
+1. **Límite de los 71 Requisitos Funcionales:** Ningún integrante de los 5 squads tiene autorización para programar vistas, tablas o controladores que no respondan directamente a un `RF` entre el `RF-01` y el `RF-71`.
+2. **Límite de No-Dinero:** Toda funcionalidad vinculada al dinero (matrícula pagada, pensiones, deudas, cobros) queda **100% excluida**. El sistema es estrictamente de gestión académica e institucional.
+3. **Límite de Conectividad en Kiosco:** La capacidad Offline-First está restringida **únicamente** al módulo de Asistencia de Portería (`RF-25` con IndexedDB/Hive). El resto de módulos requiere conexión al backend.
+4. **Límite de Calificaciones:** El sistema maneja exclusivamente el registro dual (Vigesimal 0-20 y CNEB Literal AD, A, B, C) con auto-guardado debounce (400ms) y planilla ágil ("Modo Excel"). No se admiten configuraciones curriculares internacionales ni escalas no oficiales.
+5. **Límite de Analítica:** Los mapas de calor y la Ficha 360° son herramientas de visualización y semaforización diagnóstica (verde, amarillo, rojo). No calculan proyecciones probabilísticas ni analítica prescriptiva compleja.
+6. **Límite de Verificación QR:** El código QR de las boletas y carnés redirige a una URL pública del sistema que valida el hash SHA-256 en la base de datos institucional. No requiere interoperabilidad con pasarelas notariales.
+7. **Límite de Practicantes y Docentes Contratados:** El sistema se detiene en el cómputo de horas efectivas y emisión de fichas de conformidad para la UNSCH. No liquida pagos ni contratos laborales.
+8. **Límite de Portal Web:** El portal institucional (`RF-69` al `RF-71`) es un canal informativo estático-dinámico para noticias, avisos y calendario cívico. No es una red social, ni un foro de discusión, ni un repositorio de tareas.
+9. **Límite de Hardware:** El sistema operará con hardware estándar de oficina (computadoras con navegadores web modernos, lectores de código de barras USB/Bluetooth convencionales y cámaras web).
+10. **Límite Temporal y de Acreditación:** El proyecto culmina al finalizar el periodo lectivo 2026-II con la entrega del informe final y sustento del Servicio Social Universitario (IS-480).
+
+---
+
+### 5.3 Criterios de Parada y Definición de Terminado (Definition of Done - DoD)
+
+El proyecto se declarará oficialmente **FINALIZADO Y CERRADO** cuando se verifiquen todos y cada uno de los siguientes hitos técnicos:
+
+* [ ] **Cobertura Funcional 100%:** Los 71 Requisitos Funcionales (`RF-01` al `RF-71`) desarrollados y operando según sus especificaciones.
+* [ ] **Control de Calidad de Código:** `flutter analyze` ejecutado con **0 errores y 0 warnings**.
+* [ ] **Batería de Pruebas Automatizadas:** `flutter test` ejecutado exitosamente con todas las pruebas unitarias y de widgets aprobadas.
+* [ ] **Cumplimiento de los 5 Squads:**
+  * **Squad 1:** Autenticación JWT, RBAC, configuración de periodos/grados y auditoría inmutable Ley N.° 29733 operativa.
+  * **Squad 2:** Matrícula, nóminas, app de toma rápida, generación de carnés QR y Kiosco Offline-First con sincronización validada.
+  * **Squad 3:** Planilla de notas "Modo Excel" con debounce de 400ms, auto-guardado, conversor vigesimal/CNEB y conclusiones descriptivas.
+  * **Squad 4:** Mapas de calor con navegación Drill-Down, Ficha 360° del alumno y Tablero de impacto SSU IS-480 activo.
+  * **Squad 5:** Generación de boletas oficiales PDF con hash SHA-256 y verificación pública QR, cuadros de mérito y portal web institucional.
+* [ ] **Cierre Documental:** SDDs canónicos IEEE 1016 aprobados y alineados con la matriz de trazabilidad.

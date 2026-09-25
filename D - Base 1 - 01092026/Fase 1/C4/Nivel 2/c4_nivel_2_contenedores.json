@@ -1,0 +1,158 @@
+{
+  "$schema": "https://raw.githubusercontent.com/structurizr/json/master/schema.json",
+  "c4Level": "Level 2: Containers",
+  "title": "Sistema de Gestión Escolar Guamán Poma de Ayala (UNSCH)",
+  "scope": "Containers Diagram",
+  "version": "1.0.0",
+  "academicFramework": "Servicio Social Universitario IS-480 (2026-II)",
+  "model": {
+    "containers": [
+      {
+        "id": "C-01",
+        "name": "Single Page Application (SPA Web)",
+        "type": "Container",
+        "technology": "Flutter 3.35.x Web / Dart 3.9.x / Material Design 3",
+        "description": "Aplicación web interactiva y responsiva (PWA) para docentes, directivos, secretaría y alumnos. Incluye la planilla Modo Excel, mapas de calor Drill-Down y Ficha 360°.",
+        "tags": ["Frontend", "Web", "PWA"],
+        "runtime": "Navegador Web (CanvasKit / WebAssembly)"
+      },
+      {
+        "id": "C-02",
+        "name": "Aplicación Desktop Kiosco",
+        "type": "Container",
+        "technology": "Flutter 3.35.x Windows Desktop / Dart 3.9.x / Hive",
+        "description": "Aplicación de alta velocidad en portería. Procesa el escaneo de carnés QR/Barras en menos de 200ms con capacidad Offline-First ante contingencias de red.",
+        "tags": ["Frontend", "Desktop", "OfflineFirst"],
+        "runtime": "Windows x64 Native Executable"
+      },
+      {
+        "id": "C-03",
+        "name": "Reverse Proxy & Web Server",
+        "type": "Container",
+        "technology": "Nginx 1.24+ / Alpine Linux / Docker",
+        "description": "Terminación SSL TLS 1.3, compresión Brotli/Gzip, entrega de estáticos de la SPA Web y enrutamiento proxy-pass hacia la API REST y WebSockets.",
+        "tags": ["Infrastructure", "Proxy", "Security"],
+        "runtime": "Docker Container (Puertos 80, 443)"
+      },
+      {
+        "id": "C-04",
+        "name": "API Gateway & Application Server",
+        "type": "Container",
+        "technology": "Node.js v20+ LTS / TypeScript 5.x / Clean Architecture",
+        "description": "Servidor backend de aplicación. Procesa lógica de negocio, autenticación JWT, control RBAC, gateway WebSockets, cálculo de escala CNEB y firma SHA-256.",
+        "tags": ["Backend", "API", "CoreServices"],
+        "runtime": "Docker Container (Puerto 3000 interno)"
+      },
+      {
+        "id": "C-05",
+        "name": "Base de Datos Relacional ACID",
+        "type": "Container",
+        "technology": "PostgreSQL 16+ / PL/pgSQL / JSONB",
+        "description": "Almacén relacional principal con soporte multi-tenant (discriminador tenant_id), transacciones ACID y triggers de inmutabilidad para auditoría Ley N.° 29733.",
+        "tags": ["Database", "SQL", "Persistence"],
+        "runtime": "Docker Container (Puerto 5432 interno)"
+      },
+      {
+        "id": "C-06",
+        "name": "Almacén en Memoria y Cola de Eventos",
+        "type": "Container",
+        "technology": "Redis 7+ / RAM In-Memory Store",
+        "description": "Caché de alta velocidad para revocación de JWT (Blacklist), rate limiting de login, caché de catálogos y bus Pub/Sub para WebSockets.",
+        "tags": ["Cache", "InMemory", "PubSub"],
+        "runtime": "Docker Container (Puerto 6379 interno)"
+      },
+      {
+        "id": "C-07",
+        "name": "Almacenamiento Local en Cliente",
+        "type": "Container",
+        "technology": "Hive NoSQL (Desktop) / IndexedDB (Web)",
+        "description": "Búfer local cifrado en el dispositivo cliente. Guarda temporalmente asistencias en portería cuando no hay internet y coordina la sincronización atómica posterior.",
+        "tags": ["ClientStorage", "OfflineBuffer"],
+        "runtime": "Almacenamiento en disco local del cliente"
+      },
+      {
+        "id": "C-08",
+        "name": "Almacén de Archivos y Documentos",
+        "type": "Container",
+        "technology": "File System Local / Volumen Docker / AWS S3 Compatible",
+        "description": "Repositorio seguro para archivos PDF oficiales generados (boletas de notas con sello SHA-256) y carnés escolares vectoriales con código QR.",
+        "tags": ["Storage", "FileSystem", "Documents"],
+        "runtime": "Volumen Docker persistente"
+      }
+    ],
+    "relationships": [
+      {
+        "id": "CREL-01",
+        "sourceId": "C-01",
+        "targetId": "C-03",
+        "description": "Solicita páginas web y recursos estáticos",
+        "technology": "HTTPS / TLS 1.3",
+        "protocol": "HTTP/2 (Puerto 443)"
+      },
+      {
+        "id": "CREL-02",
+        "sourceId": "C-01",
+        "targetId": "C-03",
+        "description": "Ejecuta operaciones transaccionales y de consulta",
+        "technology": "HTTPS / JSON REST",
+        "protocol": "HTTP/2 (Bearer JWT)"
+      },
+      {
+        "id": "CREL-03",
+        "sourceId": "C-01",
+        "targetId": "C-03",
+        "description": "Mantiene canal bidireccional para asistencia y alertas en vivo",
+        "technology": "WSS / WebSockets",
+        "protocol": "WSS (Puerto 443)"
+      },
+      {
+        "id": "CREL-04",
+        "sourceId": "C-02",
+        "targetId": "C-07",
+        "description": "Guarda de inmediato marcaciones de portería ante falta de red",
+        "technology": "Local I/O Binario",
+        "protocol": "Hive Box Store"
+      },
+      {
+        "id": "CREL-05",
+        "sourceId": "C-02",
+        "targetId": "C-03",
+        "description": "Sincroniza en lote marcaciones acumuladas con clave de idempotencia",
+        "technology": "HTTPS / JSON Batch",
+        "protocol": "REST / Sync"
+      },
+      {
+        "id": "CREL-06",
+        "sourceId": "C-03",
+        "targetId": "C-04",
+        "description": "Enruta tráfico de API y actualiza cabeceras WebSocket (Upgrade)",
+        "technology": "HTTP/2 Proxy Pass",
+        "protocol": "Red interna school_net (Puerto 3000)"
+      },
+      {
+        "id": "CREL-07",
+        "sourceId": "C-04",
+        "targetId": "C-05",
+        "description": "Lee y escribe registros relacionales, notas, asistencias y auditoría",
+        "technology": "TCP / SQL Dialect",
+        "protocol": "PostgreSQL Wire Protocol (5432)"
+      },
+      {
+        "id": "CREL-08",
+        "sourceId": "C-04",
+        "targetId": "C-06",
+        "description": "Verifica tokens revocados, aplica rate limit y publica eventos",
+        "technology": "TCP / Protocolo RESP",
+        "protocol": "Redis Client (6379)"
+      },
+      {
+        "id": "CREL-09",
+        "sourceId": "C-04",
+        "targetId": "C-08",
+        "description": "Almacena y recupera boletas PDF firmadas y carnés generados",
+        "technology": "POSIX File I/O",
+        "protocol": "Disk System Stream"
+      }
+    ]
+  }
+}

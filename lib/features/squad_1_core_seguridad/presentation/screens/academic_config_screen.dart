@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/models/academic_period.dart';
 import '../../domain/models/grade_section.dart';
-import '../../domain/models/grading_scale.dart';
 import '../../domain/models/institutional_params.dart';
 import '../../domain/models/session_tokens.dart';
 import '../controllers/academic_config_controller.dart';

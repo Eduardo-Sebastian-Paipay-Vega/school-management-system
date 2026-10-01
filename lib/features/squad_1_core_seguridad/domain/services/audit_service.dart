@@ -54,7 +54,8 @@ class AuditService {
   final Clock _clock;
   final IdGenerator _ids;
 
-  static const String genesisHash = '0' * 64;
+  static const String genesisHash =
+      '0000000000000000000000000000000000000000000000000000000000000000';
 
   /// Hash canónico de una entrada de auditoría: `SHA256(previousHash +
   /// datos_del_registro)`. Es una función pura, reutilizada tanto para

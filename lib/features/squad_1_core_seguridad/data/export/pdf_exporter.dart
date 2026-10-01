@@ -28,7 +28,7 @@ class PdfExporter {
           ),
           pw.SizedBox(height: 12),
           if (report.rejected.isNotEmpty)
-            pw.Table.fromTextArray(
+            pw.TableHelper.fromTextArray(
               headers: ['Fila', 'Datos', 'Motivo de rechazo'],
               data: report.rejected
                   .map((r) => [r.rowNumber.toString(), r.rawData, r.reason])
@@ -58,7 +58,7 @@ class PdfExporter {
           pw.Text(tenantName, style: const pw.TextStyle(fontSize: 10)),
           pw.Text('Exportado por: $requestedBy', style: const pw.TextStyle(fontSize: 9)),
           pw.SizedBox(height: 12),
-          pw.Table.fromTextArray(
+          pw.TableHelper.fromTextArray(
             headers: ['Fecha UTC', 'Usuario', 'Acción', 'Entidad', 'IP', 'Hash'],
             data: entries
                 .map((e) => [
@@ -71,7 +71,7 @@ class PdfExporter {
                     ])
                 .toList(),
             cellStyle: const pw.TextStyle(fontSize: 7),
-            headerStyle: const pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
+            headerStyle: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
           ),
         ],
       ),

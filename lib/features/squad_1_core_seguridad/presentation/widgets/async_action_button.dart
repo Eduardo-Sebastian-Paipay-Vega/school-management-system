@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -26,6 +27,13 @@ class AsyncActionButton extends StatefulWidget {
 
 class _AsyncActionButtonState extends State<AsyncActionButton> {
   bool _justSucceeded = false;
+  Timer? _resetTimer;
+
+  @override
+  void dispose() {
+    _resetTimer?.cancel();
+    super.dispose();
+  }
 
   Future<void> _handleTap() async {
     if (widget.isLoading) return;
@@ -33,7 +41,8 @@ class _AsyncActionButtonState extends State<AsyncActionButton> {
     if (!mounted) return;
     if (success) {
       setState(() => _justSucceeded = true);
-      Future.delayed(const Duration(seconds: 2), () {
+      _resetTimer?.cancel();
+      _resetTimer = Timer(const Duration(seconds: 2), () {
         if (mounted) setState(() => _justSucceeded = false);
       });
     }

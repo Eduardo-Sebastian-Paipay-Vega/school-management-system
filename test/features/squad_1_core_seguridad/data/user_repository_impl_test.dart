@@ -3,6 +3,7 @@ import 'package:flutter_application_1/features/squad_1_core_seguridad/data/datas
 import 'package:flutter_application_1/features/squad_1_core_seguridad/data/repositories/audit_repository_impl.dart';
 import 'package:flutter_application_1/features/squad_1_core_seguridad/data/repositories/user_repository_impl.dart';
 import 'package:flutter_application_1/features/squad_1_core_seguridad/domain/models/role.dart';
+import 'package:flutter_application_1/features/squad_1_core_seguridad/domain/models/user.dart';
 import 'package:flutter_application_1/features/squad_1_core_seguridad/domain/models/session_tokens.dart';
 import 'package:flutter_application_1/features/squad_1_core_seguridad/domain/repositories/user_repository.dart';
 import 'package:flutter_application_1/features/squad_1_core_seguridad/domain/services/audit_service.dart';

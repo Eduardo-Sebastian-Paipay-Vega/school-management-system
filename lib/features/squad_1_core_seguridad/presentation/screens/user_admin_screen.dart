@@ -105,7 +105,7 @@ class _CreateUserTabState extends State<_CreateUserTab> {
                 ),
                 const SizedBox(height: 10),
                 DropdownButtonFormField<AppRole>(
-                  value: _rol,
+                  initialValue: _rol,
                   decoration: const InputDecoration(labelText: 'Rol inicial', border: OutlineInputBorder()),
                   items: AppRole.values
                       .map((r) => DropdownMenuItem(value: r, child: Text(r.label)))

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../shared/validators.dart';
-import '../controllers/auth_controller.dart';
 import '../scope/squad_1_scope.dart';
 import '../widgets/async_action_button.dart';
 import '../widgets/rbac_role_chip.dart';
@@ -130,7 +129,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 currentPassword: _currentPasswordController.text,
                                 newPassword: _newPasswordController.text,
                               );
-                              if (ok && mounted) Navigator.popUntil(context, (route) => route.isFirst);
+                              if (ok && context.mounted) Navigator.popUntil(context, (route) => route.isFirst);
                               return ok;
                             },
                           ),

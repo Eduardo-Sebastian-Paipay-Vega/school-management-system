@@ -3,7 +3,7 @@ class Validators {
   const Validators._();
 
   static final RegExp _dni = RegExp(r'^\d{8}$');
-  static final RegExp _email = RegExp(r'^[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}$');
+  static final RegExp _email = RegExp(r'^[\w.+-]+@(?:[\w-]+\.)+[a-zA-Z]{2,}$');
   static final RegExp _hasLetter = RegExp(r'[A-Za-z]');
   static final RegExp _hasDigit = RegExp(r'\d');
 

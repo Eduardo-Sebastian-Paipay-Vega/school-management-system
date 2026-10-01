@@ -1,215 +1,224 @@
 <div align="center">
 
-# Sistema de Información Integral de Gestión Administrativa
+# Sistema Integral de Gestión Escolar e Información Institucional
 
 ### Planteles de Aplicación "Guamán Poma de Ayala" — UNSCH
+**Servicio Social Universitario (SSU IS-480, Semestre 2026-II) · EPIS UNSCH**
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
-[![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart&logoColor=white)](https://dart.dev)
-[![License: MIT](https://img.shields.io/badge/Licencia-MIT-green.svg)](LICENSE)
-[![Estado](https://img.shields.io/badge/Estado-En%20Desarrollo-yellow)]()
+[![Flutter](https://img.shields.io/badge/Flutter-3.35.x_Web-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.9.x-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-20_LTS-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-7+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
+[![QA Quality](https://img.shields.io/badge/Flutter_Analyze-0_Errors_|_0_Warnings-brightgreen?style=for-the-badge&logo=flutter)](https://flutter.dev)
+[![Tests](https://img.shields.io/badge/Tests-48%2F48_Passed_(100%25)-brightgreen?style=for-the-badge)](https://flutter.dev)
+[![Git Flow](https://img.shields.io/badge/Git_Branches-main_%7C_dev-orange?style=for-the-badge&logo=git&logoColor=white)](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system)
+[![Licencia](https://img.shields.io/badge/Licencia-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
 </div>
 
 ---
 
-## Descripción
+## 📌 Descripción del Proyecto
 
-Sistema de información integral orientado a la **gestión administrativa** y plataforma de **difusión digital** para los Planteles de Aplicación "Guamán Poma de Ayala" de la Universidad Nacional de San Cristóbal de Huamanga (UNSCH).
+Plataforma Web integral orientada a la **modernización de la gestión académica, asistencia escolar en tiempo real, planilla de calificaciones ágil y difusión digital** para los Planteles de Aplicación "Guamán Poma de Ayala" de la Universidad Nacional de San Cristóbal de Huamanga (UNSCH), en la ciudad de Ayacucho, Perú.
 
-Este proyecto se desarrolla en el marco del **Servicio Social Universitario (IS-480)** durante el Semestre Académico **2026-II**, con una duración de **16 semanas académicas** (96 horas por persona).
-
----
-
-## Objetivo
-
-Reducir la brecha digital y modernizar los procesos administrativos de la institución educativa mediante la implementación de una solución tecnológica integral que:
-
-- Centralice la gestión administrativa en una plataforma única.
-- Digitalice procesos que actualmente se realizan de forma manual.
-- Mejore la comunicación institucional a través de una plataforma de difusión digital.
-- Capacite al personal en el uso eficiente de herramientas tecnológicas.
+Desarrollada por **5 Squads Técnicos Especializados** de la Escuela Profesional de Ingeniería de Sistemas (EPIS) en el marco del **Servicio Social Universitario (IS-480)**, abarcando **71 Requisitos Funcionales (`RF-01` al `RF-71`)**, **20 Requisitos No Funcionales (ISO/IEC 25010)** y el cumplimiento estricto de la normativa de protección de datos personales (**Ley N.° 29733**).
 
 ---
 
-## Funcionalidades y Módulos del Sistema (71 Requisitos)
+## 🎯 Objetivos de Impacto
 
-El sistema integra **13 módulos funcionales** con un total de **71 requerimientos normativos formalizados**, incorporando capacidades de innovación operativa y pedagógica de alto impacto:
-
-1. 🔐 **Módulo 1: Acceso, Autenticación JWT y RBAC** (`RF-01` al `RF-04`)
-2. 👥 **Módulo 2: Administración de Usuarios y Directorio** (`RF-05` al `RF-09`)
-3. 🏫 **Módulo 3: Configuración Escolar, Periodos y Escalas** (`RF-10` al `RF-14`)
-4. 📚 **Módulo 4: Gestión Académica, Matrícula y Carga Lectiva** (`RF-15` al `RF-19`)
-5. ⏱️ **Módulo 5: Asistencia Estudiantil, Kiosco Offline-First, App Rápida y Carnés QR** (`RF-20` al `RF-27`) — *[Innovación 1, 2 y 3]*
-6. 🎓 **Módulo 6: Asistencia y Cómputo de Horas de Practicantes** (`RF-28` al `RF-31`)
-7. 👨‍🏫 **Módulo 7: Horas de Docentes Contratados y Reprogramación** (`RF-32` al `RF-35`)
-8. 📊 **Módulo 8: Calificaciones en Tiempo Real, Modo Excel, Auto-Guardado y Conversión CNEB** (`RF-36` al `RF-46`) — *[Innovación 4, 5, 6 y 7]*
-9. 🗺️ **Módulo 9: Mapas de Calor con Navegación Drill-Down** (`RF-47` al `RF-51`) — *[Innovación 8]*
-10. 📈 **Módulo 10: Dashboards, Ficha 360° del Alumno y Métricas SSU IS-480** (`RF-52` al `RF-58`) — *[Innovación 9 y 10]*
-11. 📑 **Módulo 11: Emisión de Reportes y Verificación Criptográfica QR** (`RF-59` al `RF-64`) — *[Innovación 11]*
-12. 🛡️ **Módulo 12: Trazabilidad, Auditoría y Protección de Datos (Ley 29733)** (`RF-65` al `RF-68`)
-13. 🌐 **Módulo 13: Plataforma de Difusión Digital y Portal Institucional** (`RF-69` al `RF-71`)
+- **Erradicar la pérdida de clases y tiempo administrativo:** Reducir en más de 40% el tiempo dedicado al llenado de actas manuales y registro de asistencia.
+- **Resiliencia Operativa Offline-First:** Garantizar que el control de portería funcione sin internet y sincronice automáticamente al reanudar conexión (<200 ms de respuesta).
+- **Planilla de Notas a 60 FPS:** Permitir a los docentes registrar calificaciones a máxima velocidad mediante teclado en "Modo Excel" con auto-guardado en segundo plano (debounce 400 ms).
+- **Trazabilidad Institucional y Anticorrupción:** Auditoría inmutable con sellado criptográfico SHA-256 para cada cambio en notas y asistencias.
+- **Acreditación Universitaria y Transparencia:** Panel de indicadores del SSU IS-480 y verificación pública documental mediante códigos QR sin requerir inicio de sesión.
 
 ---
 
-## Innovaciones Estratégicas del Sistema
+## 🚀 Funcionalidades y Módulos del Sistema (71 RFs)
 
-| # | Innovación | Módulo Relacionado | Valor para la Institución |
+El sistema integra **13 módulos funcionales** distribuidos estratégicamente entre los 5 squads técnicos:
+
+1. 🔐 **Módulo 1: Acceso, Autenticación JWT y RBAC** (`RF-01` al `RF-04`) — Squad 1
+2. 👥 **Módulo 2: Administración de Usuarios y Directorio** (`RF-05` al `RF-09`) — Squad 1
+3. 🏫 **Módulo 3: Configuración Escolar, Periodos y Escalas** (`RF-10` al `RF-14`) — Squad 1
+4. 📚 **Módulo 4: Gestión Académica, Matrícula y Carga Lectiva** (`RF-15` al `RF-19`) — Squad 2
+5. ⏱️ **Módulo 5: Asistencia Estudiantil, Kiosco Offline-First y Carnés QR** (`RF-20` al `RF-27`) — Squad 2
+6. 🎓 **Módulo 6: Asistencia y Cómputo de Horas de Practicantes SSU** (`RF-28` al `RF-31`) — Squad 2
+7. 👨‍🏫 **Módulo 7: Horas de Docentes Contratados y Reprogramación** (`RF-32` al `RF-35`) — Squad 2
+8. 📊 **Módulo 8: Calificaciones en Tiempo Real, Modo Excel y Motor CNEB** (`RF-36` al `RF-46`) — Squad 3
+9. 🗺️ **Módulo 9: Mapas de Calor con Navegación Drill-Down** (`RF-47` al `RF-51`) — Squad 4
+10. 📈 **Módulo 10: Dashboards, Ficha 360° del Alumno y Métricas SSU IS-480** (`RF-52` al `RF-58`) — Squad 4
+11. 📑 **Módulo 11: Emisión de Reportes y Verificación Criptográfica QR** (`RF-59` al `RF-64`) — Squad 5
+12. 🛡️ **Módulo 12: Trazabilidad, Auditoría Inmutable y Ley 29733** (`RF-65` al `RF-68`) — Squad 1
+13. 🌐 **Módulo 13: Plataforma de Difusión Digital y Portal Institucional** (`RF-69` al `RF-71`) — Squad 5
+
+---
+
+## 💡 Innovaciones Estratégicas del Sistema
+
+| # | Innovación Tecnológica | Módulo & RF | Valor Agregado para el Plantel |
 |:---:|---|:---:|---|
-| 1 | **Kiosco de Portería Offline-First** | Módulo 5 (`RF-25`) | Registro de ingreso de alumnos sin caídas ante cortes de internet (buffer local IndexedDB con sync automática). |
-| 2 | **Emisión de Carnés Escolares con QR** | Módulo 5 (`RF-26`) | Carnés imprimibles en PDF A4 con código QR institucional de lectura instantánea. |
-| 3 | **Toma Rápida de Asistencia Móvil (WebSockets)** | Módulo 5 (`RF-27`) | Marcación táctil ágil en aula en 1 toque con difusión en tiempo real a dirección (< 500 ms). |
-| 4 | **Planilla Rápida de Notas (Modo Excel)** | Módulo 8 (`RF-38`) | Interfaz ultra-rápida con flechas de teclado, Tab, Enter y pegado matricial masivo desde hojas de cálculo. |
-| 5 | **Asistente de Conclusiones CNEB/MINEDU** | Módulo 8 (`RF-39`) | Banco taxonómico de retroalimentación pedagógica contextual según nivel de logro (AD, A, B, C). |
-| 6 | **Auto-Guardado Conectado en Segundo Plano** | Módulo 8 (`RF-45`) | Registro transparente con debounce de 400 ms, sin bloqueos de pantalla ni pérdida de datos. |
-| 7 | **Motor de Conversión Dual (0-20 a Literal CNEB)**| Módulo 8 (`RF-46`) | Conversión automática de notas vigesimales a letras (AD, A, B, C) oficial MINEDU con persistencia dual. |
-| 8 | **Mapas de Calor con Navegación Drill-Down** | Módulo 9 (`RF-49`) | Análisis jerárquico interactivo por clics (Plantel -> Nivel -> Grado -> Sección -> Estudiante). |
-| 9 | **Ficha Escolar Integral 360° del Estudiante** | Módulo 10 (`RF-56`) | Perfil unificado con kardex de notas, asistencia, inasistencias y alertas tempranas en un solo clic. |
-| 10 | **Dashboard de Impacto Social SSU IS-480** | Módulo 10 (`RF-57`) | Monitoreo de KPIs de brecha digital, adopción y horas de servicio social universitario. |
-| 11 | **Verificación Documental Criptográfica SHA-256 + QR** | Módulo 11 (`RF-60`) | Boletas y reportes inalterables verificables desde cualquier celular sin inicio de sesión. |
+| 1 | **Kiosco de Portería Offline-First** | M5 (`RF-25`) | Registro de ingreso de estudiantes (<200 ms) sin caídas ante cortes de red gracias al búfer local en IndexedDB/Hive. |
+| 2 | **Carnés Escolares con Token QR** | M5 (`RF-26`) | Emisión e impresión de credenciales en PDF vectorial con token criptográfico para control de portería. |
+| 3 | **Toma Rápida en Aula con WebSockets** | M5 (`RF-27`) | Marcación táctil en 1 clic desde el celular del docente con difusión en tiempo real a dirección y monitores. |
+| 4 | **Planilla Ágil de Notas ("Modo Excel")** | M8 (`RF-38`) | Interfaz ultra-rápida a 60 FPS con navegación completa por teclado (flechas, Enter, Tab) y pegado masivo. |
+| 5 | **Asistente de Conclusiones CNEB/MINEDU** | M8 (`RF-39`) | Banco taxonómico de retroalimentación pedagógica contextual según nivel de logro (AD, A, B, C). |
+| 6 | **Auto-Guardado Asistido (Debounce 400 ms)** | M8 (`RF-45`) | Guardado transparente en segundo plano que evita pérdida de información y bloqueos de interfaz. |
+| 7 | **Motor de Conversión Dual (Vigesimal ➔ CNEB)** | M8 (`RF-46`) | Conversión algorítmica canónica de notas 0-20 a escala cualitativa oficial del MINEDU (AD, A, B, C). |
+| 8 | **Mapas de Calor con Navegación Drill-Down** | M9 (`RF-49`) | Diagnóstico visual interactivo por clics jerárquicos: Plantel ➔ Nivel ➔ Grado ➔ Sección ➔ Alumno. |
+| 9 | **Ficha Escolar Integral 360° del Estudiante** | M10 (`RF-56`) | Radiografía individual con gráfico de Radar, historial de notas, ausentismo y alertas de deserción en 1 pantalla. |
+| 10 | **Dashboard de Impacto Social SSU IS-480** | M10 (`RF-57`) | Monitoreo continuo de KPIs de adopción, horas de servicio social y metas del proyecto para la UNSCH. |
+| 11 | **Verificación Criptográfica QR SHA-256** | M11 (`RF-60`) | Consulta pública instantánea de autenticidad de boletas y certificados sin necesidad de login. |
+| 12 | **Cadena Inmutable de Auditoría (Ley 29733)** | M12 (`RF-65`) | Cadena criptográfica `SHA-256` encadenada desde `genesisHash` con trigger de inmutabilidad en PostgreSQL. |
 
 ---
 
-## Arquitectura
+## 🏛️ Arquitectura del Sistema (Desacoplada y Cloud)
 
-El proyecto sigue una arquitectura modular desarrollada con **Flutter** para garantizar compatibilidad multiplataforma (Android, iOS, Web, Desktop) y resiliencia offline.
+El sistema implementa una arquitectura desacoplada **Clean Architecture + Feature-First**, optimizada para la nube y la resiliencia en red escolar:
 
 ```
-┌──────────────────────────────────────────────┐
-│              CAPA DE PRESENTACIÓN            │
-│       Flutter Web (Material Design 3)        │
-├──────────────────────────────────────────────┤
-│              CAPA DE NEGOCIO                 │
-│    APIs RESTful + WebSockets + Offline Buffer│
-├──────────────────────────────────────────────┤
-│              CAPA DE DATOS                   │
-│   PostgreSQL Multi-Tenant + Redis + IndexedDB│
-├──────────────────────────────────────────────┤
-│            INFRAESTRUCTURA                   │
-│       VPS Cloud + Dominio + SSL HTTPS        │
-└──────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                              CAPA DE FRONTEND (CLIENTE)                                │
+│       Flutter 3.35.x Web (CanvasKit / WebAssembly) • PWA • Material Design 3           │
+│   [Desplegado globalmente en Vercel CDN • Modo Kiosco Offline-First en IndexedDB/Hive] │
+└──────────────────────────────────────────┬─────────────────────────────────────────────┘
+                                           │
+                                           │ HTTPS (TLS 1.3) / WSS (WebSockets RFC 6455)
+                                           │ Contratos JSON Tipados / OpenAPI 3.0
+                                           ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                              CAPA DE BACKEND (SERVICIOS)                               │
+│       Node.js v20+ LTS • TypeScript 5.x • Express Modular • Clean Architecture         │
+│   [Auth JWT/RBAC • Sync Worker Kiosco • Grading Engine • WebSocket Gateway • QR Verifier]
+└──────────────────────────────────────────┬─────────────────────────────────────────────┘
+                                           │
+                                           │ Conexión Segura TCP Pool (Puertos 5432 y 6379)
+                                           ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                         CAPA DE PERSISTENCIA Y CACHÉ                                   │
+│   • PostgreSQL 16+: Motor relacional ACID con discriminador multi-tenant (tenant_id)   │
+│   • Redis 7+: Almacén en RAM para token blacklist, rate limiting y Pub/Sub WebSockets  │
+└────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Tecnologías
-
-| Capa | Tecnología |
-|---|---|
-| **Frontend** | Flutter 3.x, Dart 3.x, Material Design 3, Hive / IndexedDB (Offline-First) |
-| **Backend** | Node.js / Python (APIs RESTful con arquitectura limpia) |
-| **Tiempo Real** | WebSockets / Server-Sent Events (SSE) |
-| **Base de Datos** | PostgreSQL (Aislamiento Multi-Tenant por `tenant_id`) |
-| **Caché & Sesiones** | Redis |
-| **Infraestructura** | VPS Cloud, Dominio institucional, Certificados SSL (HTTPS) |
-| **Control de Versiones** | Git + GitHub |
-| **Metodología** | Scrum (Sprints semanales) |
-
----
-
-## Estructura del Proyecto
+## 📂 Estructura del Repositorio (Monorepo Modular)
 
 ```text
 school-management-system/
-├── .agents/                    # Reglas, skills y plantilla canónica SDD (IEEE 1016)
-│   ├── rules/sdd_rules.md      # Reglas técnicas de arquitectura y diseño
-│   └── skills/sdd-authoring/   # Skill para elaboración paso a paso de SDDs
-├── AGENTS.md                   # Directivas y reglas obligatorias para agentes de IA
-├── lib/                        # Código fuente modular (Clean Architecture Feature-First)
-│   ├── main.dart               # Shell de navegación interactivo por Squads
-│   ├── core/                   # Módulos transversales compartidos
-│   │   ├── constants/          # Constantes globales, URLs base de API y metadatos
-│   │   ├── theme/              # Paleta oficial (Verde Guamán Poma, Azul UNSCH, escala CNEB)
-│   │   └── widgets/            # Tarjetas de squad y componentes reutilizables
-│   └── features/               # Módulos independientes asignados a los 5 Squads
-│       ├── squad_1_core_seguridad/        # Brandon Montero (JWT, RBAC, Auditoría)
-│       ├── squad_2_matricula_asistencia/  # Sebastian Paipay (Kiosco Offline, QR)
-│       ├── squad_3_calificaciones/        # Steve Ovalle (Modo Excel, CNEB 400ms)
-│       ├── squad_4_analitica_dashboards/  # Aracely Rodríguez (Drill-Down, Ficha 360°)
-│       └── squad_5_secretaria_portal/     # Cesar Leon (Libretas PDF, QR Público)
-├── web/                        # Configuración Web PWA (Metadatos y Branding Oficial)
-├── test/                       # Batería de pruebas unitarias y de widgets
-├── D - Base 1 - 01092026/     # Documentación técnica, RFs, CUs y Arquitectura
-│   └── Fase 2/
-│       ├── Requisitos Funcionales/ # 71 RFs organizados por Squad
-│       ├── Casos de uso/           # 71 CUs organizados por Squad
-│       └── Arquitectura/           # SAD maestro, DDLs, APIs y SDDs
-├── pubspec.yaml                # Dependencias del proyecto
-└── README.md                   # Este archivo
+├── backend/                       # Servidor API RESTful y Gateway WebSockets
+│   ├── src/
+│   │   ├── config/                # Conexiones a PostgreSQL 16 (pg Pool) y Redis 7 (ioredis)
+│   │   ├── middlewares/           # authenticateJwt (RF-01) y requireRoles (RF-04)
+│   │   ├── routes/                # Rutas REST (/api/v1/health, auth, users, etc.)
+│   │   └── server.ts              # Servidor Express con Helmet, CORS y Morgan
+│   ├── .env.example               # Plantilla de variables de entorno cloud
+│   ├── package.json               # Dependencias de producción (Node.js/TypeScript)
+│   └── tsconfig.json              # Configuración estricta de TypeScript 5
+│
+├── database/                      # Esquema de Base de Datos PostgreSQL
+│   └── init/
+│       └── 01_esquema_consolidado.sql # DDL unificado de los 5 Squads con triggers y semillas
+│
+├── docker-compose.yml             # Orquestador local (Postgres 16, Redis 7 y Adminer :8080)
+├── vercel.json                    # Despliegue de Flutter Web (SPA Rewrites y Cache Wasm)
+│
+├── lib/                           # Código Fuente Frontend (Flutter 3.35 / Dart 3.9)
+│   ├── main.dart                  # Shell institucional y selector interactivo de squads
+│   ├── core/                      # Componentes transversales compartidos
+│   │   ├── constants/             # Constantes globales y metadatos
+│   │   ├── theme/app_theme.dart   # Tokens visuales (Verde Botella, Azul UNSCH, Escala CNEB)
+│   │   └── widgets/               # Widgets y botones reutilizables (AsyncActionButton, etc.)
+│   └── features/                  # Módulos por Squads (Arquitectura Feature-First)
+│       ├── squad_1_core_seguridad/        # M1, M2, M3, M12 (JWT, RBAC, Auditoría)
+│       ├── squad_2_matricula_asistencia/  # M4, M5, M6, M7 (Kiosco Offline, QR)
+│       ├── squad_3_calificaciones/        # M8 (Planilla Modo Excel a 60 FPS)
+│       ├── squad_4_analitica_dashboards/  # M9, M10 (Mapas Drill-Down, Ficha 360°)
+│       └── squad_5_secretaria_portal/     # M11, M13 (Libretas PDF, Portal Web)
+│
+├── test/                          # Batería de 48 Pruebas Unitarias y de Widgets
+├── web/                           # PWA Manifest y metadatos HTML5
+├── pubspec.yaml                   # Dependencias de Flutter (Crypto, PDF, Printing, etc.)
+├── AGENTS.md                      # Directivas y reglas obligatorias para agentes de IA
+└── README.md                      # Documentación maestra del proyecto
 ```
 
 ---
 
 ## ⚡ Guía de Inicio Rápido (Quick Start Dev)
 
-### 1. Iniciar el Servidor de Desarrollo (Equivalente a `npm run dev`)
+Sigue estos 3 pasos para levantar el entorno completo de desarrollo en local:
 
-Para ejecutar la aplicación localmente y ver los cambios en vivo en el navegador o en el escritorio:
+### Paso 1: Levantar Base de Datos y Caché (Docker Compose)
 
 ```bash
-# Iniciar en Google Chrome (Modo Web con Hot Reload) — RECOMENDADO
+# Levantar PostgreSQL 16 (:5432), Redis 7 (:6379) y Adminer (:8080) en segundo plano
+docker compose up -d
+
+# Verificar que los 3 contenedores estén corriendo saludablemente
+docker compose ps
+```
+
+* **Gestor Web de Base de Datos:** Abre [http://localhost:8080](http://localhost:8080) en tu navegador.
+  * **Sistema:** PostgreSQL | **Servidor:** `postgres` | **Usuario:** `postgres` | **Contraseña:** `postgrespassword2026!` | **Base de Datos:** `school_management`
+
+### Paso 2: Iniciar el Backend API (Node.js + TypeScript)
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+* **Servidor API:** Activo en [http://localhost:3000](http://localhost:3000)
+* **Health Check:** [http://localhost:3000/api/v1/health](http://localhost:3000/api/v1/health) (Valida conexión a PostgreSQL y Redis en tiempo real).
+
+### Paso 3: Iniciar el Frontend (Flutter Web)
+
+En una nueva terminal, desde la raíz del proyecto:
+
+```bash
+# 1. Descargar paquetes de Flutter
+flutter pub get
+
+# 2. Iniciar en Google Chrome con renderizador CanvasKit / Wasm (RECOMENDADO)
 flutter run -d chrome
 
-# Iniciar en Chrome fijando un puerto específico (ej. 3000)
-flutter run -d chrome --web-port 3000
-
-# Iniciar en Microsoft Edge
-flutter run -d edge
-
-# Iniciar como aplicación de escritorio nativa de Windows (.exe)
-flutter run -d windows
+# Opciones alternativas:
+# flutter run -d chrome --web-port 3000
+# flutter run -d edge
+# flutter run -d windows
 ```
 
 > 💡 **Con 1 Clic desde el Editor:** Puedes presionar la tecla **`F5`** (o *Run > Start Debugging*) en VS Code, Cursor o Antigravity IDE para lanzar la aplicación automáticamente.
 
----
-
-### 2. Atajos de Desarrollo en Tiempo Real (Mientras corre la App)
-
-Mientras el comando `flutter run` se encuentra activo en tu terminal:
-
-| Tecla | Acción | ¿Para qué sirve? |
-|:---:|---|---|
-| **`r`** | **Hot Reload** | Aplica cambios visuales instantáneamente (< 1 seg) sin reiniciar la app ni perder el estado. |
-| **`R`** | **Hot Restart** | Reinicia la aplicación por completo recargando todos los estados. |
-| **`h`** | **Help** | Muestra la lista completa de comandos de depuración disponibles. |
-| **`q`** | **Quit** | Detiene el servidor de desarrollo y cierra la aplicación. |
+#### Atajos de Teclado Útiles Mientras Corre Flutter:
+* **`r`**: **Hot Reload** (aplica cambios visuales en < 1 segundo sin reiniciar la app).
+* **`R`**: **Hot Restart** (reinicia la aplicación y recarga estados).
+* **`q`**: **Quit** (detiene la aplicación).
 
 ---
 
-### 3. Instalación Inicial desde Cero
+## 🧭 ¿Cómo Usar el Software y por Dónde Empezar? (Flujo por Fases)
 
-```bash
-# 1. Clonar el repositorio
-git clone https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system.git
+### 1. Punto de Partida: Hub Central de Navegación (`lib/main.dart`)
 
-# 2. Acceder al directorio
-cd school-management-system
-
-# 3. Descargar dependencias de Flutter
-flutter pub get
-
-# 4. Verificar estado de herramientas
-flutter doctor
-
-# 5. Ejecutar la app
-flutter run -d chrome
-```
+Al ejecutar el proyecto, se despliega el **Hub Central Interactivo**, donde podrás:
+- Explorar los paneles de trabajo de los **5 Squads**.
+- Visualizar los entregables asignados (`RF` y `RNF`).
+- Acceder al visor en vivo del **SDD (Documento de Diseño de Software IEEE 1016)**.
 
 ---
 
-## 🧭 ¿Cómo Usar el Software y por Dónde Empezar? (Guía de Flujo y Fases)
-
-### 1. Punto de Partida al Iniciar la Aplicación
-
-Al ejecutar el comando `flutter run -d chrome`, se abrirá automáticamente en tu navegador el **Hub Central de Navegación del Sistema** (`lib/main.dart`):
-
-* **🎛️ Tarjetas Interactivas de los 5 Squads:** Cada tarjeta muestra los módulos funcionales, el responsable del equipo, sus requerimientos asignados (`RF` y `RNF`) y un botón para ingresar a la pantalla de trabajo del Squad.
-* **📄 Visor Interactivo de SDD:** En la barra superior (o en la tarjeta del Squad 1) puedes pulsar el botón **"Ver SDD Interactivo"** para consultar el Documento de Diseño de Software (IEEE 1016) renderizado en vivo dentro de la propia aplicación Flutter.
-
----
-
-### 2. Ruta Lógica de Negocio: ¿Por qué Fase y Squad Empezar?
+### 2. Secuencia Lógica del Ciclo Escolar
 
 Para ingresar datos o validar el software en orden coherente, se debe seguir la secuencia del ciclo académico escolar:
 
@@ -248,101 +257,6 @@ Para ingresar datos o validar el software en orden coherente, se debe seguir la 
 
 ---
 
-## 🌿 Estrategia de Ramas Git Unificada (`main` y `dev`)
-
-Para mantener el repositorio limpio, centralizado y evitar la dispersión de cambios, el equipo opera bajo el modelo **Trunk-Based / GitFlow Ligero**:
-
-| Rama | Propósito | Regla de Oro |
-|---|---|---|
-| **`main`** | **Producción / Despliegue Oficial** | Contiene únicamente versiones cerradas, estables y validadas para sustentaciones del SSU IS-480. **Prohibido push directo.** |
-| **`dev`** | **Desarrollo Activo e Integración Continua** | **Rama principal de trabajo.** Todo el equipo converge aquí. Todo cambio se prueba y sincroniza sobre esta rama. |
-
-### Flujo de Trabajo Diario para los Desarrolladores
-
-```bash
-# 1. Al comenzar el día, ubicarse en 'dev' y sincronizar lo último
-git checkout dev
-git pull origin dev
-
-# 2. Realizar cambios, probarlos localmente (flutter analyze && flutter test)
-# 3. Guardar y subir a 'dev':
-git add .
-git commit -m "feat(squad-X): descripción del avance (RF-XX)"
-git push origin dev
-```
-
----
-
-## 🧪 Pruebas de Calidad y Verificación (QA)
-
-Antes de realizar cualquier commit o pull request, el código debe pasar limpiamente:
-
-```bash
-# 1. Análisis estático de código (0 errores, 0 warnings requeridos)
-flutter analyze
-
-# 2. Ejecutar todas las pruebas automáticas
-flutter test
-
-# 3. Limpiar caché en caso de inconsistencias
-flutter clean && flutter pub get
-```
-
----
-
-## 📚 Especificación y Documentación Técnica (Fase 2)
-
-El proyecto cuenta con documentación formal de ingeniería de software con trazabilidad bidireccional:
-
-* 📋 **Requisitos Funcionales (RF):** [Catálogo Maestro de 71 RFs (IEEE 830)](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) y [SRS Técnico con Contratos JSON](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md).
-* ⚙️ **Requisitos No Funcionales (RNF):** [Especificación de 20 RNFs Cuantificables (ISO/IEC 25010)](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20No%20Funcionales/requisitos_no_funcionales.md) y [Navegación por Squads](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20No%20Funcionales/README.md).
-* 🎭 **Casos de Uso UML (CU):** [Catálogo Maestro de 71 Casos de Uso por Squad](D%20-%20Base%201%20-%2001092026/Fase%202/Casos%20de%20uso/README.md).
-* 📐 **Diseño de Software (SDD - IEEE 1016):**
-  * 📖 **[Guía Rápida: ¿Cómo y Dónde se elabora el SDD?](D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/GUIA_RAPIDA_SDD.md)**
-  * 📋 **[Plantilla Canónica SDD (IEEE 1016)](.agents/skills/sdd-authoring/resources/plantilla_sdd.md)**
-  * 🌟 **[Ejemplo Modelo Completo: SDD Squad 1](D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/Squad%201%20-%20Core%20y%20Seguridad/sdd_squad_1.md)**
-  * 🛠️ **Skill para Asistentes de IA:** Ubicada en [`.agents/skills/sdd-authoring/SKILL.md`](.agents/skills/sdd-authoring/SKILL.md).
-
----
-
-## Deployment
-
-| Entorno | Descripción | Estado |
-|---|---|---|
-| **Desarrollo** | Local (Flutter SDK) | Activo |
-| **Producción** | VPS Cloud con dominio y SSL | Pendiente (Semana 10) |
-
-El despliegue a producción se realizará en la **Semana 10** del cronograma, incluyendo configuración de servidor VPS, dominio y certificados SSL.
-
----
-
-## Metodología de Desarrollo
-
-El proyecto se ejecuta en **4 fases** utilizando metodologías ágiles (Scrum):
-
-| Fase | Semanas | Descripción |
-|---|:---:|---|
-| I. Diagnóstico y Formulación | 1 - 3 | Levantamiento de información, análisis de brecha digital, Project Charter. |
-| II. Diseño y Desarrollo | 4 - 8 | Arquitectura, prototipado UI/UX, desarrollo Frontend y Backend. |
-| III. Pruebas e Implementación | 9 - 11 | QA, corrección de bugs, despliegue en VPS (Go-Live). |
-| IV. Capacitación y Cierre | 12 - 16 | Capacitación al personal, evaluación de impacto, sustentación final. |
-
-> Para más detalle, consultar el [Plan de Trabajo completo](D%20-%20Base%201%20-%2001092026/plan_trabajo.md).
-
----
-
-## KPIs del Proyecto
-
-| Indicador | Meta |
-|---|---|
-| Tasa de Adopción | >= 80% del personal usando el sistema |
-| Satisfacción del Usuario | Calificación promedio > 4/5 |
-| Rendimiento del Sistema | Tiempo de respuesta < 2 segundos |
-| Disponibilidad | Uptime 99% en horario escolar |
-| Reducción de Tiempo | >= 40% menos en trámites administrativos |
-
----
-
 ## 👥 Equipo de Desarrollo y Matriz de Responsabilidades
 
 El proyecto se desarrolla bajo el marco del **Servicio Social Universitario (SSU IS-480, Semestre 2026-II)** de la **Escuela Profesional de Ingeniería de Sistemas (EPIS - UNSCH)** para los **Planteles de Aplicación "Guamán Poma de Ayala"**.
@@ -359,93 +273,93 @@ El proyecto se desarrolla bajo el marco del **Servicio Social Universitario (SSU
 
 ---
 
-## 🛠️ Guía Rápida para Desarrolladores: Cómo Iniciar el Proyecto
+## 🌿 Estrategia de Ramas Git Unificada (`main` y `dev`)
 
-### 1. Levantar Base de Datos y Caché Local (Docker)
-```bash
-# Iniciar PostgreSQL 16 (:5432), Redis 7 (:6379) y Adminer (:8080)
-docker compose up -d
+Para mantener el repositorio libre de conflictos y simplificar la colaboración de los 5 squads, el equipo opera bajo una política simplificada de **Integración Continua**:
 
-# Ver el estado de los contenedores
-docker compose ps
-
-# Abrir el gestor de BD en el navegador:
-# URL: http://localhost:8080 | Servidor: postgres | Usuario: postgres | Contraseña: postgrespassword2026! | BD: school_management
-```
-
-### 2. Iniciar el Backend API (Node.js + TypeScript)
-```bash
-cd backend
-npm install
-npm run dev
-# El servidor responderá en http://localhost:3000
-# Comprobación de salud: http://localhost:3000/api/v1/health
-```
-
-### 3. Iniciar el Frontend (Flutter Web)
-```bash
-# Desde la raíz del repositorio:
-flutter pub get
-flutter run -d chrome --web-renderer canvaskit
-```
-
----
-
-## Documentación del Proyecto
-
-| Fase / Artefacto | Descripción | Enlace |
+| Rama | Propósito | Regla de Oro |
 |---|---|---|
-| **Plan de Trabajo** | Programación completa de 16 semanas con artefactos, KPIs y entregables SSU. | [plan_trabajo.md](D%20-%20Base%201%20-%2001092026/plan_trabajo.md) |
-| **Fase 1: Requerimientos de Usuario (RF)** | Especificación no técnica de necesidades para los 71 requerimientos y 13 módulos. | [requerimientos_funcionales.md](D%20-%20Base%201%20-%2001092026/Fase%201/Requerimientos/requerimientos_funcionales.md) |
-| **Fase 1: Requerimientos de Calidad (RNF)** | Atributos de calidad institucional, restricciones y normas (**ISO/IEC 25010**). | [requerimientos_no_funcionales.md](D%20-%20Base%201%20-%2001092026/Fase%201/Requerimientos/requerimientos_no_funcionales.md) |
-| **Fase 2: Catálogo Documental IEEE 830** | Especificación formal y normativa de requisitos (`RF-01` al `RF-71`) con flujos y aceptación. | [requisitos_funcionales.md](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) |
-| **Fase 2: Especificación RNF por Squads** | 20 RNFs técnicos cuantificables (JWT, Debounce 400ms, Kiosco Offline, WCAG AA). | [requisitos_no_funcionales.md](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20No%20Funcionales/requisitos_no_funcionales.md) |
-| **Fase 2: SRS Técnico de Arquitectura** | Contratos de API REST, controladores Flutter, consultas PostgreSQL, Redis y WebSockets. | [requisitos_funcionales_tecnicos.md](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md) |
-| **Manuales de Usuario y Admin** | Guías de operación para personal docente, portería y dirección. | Programado para Semana 12 |
+| **`main`** | **Producción / Despliegue Oficial** | Contiene únicamente versiones cerradas, probadas y listas para sustentaciones del SSU IS-480. **Prohibido push directo.** Solo recibe merges desde `dev`. |
+| **`dev`** | **Desarrollo Activo e Integración Continua** | **Rama de trabajo diaria.** Los 5 squads integran y prueban aquí sus avances de forma continua. |
+
+### Flujo Diario de Trabajo:
+
+```bash
+# 1. Al comenzar la jornada, sincronizar la última versión de dev
+git checkout dev
+git pull origin dev
+
+# 2. Realizar cambios en el código
+# 3. Comprobar calidad y tests antes de subir
+flutter analyze
+flutter test
+
+# 4. Guardar y enviar cambios a dev
+git add .
+git commit -m "feat(squad-X): avance del módulo (RF-XX)"
+git push origin dev
+```
+
+### Convención de Commits:
+
+| Prefijo | Significado | Ejemplo |
+|---|---|---|
+| `feat:` | Nueva funcionalidad | `feat(squad-2): implementación del lector QR de portería (RF-25)` |
+| `fix:` | Corrección de bug | `fix(squad-1): resolver validación de correo institucional (RF-05)` |
+| `docs:` | Actualización de documentación | `docs: actualizar SDD de calificaciones (RF-38)` |
+| `test:` | Adición o ajuste de pruebas | `test: agregar test de debounce para guardado de notas` |
+| `refactor:` | Refactorización de código | `refactor: optimizar pool de conexiones a PostgreSQL` |
+| `chore:` | Tareas de configuración | `chore: actualizar dependencias en pubspec.yaml` |
 
 ---
 
-## Contribución
+## 🧪 Pruebas de Calidad y Verificación (QA)
 
-Este repositorio tiene acceso restringido. Solo los miembros autorizados del equipo pueden realizar cambios.
+Antes de realizar cualquier commit a la rama `dev`, el código debe superar satisfactoriamente:
 
-### Flujo de trabajo
+```bash
+# 1. Análisis estático de código Flutter (0 errores, 0 warnings requeridos)
+flutter analyze
 
-1. Crear una rama desde `main`:
-   ```bash
-   git checkout -b feature/nombre-de-la-funcionalidad
-   ```
-2. Realizar los cambios y hacer commit:
-   ```bash
-   git add .
-   git commit -m "feat: descripción del cambio"
-   ```
-3. Subir la rama:
-   ```bash
-   git push origin feature/nombre-de-la-funcionalidad
-   ```
-4. Crear un **Pull Request** en GitHub hacia `main`.
-5. Esperar la **aprobación** de al menos 1 miembro del equipo.
-6. Hacer **merge** una vez aprobado.
+# 2. Ejecución de la batería de pruebas (48 pruebas pasando)
+flutter test
 
-### Convención de Commits
-
-| Prefijo | Uso |
-|---|---|
-| `feat:` | Nueva funcionalidad |
-| `fix:` | Corrección de errores |
-| `docs:` | Cambios en documentación |
-| `style:` | Cambios de formato (sin afectar lógica) |
-| `refactor:` | Reestructuración de código |
-| `test:` | Agregar o modificar pruebas |
-| `chore:` | Tareas de mantenimiento |
+# 3. Compilación y verificación del Backend
+cd backend && npm run build
+```
 
 ---
 
-## Licencia
+## 📚 Documentación Técnica e Ingeniería de Software
 
-Este proyecto está licenciado bajo la **MIT License**. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+El proyecto cuenta con documentación formal de ingeniería de software con trazabilidad bidireccional:
+
+* 📋 **Requisitos Funcionales (RF):** [Catálogo Maestro de 71 RFs (IEEE 830)](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) y [SRS Técnico con Contratos JSON](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md).
+* ⚙️ **Requisitos No Funcionales (RNF):** [Especificación de 20 RNFs Cuantificables (ISO/IEC 25010)](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20No%20Funcionales/requisitos_no_funcionales.md) y [Navegación por Squads](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20No%20Funcionales/README.md).
+* 🎭 **Casos de Uso UML (CU):** [Catálogo Maestro de 71 Casos de Uso por Squad](D%20-%20Base%201%20-%2001092026/Fase%202/Casos%20de%20uso/README.md).
+* 📐 **Diseño de Software (SDD - IEEE 1016):**
+  * 📖 **[Guía Rápida: ¿Cómo y Dónde se elabora el SDD?](D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/GUIA_RAPIDA_SDD.md)**
+  * 📋 **[Plantilla Canónica SDD (IEEE 1016)](.agents/skills/sdd-authoring/resources/plantilla_sdd.md)**
+  * 🌟 **[Ejemplo Modelo Completo: SDD Squad 1](D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/Squad%201%20-%20Core%20y%20Seguridad/sdd_squad_1.md)**
+  * 🛠️ **Skill para Asistentes de IA:** Ubicada en [`.agents/skills/sdd-authoring/SKILL.md`](.agents/skills/sdd-authoring/SKILL.md).
+* 📅 **Plan de Trabajo y Cronograma SSU:** [Plan de Trabajo IS-480 (16 Semanas)](D%20-%20Base%201%20-%2001092026/plan_trabajo.md).
+
+---
+
+## 🌐 Despliegue e Infraestructura Cloud
+
+| Componente | Plataforma / Entorno | Estrategia de Entrega |
+|---|---|---|
+| **Frontend Web (Flutter)** | **Vercel CDN** | Despliegue continuo con renderizado CanvasKit/Wasm, headers de caché estático y SPA rewrites ([`vercel.json`](vercel.json)). |
+| **Backend REST & WebSockets** | **Cloud VPS / Render / Railway** | Contenedor Node.js v20 LTS con TypeScript compilado y proxies Nginx/TLS. |
+| **Base de Datos & Caché** | **PostgreSQL 16 + Redis 7** | Aislamiento multi-tenant por `tenant_id`, pools gestionados y triggers de inmutabilidad Ley 29733. |
+
+---
+
+## 📄 Licencia
+
+Este proyecto está licenciado bajo la **Licencia MIT**. Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 ```
-MIT License - Copyright (c) 2026 Eduardo Sebastian Paipay Vega
+MIT License - Copyright (c) 2026 Eduardo Sebastian Paipay Vega & Equipo SSU IS-480 (EPIS UNSCH)
 ```

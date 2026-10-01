@@ -25,14 +25,24 @@ El proyecto cuenta con **71 Requisitos Funcionales (`RF-01` al `RF-71`)** y **71
 
 1. **Squad 1 - Core y Seguridad:** Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`)  
    *M1, M2, M3, M12 (RF-01 al RF-14, RF-65 al RF-68)* — JWT, RBAC, Configuración escolar y Auditoría Ley 29733.
-2. **Squad 2 - Matrícula y Asistencia:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`)  
+   * **Entrega (Outputs):** `squad_1_core.dart` (Dart), middlewares `authenticateJwt` y `requireRoles` (Node.js), endpoints `/api/v1/auth`, `/api/v1/users`, `/api/v1/audit`.
+   * **Consume (Inputs):** `docker-compose.yml` (PostgreSQL 16, Redis 7) y `database/init/01_esquema_consolidado.sql`.
+2. **Squad 2 - Matrícula y Asistencia:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`) — *Líder de Proyecto*  
    *M4, M5, M6, M7 (RF-15 al RF-35)* — Matrícula, Kiosco Offline-First (IndexedDB/Hive), Carnés QR y Horas SSU.
-3. **Squad 3 - Calificaciones y Modo Excel:** Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`)  
+   * **Entrega (Outputs):** Kiosco de portería (<200ms), carné QR (`RF-26`), endpoint de sync masivo (`POST /api/v1/attendance/sync-batch`), WebSocket Gateway (`RF-27`).
+   * **Consume (Inputs):** `squad_1_core.dart` (`AccessControlService`, sesiones), tablas `instituciones`, `usuarios` y `anios_lectivos`.
+3. **Squad 3 - Calificaciones y Modo Excel:** Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`) — *Sub Líder*  
    *M8 (RF-36 al RF-46)* — Planilla "Modo Excel", Debounce 400ms, Conclusiones MINEDU y Conversión Dual.
+   * **Entrega (Outputs):** Planilla ágil a 60 FPS por teclado (`RF-38`), asistente de conclusiones (`RF-39`), endpoint en lote (`PATCH /api/v1/grades/batch`) y motor CNEB (`RF-46`).
+   * **Consume (Inputs):** `GradingScaleService` (escala CNEB AD, A, B, C de Squad 1), lista de `matriculas` (Squad 2) y tablas `calificaciones` / `evaluaciones`.
 4. **Squad 4 - Analítica y Dashboards:** Grissel Arascely Rodríguez Quispe (`@Arascely`)  
    *M9, M10 (RF-47 al RF-58)* — Mapas de Calor Drill-Down, Ficha 360°, Deserción y Métricas SSU IS-480.
+   * **Entrega (Outputs):** Mapas de calor interactivos (`fl_chart`), radar chart Ficha 360° (`RF-56`), endpoints de agregación (`/api/v1/analytics/*`).
+   * **Consume (Inputs):** Récord de asistencia (Squad 2), notas (Squad 3), vistas materializadas `vm_rendimiento_seccion` y `vm_asistencia_mensual`.
 5. **Squad 5 - Secretaría y Portal Web:** Cesar Antonio Leon Reyna (`@cesarleon27-ai`)  
    *M11, M13 (RF-59 al RF-64, RF-69 al RF-71)* — Libretas PDF, Verificación QR SHA-256 y Portal Web Institucional.
+   * **Entrega (Outputs):** Libretas escolares en PDF vectorial (`RF-59`), Verificador Público QR sin autenticación (`GET /api/v1/public/verify/:token` — `RF-60`), Portal Web en Vercel (`RF-71`).
+   * **Consume (Inputs):** Membrete oficial (Squad 1), actas/notas consolidadas (Squad 3), cuadros de mérito (Squad 4), configuración `vercel.json`.
 
 ---
 

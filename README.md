@@ -360,20 +360,51 @@ El proyecto se ejecuta en **4 fases** utilizando metodologías ágiles (Scrum):
 
 ---
 
-## Equipo de Desarrollo
+## 👥 Equipo de Desarrollo y Matriz de Responsabilidades
 
-| Nombre | Rol | GitHub |
-|---|---|---|
-| Paipay Vega, Eduardo Sebastian | Líder de Proyecto | [@Eduardo-Sebastian-Paipay-Vega](https://github.com/Eduardo-Sebastian-Paipay-Vega) |
-| Leon Reyna, Cesar Antonio | Desarrollador | [@cesarleon27-ai](https://github.com/cesarleon27-ai) |
-| Montero Gutiérrez, Brandon Fernando | Desarrollador | [@brandonmontero27-g](https://github.com/brandonmontero27-g) |
-| Ovalle Luyo, Steve Smith | Sub Líder | [@steveovalle27-lgtm](https://github.com/steveovalle27-lgtm) |
-| Rodríguez Quispe, Grissel Arascely | Desarrolladora | [@Arascely](https://github.com/Arascely) |
+El proyecto se desarrolla bajo el marco del **Servicio Social Universitario (SSU IS-480, Semestre 2026-II)** de la **Escuela Profesional de Ingeniería de Sistemas (EPIS - UNSCH)** para los **Planteles de Aplicación "Guamán Poma de Ayala"**.
 
-**Institución Académica:** Universidad Nacional de San Cristóbal de Huamanga (UNSCH)
-**Escuela Profesional:** Ingeniería de Sistemas (EPIS)
-**Asignatura:** Servicio Social Universitario (IS-480)
-**Periodo:** Semestre Académico 2026-II
+### Matriz Técnica de Funciones, Entregables y Dependencias por Integrante
+
+| Integrante | Rol en el Proyecto | Squad Asignado | Módulos & RFs | 📦 Qué debe Entregar / Desarrollar (Outputs) | 📥 Qué debe Usar / Consumir (Inputs) |
+|---|---|---|:---:|---|---|
+| **Paipay Vega, Eduardo Sebastian**<br>([@Eduardo-Sebastian-Paipay-Vega](https://github.com/Eduardo-Sebastian-Paipay-Vega)) | **Líder de Proyecto** | **Squad 2:<br>Matrícula y Asistencia** | **M4, M5, M6, M7**<br>(RF-15 al RF-35) | • **Frontend:** Kiosco Offline-First (`RF-21`, `RF-25`) en IndexedDB/Hive, escaneo QR (<200ms), carnés escolares (`RF-26`), matrícula y nóminas.<br>• **Backend:** Endpoint de matrícula ACID, sync masivo del Kiosco (`POST /api/v1/attendance/sync-batch`), WebSocket Gateway (`RF-27`), control de practicantes y docentes contratados. | • **De Squad 1:** `squad_1_core.dart` (`AccessControlService`, sesiones y sedes).<br>• **De BD:** Tablas `instituciones`, `usuarios`, `anios_lectivos`.<br>• **De Docker:** `docker compose up -d` para PostgreSQL y Redis. |
+| **Ovalle Luyo, Steve Smith**<br>([@steveovalle27-lgtm](https://github.com/steveovalle27-lgtm)) | **Sub Líder de Proyecto** | **Squad 3:<br>Calificaciones y Modo Excel** | **M8**<br>(RF-36 al RF-46) | • **Frontend:** Planilla ágil tipo Excel (`RF-38`) a 60 FPS con navegación 100% por teclado, debounce 400ms (`RF-45`), asistente de conclusiones CNEB (`RF-39`).<br>• **Backend:** Endpoint de guardado en lote idempotente (`PATCH /api/v1/grades/batch`), motor canónico CNEB (`RF-46`), bloqueo de cierre de actas (`RF-42`). | • **De Squad 1:** `GradingScaleService` (escala CNEB AD, A, B, C de `RF-13`) y `AcademicCalendarService` (fechas límites).<br>• **De Squad 2:** Lista de estudiantes matriculados (`matriculas`).<br>• **De BD:** Tablas `evaluaciones`, `calificaciones`, `banco_conclusiones_cneb`. |
+| **Montero Gutiérrez, Brandon Fernando**<br>([@brandonmontero27-g](https://github.com/brandonmontero27-g)) | **Desarrollador** | **Squad 1:<br>Core y Seguridad** | **M1, M2, M3, M12**<br>(RF-01 al RF-14,<br>RF-65 al RF-68) | • **Frontend:** Login, Perfil, Sedes, Configuración Escolar, Matriz RBAC, Bitácora de Auditoría y exportador PDF sellado.<br>• **Backend:** Endpoints de Auth JWT (`/api/v1/auth`), CRUD de usuarios y carga masiva (`/api/v1/users`), configuración y servicio inmutable Ley 29733.<br>• **Core:** Middlewares `authenticateJwt`, `requireRoles` y biblioteca `squad_1_core.dart`. | • **De BD:** Tablas `instituciones`, `usuarios`, `roles`, `periodos_academicos`, `logs_auditoria`.<br>• **De Infra:** Redis para token blacklist y Docker Compose local. |
+| **Rodríguez Quispe, Grissel Arascely**<br>([@Arascely](https://github.com/Arascely)) | **Desarrolladora** | **Squad 4:<br>Analítica y Dashboards** | **M9, M10**<br>(RF-47 al RF-58) | • **Frontend:** Mapas de calor interactivos Drill-Down (`fl_chart`), Gráfico de Radar de la Ficha 360° (`RF-56`), Dashboards para Dirección (`RF-52`), Coordinación (`RF-53`), Docentes y panel de impacto SSU IS-480 (`RF-57`).<br>• **Backend:** Endpoints de analítica agregada (`/api/v1/analytics/heatmap`, `/student-360/:id`). | • **De Squad 2:** Récord de asistencia acumulada para ausentismo crónico (`RF-24`).<br>• **De Squad 3:** Calificaciones y notas vigesimales.<br>• **De BD:** Vistas materializadas `vm_rendimiento_seccion`, `vm_asistencia_mensual` y `metricas_impacto_ssu`. |
+| **Leon Reyna, Cesar Antonio**<br>([@cesarleon27-ai](https://github.com/cesarleon27-ai)) | **Desarrollador** | **Squad 5:<br>Secretaría y Portal Web** | **M11, M13**<br>(RF-59 al RF-64,<br>RF-69 al RF-71) | • **Frontend:** Maquetación vectorial e impresión de Libretas Escolares PDF (`RF-59`), Cuadros de Mérito (`RF-61`), y Portal Web Institucional responsive con cartelera y calendario cívico.<br>• **Backend:** Servicio de firma SHA-256 de documentos y Verificador Público QR sin autenticación (`GET /api/v1/public/verify/:token` — `RF-60`). | • **De Squad 1:** Membrete oficial y escudo institucional.<br>• **De Squad 3:** Notas y conclusiones consolidadas para boletas PDF.<br>• **De Squad 4:** Cuadro de méritos.<br>• **De Cloud:** `vercel.json` para entrega CDN estática. |
+
+---
+
+## 🛠️ Guía Rápida para Desarrolladores: Cómo Iniciar el Proyecto
+
+### 1. Levantar Base de Datos y Caché Local (Docker)
+```bash
+# Iniciar PostgreSQL 16 (:5432), Redis 7 (:6379) y Adminer (:8080)
+docker compose up -d
+
+# Ver el estado de los contenedores
+docker compose ps
+
+# Abrir el gestor de BD en el navegador:
+# URL: http://localhost:8080 | Servidor: postgres | Usuario: postgres | Contraseña: postgrespassword2026! | BD: school_management
+```
+
+### 2. Iniciar el Backend API (Node.js + TypeScript)
+```bash
+cd backend
+npm install
+npm run dev
+# El servidor responderá en http://localhost:3000
+# Comprobación de salud: http://localhost:3000/api/v1/health
+```
+
+### 3. Iniciar el Frontend (Flutter Web)
+```bash
+# Desde la raíz del repositorio:
+flutter pub get
+flutter run -d chrome --web-renderer canvaskit
+```
 
 ---
 

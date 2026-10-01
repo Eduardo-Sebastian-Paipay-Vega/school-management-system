@@ -1,285 +1,242 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../domain/models/role.dart';
+import '../../domain/models/session_tokens.dart';
+import '../scope/squad_1_scope.dart';
+import '../widgets/privacy_policy_dialog.dart';
+import '../widgets/session_timer_widget.dart';
+import 'academic_config_screen.dart';
+import 'audit_viewer_screen.dart';
+import 'directory_screen.dart';
+import 'login_screen.dart';
+import 'profile_screen.dart';
+import 'rbac_matrix_screen.dart';
 import 'sdd_viewer_screen.dart';
+import 'sedes_screen.dart';
+import 'user_admin_screen.dart';
 
-/// Pantalla Principal del Squad 1: Core, Seguridad y Auditoría
+/// Pantalla Principal del Squad 1: Core, Seguridad, Configuración y Auditoría.
 /// Responsable: Brandon Fernando Montero Gutiérrez (@brandonmontero27-g)
-class Squad1Screen extends StatefulWidget {
+///
+/// Encapsula su propio [Squad1Root] de composición para no requerir
+/// cambios en `main.dart`: mientras no haya sesión activa se muestra
+/// [LoginScreen] (RF-01); autenticado, se despliega el hub de los 18 RFs
+/// bajo el vigía de inactividad de RF-02.
+class Squad1Screen extends StatelessWidget {
   const Squad1Screen({super.key});
 
   @override
-  State<Squad1Screen> createState() => _Squad1ScreenState();
+  Widget build(BuildContext context) {
+    return const Squad1Root(child: _Squad1Gate());
+  }
 }
 
-class _Squad1ScreenState extends State<Squad1Screen> {
-  final _usernameController = TextEditingController(text: '70859632');
-  final _passwordController = TextEditingController(text: '••••••••••••');
-  bool _isLogged = false;
-  String _selectedRole = 'DIRECTOR';
-
-  @override
-  void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
+class _Squad1Gate extends StatelessWidget {
+  const _Squad1Gate();
 
   @override
   Widget build(BuildContext context) {
+    final auth = Squad1Scope.of(context).authController;
+    return ListenableBuilder(
+      listenable: auth,
+      builder: (context, _) {
+        if (!auth.isAuthenticated) return const LoginScreen();
+        return const SessionTimerGate(child: _Squad1Hub());
+      },
+    );
+  }
+}
+
+class _Squad1Hub extends StatefulWidget {
+  const _Squad1Hub();
+
+  @override
+  State<_Squad1Hub> createState() => _Squad1HubState();
+}
+
+class _Squad1HubState extends State<_Squad1Hub> {
+  bool _policyShown = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = Squad1Scope.of(context);
+    final session = scope.authController.session!;
+
+    if (!_policyShown) {
+      _policyShown = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) showPrivacyPolicyDialog(context);
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Squad 1: Core y Seguridad'),
-        backgroundColor: const Color(0xFF2C3E50),
         actions: [
           IconButton(
             icon: const Icon(Icons.menu_book),
             tooltip: 'Ver SDD Oficial (IEEE 1016)',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SddViewerScreen()),
-              );
-            },
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SddViewerScreen()),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.person_outline),
+            tooltip: 'Mi perfil (RF-09)',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Cerrar sesión (RF-02)',
+            onPressed: () => scope.authController.logout(),
           ),
         ],
       ),
+      // RF-04: la navegación principal solo ofrece los módulos para los
+      // que el rol activo tiene permiso; el intento directo (ej. deep
+      // link) igual queda bloqueado por `AccessControlService` en cada
+      // controlador, que es la barrera de seguridad real.
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _buildSquadHeader(),
-          const SizedBox(height: 12),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SddViewerScreen()),
-              );
-            },
-            icon: const Icon(Icons.description, color: Colors.amber),
-            label: const Text('📄 Ver Documento de Diseño de Software (SDD - IEEE 1016)'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1A252F),
-              padding: const EdgeInsets.symmetric(vertical: 14),
-            ),
-          ),
+          _buildSessionCard(session),
           const SizedBox(height: 16),
-          _buildAuthCard(),
+          const Text('Módulo 1 — Acceso y Seguridad (RF-01..04)',
+              style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+          const SizedBox(height: 8),
+          if (RbacPolicy.grants(session.roles, Permission.rbacView))
+            _ModuleCard(
+              icon: Icons.rule,
+              title: 'Matriz RBAC',
+              subtitle: 'RF-04 · Control de privilegios por rol',
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RbacMatrixScreen())),
+            ),
           const SizedBox(height: 16),
-          _buildRbacCard(),
-          const SizedBox(height: 16),
-          _buildAuditLogPreview(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSquadHeader() {
-    return Card(
-      color: const Color(0xFF2C3E50),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              'MÓDULOS M1, M2, M3, M12 (RF-01 al RF-14, RF-65 al RF-68)',
-              style: TextStyle(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 4),
-            Text(
-              'Autenticación JWT, RBAC, Multi-Tenant y Auditoría Inmutable',
-              style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 6),
-            Text(
-              'Líder: Brandon Fernando Montero Gutiérrez (@brandonmontero27-g)',
-              style: TextStyle(color: Colors.white70, fontSize: 13),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAuthCard() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.security, color: Color(0xFF2C3E50)),
-                const SizedBox(width: 8),
-                const Text(
-                  'Prueba de Autenticación JWT (RF-01, RF-02)',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _usernameController,
-              decoration: const InputDecoration(
-                labelText: 'DNI / Usuario Institucional',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Contraseña (bcrypt hash)',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _isLogged = !_isLogged;
-                    });
-                  },
-                  icon: Icon(_isLogged ? Icons.logout : Icons.login),
-                  label: Text(_isLogged ? 'Cerrar Sesión (Invalidar JWT)' : 'Iniciar Sesión (Generar Access/Refresh)'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _isLogged ? Colors.red[700] : const Color(0xFF2C3E50),
-                  ),
-                ),
-              ],
-            ),
-            if (_isLogged) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.green[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.check_circle, color: Colors.green, size: 20),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Token JWT activo (15 min) • Refresh Token en cookie HttpOnly • Tenant: GP-AYACUCHO-2026',
-                        style: TextStyle(fontSize: 12, color: Colors.green, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRbacCard() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Control de Acceso Basado en Roles (RBAC - RF-04)',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              children: ['SUPERADMIN', 'DIRECTOR', 'DOCENTE', 'PRACTICANTE', 'PORTERIA', 'ESTUDIANTE'].map((role) {
-                final isSelected = _selectedRole == role;
-                return ChoiceChip(
-                  label: Text(role),
-                  selected: isSelected,
-                  selectedColor: const Color(0xFF2C3E50),
-                  labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black),
-                  onSelected: (val) {
-                    setState(() {
-                      _selectedRole = role;
-                    });
-                  },
-                );
-              }).toList(),
+          const Text('Módulo 2 — Usuarios y Directorio (RF-05..09)',
+              style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+          const SizedBox(height: 8),
+          if (RbacPolicy.grants(session.roles, Permission.usersCreate)) ...[
+            _ModuleCard(
+              icon: Icons.person_add_alt,
+              title: 'Alta e Importación de Personal',
+              subtitle: 'RF-05 alta individual · RF-06 importación masiva CSV/XLSX',
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserAdminScreen())),
             ),
             const SizedBox(height: 8),
-            Text(
-              'Permisos concedidos: ${_getPermissionsForRole(_selectedRole)}',
-              style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
-            ),
           ],
-        ),
+          if (RbacPolicy.grants(session.roles, Permission.directoryView))
+            _ModuleCard(
+              icon: Icons.groups_2_outlined,
+              title: 'Directorio Escolar',
+              subtitle: 'RF-08 búsqueda y filtros · RF-04 roles · RF-68 datos enmascarados',
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DirectoryScreen())),
+            ),
+          const SizedBox(height: 16),
+          const Text('Módulo 3 — Configuración Escolar (RF-07, RF-10..14)',
+              style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+          const SizedBox(height: 8),
+          if (RbacPolicy.grants(session.roles, Permission.sedesManage)) ...[
+            _ModuleCard(
+              icon: Icons.apartment,
+              title: 'Sedes Multi-Tenant',
+              subtitle: 'RF-07 · Aislamiento lógico por tenant_id',
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SedesScreen())),
+            ),
+            const SizedBox(height: 8),
+          ],
+          if (RbacPolicy.grants(session.roles, Permission.academicYearManage))
+            _ModuleCard(
+              icon: Icons.settings_suggest_outlined,
+              title: 'Configuración Escolar',
+              subtitle: 'RF-10 año lectivo · RF-11 periodos · RF-12 secciones · RF-13 escala CNEB · RF-14 membrete',
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AcademicConfigScreen())),
+            ),
+          const SizedBox(height: 16),
+          const Text('Módulo 12 — Auditoría (RF-65..68)',
+              style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+          const SizedBox(height: 8),
+          if (RbacPolicy.grants(session.roles, Permission.auditView)) ...[
+            _ModuleCard(
+              icon: Icons.history,
+              title: 'Bitácora de Auditoría',
+              subtitle: 'RF-65 inmutable · RF-66 historial de cambios · RF-67 búsqueda forense',
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AuditViewerScreen())),
+            ),
+            const SizedBox(height: 8),
+          ],
+          _ModuleCard(
+            icon: Icons.privacy_tip_outlined,
+            title: 'Protección de Datos Personales',
+            subtitle: 'RF-68 · Ley N.° 29733',
+            onTap: () => showPrivacyPolicyDialog(context),
+          ),
+        ],
       ),
     );
   }
 
-  String _getPermissionsForRole(String role) {
-    switch (role) {
-      case 'SUPERADMIN':
-        return 'Control total del sistema, configuración de sedes, gestión de roles y auditoría.';
-      case 'DIRECTOR':
-        return 'Aprobación de actas, supervisión general, mapas de calor, reportes de impacto.';
-      case 'DOCENTE':
-        return 'Registro de calificaciones (Modo Excel), conclusiones CNEB, asistencia de aula.';
-      case 'PRACTICANTE':
-        return 'Marcación de permanencia SSU, asistencia asistida de notas bajo supervisión.';
-      case 'PORTERIA':
-        return 'Acceso exclusivo al Kiosco de Asistencia Offline-First y lector de carnés QR.';
-      case 'ESTUDIANTE':
-        return 'Consulta de notas publicadas, récord de asistencia y carné digital institucional.';
-      default:
-        return 'Acceso restringido.';
-    }
-  }
-
-  Widget _buildAuditLogPreview() {
+  Widget _buildSessionCard(AuthSession session) {
     return Card(
+      color: AppTheme.primary,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
-              children: [
-                Icon(Icons.history, color: Colors.blueGrey),
-                SizedBox(width: 8),
-                Text(
-                  'Bitácora Inmutable de Auditoría (Ley 29733 - RF-65, RF-66)',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ],
+            Text(
+              session.nombreCompleto,
+              style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10),
-            _buildAuditRow('AUTH_LOGIN_SUCCESS', '70859632', '190.237.12.44', 'Hace 2 min'),
-            _buildAuditRow('GRADE_MODIFIED_AUDIT', 'DOC-2026-04', '192.168.1.105', 'Hace 15 min'),
-            _buildAuditRow('SESSION_TIMEOUT_EXPIRE', 'ALU-2026-118', '192.168.1.80', 'Hace 45 min'),
+            const SizedBox(height: 4),
+            Text(
+              'Roles: ${session.roles.map((AppRole r) => r.label).join(", ")}',
+              style: const TextStyle(color: Colors.white70, fontSize: 12),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                'Access Token JWT activo (15 min) · Refresh Token 7 días · Tenant: ${session.tenantId.substring(0, 8)}…',
+                style: const TextStyle(color: Colors.amberAccent, fontSize: 11, fontWeight: FontWeight.bold),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildAuditRow(String action, String user, String ip, String time) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(action, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, fontFamily: 'monospace')),
-          Text('Usuario: $user', style: const TextStyle(fontSize: 12, color: Colors.black54)),
-          Text(ip, style: const TextStyle(fontSize: 11, color: Colors.grey)),
-          Text(time, style: const TextStyle(fontSize: 11, color: Colors.blueGrey)),
-        ],
+class _ModuleCard extends StatelessWidget {
+  const _ModuleCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTile(
+        leading: CircleAvatar(backgroundColor: AppTheme.backgroundLight, child: Icon(icon, color: AppTheme.primary)),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(subtitle, style: const TextStyle(fontSize: 11)),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: onTap,
       ),
     );
   }

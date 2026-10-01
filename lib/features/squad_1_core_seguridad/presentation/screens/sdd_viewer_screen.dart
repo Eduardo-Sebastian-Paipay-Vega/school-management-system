@@ -240,11 +240,23 @@ class _TabTraceability extends StatelessWidget {
   Widget build(BuildContext context) {
     final rows = [
       {'rf': 'RF-01', 'cu': 'CU-SEG-01', 'sql': 'usuarios', 'api': 'POST /auth/login', 'ui': 'LoginScreen'},
-      {'rf': 'RF-02', 'cu': 'CU-SEG-02', 'sql': 'Redis Blacklist', 'api': 'POST /auth/logout', 'ui': 'SessionTimer'},
-      {'rf': 'RF-04', 'cu': 'CU-SEG-04', 'sql': 'usuario_roles', 'api': 'GET /roles', 'ui': 'RbacRoleChip'},
-      {'rf': 'RF-08', 'cu': 'CU-USR-04', 'sql': 'usuarios (trgm)', 'api': 'GET /users', 'ui': 'UserDirectory'},
-      {'rf': 'RF-65', 'cu': 'CU-AUD-01', 'sql': 'audit_logs', 'api': 'POST /audit/logs', 'ui': 'AuditInterceptor'},
+      {'rf': 'RF-02', 'cu': 'CU-SEG-02', 'sql': 'Redis Blacklist', 'api': 'POST /auth/logout', 'ui': 'SessionTimerGate'},
+      {'rf': 'RF-03', 'cu': 'CU-SEG-03', 'sql': 'usuarios', 'api': 'POST /auth/reset-password', 'ui': 'ResetPasswordScreen'},
+      {'rf': 'RF-04', 'cu': 'CU-SEG-04', 'sql': 'roles, usuario_roles', 'api': 'PUT /users/:id/roles', 'ui': 'RbacMatrixScreen / RbacRoleChips'},
+      {'rf': 'RF-05', 'cu': 'CU-USR-01', 'sql': 'usuarios', 'api': 'POST /users', 'ui': 'UserAdminScreen (alta)'},
+      {'rf': 'RF-06', 'cu': 'CU-USR-02', 'sql': 'usuarios (lote)', 'api': 'POST /users/import', 'ui': 'UserAdminScreen (import)'},
+      {'rf': 'RF-07', 'cu': 'CU-USR-03', 'sql': 'instituciones', 'api': 'POST /sedes', 'ui': 'SedesScreen'},
+      {'rf': 'RF-08', 'cu': 'CU-USR-04', 'sql': 'usuarios (trgm)', 'api': 'GET /users', 'ui': 'DirectoryScreen'},
+      {'rf': 'RF-09', 'cu': 'CU-USR-05', 'sql': 'usuarios', 'api': 'PATCH /users/me', 'ui': 'ProfileScreen'},
+      {'rf': 'RF-10', 'cu': 'CU-INS-01', 'sql': 'anios_lectivos', 'api': 'POST /academic-years', 'ui': 'AcademicConfigScreen'},
+      {'rf': 'RF-11', 'cu': 'CU-INS-02', 'sql': 'periodos_academicos', 'api': 'POST /periods', 'ui': 'AcademicConfigScreen'},
+      {'rf': 'RF-12', 'cu': 'CU-INS-03', 'sql': 'grados_secciones', 'api': 'POST /grade-sections', 'ui': 'AcademicConfigScreen'},
+      {'rf': 'RF-13', 'cu': 'CU-INS-04', 'sql': 'escalas_calificacion', 'api': 'PUT /grading-scales', 'ui': 'AcademicConfigScreen'},
+      {'rf': 'RF-14', 'cu': 'CU-INS-05', 'sql': 'parametros_globales', 'api': 'PUT /institutional-params', 'ui': 'LetterheadPreview'},
+      {'rf': 'RF-65', 'cu': 'CU-AUD-01', 'sql': 'audit_logs', 'api': 'POST /audit/logs', 'ui': 'AuditService (interceptor)'},
+      {'rf': 'RF-66', 'cu': 'CU-AUD-02', 'sql': 'historial_cambios_notas', 'api': 'AuditService.recordChange', 'ui': 'ChangeTimeline'},
       {'rf': 'RF-67', 'cu': 'CU-AUD-03', 'sql': 'audit_logs', 'api': 'GET /audit/logs', 'ui': 'AuditViewerScreen'},
+      {'rf': 'RF-68', 'cu': 'CU-AUD-04', 'sql': 'audit_logs, usuarios', 'api': 'DataProtectionService.unmask', 'ui': 'MaskedText / PrivacyPolicyDialog'},
     ];
 
     return ListView(

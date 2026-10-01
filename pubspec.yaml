@@ -35,6 +35,22 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
+  # --- Squad 1: Core, Seguridad, Configuración y Auditoría (RF-01..14, RF-65..68) ---
+  # SHA-256/HMAC para JWT simulado (RF-01) y cadena de hashes de auditoría (RF-65).
+  crypto: ^3.0.3
+  # Cifrado AES-256 en reposo de campos sensibles (RF-68, Ley N.° 29733).
+  encrypt: ^5.0.3
+  # Selección de archivos .csv/.xlsx (RF-06) y escudo institucional (RF-14).
+  file_picker: ^8.1.2
+  # Parseo de plantillas .csv de importación masiva (RF-06).
+  csv: ^6.0.0
+  # Parseo de plantillas .xlsx de importación masiva (RF-06).
+  excel: ^4.0.6
+  # Generación de PDF: reporte de importación (RF-06) y exportación sellada de auditoría (RF-67).
+  pdf: ^3.11.1
+  # Diálogo de impresión/descarga multiplataforma para los PDF generados.
+  printing: ^5.13.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

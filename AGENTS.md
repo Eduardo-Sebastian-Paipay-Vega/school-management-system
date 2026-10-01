@@ -73,11 +73,11 @@ Cuando se solicite crear, estructurar o revisar un **SDD (Documento de Diseño d
 ## 4. Política de Ramas Git (GitFlow Ligero)
 
 1. **`main` (Blindada / Producción):**
-   * Contiene únicamente código estable, probado y listo para sustentaciones, demos o despliegue.
-   * Prohibido hacer push directo a `main`. Solo recibe merges desde `dev` tras alcanzar hitos validados.
-2. **`dev` (Integración Continua):**
-   * Rama base de desarrollo donde convergen los módulos de los 5 squads.
-   * Todos los Pull Requests de features se abren hacia `dev`.
-3. **`feature/squad-[X]-[nombre-funcionalidad]` (Desarrollo por Squad):**
-   * Ramas de trabajo individuales para cada desarrollador/squad (ej. `feature/squad-1-jwt-auth`, `feature/squad-2-kiosco-qr`).
+   * Contiene únicamente versiones cerradas, probadas y listas para sustentaciones, demos o despliegue oficial.
+   * Prohibido hacer push directo a `main`. Solo recibe merges desde `dev` tras alcanzar hitos validados por el líder.
+2. **`dev` (Desarrollo Activo e Integración Continua):**
+   * Rama principal de trabajo donde convergen los módulos de los 5 squads.
+   * Todo avance se prueba (`flutter analyze` y `flutter test`) y se integra directamente en `dev`.
+3. **Ramas temporales / de soporte (Opcionales y Efímeras):**
+   * Si un desarrollador necesita aislar un experimento o feature específica, crea una rama temporal desde `dev` (ej. `temp/kiosco-test`) y la elimina inmediatamente tras mergearla hacia `dev`, manteniendo el repositorio limpio.
 

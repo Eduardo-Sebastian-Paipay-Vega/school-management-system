@@ -248,44 +248,27 @@ Para ingresar datos o validar el software en orden coherente, se debe seguir la 
 
 ---
 
-## 🌿 Estrategia de Ramas Git (GitFlow Ligero)
+## 🌿 Estrategia de Ramas Git Unificada (`main` y `dev`)
 
-Para coordinar el trabajo paralelo de los **5 Squads Técnicos** sin generar conflictos ni romper la estabilidad del sistema, seguimos la siguiente política de ramas:
+Para mantener el repositorio limpio, centralizado y evitar la dispersión de cambios, el equipo opera bajo el modelo **Trunk-Based / GitFlow Ligero**:
 
 | Rama | Propósito | Regla de Oro |
 |---|---|---|
-| **`main`** | **Producción / Hitos Oficiales** | Solo código 100% probado y estable. Es la versión para sustentaciones y despliegue. **Prohibido push directo.** |
-| **`dev`** | **Integración Continua (Default)** | Punto de encuentro de los 5 squads. Todos los desarrollos se integran aquí antes de pasar a `main`. |
-| **`feature/squad-[X]-[nombre]`** | **Ramas de los Squads** | Ramas oficiales de desarrollo para cada uno de los 5 equipos. |
+| **`main`** | **Producción / Despliegue Oficial** | Contiene únicamente versiones cerradas, estables y validadas para sustentaciones del SSU IS-480. **Prohibido push directo.** |
+| **`dev`** | **Desarrollo Activo e Integración Continua** | **Rama principal de trabajo.** Todo el equipo converge aquí. Todo cambio se prueba y sincroniza sobre esta rama. |
 
-### 🚀 Ramas Oficiales Asignadas por Squad
-
-| Squad | Desarrollador Responsable | Rama Activa en GitHub | Comando para empezar |
-|---|---|---|---|
-| **Squad 1 - Core y Seguridad** | Brandon Montero (`@brandonmontero27-g`) | `feature/squad-1-core-seguridad` | `git checkout feature/squad-1-core-seguridad` |
-| **Squad 2 - Matrícula y Asistencia** | Sebastian Paipay (`@Eduardo-Sebastian-Paipay-Vega`) | `feature/squad-2-matricula-asistencia` | `git checkout feature/squad-2-matricula-asistencia` |
-| **Squad 3 - Calificaciones** | Steve Ovalle (`@steveovalle27-lgtm`) | `feature/squad-3-calificaciones` | `git checkout feature/squad-3-calificaciones` |
-| **Squad 4 - Analítica y Dashboards** | Aracely Rodríguez (`@Arascely`) | `feature/squad-4-analitica-dashboards` | `git checkout feature/squad-4-analitica-dashboards` |
-| **Squad 5 - Secretaría y Portal** | Cesar Leon (`@cesarleon27-ai`) | `feature/squad-5-secretaria-portal` | `git checkout feature/squad-5-secretaria-portal` |
-
-### Flujo de Trabajo para Desarrolladores
+### Flujo de Trabajo Diario para los Desarrolladores
 
 ```bash
-# 1. Asegurarse de estar en 'dev' y tener lo último
+# 1. Al comenzar el día, ubicarse en 'dev' y sincronizar lo último
 git checkout dev
 git pull origin dev
 
-# 2. Crear una rama para tu funcionalidad (ejemplo Squad 2)
-git checkout -b feature/squad-2-kiosco-qr
-
-# 3. Desarrollar, probar y commitear cambios
+# 2. Realizar cambios, probarlos localmente (flutter analyze && flutter test)
+# 3. Guardar y subir a 'dev':
 git add .
-git commit -m "feat(squad-2): implementar lectura de qr para kiosco (RF-22)"
-
-# 4. Subir la rama a GitHub
-git push -u origin feature/squad-2-kiosco-qr
-
-# 5. Abrir un Pull Request (PR) en GitHub con destino hacia la rama 'dev'
+git commit -m "feat(squad-X): descripción del avance (RF-XX)"
+git push origin dev
 ```
 
 ---

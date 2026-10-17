@@ -1,269 +1,782 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../data/repositories/api_grades_repository.dart';
+import '../../data/repositories/demo_grades_repository.dart';
+import '../../data/repositories/grades_repository.dart';
+import '../../domain/models/gradebook.dart';
+import '../controllers/gradebook_controller.dart';
+import '../widgets/grade_matrix.dart';
 
-/// Pantalla Principal del Squad 3: Calificaciones y Modo Excel
-/// Responsable: Steve Smith Ovalle Luyo (@steveovalle27-lgtm)
 class Squad3Screen extends StatefulWidget {
-  const Squad3Screen({super.key});
-
+  const Squad3Screen({
+    super.key,
+    this.repository,
+    this.accessToken,
+    this.registerLeaveGuard,
+    this.session = const GradeSession('teacher-demo', GradeRole.teacher),
+  });
+  final GradesRepository? repository;
+  final String Function()? accessToken;
+  final void Function(Future<bool> Function()? guard)? registerLeaveGuard;
+  final GradeSession session;
   @override
   State<Squad3Screen> createState() => _Squad3ScreenState();
 }
 
 class _Squad3ScreenState extends State<Squad3Screen> {
-  final List<Map<String, dynamic>> _students = [
-    {'name': 'Alarcón Huamán, Diego', 'n1': '18', 'n2': '16', 'cneb': 'AD', 'conclusion': 'Demuestra dominio destacado de los algoritmos.'},
-    {'name': 'Bendezú Quispe, Flor', 'n1': '15', 'n2': '14', 'cneb': 'A', 'conclusion': 'Alcanza el nivel esperado en resolución de problemas.'},
-    {'name': 'Carbajal Mendoza, Joel', 'n1': '12', 'n2': '11', 'cneb': 'B', 'conclusion': 'Se encuentra en proceso, requiere mayor acompañamiento.'},
-    {'name': 'Díaz Navarro, Lucía', 'n1': '08', 'n2': '09', 'cneb': 'C', 'conclusion': 'En inicio. Se sugiere plan de refuerzo pedagógico.'},
-  ];
-
-  String _autoSaveStatus = 'Guardado en la nube (PostgreSQL)';
-  Color _autoSaveColor = Colors.green;
-  Timer? _debounceTimer;
-
-  void _onGradeChanged(int index, String field, String value) {
-    setState(() {
-      _students[index][field] = value;
-      _autoSaveStatus = 'Guardando en segundo plano (debounce 400 ms)...';
-      _autoSaveColor = Colors.orange;
-
-      // Conversión dual 0-20 a CNEB (RF-46)
-      final num1 = double.tryParse(_students[index]['n1'] ?? '') ?? 0;
-      final num2 = double.tryParse(_students[index]['n2'] ?? '') ?? 0;
-      final prom = (num1 + num2) / 2.0;
-
-      if (prom >= 18) {
-        _students[index]['cneb'] = 'AD';
-      } else if (prom >= 14) {
-        _students[index]['cneb'] = 'A';
-      } else if (prom >= 11) {
-        _students[index]['cneb'] = 'B';
-      } else {
-        _students[index]['cneb'] = 'C';
+  late GradebookController controller;
+  late GradeSession _session;
+  Timer? _refresh;
+  StreamSubscription<void>? _live;
+  String search = '';
+  String roleLabel(GradeRole role) => switch (role) {
+    GradeRole.teacher => 'Docente',
+    GradeRole.practitioner => 'Practicante',
+    GradeRole.coordinator => 'Coordinación',
+    GradeRole.director => 'Dirección',
+    GradeRole.student => 'Estudiante',
+  };
+  @override
+  void initState() {
+    super.initState();
+    _session = widget.session;
+    const url = String.fromEnvironment('GRADES_API_URL');
+    const book = String.fromEnvironment('GRADES_BOOK_ID');
+    // Authenticated hosts inject a repository with a refreshing token callback.
+    final repository =
+        widget.repository ??
+        (url.isEmpty
+            ? DemoGradesRepository(session: _session)
+            : ApiGradesRepository(
+                baseUrl: url,
+                bookId: book,
+                token: () => widget.accessToken?.call() ?? '',
+              ));
+    controller = GradebookController(repository, _session)..load();
+    widget.registerLeaveGuard?.call(confirmLeave);
+    _live = repository.updates.listen((_) {
+      if (controller.clean) controller.load();
+    });
+    _refresh = Timer.periodic(const Duration(seconds: 10), (_) {
+      if (controller.clean && !controller.busy && !controller.loading) {
+        controller.load();
       }
     });
-
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 400), () {
-      setState(() {
-        _autoSaveStatus = 'Guardado en la nube (PostgreSQL ACID)';
-        _autoSaveColor = Colors.green;
-      });
-    });
-  }
-
-  Color _getCnebColor(String cneb) {
-    switch (cneb) {
-      case 'AD':
-        return AppTheme.cnebAD;
-      case 'A':
-        return AppTheme.cnebA;
-      case 'B':
-        return AppTheme.cnebB;
-      case 'C':
-        return AppTheme.cnebC;
-      default:
-        return Colors.grey;
-    }
   }
 
   @override
   void dispose() {
-    _debounceTimer?.cancel();
+    widget.registerLeaveGuard?.call(null);
+    _refresh?.cancel();
+    _live?.cancel();
+    controller.dispose();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Squad 3: Calificaciones y Modo Excel'),
-        backgroundColor: const Color(0xFF0E6655),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _buildSquadHeader(),
-          const SizedBox(height: 16),
-          _buildAutoSaveBar(),
-          const SizedBox(height: 12),
-          _buildExcelMatrixCard(),
-          const SizedBox(height: 16),
-          _buildCnebAssistantCard(),
-        ],
-      ),
-    );
+  Future<bool> confirmLeave() async {
+    if (controller.clean) return true;
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Hay notas sin guardar'),
+            content: const Text(
+              'Sus cambios locales se perderán al salir. Puede permanecer y resolver el guardado.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Permanecer'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Salir y descartar'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
   }
 
-  Widget _buildSquadHeader() {
-    return Card(
-      color: const Color(0xFF0E6655),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              'MÓDULO M8 (RF-36 al RF-46)',
-              style: TextStyle(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.bold),
+  Future<void> messageAction(String action, [Json payload = const {}]) async {
+    final success = await controller.action(action, payload);
+    if (mounted && success) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Operación completada')));
+    }
+  }
+
+  void changeDemoRole(GradeRole? role) {
+    final repository = controller.repository;
+    if (role == null ||
+        repository is! DemoGradesRepository ||
+        !controller.clean ||
+        controller.busy) {
+      return;
+    }
+    final next = GradeSession(
+      '${role.name}-demo',
+      role,
+      studentId: role == GradeRole.student ? 'mat-1' : null,
+    );
+    controller.dispose();
+    repository.session = next;
+    setState(() {
+      _session = next;
+      search = '';
+      controller = GradebookController(repository, next)..load();
+    });
+  }
+
+  Future<void> showAnnual() async {
+    try {
+      final report = await controller.repository.annual();
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Consolidado anual'),
+          content: SizedBox(
+            width: 520,
+            height: 360,
+            child: ListView(
+              children: [
+                for (final student in report['students'] as List)
+                  ListTile(
+                    title: Text(student['name'] as String),
+                    subtitle: Text(
+                      student['annual'] == null
+                          ? 'Incompleto: se requieren todos los periodos cerrados y las notas correspondientes.'
+                          : '${student['annual']['literal']}${student['annual']['numeric'] == null ? '' : ' · ${student['annual']['numeric']}'}',
+                    ),
+                  ),
+              ],
             ),
-            SizedBox(height: 4),
-            Text(
-              'Planilla Rápida "Modo Excel", Auto-Guardado 400ms y Motor CNEB',
-              style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 6),
-            Text(
-              'Líder: Steve Smith Ovalle Luyo (@steveovalle27-lgtm)',
-              style: TextStyle(color: Colors.white70, fontSize: 13),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cerrar'),
             ),
           ],
         ),
-      ),
-    );
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$e')));
+      }
+    }
   }
 
-  Widget _buildAutoSaveBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: _autoSaveColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: _autoSaveColor),
-      ),
-      child: Row(
-        children: [
-          Icon(_autoSaveColor == Colors.green ? Icons.cloud_done : Icons.cloud_sync, color: _autoSaveColor, size: 20),
-          const SizedBox(width: 8),
-          Text(
-            _autoSaveStatus,
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _autoSaveColor),
+  Future<Json?> form(
+    String title,
+    Map<String, String> fields, {
+    Map<String, String> initial = const {},
+  }) async {
+    final editors = {
+      for (final field in fields.keys)
+        field: TextEditingController(text: initial[field] ?? ''),
+    };
+    final key = GlobalKey<FormState>();
+    final result = await showDialog<Json>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: SizedBox(
+          width: 440,
+          child: SingleChildScrollView(
+            child: Form(
+              key: key,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (final field in fields.entries)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: field.key == 'competency'
+                          ? DropdownButtonFormField<String>(
+                              isExpanded: true,
+                              decoration: InputDecoration(
+                                labelText: field.value,
+                              ),
+                              items: [
+                                for (final competency
+                                    in controller.book!.json['competencies']
+                                        as List)
+                                  DropdownMenuItem(
+                                    value: competency as String,
+                                    child: Text(
+                                      competency,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                              ],
+                              onChanged: (value) =>
+                                  editors[field.key]!.text = value ?? '',
+                              validator: (value) => value == null
+                                  ? 'Seleccione una competencia'
+                                  : null,
+                            )
+                          : TextFormField(
+                              controller: editors[field.key],
+                              decoration: InputDecoration(
+                                labelText: field.value,
+                              ),
+                              maxLines:
+                                  field.key == 'text' || field.key == 'reason'
+                                  ? 3
+                                  : 1,
+                              validator: (v) => field.key == 'conclusion'
+                                  ? null
+                                  : v == null || v.trim().isEmpty
+                                  ? 'Campo obligatorio'
+                                  : null,
+                            ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (key.currentState!.validate()) {
+                Navigator.pop(context, {
+                  for (final e in editors.entries) e.key: e.value.text.trim(),
+                });
+              }
+            },
+            child: const Text('Continuar'),
           ),
         ],
       ),
     );
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    for (final editor in editors.values) {
+      editor.dispose();
+    }
+    return result;
   }
 
-  Widget _buildExcelMatrixCard() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Planilla Matricial Ágil (RF-38, RF-46)',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'Navegación: Flechas / Enter / Tab',
-                  style: TextStyle(fontSize: 11, color: Colors.grey),
-                ),
-              ],
+  Future<void> confirm(String title, String action) async {
+    final accepted = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: const Text(
+          'La operación se aplicará a esta sección, curso y periodo. Compruebe las notas antes de continuar.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Confirmar'),
+          ),
+        ],
+      ),
+    );
+    if (accepted == true) await messageAction(action);
+  }
+
+  Future<void> conclusion(Json student) async {
+    final book = controller.preview;
+    final summary = book.summary(student['id'] as String);
+    final bank = (book.json['conclusionBank'] as List)
+        .cast<Json>()
+        .where(
+          (entry) =>
+              entry['level'] == summary?.literal &&
+              book.evaluations.any(
+                (e) => e['competency'] == entry['competency'],
+              ),
+        )
+        .toList();
+    final suggested = bank.isEmpty ? '' : bank.first['text'] as String;
+    final result = await form(
+      'Conclusión · ${student['name']}',
+      {'text': 'Conclusión descriptiva (revise la sugerencia)'},
+      initial: {
+        'text': book.conclusions[student['id']] as String? ?? suggested,
+      },
+    );
+    if (result != null) {
+      await messageAction('conclusion', {
+        'studentId': student['id'],
+        ...result,
+      });
+    }
+  }
+
+  Future<void> rectify(Json student) async {
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text('Evaluación a rectificar'),
+        children: [
+          for (final e in controller.book!.evaluations)
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, e['id'] as String),
+              child: Text(e['name'] as String),
             ),
-            const SizedBox(height: 12),
-            Table(
-              columnWidths: const {
-                0: FlexColumnWidth(3),
-                1: FlexColumnWidth(1.2),
-                2: FlexColumnWidth(1.2),
-                3: FlexColumnWidth(1.2),
-              },
-              border: TableBorder.all(color: Colors.grey[300]!),
-              children: [
-                TableRow(
-                  decoration: BoxDecoration(color: Colors.grey[100]),
-                  children: const [
-                    Padding(padding: EdgeInsets.all(8), child: Text('Estudiante', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                    Padding(padding: EdgeInsets.all(8), child: Text('Eval 1', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                    Padding(padding: EdgeInsets.all(8), child: Text('Eval 2', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                    Padding(padding: EdgeInsets.all(8), child: Text('CNEB', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                  ],
-                ),
-                ..._students.asMap().entries.map((entry) {
-                  final i = entry.key;
-                  final s = entry.value;
-                  return TableRow(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(s['name'], style: const TextStyle(fontSize: 13)),
+        ],
+      ),
+    );
+    if (selected == null || !mounted) return;
+    final result = await form('Solicitar rectificación', {
+      'input': 'Nueva nota',
+      'reason': 'Justificación',
+      'document': 'Referencia del documento / evidencia institucional',
+      'conclusion': 'Conclusión posterior (obligatoria si resulta B/C)',
+    });
+    if (result != null) {
+      await messageAction('rectification', {
+        'studentId': student['id'],
+        'evaluationId': selected,
+        ...result,
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: controller,
+    builder: (context, _) {
+      final book = controller.book;
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Calificaciones · Modo Excel'),
+          actions: [
+            IconButton(
+              tooltip: 'Consolidado anual',
+              onPressed: book == null || controller.busy || !controller.clean
+                  ? null
+                  : showAnnual,
+              icon: const Icon(Icons.summarize_outlined),
+            ),
+            IconButton(
+              tooltip: 'Actualizar',
+              onPressed: controller.clean && !controller.busy
+                  ? controller.load
+                  : null,
+              icon: const Icon(Icons.refresh),
+            ),
+          ],
+        ),
+        body: book == null
+            ? Center(
+                child: controller.loading
+                    ? const CircularProgressIndicator()
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            controller.error ?? 'No hay planilla disponible',
+                          ),
+                          TextButton(
+                            onPressed: controller.load,
+                            child: const Text('Reintentar'),
+                          ),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(4),
-                        child: TextFormField(
-                          initialValue: s['n1'],
-                          textAlign: TextAlign.center,
-                          decoration: const InputDecoration(border: InputBorder.none, isDense: true),
-                          onChanged: (val) => _onGradeChanged(i, 'n1', val),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(4),
-                        child: TextFormField(
-                          initialValue: s['n2'],
-                          textAlign: TextAlign.center,
-                          decoration: const InputDecoration(border: InputBorder.none, isDense: true),
-                          onChanged: (val) => _onGradeChanged(i, 'n2', val),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(6),
-                        child: Center(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: _getCnebColor(s['cneb']),
-                              borderRadius: BorderRadius.circular(4),
+              )
+            : LayoutBuilder(
+                builder: (context, constraints) {
+                  final minimum = book.requests.isEmpty ? 760.0 : 920.0;
+                  return SingleChildScrollView(
+                    child: SizedBox(
+                      height: constraints.maxHeight < minimum
+                          ? minimum
+                          : constraints.maxHeight,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (controller.repository.isDemo)
+                            const Material(
+                              color: AppTheme.accentGold,
+                              child: Padding(
+                                padding: EdgeInsets.all(8),
+                                child: Text(
+                                  'DEMOSTRACIÓN · Datos ficticios en memoria. Los cambios se pierden al salir.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: AppTheme.textDark),
+                                ),
+                              ),
                             ),
-                            child: Text(
-                              s['cneb'],
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                            child: Wrap(
+                              spacing: 12,
+                              runSpacing: 8,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Text(
+                                  book.title,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium,
+                                ),
+                                Chip(
+                                  avatar: Icon(
+                                    book.closed ? Icons.lock : Icons.edit,
+                                    size: 16,
+                                  ),
+                                  label: Text(
+                                    book.closed
+                                        ? 'Periodo cerrado'
+                                        : 'Periodo abierto',
+                                  ),
+                                ),
+                                if (controller.repository
+                                    is DemoGradesRepository)
+                                  DropdownButton<GradeRole>(
+                                    isExpanded: false,
+                                    value: _session.role,
+                                    hint: const Text('Perfil demo'),
+                                    items: [
+                                      for (final role in GradeRole.values)
+                                        DropdownMenuItem(
+                                          value: role,
+                                          child: Text(roleLabel(role)),
+                                        ),
+                                    ],
+                                    onChanged:
+                                        controller.clean && !controller.busy
+                                        ? changeDemoRole
+                                        : null,
+                                  )
+                                else
+                                  Text('Perfil: ${roleLabel(_session.role)}'),
+                                if (controller.busy || controller.loading)
+                                  const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
-                        ),
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 240,
+                                  child: TextField(
+                                    decoration: const InputDecoration(
+                                      labelText: 'Buscar estudiante',
+                                      prefixIcon: Icon(Icons.search),
+                                      isDense: true,
+                                    ),
+                                    onChanged: (value) =>
+                                        setState(() => search = value),
+                                  ),
+                                ),
+                                if (_session.canTeach && !book.closed) ...[
+                                  OutlinedButton(
+                                    onPressed:
+                                        controller.clean && !controller.busy
+                                        ? () async {
+                                            final result = await form(
+                                              'Observaciones al practicante',
+                                              {
+                                                'reason':
+                                                    'Motivo de rechazo del borrador',
+                                              },
+                                            );
+                                            if (result != null) {
+                                              await messageAction(
+                                                'reject',
+                                                result,
+                                              );
+                                            }
+                                          }
+                                        : null,
+                                    child: const Text('Observar borradores'),
+                                  ),
+                                  OutlinedButton.icon(
+                                    onPressed:
+                                        controller.clean && !controller.busy
+                                        ? () async {
+                                            final result = await form(
+                                              'Nueva evaluación y rúbrica',
+                                              {
+                                                'name': 'Nombre',
+                                                'weight': 'Peso positivo',
+                                                'competency':
+                                                    'Competencia CNEB',
+                                                'rubric':
+                                                    'Criterios de rúbrica',
+                                              },
+                                            );
+                                            if (result != null) {
+                                              await messageAction(
+                                                'evaluation',
+                                                result,
+                                              );
+                                            }
+                                          }
+                                        : null,
+                                    icon: const Icon(Icons.add),
+                                    label: const Text('Evaluación'),
+                                  ),
+                                  OutlinedButton(
+                                    onPressed:
+                                        controller.clean && !controller.busy
+                                        ? () => confirm(
+                                            'Aprobar borradores de practicantes',
+                                            'approve',
+                                          )
+                                        : null,
+                                    child: const Text('Aprobar borradores'),
+                                  ),
+                                  FilledButton(
+                                    onPressed:
+                                        controller.clean && !controller.busy
+                                        ? () => confirm(
+                                            'Publicar calificaciones',
+                                            'publish',
+                                          )
+                                        : null,
+                                    child: const Text('Publicar'),
+                                  ),
+                                ],
+                                if (_session.canClose && !book.closed)
+                                  OutlinedButton.icon(
+                                    onPressed:
+                                        controller.clean && !controller.busy
+                                        ? () =>
+                                              confirm('Cerrar periodo', 'close')
+                                        : null,
+                                    icon: const Icon(Icons.lock),
+                                    label: const Text('Cerrar periodo'),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            child: Wrap(
+                              spacing: 8,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Icon(
+                                  controller.error == null
+                                      ? Icons.cloud_outlined
+                                      : Icons.error_outline,
+                                  size: 18,
+                                  color: controller.error == null
+                                      ? AppTheme.primary
+                                      : AppTheme.cnebC,
+                                ),
+                                Text(
+                                  _status(),
+                                  style: const TextStyle(
+                                    color: AppTheme.textDark,
+                                  ),
+                                ),
+                                if (controller.saveState == SaveState.error)
+                                  TextButton(
+                                    onPressed: controller.flush,
+                                    child: const Text('Reintentar guardado'),
+                                  ),
+                                if (controller.saveState ==
+                                        SaveState.conflict ||
+                                    controller.invalid.isNotEmpty)
+                                  TextButton(
+                                    onPressed: () async {
+                                      final discard = await showDialog<bool>(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: const Text(
+                                            '¿Descartar cambios locales y recargar?',
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context, false),
+                                              child: const Text('Cancelar'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context, true),
+                                              child: const Text(
+                                                'Descartar y recargar',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                      if (discard == true) {
+                                        await controller.load(discard: true);
+                                      }
+                                    },
+                                    child: const Text('Resolver / recargar'),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          if (controller.error != null)
+                            Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Text(
+                                controller.error!,
+                                style: const TextStyle(color: AppTheme.cnebC),
+                              ),
+                            ),
+                          if (book.json['draftFeedback'] != null)
+                            Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Text(
+                                'Observaciones del docente: ${book.json['draftFeedback']}',
+                                style: const TextStyle(color: AppTheme.cnebB),
+                              ),
+                            ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 6,
+                            ),
+                            child: Text(
+                              'Flechas: mover · Tab: siguiente · Enter: bajar · Esc: restaurar · Ctrl+V: pegar bloque',
+                              style: TextStyle(
+                                color: AppTheme.textMuted,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GradeMatrix(
+                              controller: controller,
+                              search: search,
+                              onConclusion: conclusion,
+                              onRectify: rectify,
+                            ),
+                          ),
+                          if (book.requests.isNotEmpty)
+                            SizedBox(
+                              height: 128,
+                              child: ListView(
+                                children: [
+                                  for (final request in book.requests)
+                                    ListTile(
+                                      dense: true,
+                                      title: Text(
+                                        'Rectificación ${request['id']} · ${request['status']}',
+                                      ),
+                                      subtitle: Text(
+                                        '${request['reason']} · ${request['document']}',
+                                      ),
+                                      trailing:
+                                          _session.canDirect &&
+                                              request['status'] == 'pending'
+                                          ? Wrap(
+                                              children: [
+                                                IconButton(
+                                                  tooltip:
+                                                      'Aprobar rectificación',
+                                                  onPressed: controller.busy
+                                                      ? null
+                                                      : () async {
+                                                          final signature = await form(
+                                                            'Confirmar aprobación directiva',
+                                                            {
+                                                              'signature':
+                                                                  'Confirmación electrónica: nombre completo',
+                                                            },
+                                                          );
+                                                          if (signature !=
+                                                              null) {
+                                                            await messageAction(
+                                                              'decide',
+                                                              {
+                                                                'requestId':
+                                                                    request['id'],
+                                                                'approve': true,
+                                                                ...signature,
+                                                              },
+                                                            );
+                                                          }
+                                                        },
+                                                  icon: const Icon(Icons.check),
+                                                ),
+                                                IconButton(
+                                                  tooltip:
+                                                      'Rechazar rectificación',
+                                                  onPressed: controller.busy
+                                                      ? null
+                                                      : () async {
+                                                          final reason = await form(
+                                                            'Rechazar solicitud',
+                                                            {
+                                                              'reason':
+                                                                  'Motivo de rechazo',
+                                                            },
+                                                          );
+                                                          if (reason != null) {
+                                                            await messageAction(
+                                                              'decide',
+                                                              {
+                                                                'requestId':
+                                                                    request['id'],
+                                                                'approve':
+                                                                    false,
+                                                                ...reason,
+                                                              },
+                                                            );
+                                                          }
+                                                        },
+                                                  icon: const Icon(Icons.close),
+                                                ),
+                                              ],
+                                            )
+                                          : null,
+                                    ),
+                                ],
+                              ),
+                            ),
+                        ],
                       ),
-                    ],
+                    ),
                   );
-                }),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+                },
+              ),
+      );
+    },
+  );
 
-  Widget _buildCnebAssistantCard() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Row(
-              children: [
-                Icon(Icons.auto_stories, color: Colors.teal),
-                SizedBox(width: 8),
-                Text(
-                  'Asistente de Conclusiones Descriptivas MINEDU (RF-39)',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Banco taxonómico oficial preconfigurado con inserción en 1 toque. Soporte para rectificaciones formales de notas (RF-43) y cierre de periodo inmutable (RF-42).',
-              style: TextStyle(fontSize: 13, color: AppTheme.textDark),
-            ),
-          ],
-        ),
-      ),
-    );
+  String _status() {
+    if (controller.invalid.isNotEmpty) {
+      return '${controller.invalid.length} celda(s) inválida(s); guardado detenido';
+    }
+    return switch (controller.saveState) {
+      SaveState.idle => 'Sin cambios pendientes',
+      SaveState.pending => 'Cambios pendientes · autoguardado 400 ms',
+      SaveState.saving => 'Guardando…',
+      SaveState.saved =>
+        controller.repository.isDemo
+            ? 'Guardado en memoria de demostración'
+            : 'Guardado en el servidor',
+      SaveState.error => 'No guardado · sus cambios siguen pendientes',
+      SaveState.conflict => 'Conflicto de versión · recargue para conciliar',
+    };
   }
 }

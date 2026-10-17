@@ -81,3 +81,9 @@ Cuando se solicite crear, estructurar o revisar un **SDD (Documento de Diseño d
 3. **Ramas temporales / de soporte (Opcionales y Efímeras):**
    * Si un desarrollador necesita aislar un experimento o feature específica, crea una rama temporal desde `dev` (ej. `temp/kiosco-test`) y la elimina inmediatamente tras mergearla hacia `dev`, manteniendo el repositorio limpio.
 
+## 5. Preferencia de interfaces: PrimeNG
+
+Por solicitud del usuario, usar la skill local [`primeng`](.agents/skills/primeng/SKILL.md) al diseñar o modificar sus interfaces en este repositorio, especialmente el módulo del Squad 3. Su fuente de referencia es `https://github.com/primefaces/primeng.git`.
+
+PrimeNG pertenece al ecosistema Angular. En el proyecto Flutter, adaptar sus patrones de componentes e interacción a widgets Dart y a los tokens de `AppTheme`. Esta preferencia no cambia el stack tecnológico ni autoriza por sí misma una migración a Angular. Para tareas sin interfaz, continuar con las skills y reglas que correspondan.
+

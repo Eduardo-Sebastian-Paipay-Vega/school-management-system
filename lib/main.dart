@@ -39,13 +39,14 @@ class MainNavigationShell extends StatefulWidget {
 class _MainNavigationShellState extends State<MainNavigationShell> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
-    SquadOverviewScreen(),
-    Squad1Screen(),
-    Squad2Screen(),
-    Squad3Screen(),
-    Squad4Screen(),
-    Squad5Screen(),
+  Future<bool> Function()? _gradeLeaveGuard;
+  late final List<Widget> _screens = [
+    const SquadOverviewScreen(),
+    const Squad1Screen(),
+    const Squad2Screen(),
+    Squad3Screen(registerLeaveGuard: (guard) => _gradeLeaveGuard = guard),
+    const Squad4Screen(),
+    const Squad5Screen(),
   ];
 
   @override
@@ -54,7 +55,14 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       body: _screens[_currentIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (int index) {
+        onDestinationSelected: (int index) async {
+          if (_currentIndex == 3 &&
+              index != 3 &&
+              _gradeLeaveGuard != null &&
+              !await _gradeLeaveGuard!()) {
+            return;
+          }
+          if (!mounted) return;
           setState(() {
             _currentIndex = index;
           });
@@ -64,26 +72,14 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
             icon: Icon(Icons.dashboard),
             label: 'Visión General',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.security),
-            label: 'Squad 1',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.how_to_reg),
-            label: 'Squad 2',
-          ),
+          NavigationDestination(icon: Icon(Icons.security), label: 'Squad 1'),
+          NavigationDestination(icon: Icon(Icons.how_to_reg), label: 'Squad 2'),
           NavigationDestination(
             icon: Icon(Icons.table_chart),
             label: 'Squad 3',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.analytics),
-            label: 'Squad 4',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.verified),
-            label: 'Squad 5',
-          ),
+          NavigationDestination(icon: Icon(Icons.analytics), label: 'Squad 4'),
+          NavigationDestination(icon: Icon(Icons.verified), label: 'Squad 5'),
         ],
       ),
     );

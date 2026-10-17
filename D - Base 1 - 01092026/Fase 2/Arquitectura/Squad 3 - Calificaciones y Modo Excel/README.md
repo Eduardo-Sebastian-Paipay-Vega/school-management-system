@@ -2,7 +2,7 @@
 
 **Squad:** Squad 3 - Calificaciones y Modo Excel  
 **Líder Técnico:** Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`)  
-**Rama de Desarrollo:** `feature/squad-3/gradebook-excel`  
+**Rama de Desarrollo:** `feature/squad-3-calificaciones-m8`
 **Requisitos Asociados:** [`Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/`](../../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/README.md) (`RF-36` al `RF-46`)  
 
 ---
@@ -50,5 +50,7 @@ sequenceDiagram
 ---
 
 ## 3. Artefactos Técnicos en este Directorio
+* 📄 **[sdd_squad_3.md](sdd_squad_3.md)**: Diseño detallado IEEE 1016 del módulo M8, trazabilidad completa y decisiones de integración.
+* 🧪 **[validacion_integracion.md](validacion_integracion.md)**: Ejecución, pruebas, rendimiento y conexión con otros squads.
 * 📄 **[esquema_datos.sql](esquema_datos.sql)**: DDL de evaluaciones, criterios de rúbricas, calificaciones duales y conclusiones descriptivas.
 * 📄 **[contratos_api.md](contratos_api.md)**: Endpoints de guardado por lotes, matriz de notas y banco taxonómico CNEB.

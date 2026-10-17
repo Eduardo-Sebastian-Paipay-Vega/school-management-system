@@ -34,6 +34,8 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  http: ^1.5.0
+  web_socket_channel: ^3.0.3
 
   # --- Squad 1: Core, Seguridad, Configuración y Auditoría (RF-01..14, RF-65..68) ---
   # SHA-256/HMAC para JWT simulado (RF-01) y cadena de hashes de auditoría (RF-65).
@@ -52,6 +54,8 @@ dependencies:
   printing: ^5.13.4
 
 dev_dependencies:
+  integration_test:
+    sdk: flutter
   flutter_test:
     sdk: flutter
 

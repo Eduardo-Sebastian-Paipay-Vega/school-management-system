@@ -1,0 +1,4 @@
+interface:
+  display_name: "PrimeNG para interfaces escolares"
+  short_description: "Patrones PrimeNG adaptados al proyecto Flutter y al Squad 3"
+  default_prompt: "Usa $primeng para diseñar o mejorar esta interfaz respetando el stack y los requisitos del repositorio."

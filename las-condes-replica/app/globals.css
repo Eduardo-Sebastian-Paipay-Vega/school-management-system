@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+
+  /* Primary Brand Colors */
+  --primary-colors-primary-brand: #500000;
+  --primary-colors-secondary-brand: #FFFFFF;
+
+  /* Secondary Brand Colors */
+  --secondary-colors-primary-brand-dark: #3C0000;
+  --secondary-colors-primary-brand-light: #732F2F;
+  --secondary-colors-tan: #D6D3C4;
+  --secondary-colors-gray-100: #F6F6F6;
+  --secondary-colors-gray-200: #EAEAEA;
+  --secondary-colors-gray-300: #D1D1D1;
+  --secondary-colors-gray-400: #A7A7A7;
+  --secondary-colors-gray-500: #707070;
+  --secondary-colors-gray-600: #626262;
+  --secondary-colors-gray-700: #535353;
+  --secondary-colors-gray-800: #3E3E3E;
+  --secondary-colors-gray-900: #202020;
+  --secondary-colors-black: #000000;
+
+  /* Accent Colors */
+  --accent-colors-ivory: #FAF7F3;
+  --accent-colors-cream: #D6D3C4;
+  --accent-colors-rouge: #95463B;
+  --accent-colors-gold: #AF8846;
+  --accent-colors-olive: #5B6236;
+  --accent-colors-green: #76987B;
+  --accent-colors-teal: #1B9D92;
+  --accent-colors-cobalt: #48597E;
+  --accent-colors-purple: #7F6078;
+
+  /* Link Colors */
+  --links-link: #4F001A;
+  --links-link-hover: #732F2F;
+  --links-link-on-dark: #FFFFFF;
+  --links-link-on-dark-hover: #E9E4DC;
+
+  /* Utility Colors */
+  --utilities-success: #389F5A;
+  --utilities-error: #D04343;
+  --utilities-warning: #E5B229;
+  --utilities-info: #3A567B;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--secondary-colors-gray-900);
+  background-color: #FFFFFF;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--secondary-colors-primary-brand-light);
+  outline-offset: 3px;
+}
+
+.content-width {
+  max-width: 1360px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+@media (min-width: 768px) {
+  .content-width {
+    padding-inline: 28px;
+  }
+}
+
+.hero-text-shadow {
+  text-shadow: 0 2px 20px rgba(32, 0, 0, 0.6);
+}
+
+.fade-in {
+  animation: fade 0.4s ease-out;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0.5;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-img {
+  background-image:
+    linear-gradient(135deg, rgba(80, 0, 0, 0.12), rgba(60, 0, 0, 0.35)),
+    linear-gradient(120deg, #FAF7F3, #D6D3C4 52%, #AF8846 120%);
+}
+
+.hero-one {
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(60, 0, 0, 0.94) 0%,
+      rgba(80, 0, 0, 0.86) 35%,
+      rgba(115, 47, 47, 0.62) 68%,
+      rgba(60, 0, 0, 0.40) 100%
+    ),
+    radial-gradient(
+      circle at 75% 35%,
+      rgba(175, 136, 70, 0.35) 0%,
+      transparent 55%
+    ),
+    url('/hero-pabellon.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.hero-two {
+  background-image:
+    linear-gradient(
+      112deg,
+      rgba(32, 0, 0, 0.95) 0%,
+      rgba(80, 0, 0, 0.85) 40%,
+      rgba(149, 70, 59, 0.65) 75%,
+      rgba(175, 136, 70, 0.40) 100%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(214, 211, 196, 0.3) 0%,
+      transparent 45%
+    ),
+    url('/hero-pabellon.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.hero-three {
+  background-image:
+    linear-gradient(
+      115deg,
+      rgba(60, 0, 0, 0.95) 0%,
+      rgba(115, 47, 47, 0.82) 45%,
+      rgba(175, 136, 70, 0.55) 80%,
+      rgba(60, 0, 0, 0.40) 100%
+    ),
+    radial-gradient(
+      circle at 75% 45%,
+      rgba(175, 136, 70, 0.4) 0%,
+      transparent 50%
+    ),
+    url('/hero-pabellon.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}

@@ -87,3 +87,15 @@ Por solicitud del usuario, usar la skill local [`primeng`](.agents/skills/primen
 
 PrimeNG pertenece al ecosistema Angular. En el proyecto Flutter, adaptar sus patrones de componentes e interacción a widgets Dart y a los tokens de `AppTheme`. Esta preferencia no cambia el stack tecnológico ni autoriza por sí misma una migración a Angular. Para tareas sin interfaz, continuar con las skills y reglas que correspondan.
 
+---
+
+## 6. Skills de Vercel Labs y Frontend Engineering (Open Agents)
+
+Se incorporaron las skills de ingeniería y diseño frontend procedentes de [`vercel-labs/open-agents`](https://github.com/vercel-labs/open-agents.git) en [`.agents/skills/`](.agents/skills/):
+
+1. **Rendimiento React y Next.js:** [`vercel-react-best-practices`](.agents/skills/vercel-react-best-practices/SKILL.md) — 58 reglas de optimización (eliminación de waterfalls, bundle splitting, React.cache, memoización y server actions).
+2. **Diseño de Interfaces de Alta Calidad:** [`frontend-design`](.agents/skills/frontend-design/SKILL.md) y [`emil-design-eng`](.agents/skills/emil-design-eng/SKILL.md) — Directivas visuales de Emil Kowalski y diseño frontend sin patrones genéricos de IA.
+3. **Animaciones y Microinteracciones:** [`web-animation-design`](.agents/skills/web-animation-design/SKILL.md) y [`baseline-ui`](.agents/skills/baseline-ui/SKILL.md) — Físicas con Framer Motion, timing curves y accesibilidad visual.
+4. **Planificación y Revisión de Código:** [`plan-mode`](.agents/skills/plan-mode/SKILL.md) y [`code-review`](.agents/skills/code-review/SKILL.md) — Análisis arquitectónico sistémico y revisión automatizada de PRs y diffs.
+5. **Automatización y Flujos:** [`workflow`](.agents/skills/workflow/SKILL.md), [`agent-browser`](.agents/skills/agent-browser/SKILL.md), [`ai-sdk`](.agents/skills/ai-sdk/SKILL.md) y [`chat-sdk`](.agents/skills/chat-sdk/SKILL.md).
+

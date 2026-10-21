@@ -15,7 +15,7 @@
 >    * **Paso 1:** 71 Requisitos Funcionales (`requisitos_funcionales.md`) y 71 Casos de Uso.
 >    * **Paso 2:** Stack Tecnológico (`stack_tecnologico_proyecto.md`) y Arquitectura C4 (`arquitectura_sistema.md`).
 >    * **Paso 3:** Diseño de Detalle por Squad (Reglas SDD y SDD del Squad asignado).
->    * **Paso 4:** Código en Flutter (`lib/core/theme/` y `lib/features/squad_[X]_[modulo]/`).
+>    * **Paso 4:** Código Frontend en Next.js (`frontend/app/` y `frontend/modules/squads/squad_[X]_[modulo]/`) y Backend en Node.js (`backend/src/`).
 
 ---
 
@@ -25,19 +25,19 @@ El proyecto cuenta con **71 Requisitos Funcionales (`RF-01` al `RF-71`)** y **71
 
 1. **Squad 1 - Core y Seguridad:** Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`)  
    *M1, M2, M3, M12 (RF-01 al RF-14, RF-65 al RF-68)* — JWT, RBAC, Configuración escolar y Auditoría Ley 29733.
-   * **Entrega (Outputs):** `squad_1_core.dart` (Dart), middlewares `authenticateJwt` y `requireRoles` (Node.js), endpoints `/api/v1/auth`, `/api/v1/users`, `/api/v1/audit`.
+   * **Entrega (Outputs):** módulo core compartido (frontend), middlewares `authenticateJwt` y `requireRoles` (Node.js), endpoints `/api/v1/auth`, `/api/v1/users`, `/api/v1/audit`.
    * **Consume (Inputs):** `docker-compose.yml` (PostgreSQL 16, Redis 7) y `database/init/01_esquema_consolidado.sql`.
 2. **Squad 2 - Matrícula y Asistencia:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`) — *Líder de Proyecto*  
-   *M4, M5, M6, M7 (RF-15 al RF-35)* — Matrícula, Kiosco Offline-First (IndexedDB/Hive), Carnés QR y Horas SSU.
+   *M4, M5, M6, M7 (RF-15 al RF-35)* — Matrícula, Kiosco Offline-First (IndexedDB), Carnés QR y Horas SSU.
    * **Entrega (Outputs):** Kiosco de portería (<200ms), carné QR (`RF-26`), endpoint de sync masivo (`POST /api/v1/attendance/sync-batch`), WebSocket Gateway (`RF-27`).
-   * **Consume (Inputs):** `squad_1_core.dart` (`AccessControlService`, sesiones), tablas `instituciones`, `usuarios` y `anios_lectivos`.
+   * **Consume (Inputs):** módulo core del Squad 1 (`AccessControlService`, sesiones), tablas `instituciones`, `usuarios` y `anios_lectivos`.
 3. **Squad 3 - Calificaciones y Modo Excel:** Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`) — *Sub Líder*  
    *M8 (RF-36 al RF-46)* — Planilla "Modo Excel", Debounce 400ms, Conclusiones MINEDU y Conversión Dual.
    * **Entrega (Outputs):** Planilla ágil a 60 FPS por teclado (`RF-38`), asistente de conclusiones (`RF-39`), endpoint en lote (`PATCH /api/v1/grades/batch`) y motor CNEB (`RF-46`).
    * **Consume (Inputs):** `GradingScaleService` (escala CNEB AD, A, B, C de Squad 1), lista de `matriculas` (Squad 2) y tablas `calificaciones` / `evaluaciones`.
 4. **Squad 4 - Analítica y Dashboards:** Grissel Arascely Rodríguez Quispe (`@Arascely`)  
    *M9, M10 (RF-47 al RF-58)* — Mapas de Calor Drill-Down, Ficha 360°, Deserción y Métricas SSU IS-480.
-   * **Entrega (Outputs):** Mapas de calor interactivos (`fl_chart`), radar chart Ficha 360° (`RF-56`), endpoints de agregación (`/api/v1/analytics/*`).
+   * **Entrega (Outputs):** Mapas de calor interactivos, radar chart Ficha 360° (`RF-56`), endpoints de agregación (`/api/v1/analytics/*`).
    * **Consume (Inputs):** Récord de asistencia (Squad 2), notas (Squad 3), vistas materializadas `vm_rendimiento_seccion` y `vm_asistencia_mensual`.
 5. **Squad 5 - Secretaría y Portal Web:** Cesar Antonio Leon Reyna (`@cesarleon27-ai`)  
    *M11, M13 (RF-59 al RF-64, RF-69 al RF-71)* — Libretas PDF, Verificación QR SHA-256 y Portal Web Institucional.
@@ -56,17 +56,18 @@ Cuando se solicite crear, estructurar o revisar un **SDD (Documento de Diseño d
 
 ---
 
-## 3. Directivas de Código en Flutter
+## 3. Directivas de Código Frontend (Next.js + TypeScript)
 
 1. **Arquitectura Feature-First:**
-   * El código del squad debe residir exclusivamente en `lib/features/squad_[X]_[modulo]/`.
-   * El código transversal y compartido reside en `lib/core/`.
+   * El código del squad debe residir exclusivamente en `frontend/modules/squads/squad_[X]_[modulo]/`.
+   * El código transversal y compartido reside en `frontend/modules/shared/` y `frontend/components/`.
 2. **Calidad de Código:**
-   * Todo cambio en Flutter debe pasar limpiamente:
-     * `flutter analyze` (0 errores, 0 warnings).
-     * `flutter test` (todos los tests pasando).
+   * Todo cambio en el frontend debe pasar limpiamente:
+     * `npm run lint` (0 errores).
+     * `npm run build` (compilación TypeScript sin errores).
+   * Todo cambio en el backend debe pasar `npm run build` en `backend/`.
 3. **Identidad Visual:**
-   * Utilizar exclusivamente los tokens de diseño de [`lib/core/theme/app_theme.dart`](lib/core/theme/app_theme.dart) (Verde botella institucional, Azul UNSCH y colores oficiales CNEB).
+   * Utilizar exclusivamente los tokens de diseño de [`frontend/tailwind.config.ts`](frontend/tailwind.config.ts) y [`frontend/app/globals.css`](frontend/app/globals.css) (Verde botella institucional, Azul UNSCH y colores oficiales CNEB).
 
 ---
 
@@ -77,7 +78,7 @@ Cuando se solicite crear, estructurar o revisar un **SDD (Documento de Diseño d
    * Prohibido hacer push directo a `main`. Solo recibe merges desde `dev` tras alcanzar hitos validados por el líder.
 2. **`dev` (Desarrollo Activo e Integración Continua):**
    * Rama principal de trabajo donde convergen los módulos de los 5 squads.
-   * Todo avance se prueba (`flutter analyze` y `flutter test`) y se integra directamente en `dev`.
+   * Todo avance se prueba (`npm run lint` y `npm run build`) y se integra directamente en `dev`.
 3. **Ramas temporales / de soporte (Opcionales y Efímeras):**
    * Si un desarrollador necesita aislar un experimento o feature específica, crea una rama temporal desde `dev` (ej. `temp/kiosco-test`) y la elimina inmediatamente tras mergearla hacia `dev`, manteniendo el repositorio limpio.
 
@@ -85,7 +86,7 @@ Cuando se solicite crear, estructurar o revisar un **SDD (Documento de Diseño d
 
 Por solicitud del usuario, usar la skill local [`primeng`](.agents/skills/primeng/SKILL.md) al diseñar o modificar sus interfaces en este repositorio, especialmente el módulo del Squad 3. Su fuente de referencia es `https://github.com/primefaces/primeng.git`.
 
-PrimeNG pertenece al ecosistema Angular. En el proyecto Flutter, adaptar sus patrones de componentes e interacción a widgets Dart y a los tokens de `AppTheme`. Esta preferencia no cambia el stack tecnológico ni autoriza por sí misma una migración a Angular. Para tareas sin interfaz, continuar con las skills y reglas que correspondan.
+PrimeNG pertenece al ecosistema Angular. En el frontend Next.js, adaptar sus patrones de componentes e interacción a componentes React y a los tokens de tema del frontend. Esta preferencia no cambia el stack tecnológico ni autoriza por sí misma una migración a Angular. Para tareas sin interfaz, continuar con las skills y reglas que correspondan.
 
 ---
 

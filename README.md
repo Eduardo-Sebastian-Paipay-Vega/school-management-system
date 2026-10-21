@@ -5,16 +5,14 @@
 ### Planteles de Aplicación "Guamán Poma de Ayala" — UNSCH
 **Servicio Social Universitario (SSU IS-480, Semestre 2026-II) · EPIS UNSCH**
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.35.x_Web-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
-[![Dart](https://img.shields.io/badge/Dart-3.9.x-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
+[![Next.js](https://img.shields.io/badge/Next.js-15.x-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.x-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20_LTS-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/Redis-7+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
-[![QA Quality](https://img.shields.io/badge/Flutter_Analyze-0_Errors_|_0_Warnings-brightgreen?style=for-the-badge&logo=flutter)](https://flutter.dev)
-[![Tests](https://img.shields.io/badge/Tests-48%2F48_Passed_(100%25)-brightgreen?style=for-the-badge)](https://flutter.dev)
 [![Git Flow](https://img.shields.io/badge/Git_Branches-main_%7C_dev-orange?style=for-the-badge&logo=git&logoColor=white)](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system)
 [![Licencia](https://img.shields.io/badge/Licencia-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
@@ -64,7 +62,7 @@ El sistema integra **13 módulos funcionales** distribuidos estratégicamente en
 
 | # | Innovación Tecnológica | Módulo & RF | Valor Agregado para el Plantel |
 |:---:|---|:---:|---|
-| 1 | **Kiosco de Portería Offline-First** | M5 (`RF-25`) | Registro de ingreso de estudiantes (<200 ms) sin caídas ante cortes de red gracias al búfer local en IndexedDB/Hive. |
+| 1 | **Kiosco de Portería Offline-First** | M5 (`RF-25`) | Registro de ingreso de estudiantes (<200 ms) sin caídas ante cortes de red gracias al búfer local en IndexedDB. |
 | 2 | **Carnés Escolares con Token QR** | M5 (`RF-26`) | Emisión e impresión de credenciales en PDF vectorial con token criptográfico para control de portería. |
 | 3 | **Toma Rápida en Aula con WebSockets** | M5 (`RF-27`) | Marcación táctil en 1 clic desde el celular del docente con difusión en tiempo real a dirección y monitores. |
 | 4 | **Planilla Ágil de Notas ("Modo Excel")** | M8 (`RF-38`) | Interfaz ultra-rápida a 60 FPS con navegación completa por teclado (flechas, Enter, Tab) y pegado masivo. |
@@ -86,8 +84,8 @@ El sistema implementa una arquitectura desacoplada **Clean Architecture + Featur
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │                              CAPA DE FRONTEND (CLIENTE)                                │
-│       Flutter 3.35.x Web (CanvasKit / WebAssembly) • PWA • Material Design 3           │
-│   [Desplegado globalmente en Vercel CDN • Modo Kiosco Offline-First en IndexedDB/Hive] │
+│       Next.js 15 (App Router) • React 19 • TypeScript 5 • Tailwind CSS • PrimeNG       │
+│    [Desplegado globalmente en Vercel CDN • Modo Kiosco Offline-First en IndexedDB]     │
 └──────────────────────────────────────────┬─────────────────────────────────────────────┘
                                            │
                                            │ HTTPS (TLS 1.3) / WSS (WebSockets RFC 6455)
@@ -129,24 +127,18 @@ school-management-system/
 │       └── 01_esquema_consolidado.sql # DDL unificado de los 5 Squads con triggers y semillas
 │
 ├── docker-compose.yml             # Orquestador local (Postgres 16, Redis 7 y Adminer :8080)
-├── vercel.json                    # Despliegue de Flutter Web (SPA Rewrites y Cache Wasm)
+├── vercel.json                    # Headers de seguridad para el despliegue en Vercel
 │
-├── lib/                           # Código Fuente Frontend (Flutter 3.35 / Dart 3.9)
-│   ├── main.dart                  # Shell institucional y selector interactivo de squads
-│   ├── core/                      # Componentes transversales compartidos
-│   │   ├── constants/             # Constantes globales y metadatos
-│   │   ├── theme/app_theme.dart   # Tokens visuales (Verde Botella, Azul UNSCH, Escala CNEB)
-│   │   └── widgets/               # Widgets y botones reutilizables (AsyncActionButton, etc.)
-│   └── features/                  # Módulos por Squads (Arquitectura Feature-First)
-│       ├── squad_1_core_seguridad/        # M1, M2, M3, M12 (JWT, RBAC, Auditoría)
-│       ├── squad_2_matricula_asistencia/  # M4, M5, M6, M7 (Kiosco Offline, QR)
-│       ├── squad_3_calificaciones/        # M8 (Planilla Modo Excel a 60 FPS)
-│       ├── squad_4_analitica_dashboards/  # M9, M10 (Mapas Drill-Down, Ficha 360°)
-│       └── squad_5_secretaria_portal/     # M11, M13 (Libretas PDF, Portal Web)
+├── frontend/                      # Código Fuente Frontend (Next.js 15 / React 19 / TypeScript)
+│   ├── app/                       # App Router: (landing) portal público e (intranet)
+│   ├── components/                # Componentes UI reutilizables
+│   ├── modules/                   # Módulos por dominio (Arquitectura Feature-First)
+│   │   ├── landing/               # Portal Web Institucional (M13)
+│   │   ├── intranet/              # Login y hub de la intranet
+│   │   └── squads/                # Vistas de los 5 squads (squad_1_core … squad_5_secretaria)
+│   ├── tailwind.config.ts         # Tokens visuales institucionales
+│   └── package.json               # Dependencias del frontend
 │
-├── test/                          # Batería de 48 Pruebas Unitarias y de Widgets
-├── web/                           # PWA Manifest y metadatos HTML5
-├── pubspec.yaml                   # Dependencias de Flutter (Crypto, PDF, Printing, etc.)
 ├── AGENTS.md                      # Directivas y reglas obligatorias para agentes de IA
 └── README.md                      # Documentación maestra del proyecto
 ```
@@ -181,40 +173,27 @@ npm run dev
 * **Servidor API:** Activo en [http://localhost:3000](http://localhost:3000)
 * **Health Check:** [http://localhost:3000/api/v1/health](http://localhost:3000/api/v1/health) (Valida conexión a PostgreSQL y Redis en tiempo real).
 
-### Paso 3: Iniciar el Frontend (Flutter Web)
+### Paso 3: Iniciar el Frontend (Next.js)
 
 En una nueva terminal, desde la raíz del proyecto:
 
 ```bash
-# 1. Descargar paquetes de Flutter
-flutter pub get
-
-# 2. Iniciar en Google Chrome con renderizador CanvasKit / Wasm (RECOMENDADO)
-flutter run -d chrome
-
-# Opciones alternativas:
-# flutter run -d chrome --web-port 3000
-# flutter run -d edge
-# flutter run -d windows
+cd frontend
+npm install
+npm run dev
 ```
 
-> 💡 **Con 1 Clic desde el Editor:** Puedes presionar la tecla **`F5`** (o *Run > Start Debugging*) en VS Code, Cursor o Antigravity IDE para lanzar la aplicación automáticamente.
-
-#### Atajos de Teclado Útiles Mientras Corre Flutter:
-* **`r`**: **Hot Reload** (aplica cambios visuales en < 1 segundo sin reiniciar la app).
-* **`R`**: **Hot Restart** (reinicia la aplicación y recarga estados).
-* **`q`**: **Quit** (detiene la aplicación).
+* **Frontend:** Next.js levanta en el primer puerto libre (por defecto `3000`; si el backend ya lo ocupa, usará `3001`).
 
 ---
 
 ## 🧭 ¿Cómo Usar el Software y por Dónde Empezar? (Flujo por Fases)
 
-### 1. Punto de Partida: Hub Central de Navegación (`lib/main.dart`)
+### 1. Punto de Partida: Portal e Intranet (`frontend/app/`)
 
-Al ejecutar el proyecto, se despliega el **Hub Central Interactivo**, donde podrás:
-- Explorar los paneles de trabajo de los **5 Squads**.
-- Visualizar los entregables asignados (`RF` y `RNF`).
-- Acceder al visor en vivo del **SDD (Documento de Diseño de Software IEEE 1016)**.
+Al ejecutar el frontend se accede a:
+- El **Portal Web Institucional** (`frontend/app/(landing)`).
+- La **Intranet** (`frontend/app/(intranet)`), con el login y el hub de los paneles de los **5 Squads**.
 
 ---
 
@@ -265,10 +244,10 @@ El proyecto se desarrolla bajo el marco del **Servicio Social Universitario (SSU
 
 | Integrante | Rol en el Proyecto | Squad Asignado | Módulos & RFs | 📦 Qué debe Entregar / Desarrollar (Outputs) | 📥 Qué debe Usar / Consumir (Inputs) |
 |---|---|---|:---:|---|---|
-| **Paipay Vega, Eduardo Sebastian**<br>([@Eduardo-Sebastian-Paipay-Vega](https://github.com/Eduardo-Sebastian-Paipay-Vega)) | **Líder de Proyecto** | **Squad 2:<br>Matrícula y Asistencia** | **M4, M5, M6, M7**<br>(RF-15 al RF-35) | • **Frontend:** Kiosco Offline-First (`RF-21`, `RF-25`) en IndexedDB/Hive, escaneo QR (<200ms), carnés escolares (`RF-26`), matrícula y nóminas.<br>• **Backend:** Endpoint de matrícula ACID, sync masivo del Kiosco (`POST /api/v1/attendance/sync-batch`), WebSocket Gateway (`RF-27`), control de practicantes y docentes contratados. | • **De Squad 1:** `squad_1_core.dart` (`AccessControlService`, sesiones y sedes).<br>• **De BD:** Tablas `instituciones`, `usuarios`, `anios_lectivos`.<br>• **De Docker:** `docker compose up -d` para PostgreSQL y Redis. |
+| **Paipay Vega, Eduardo Sebastian**<br>([@Eduardo-Sebastian-Paipay-Vega](https://github.com/Eduardo-Sebastian-Paipay-Vega)) | **Líder de Proyecto** | **Squad 2:<br>Matrícula y Asistencia** | **M4, M5, M6, M7**<br>(RF-15 al RF-35) | • **Frontend:** Kiosco Offline-First (`RF-21`, `RF-25`) en IndexedDB, escaneo QR (<200ms), carnés escolares (`RF-26`), matrícula y nóminas.<br>• **Backend:** Endpoint de matrícula ACID, sync masivo del Kiosco (`POST /api/v1/attendance/sync-batch`), WebSocket Gateway (`RF-27`), control de practicantes y docentes contratados. | • **De Squad 1:** módulo core del Squad 1 (`AccessControlService`, sesiones y sedes).<br>• **De BD:** Tablas `instituciones`, `usuarios`, `anios_lectivos`.<br>• **De Docker:** `docker compose up -d` para PostgreSQL y Redis. |
 | **Ovalle Luyo, Steve Smith**<br>([@steveovalle27-lgtm](https://github.com/steveovalle27-lgtm)) | **Sub Líder de Proyecto** | **Squad 3:<br>Calificaciones y Modo Excel** | **M8**<br>(RF-36 al RF-46) | • **Frontend:** Planilla ágil tipo Excel (`RF-38`) a 60 FPS con navegación 100% por teclado, debounce 400ms (`RF-45`), asistente de conclusiones CNEB (`RF-39`).<br>• **Backend:** Endpoint de guardado en lote idempotente (`PATCH /api/v1/grades/batch`), motor canónico CNEB (`RF-46`), bloqueo de cierre de actas (`RF-42`). | • **De Squad 1:** `GradingScaleService` (escala CNEB AD, A, B, C de `RF-13`) y `AcademicCalendarService` (fechas límites).<br>• **De Squad 2:** Lista de estudiantes matriculados (`matriculas`).<br>• **De BD:** Tablas `evaluaciones`, `calificaciones`, `banco_conclusiones_cneb`. |
-| **Montero Gutiérrez, Brandon Fernando**<br>([@brandonmontero27-g](https://github.com/brandonmontero27-g)) | **Desarrollador** | **Squad 1:<br>Core y Seguridad** | **M1, M2, M3, M12**<br>(RF-01 al RF-14,<br>RF-65 al RF-68) | • **Frontend:** Login, Perfil, Sedes, Configuración Escolar, Matriz RBAC, Bitácora de Auditoría y exportador PDF sellado.<br>• **Backend:** Endpoints de Auth JWT (`/api/v1/auth`), CRUD de usuarios y carga masiva (`/api/v1/users`), configuración y servicio inmutable Ley 29733.<br>• **Core:** Middlewares `authenticateJwt`, `requireRoles` y biblioteca `squad_1_core.dart`. | • **De BD:** Tablas `instituciones`, `usuarios`, `roles`, `periodos_academicos`, `logs_auditoria`.<br>• **De Infra:** Redis para token blacklist y Docker Compose local. |
-| **Rodríguez Quispe, Grissel Arascely**<br>([@Arascely](https://github.com/Arascely)) | **Desarrolladora** | **Squad 4:<br>Analítica y Dashboards** | **M9, M10**<br>(RF-47 al RF-58) | • **Frontend:** Mapas de calor interactivos Drill-Down (`fl_chart`), Gráfico de Radar de la Ficha 360° (`RF-56`), Dashboards para Dirección (`RF-52`), Coordinación (`RF-53`), Docentes y panel de impacto SSU IS-480 (`RF-57`).<br>• **Backend:** Endpoints de analítica agregada (`/api/v1/analytics/heatmap`, `/student-360/:id`). | • **De Squad 2:** Récord de asistencia acumulada para ausentismo crónico (`RF-24`).<br>• **De Squad 3:** Calificaciones y notas vigesimales.<br>• **De BD:** Vistas materializadas `vm_rendimiento_seccion`, `vm_asistencia_mensual` y `metricas_impacto_ssu`. |
+| **Montero Gutiérrez, Brandon Fernando**<br>([@brandonmontero27-g](https://github.com/brandonmontero27-g)) | **Desarrollador** | **Squad 1:<br>Core y Seguridad** | **M1, M2, M3, M12**<br>(RF-01 al RF-14,<br>RF-65 al RF-68) | • **Frontend:** Login, Perfil, Sedes, Configuración Escolar, Matriz RBAC, Bitácora de Auditoría y exportador PDF sellado.<br>• **Backend:** Endpoints de Auth JWT (`/api/v1/auth`), CRUD de usuarios y carga masiva (`/api/v1/users`), configuración y servicio inmutable Ley 29733.<br>• **Core:** Middlewares `authenticateJwt`, `requireRoles` y módulo core compartido del Squad 1. | • **De BD:** Tablas `instituciones`, `usuarios`, `roles`, `periodos_academicos`, `logs_auditoria`.<br>• **De Infra:** Redis para token blacklist y Docker Compose local. |
+| **Rodríguez Quispe, Grissel Arascely**<br>([@Arascely](https://github.com/Arascely)) | **Desarrolladora** | **Squad 4:<br>Analítica y Dashboards** | **M9, M10**<br>(RF-47 al RF-58) | • **Frontend:** Mapas de calor interactivos Drill-Down, Gráfico de Radar de la Ficha 360° (`RF-56`), Dashboards para Dirección (`RF-52`), Coordinación (`RF-53`), Docentes y panel de impacto SSU IS-480 (`RF-57`).<br>• **Backend:** Endpoints de analítica agregada (`/api/v1/analytics/heatmap`, `/student-360/:id`). | • **De Squad 2:** Récord de asistencia acumulada para ausentismo crónico (`RF-24`).<br>• **De Squad 3:** Calificaciones y notas vigesimales.<br>• **De BD:** Vistas materializadas `vm_rendimiento_seccion`, `vm_asistencia_mensual` y `metricas_impacto_ssu`. |
 | **Leon Reyna, Cesar Antonio**<br>([@cesarleon27-ai](https://github.com/cesarleon27-ai)) | **Desarrollador** | **Squad 5:<br>Secretaría y Portal Web** | **M11, M13**<br>(RF-59 al RF-64,<br>RF-69 al RF-71) | • **Frontend:** Maquetación vectorial e impresión de Libretas Escolares PDF (`RF-59`), Cuadros de Mérito (`RF-61`), y Portal Web Institucional responsive con cartelera y calendario cívico.<br>• **Backend:** Servicio de firma SHA-256 de documentos y Verificador Público QR sin autenticación (`GET /api/v1/public/verify/:token` — `RF-60`). | • **De Squad 1:** Membrete oficial y escudo institucional.<br>• **De Squad 3:** Notas y conclusiones consolidadas para boletas PDF.<br>• **De Squad 4:** Cuadro de méritos.<br>• **De Cloud:** `vercel.json` para entrega CDN estática. |
 
 ---
@@ -290,9 +269,9 @@ git checkout dev
 git pull origin dev
 
 # 2. Realizar cambios en el código
-# 3. Comprobar calidad y tests antes de subir
-flutter analyze
-flutter test
+# 3. Comprobar calidad antes de subir
+cd frontend && npm run lint && npm run build && cd ..
+cd backend && npm run build && cd ..
 
 # 4. Guardar y enviar cambios a dev
 git add .
@@ -309,7 +288,7 @@ git push origin dev
 | `docs:` | Actualización de documentación | `docs: actualizar SDD de calificaciones (RF-38)` |
 | `test:` | Adición o ajuste de pruebas | `test: agregar test de debounce para guardado de notas` |
 | `refactor:` | Refactorización de código | `refactor: optimizar pool de conexiones a PostgreSQL` |
-| `chore:` | Tareas de configuración | `chore: actualizar dependencias en pubspec.yaml` |
+| `chore:` | Tareas de configuración | `chore: actualizar dependencias en package.json` |
 
 ---
 
@@ -318,14 +297,11 @@ git push origin dev
 Antes de realizar cualquier commit a la rama `dev`, el código debe superar satisfactoriamente:
 
 ```bash
-# 1. Análisis estático de código Flutter (0 errores, 0 warnings requeridos)
-flutter analyze
+# 1. Lint y compilación del Frontend (0 errores requeridos)
+cd frontend && npm run lint && npm run build
 
-# 2. Ejecución de la batería de pruebas (48 pruebas pasando)
-flutter test
-
-# 3. Compilación y verificación del Backend
-cd backend && npm run build
+# 2. Compilación y verificación del Backend
+cd ../backend && npm run build
 ```
 
 ---
@@ -350,7 +326,7 @@ El proyecto cuenta con documentación formal de ingeniería de software con traz
 
 | Componente | Plataforma / Entorno | Estrategia de Entrega |
 |---|---|---|
-| **Frontend Web (Flutter)** | **Vercel CDN** | Despliegue continuo con renderizado CanvasKit/Wasm, headers de caché estático y SPA rewrites ([`vercel.json`](vercel.json)). |
+| **Frontend Web (Next.js)** | **Vercel CDN** | Despliegue continuo del App Router de Next.js con headers de seguridad ([`vercel.json`](vercel.json)). |
 | **Backend REST & WebSockets** | **Cloud VPS / Render / Railway** | Contenedor Node.js v20 LTS con TypeScript compilado y proxies Nginx/TLS. |
 | **Base de Datos & Caché** | **PostgreSQL 16 + Redis 7** | Aislamiento multi-tenant por `tenant_id`, pools gestionados y triggers de inmutabilidad Ley 29733. |
 

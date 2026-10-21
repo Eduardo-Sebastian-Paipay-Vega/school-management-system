@@ -54,7 +54,7 @@ export default function IntranetLayout({ children }: { children: React.ReactNode
       <footer className="border-t border-gray-200 bg-white py-4 text-center text-xs text-gray-500">
         <div className="content-width flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>Sistema de Gestión Escolar — Servicio Social Universitario IS-480 (2026-II)</span>
-          <span>Planteles de Aplicación "Guamán Poma de Ayala" · UNSCH</span>
+          <span>Planteles de Aplicación &quot;Guamán Poma de Ayala&quot; · UNSCH</span>
         </div>
       </footer>
     </div>

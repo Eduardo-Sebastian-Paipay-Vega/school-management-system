@@ -96,7 +96,8 @@ const metrics = [
 ];
 
 export default function TestimoniosPage() {
-  const [filter, setFilter] = useState<'todos' | 'exalumnos' | 'padres' | 'catedraticos'>('todos');
+  type Filter = 'todos' | 'exalumnos' | 'padres' | 'catedraticos';
+  const [filter, setFilter] = useState<Filter>('todos');
   const [submitted, setSubmitted] = useState(false);
   const [testimonialData, setTestimonialData] = useState({
     nombre: '',
@@ -179,7 +180,7 @@ export default function TestimoniosPage() {
           ].map(f => (
             <button
               key={f.id}
-              onClick={() => setFilter(f.id as any)}
+              onClick={() => setFilter(f.id as Filter)}
               className={cn(
                 'rounded-2xl px-5 py-3 text-xs font-extrabold uppercase tracking-wider transition-all',
                 filter === f.id

@@ -100,7 +100,7 @@ Guiados por catedráticos de la Facultad de Ciencias Biológicas, los estudiante
 export default function NoticiasPage() {
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeArticle, setActiveArticle] = useState<any | null>(null);
+  const [activeArticle, setActiveArticle] = useState<(typeof newsArticles)[number] | null>(null);
 
   const categories = ['Todos', 'Institucional', 'Infraestructura', 'Académico', 'Cultura'];
 

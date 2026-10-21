@@ -121,7 +121,7 @@ export default function CalificacionesModuleView() {
       <div className="grid gap-3 sm:grid-cols-4 rounded-3xl border border-gray-200 bg-accent-ivory/50 p-4 text-xs">
         <div>
           <span className="text-gray-500 font-medium">Nivel y Grado:</span>
-          <p className="font-black text-brand-dark text-sm">Secundaria · 4to Año "A"</p>
+          <p className="font-black text-brand-dark text-sm">Secundaria · 4to Año &quot;A&quot;</p>
         </div>
         <div>
           <span className="text-gray-500 font-medium">Área Curricular:</span>
@@ -192,7 +192,7 @@ export default function CalificacionesModuleView() {
                     <span className="rounded-md bg-brand/10 px-2 py-0.5">{st.promedio}</span>
                   </td>
                   <td className="py-3 px-4 text-gray-600 italic text-[11px] leading-relaxed">
-                    "{st.conclusion}"
+                    &quot;{st.conclusion}&quot;
                   </td>
                   <td className="py-3 px-3 text-center">
                     <span className="inline-flex items-center gap-1 rounded-full bg-utility-success/15 px-2 py-0.5 text-[10px] font-bold text-utility-success">

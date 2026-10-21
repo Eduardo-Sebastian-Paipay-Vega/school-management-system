@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
+import 'primeicons/primeicons.css';
+import '@/modules/shared/prime/theme/unsch-lara.css';
 import './globals.css';
+import { PrimeProvider } from '@/modules/shared/prime';
 
 export const metadata: Metadata = {
   title: 'Planteles de Aplicación "Guamán Poma de Ayala" - UNSCH | Portal Oficial',
@@ -14,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <body className="min-h-screen bg-white text-gray-900 antialiased selection:bg-brand selection:text-white">
-        {children}
+        <PrimeProvider>{children}</PrimeProvider>
       </body>
     </html>
   );

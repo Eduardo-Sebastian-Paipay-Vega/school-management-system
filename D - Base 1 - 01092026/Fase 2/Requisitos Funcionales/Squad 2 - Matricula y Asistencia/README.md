@@ -1,7 +1,7 @@
 # Requisitos Funcionales - Squad 2: Gestión Académica, Matrícula y Asistencia Offline-First
 
 **Responsable Técnico:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`)  
-**Total de Requisitos:** 22 Requisitos Funcionales  
+**Total de Requisitos:** 24 Requisitos Funcionales  
 
 En esta carpeta se encuentra la especificación formal individual (estándar IEEE 830) de cada uno de los requisitos a cargo de este equipo:
 
@@ -31,7 +31,9 @@ En esta carpeta se encuentra la especificación formal individual (estándar IEE
 * **[RF-34](RF-34.md)**: Consolidación Mensual de Cumplimiento de Horas Lectivas Dictadas
 * **[RF-35](RF-35.md)**: Supervisión y Monitoreo de Cobertura y Puntualidad de Clases
 * **[RF-74](RF-74.md)**: Conformidad y Validación Periódica de Horas por el Docente Tutor
+* **[RF-77](RF-77.md)**: Aviso Automático de Inasistencias y Tardanzas al Apoderado
+* **[RF-78](RF-78.md)**: Importación Masiva de Estudiantes y Matrícula desde Nóminas Excel (Formato SIAGIE)
 
 ---
 
-> Para consultar la arquitectura, modelos de base de datos y endpoints asociados a estos requisitos, ver [`../../Arquitectura/Squad 2 - Matricula y Asistencia/Diseno Tecnico/README.md`](../../Arquitectura/Squad%202%20-%20Matricula%20y%20Asistencia/Diseno%20Tecnico/README.md).
+> Para consultar la arquitectura, modelos de base de datos y endpoints asociados a estos requisitos, ver [`esquema_datos.sql`](../../Arquitectura/Squad%202%20-%20Matricula%20y%20Asistencia/esquema_datos.sql) y [`contratos_api.md`](../../Arquitectura/Squad%202%20-%20Matricula%20y%20Asistencia/contratos_api.md).

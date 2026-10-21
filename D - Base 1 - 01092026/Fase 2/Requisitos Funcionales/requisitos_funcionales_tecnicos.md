@@ -748,7 +748,7 @@ MÓDULO TÉCNICO 13: DIFUSIÓN DIGITAL Y CONTENIDOS INSTITUCIONALES (RF-TEC-DIF)
 
 ---
 
-## 4. MATRIZ DE TRAZABILIDAD TÉCNICA INTEGRAL (RF-01 AL RF-74)
+## 4. MATRIZ DE TRAZABILIDAD TÉCNICA INTEGRAL (RF-01 AL RF-89)
 
 | Requisito Documental | Requisito Técnico | Endpoint / Componente | Método HTTP | Tablas Principales | Rol Mínimo |
 |:---:|:---:|---|:---:|---|:---:|
@@ -826,6 +826,21 @@ MÓDULO TÉCNICO 13: DIFUSIÓN DIGITAL Y CONTENIDOS INSTITUCIONALES (RF-TEC-DIF)
 | `RF-72` | `RF-TEC-USU-04` | `/api/v1/users/:id` | PATCH / DELETE | `users` (Soft Delete), `audit_logs` | Admin |
 | `RF-73` | `RF-TEC-USU-05` | `/api/v1/users/:id/roles` | PUT | `users`, `roles`, `audit_logs` | Admin, Director |
 | `RF-74` | `RF-TEC-PRA-02` | `/api/v1/practitioners/batch-approve` | POST | `practitioner_logs`, `audit_logs` | Docentes Tutores |
+| `RF-75` | `RF-TEC-USU-06` | `/api/v1/guardians/invitations` | POST | `guardians`, `guardian_students`, `consents` | Secretaría |
+| `RF-76` | `RF-TEC-NTF-01` | `/api/v1/notifications` | GET / PATCH | `notifications`, `notification_prefs` | Autenticado |
+| `RF-77` | `RF-TEC-AST-09` | `AbsenceGuardianNotifier` (job) | — | `attendance`, `notifications` | Sistema |
+| `RF-78` | `RF-TEC-ACD-06` | `/api/v1/enrollments/import-siagie` | POST | `students`, `enrollments` | Secretaría |
+| `RF-79` | `RF-TEC-NOT-12` | `/api/v1/courses/:id/activities` | POST / GET | `activities`, `evaluations` | Docente |
+| `RF-80` | `RF-TEC-NOT-13` | `/api/v1/grades/import-excel` | POST | `grades`, `audit_logs` | Docente |
+| `RF-81` | `RF-TEC-NOT-14` | `GradeDeadlineMonitor` (job) | — | `grade_deadlines`, `teacher_warnings` | Sistema |
+| `RF-82` | `RF-TEC-NOT-15` | `/api/v1/guardian/students/:id/grades` | GET | `grades`, `activities` | Apoderado |
+| `RF-83` | `RF-TEC-ANA-08` | `/api/v1/analytics/grade-compliance` | GET | `grade_deadlines`, `teacher_warnings` | Coordinación |
+| `RF-84` | `RF-TEC-DIF-02` | `/api/v1/news` | POST / PATCH | `news`, `news_media` | Comunicaciones |
+| `RF-85` | `RF-TEC-DIF-03` | `/api/v1/integrations/facebook` | POST | `integrations`, `news` | Comunicaciones |
+| `RF-86` | `RF-TEC-TRA-01` | `/api/v1/public/mesa-partes` | POST / GET | `expedientes`, `expediente_movimientos` | Público / Secretaría |
+| `RF-87` | `RF-TEC-TRA-02` | `/api/v1/certificates/requests` | POST / PATCH | `certificate_requests`, `documentos_emitidos` | Apoderado / Secretaría |
+| `RF-88` | `RF-TEC-REP-07` | `/api/v1/siagie/exports` | POST / GET | `siagie_exports` | Secretaría |
+| `RF-89` | `RF-TEC-ANA-09` | `/api/v1/appointments` | POST / GET | `appointment_slots`, `appointments` | Apoderado / Tutor |
 
 ---
 

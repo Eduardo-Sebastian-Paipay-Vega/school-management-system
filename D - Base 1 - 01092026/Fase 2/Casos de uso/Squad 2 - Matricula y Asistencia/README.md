@@ -2,8 +2,8 @@
 
 **Responsable Técnico:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`)  
 **Rama de Desarrollo:** `feature/squad-2/academic-attendance`  
-**Total de Casos de Uso:** 22 Casos de Uso Formatos UML  
-**Enfoque de Arquitectura:** Académico y Asistencia Offline-First: Matrícula, Kiosco de portería con búfer local (IndexedDB/Hive), carnés QR, asistencia por WebSockets y control de horas practicantes/docentes.  
+**Total de Casos de Uso:** 24 Casos de Uso Formatos UML  
+**Enfoque de Arquitectura:** Académico y Asistencia Offline-First: Matrícula, Kiosco de portería con búfer local (IndexedDB), carnés QR, asistencia por WebSockets y control de horas practicantes/docentes.  
 
 En esta carpeta se encuentra la especificación formal individual (estándar UML / Cockburn) de cada uno de los casos de uso asignados a este equipo:
 
@@ -36,6 +36,8 @@ flowchart LR
     Actor --> CU_DOC_02("CU-DOC-02: Registro de Justificaciones y Reprogramación de Clases Docentes")
     Actor --> CU_DOC_03("CU-DOC-03: Consolidación Mensual de Cumplimiento de Horas Lectivas Dictadas")
     Actor --> CU_DOC_04("CU-DOC-04: Supervisión y Monitoreo de Cobertura y Puntualidad de Clases")
+    Actor --> CU_AST_09("CU-AST-09: Aviso Automático de Inasistencias y Tardanzas al Apoderado")
+    Actor --> CU_ACD_06("CU-ACD-06: Importación Masiva de Estudiantes y Matrícula desde Nóminas Excel (Formato SIAGIE)")
 ```
 
 ---
@@ -66,6 +68,8 @@ flowchart LR
 | [CU-DOC-02](CU-DOC-02.md) | [RF-33](../../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-33.md) | Registro de Justificaciones y Reprogramación de Clases Docentes | Media |
 | [CU-DOC-03](CU-DOC-03.md) | [RF-34](../../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-34.md) | Consolidación Mensual de Cumplimiento de Horas Lectivas Dictadas | Mensual (Al cierre de cada mes) |
 | [CU-DOC-04](CU-DOC-04.md) | [RF-35](../../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-35.md) | Supervisión y Monitoreo de Cobertura y Puntualidad de Clases | Diaria / Continua |
+| [CU-AST-09](CU-AST-09.md) | [RF-77](../../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-77.md) | Aviso Automático de Inasistencias y Tardanzas al Apoderado | Diaria (Al cierre de cada turno) |
+| [CU-ACD-06](CU-ACD-06.md) | [RF-78](../../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-78.md) | Importación Masiva de Estudiantes y Matrícula desde Nóminas Excel (Formato SIAGIE) | Baja (Inicio del año escolar) |
 
 ---
 

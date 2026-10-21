@@ -19,7 +19,7 @@ Permite registrar calificaciones a máxima velocidad mediante una interfaz de ma
 ## 2. Actores Involucrados
 
 * **Actor Primario:** Docente Titular / Practicante Autorizado
-* **Actores Secundarios / Sistemas:** Motor Frontend (Flutter Desktop / Web WebAssembly), Base de Datos
+* **Actores Secundarios / Sistemas:** Motor Frontend (Next.js / React), Base de Datos
 
 ---
 

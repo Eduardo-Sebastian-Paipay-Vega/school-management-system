@@ -2,7 +2,7 @@
 
 **Responsable Técnico:** Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`)  
 **Rama de Desarrollo:** `feature/squad-1/auth-core`  
-**Total de Casos de Uso:** 20 Casos de Uso Formatos UML  
+**Total de Casos de Uso:** 22 Casos de Uso Formatos UML  
 **Enfoque de Arquitectura:** Seguridad, Core y Auditoría: Autenticación JWT, control de roles (RBAC), configuración escolar, multi-tenant y trazabilidad inmutable (Ley 29733).  
 
 En esta carpeta se encuentra la especificación formal individual (estándar UML / Cockburn) de cada uno de los casos de uso asignados a este equipo:
@@ -34,6 +34,8 @@ flowchart LR
     Actor --> CU_AUD_02("CU-AUD-02: Trazabilidad Histórica de Modificaciones en Notas y Asistencias")
     Actor --> CU_AUD_03("CU-AUD-03: Módulo de Búsqueda y Monitoreo de Bitácoras de Auditoría")
     Actor --> CU_AUD_04("CU-AUD-04: Cumplimiento y Protección de Datos Personales (Ley N.° 29733)")
+    Actor --> CU_USR_08("CU-USR-08: Cuenta del Apoderado con Vínculo Verificado y Consentimiento de Datos")
+    Actor --> CU_USR_09("CU-USR-09: Centro de Notificaciones Internas y por Correo Electrónico")
 ```
 
 ---
@@ -62,6 +64,8 @@ flowchart LR
 | [CU-AUD-02](CU-AUD-02.md) | [RF-66](../../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-66.md) | Trazabilidad Histórica de Modificaciones en Notas y Asistencias | Muy Alta (En cada guardado de notas o cambios de asistencia) |
 | [CU-AUD-03](CU-AUD-03.md) | [RF-67](../../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-67.md) | Módulo de Búsqueda y Monitoreo de Bitácoras de Auditoría | Media |
 | [CU-AUD-04](CU-AUD-04.md) | [RF-68](../../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-68.md) | Cumplimiento y Protección de Datos Personales (Ley N.° 29733) | Baja |
+| [CU-USR-08](CU-USR-08.md) | [RF-75](../../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-75.md) | Cuenta del Apoderado con Vínculo Verificado y Consentimiento de Datos | Alta (Inicio del año escolar) |
+| [CU-USR-09](CU-USR-09.md) | [RF-76](../../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-76.md) | Centro de Notificaciones Internas y por Correo Electrónico | Constante |
 
 ---
 

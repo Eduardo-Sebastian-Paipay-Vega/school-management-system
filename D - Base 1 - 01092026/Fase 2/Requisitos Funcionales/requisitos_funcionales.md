@@ -19,7 +19,7 @@ El catálogo integra formalmente los **módulos de innovación operativa, pedag�
 
 ---
 
-## 2. TABLA MAESTRA Y LISTA ESTRUCTURADA DE REQUISITOS FUNCIONALES (74 RF)
+## 2. TABLA MAESTRA Y LISTA ESTRUCTURADA DE REQUISITOS FUNCIONALES (89 RF)
 
 | ID | Denominación Oficial del Requisito Funcional | Módulo de Trabajo | Actor Principal | Prioridad |
 |:---:|---|---|---|:---:|
@@ -97,6 +97,21 @@ El catálogo integra formalmente los **módulos de innovación operativa, pedag�
 | **RF-72** | Modificación de Datos y Baja Lógica de Usuarios del Plantel | M2: Gestión de Usuarios | Administrador TI / Dirección General | Esencial |
 | **RF-73** | Reasignación Dinámica de Roles y Jerarquías del Personal | M2: Gestión de Usuarios | Administrador TI / Dirección General | Deseable |
 | **RF-74** | Conformidad y Validación Periódica de Horas por el Docente Tutor | M6: Practicantes | Docentes Tutores / Coordinación | Esencial |
+| **RF-75** | Cuenta del Apoderado con Vínculo Verificado y Consentimiento de Datos | M2: Gestión de Usuarios | Secretaría Académica / Apoderados | Esencial |
+| **RF-76** | Centro de Notificaciones Internas y por Correo Electrónico | M2: Gestión de Usuarios | Toda la comunidad autenticada | Esencial |
+| **RF-77** | Aviso Automático de Inasistencias y Tardanzas al Apoderado | M5: Asistencia Estudiantil | Sistema / Apoderados | Deseable |
+| **RF-78** | Importación Masiva de Estudiantes y Matrícula desde Nóminas Excel (Formato SIAGIE) | M4: Gestión Académica | Secretaría Académica | Deseable |
+| **RF-79** | Programación de Tareas, Exámenes y Actividades Evaluativas con Calendario | M8: Calificaciones | Docentes / Estudiantes / Apoderados | Esencial |
+| **RF-80** | Carga Masiva de Calificaciones desde Plantilla Excel Precargada | M8: Calificaciones | Docentes Titulares y Contratados | Esencial |
+| **RF-81** | Control de Plazos de Registro de Notas y Alertas Escalonadas a Docentes | M8: Calificaciones | Coordinación Académica / Docentes | Esencial |
+| **RF-82** | Consulta de Notas, Tareas y Exámenes por el Apoderado | M8: Calificaciones | Apoderados | Esencial |
+| **RF-83** | Tablero de Cumplimiento y Puntualidad del Registro de Notas por Docente | M10: Monitoreo y Dashboards | Coordinación Académica / Dirección | Deseable |
+| **RF-84** | Gestor de Noticias Institucionales con Editor, Galería y Publicación Programada | M13: Difusión Digital | Dirección / Comunicaciones | Deseable |
+| **RF-85** | Publicación en la Página Oficial de Facebook y Feed Integrado en el Portal | M13: Difusión Digital | Dirección / Comunicaciones | Opcional |
+| **RF-86** | Mesa de Partes Virtual para Solicitudes, Consultas y Quejas | M11: Reportes Oficiales | Apoderados / Comunidad / Secretaría | Esencial |
+| **RF-87** | Solicitud y Emisión Rápida de Certificados y Constancias en Línea | M11: Reportes Oficiales | Apoderados / Exalumnos / Secretaría | Esencial |
+| **RF-88** | Generación de Archivos de Carga para el SIAGIE con Validación y Control de Envíos | M11: Reportes Oficiales | Secretaría Académica / Dirección | Esencial |
+| **RF-89** | Agenda de Citas entre Apoderados y Tutores o Docentes | M10: Monitoreo y Dashboards | Apoderados / Tutores / Docentes | Deseable |
 
 ---
 
@@ -300,7 +315,7 @@ AMPLIACIÓN MÓDULO 11: SEGURIDAD Y VERIFICACIÓN DOCUMENTAL CRIPTOGRÁFICA
 
 ---
 
-## 4. MATRIZ DE TRAZABILIDAD DOCUMENTAL EXPANDIDA (RF-01 AL RF-74)
+## 4. MATRIZ DE TRAZABILIDAD DOCUMENTAL EXPANDIDA (RF-01 AL RF-89)
 
 | ID Fase II | Nombre Oficial del Requisito Funcional | Módulo | Actor Primario | Prioridad | Carácter de Innovación |
 |:---:|---|:---:|---|:---:|:---:|
@@ -335,6 +350,21 @@ AMPLIACIÓN MÓDULO 11: SEGURIDAD Y VERIFICACIÓN DOCUMENTAL CRIPTOGRÁFICA
 | `RF-69` a `RF-71` | Cartelera, Calendario Cívico y Portal Web | M13 | Toda la comunidad | Deseable | Difusión Digital |
 | `RF-72` a `RF-73` | Edición, Baja Lógica y Reasignación de Roles de Usuarios | M2 | Administración / Dirección | Esencial | Control de Personal |
 | `RF-74` | Conformidad de Horas de Practicantes por el Docente Tutor | M6 | Docentes Tutores / Coordinación | Esencial | Convenio UNSCH |
+| **`RF-75`** | **Cuenta del Apoderado con Vínculo Verificado** | **M2** | **Secretaría / Apoderados** | **Esencial** | **Comunicación con Familias** |
+| `RF-76` | Centro de Notificaciones Internas y por Correo | M2 | Toda la comunidad | Esencial | Comunicación Transversal |
+| `RF-77` | Aviso de Inasistencias y Tardanzas al Apoderado | M5 | Sistema / Apoderados | Deseable | Comunicación con Familias |
+| `RF-78` | Importación de Matrícula desde Nóminas SIAGIE | M4 | Secretaría | Deseable | Automatización Excel |
+| **`RF-79`** | **Tareas, Exámenes y Actividades con Calendario** | **M8** | **Docentes / Estudiantes / Apoderados** | **Esencial** | **Planificación Pedagógica** |
+| **`RF-80`** | **Carga Masiva de Notas desde Plantilla Excel** | **M8** | **Docentes** | **Esencial** | **Automatización Excel** |
+| **`RF-81`** | **Plazos de Registro de Notas y Alertas a Docentes** | **M8** | **Coordinación / Docentes** | **Esencial** | **Control de Cumplimiento** |
+| `RF-82` | Consulta de Notas, Tareas y Exámenes por el Apoderado | M8 | Apoderados | Esencial | Comunicación con Familias |
+| `RF-83` | Tablero de Cumplimiento del Registro de Notas | M10 | Coordinación / Dirección | Deseable | Control de Cumplimiento |
+| `RF-84` | Gestor de Noticias con Galería y Publicación Programada | M13 | Dirección / Comunicaciones | Deseable | Difusión Digital |
+| `RF-85` | Publicación en Facebook (Graph API) y Feed en el Portal | M13 | Dirección / Comunicaciones | Opcional | Difusión en Redes |
+| **`RF-86`** | **Mesa de Partes Virtual (Solicitudes y Quejas)** | **M11** | **Comunidad / Secretaría** | **Esencial** | **Atención al Usuario** |
+| **`RF-87`** | **Solicitud y Emisión Rápida de Certificados** | **M11** | **Apoderados / Exalumnos / Secretaría** | **Esencial** | **Trámite Digital** |
+| `RF-88` | Archivos de Carga para el SIAGIE con Control de Envíos | M11 | Secretaría / Dirección | Esencial | Cumplimiento MINEDU |
+| `RF-89` | Agenda de Citas entre Apoderados y Tutores | M10 | Apoderados / Tutores | Deseable | Comunicación con Familias |
 
 ---
 
@@ -344,7 +374,7 @@ Para evitar el desvío del alcance (*scope creep*) y garantizar la culminación 
 
 > [!IMPORTANT]
 > **REGLA DE ORO DE PARADA TÉCNICA:**  
-> El proyecto concluye de forma estricta y definitiva cuando los **74 Requisitos Funcionales (`RF-01` al `RF-74`)** y los **20 Requisitos No Funcionales (RNF)** estén implementados, integrados y aprobados según sus criterios de aceptación. **Queda terminantemente prohibido incorporar cualquier funcionalidad que no esté catalogada en esta especificación.**
+> El proyecto concluye de forma estricta y definitiva cuando los **89 Requisitos Funcionales (`RF-01` al `RF-89`)** y los **20 Requisitos No Funcionales (RNF)** estén implementados, integrados y aprobados según sus criterios de aceptación. **Queda terminantemente prohibido incorporar cualquier funcionalidad que no esté catalogada en esta especificación.**
 
 ---
 
@@ -354,12 +384,12 @@ Para evitar el desvío del alcance (*scope creep*) y garantizar la culminación 
 |---|---|---|
 | **1. Módulos Financieros y Contables** | • Ninguno. | ❌ **PROHIBIDO:** Pasarelas de pago, cobranza de pensiones, caja chica, facturación electrónica SUNAT, boletas de venta, contabilidad general y planillas de sueldos docentes. |
 | **2. Servicios Complementarios de Bienestar** | • Ninguno. | ❌ **PROHIBIDO:** Gestión de biblioteca escolar (préstamo de libros), control de comedor/cafetería escolar, control de transporte y rutas escolares, tópico de salud y fichas psicológicas clínicas. |
-| **3. Canales de Notificación Externa** | • Visualización de alertas en pantalla y panel web en tiempo real (WebSockets). | ❌ **PROHIBIDO:** Integración con API oficial de WhatsApp Business (Meta), pasarelas de SMS masivo tarifadas o servicios de telefonía IVR. |
+| **3. Canales de Notificación Externa** | • Visualización de alertas en pantalla y panel web en tiempo real (WebSockets).<br>• Notificaciones por correo electrónico (RF-76).<br>• Publicación en la página oficial de Facebook mediante la API de Meta (RF-85). | ❌ **PROHIBIDO:** Integración con API oficial de WhatsApp Business (Meta), pasarelas de SMS masivo tarifadas o servicios de telefonía IVR. Scraping de Facebook u otras redes sociales. |
 | **4. Inteligencia Artificial y Modelos Predictivos** | • Asistente de conclusiones descriptivas basado en reglas y plantillas oficiales CNEB.<br>• Mapas de calor descriptivos (notas y asistencia). | ❌ **PROHIBIDO:** Modelos de Machine Learning predictivo de deserción escolar con redes neuronales, bots generativos de conversación (LLMs externos de pago) o visión por computadora para reconocimiento facial. |
-| **5. Plataformas y Dispositivos de Despliegue** | • Plataforma Web Responsive (Flutter Web) accesible desde navegadores modernos (PC, laptops, tablets y móviles) y soporte PWA. | ❌ **PROHIBIDO:** Desarrollo y publicación de aplicaciones móviles nativas independientes en Kotlin/Swift para Google Play Store o Apple App Store. |
+| **5. Plataformas y Dispositivos de Despliegue** | • Plataforma Web Responsive (Next.js 15 + React 19) accesible desde navegadores modernos (PC, laptops, tablets y móviles) y soporte PWA. | ❌ **PROHIBIDO:** Desarrollo y publicación de aplicaciones móviles nativas independientes en Kotlin/Swift para Google Play Store o Apple App Store. |
 | **6. Identificación y Control Físico de Asistencia** | • Kiosco de portería Offline-First con lector de código de barras/QR.<br>• Carnés escolares generados en PDF con código QR institucional. | ❌ **PROHIBIDO:** Lectores de huellas dactilares biométricas, reconocimiento facial con cámaras biométricas, torniquetes mecánicos motorizados o tarjetas RFID/NFC con hardware dedicado. |
-| **7. Integraciones Gubernamentales y Externas** | • Generación de nóminas, actas y consolidados exportables en formato oficial Excel/PDF según directivas MINEDU. | ❌ **PROHIBIDO:** Conexión vía WebServices directos o integración API bidireccional en tiempo real con las plataformas centrales del MINEDU (SIAGIE) o bases de datos de la RENIEC. |
-| **8. Actores y Tipos de Usuarios** | • Administrador de TI del Plantel.<br>• Dirección General y Coordinación Académica.<br>• Docentes nombrados y docentes contratados.<br>• Practicantes preprofesionales de Educación.<br>• Estudiantes (para consulta de notas, récord de asistencia y ficha 360°). | ❌ **PROHIBIDO:** Acceso a Padres de Familia / Apoderados durante la fase piloto (no hay portal de apoderados), personal administrativo no académico y superadministrador multi-institucional nacional. |
+| **7. Integraciones Gubernamentales y Externas** | • Generación de nóminas, actas y consolidados exportables en formato oficial Excel/PDF según directivas MINEDU.<br>• Importación de nóminas SIAGIE (RF-78) y archivos de carga para el SIAGIE con control de envíos (RF-88), subidos por una persona autorizada. | ❌ **PROHIBIDO:** Conexión vía WebServices directos o integración API bidireccional en tiempo real con las plataformas centrales del MINEDU (SIAGIE) o bases de datos de la RENIEC, ni robots (RPA) sobre el portal del SIAGIE. |
+| **8. Actores y Tipos de Usuarios** | • Administrador de TI del Plantel.<br>• Dirección General y Coordinación Académica.<br>• Docentes nombrados y docentes contratados.<br>• Practicantes preprofesionales de Educación.<br>• Estudiantes (para consulta de notas, récord de asistencia y ficha 360°).<br>• Apoderados con vínculo verificado, solo lectura (RF-75, RF-82). | ❌ **PROHIBIDO:** Edición de datos por parte de apoderados o acceso a estudiantes no vinculados, personal administrativo no académico y superadministrador multi-institucional nacional. |
 | **9. Firma y Verificación de Documentos** | • Verificación pública anti-falsificación mediante código QR con sello criptográfico SHA-256 e identificador único en base de datos. | ❌ **PROHIBIDO:** Firma digital avanzada con certificados digitales PKI de pago emitidos por entidades de certificación acreditadas o tokens criptográficos físicos. |
 | **10. Ámbito Geográfico y Multi-Inquilinato** | • Piloto exclusivo en los Planteles de Aplicación "Guamán Poma de Ayala" (UNSCH), Ayacucho.<br>• Preparación arquitectónica mediante columna `tenant_id` para aislamiento lógico futuro. | ❌ **PROHIBIDO:** Despliegue simultáneo, soporte operativo o administración activa de otros colegios externos durante la ejecución de esta fase. |
 
@@ -367,9 +397,9 @@ Para evitar el desvío del alcance (*scope creep*) y garantizar la culminación 
 
 ### 5.2 Las 10 Reglas de "Alto al Alcance" (Límites Infranqueables)
 
-1. **Límite de los 74 Requisitos Funcionales:** Ningún integrante de los 5 squads tiene autorización para programar vistas, tablas o controladores que no respondan directamente a un `RF` entre el `RF-01` y el `RF-74`.
+1. **Límite de los 89 Requisitos Funcionales:** Ningún integrante de los 5 squads tiene autorización para programar vistas, tablas o controladores que no respondan directamente a un `RF` entre el `RF-01` y el `RF-89`.
 2. **Límite de No-Dinero:** Toda funcionalidad vinculada al dinero (matrícula pagada, pensiones, deudas, cobros) queda **100% excluida**. El sistema es estrictamente de gestión académica e institucional.
-3. **Límite de Conectividad en Kiosco:** La capacidad Offline-First está restringida **únicamente** al módulo de Asistencia de Portería (`RF-25` con IndexedDB/Hive). El resto de módulos requiere conexión al backend.
+3. **Límite de Conectividad en Kiosco:** La capacidad Offline-First está restringida **únicamente** al módulo de Asistencia de Portería (`RF-25` con IndexedDB). El resto de módulos requiere conexión al backend.
 4. **Límite de Calificaciones:** El sistema maneja exclusivamente el registro dual (Vigesimal 0-20 y CNEB Literal AD, A, B, C) con auto-guardado debounce (400ms) y planilla ágil ("Modo Excel"). No se admiten configuraciones curriculares internacionales ni escalas no oficiales.
 5. **Límite de Analítica:** Los mapas de calor y la Ficha 360° son herramientas de visualización y semaforización diagnóstica (verde, amarillo, rojo). No calculan proyecciones probabilísticas ni analítica prescriptiva compleja.
 6. **Límite de Verificación QR:** El código QR de las boletas y carnés redirige a una URL pública del sistema que valida el hash SHA-256 en la base de datos institucional. No requiere interoperabilidad con pasarelas notariales.
@@ -384,9 +414,9 @@ Para evitar el desvío del alcance (*scope creep*) y garantizar la culminación 
 
 El proyecto se declarará oficialmente **FINALIZADO Y CERRADO** cuando se verifiquen todos y cada uno de los siguientes hitos técnicos:
 
-* [ ] **Cobertura Funcional 100%:** Los 74 Requisitos Funcionales (`RF-01` al `RF-74`) desarrollados y operando según sus especificaciones.
-* [ ] **Control de Calidad de Código:** `flutter analyze` ejecutado con **0 errores y 0 warnings**.
-* [ ] **Batería de Pruebas Automatizadas:** `flutter test` ejecutado exitosamente con todas las pruebas unitarias y de widgets aprobadas.
+* [ ] **Cobertura Funcional 100%:** Los 89 Requisitos Funcionales (`RF-01` al `RF-89`) desarrollados y operando según sus especificaciones.
+* [ ] **Control de Calidad de Código:** `npm run lint` ejecutado con **0 errores** en `frontend/` y `backend/`.
+* [ ] **Compilación:** `npm run build` exitoso en el frontend (Next.js) y el backend (TypeScript), con las pruebas automatizadas aprobadas.
 * [ ] **Cumplimiento de los 5 Squads:**
   * **Squad 1:** Autenticación JWT, RBAC, configuración de periodos/grados y auditoría inmutable Ley N.° 29733 operativa.
   * **Squad 2:** Matrícula, nóminas, app de toma rápida, generación de carnés QR y Kiosco Offline-First con sincronización validada.

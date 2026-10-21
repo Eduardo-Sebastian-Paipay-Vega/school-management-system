@@ -1,7 +1,7 @@
 # Requisitos Funcionales - Squad 3: Evaluación Pedagógica, Planilla Rápida y Motor CNEB
 
 **Responsable Técnico:** Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`)  
-**Total de Requisitos:** 11 Requisitos Funcionales  
+**Total de Requisitos:** 15 Requisitos Funcionales  
 
 En esta carpeta se encuentra la especificación formal individual (estándar IEEE 830) de cada uno de los requisitos a cargo de este equipo:
 
@@ -20,7 +20,11 @@ En esta carpeta se encuentra la especificación formal individual (estándar IEE
 * **[RF-44](RF-44.md)**: Consulta Inmediata y Transparente de Calificaciones para Estudiantes
 * **[RF-45](RF-45.md)**: Llenado Asistido con Auto-Guardado y Conexión Automática en Segundo Plano
 * **[RF-46](RF-46.md)**: Motor de Conversión Escala Vigesimal (0-20) a Literal CNEB (AD, A, B, C)
+* **[RF-79](RF-79.md)**: Programación de Tareas, Exámenes y Actividades Evaluativas con Calendario
+* **[RF-80](RF-80.md)**: Carga Masiva de Calificaciones desde Plantilla Excel Precargada
+* **[RF-81](RF-81.md)**: Control de Plazos de Registro de Notas y Alertas Escalonadas a Docentes
+* **[RF-82](RF-82.md)**: Consulta de Notas, Tareas y Exámenes por el Apoderado
 
 ---
 
-> Para consultar la arquitectura, modelos de base de datos y endpoints asociados a estos requisitos, ver [`../../Arquitectura/Squad 3 - Calificaciones y Modo Excel/Diseno Tecnico/README.md`](../../Arquitectura/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/Diseno%20Tecnico/README.md).
+> Para consultar la arquitectura, modelos de base de datos y endpoints asociados a estos requisitos, ver [`esquema_datos.sql`](../../Arquitectura/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/esquema_datos.sql) y [`contratos_api.md`](../../Arquitectura/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/contratos_api.md).

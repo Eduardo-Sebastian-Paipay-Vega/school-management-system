@@ -14,7 +14,7 @@
 
 ```mermaid
 graph TD
-    F0["Fase 0: Reglas y Fronteras<br>(AGENTS.md + Límites del Proyecto)"] --> F1["Fase 1: Negocio y Requerimientos<br>(README F2 + 74 RFs + 74 Casos de Uso)"]
+    F0["Fase 0: Reglas y Fronteras<br>(AGENTS.md + Límites del Proyecto)"] --> F1["Fase 1: Negocio y Requerimientos<br>(README F2 + 89 RFs + 89 Casos de Uso)"]
     F1 --> F2["Fase 2: Arquitectura y Tecnologías<br>(Stack Tecnológico + Arquitectura C4)"]
     F2 --> F3["Fase 3: Diseño de Software SDD<br>(Reglas SDD + SDD específico del Squad)"]
     F3 --> F4["Fase 4: Código Flutter<br>(lib/core/theme + lib/features/squad_X)"]
@@ -34,8 +34,8 @@ Antes de responder preguntas o escribir código, se deben fijar las reglas del j
 ### FASE 1: Entendimiento Funcional del Sistema (Qué hace el sistema)
 Comprender la lógica institucional de los Planteles de Aplicación:
 3. 📄 [`D - Base 1 - 01092026/Fase 2/README.md`](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/README.md): Índice canónico de toda la Fase 2.
-4. 📄 [`D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/requisitos_funcionales.md`](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md): Los **74 Requisitos Funcionales (`RF-01` al `RF-74`)** con sus precondiciones, entradas y salidas.
-5. 📄 [`D - Base 1 - 01092026/Fase 2/Casos de uso/README.md`](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Casos%20de%20uso/README.md): Los **74 Casos de Uso UML** y el comportamiento de los actores escolares.
+4. 📄 [`D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/requisitos_funcionales.md`](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md): Los **89 Requisitos Funcionales (`RF-01` al `RF-89`)** con sus precondiciones, entradas y salidas.
+5. 📄 [`D - Base 1 - 01092026/Fase 2/Casos de uso/README.md`](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Casos%20de%20uso/README.md): Los **89 Casos de Uso UML** y el comportamiento de los actores escolares.
 6. 📄 [`D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md`](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20No%20Funcionales/requisitos_no_funcionales.md): Los 20 RNFs (seguridad, tiempos P95 < 3s, debounce 400ms, accesibilidad).
 
 ---
@@ -78,7 +78,7 @@ Directivas para implementar pantallas, widgets y lógica:
 ## 3. CHECKLIST RÁPIDO DE PREVENCIÓN DE EXTRAVÍO
 
 Antes de dar por concluida cualquier tarea, responder afirmativamente:
-- [ ] ¿El requerimiento que toqué está entre el `RF-01` y el `RF-74`?
+- [ ] ¿El requerimiento que toqué está entre el `RF-01` y el `RF-89`?
 - [ ] ¿Verifiqué que no está en la lista de prohibiciones de `limites_y_alcance_proyecto.md`?
 - [ ] ¿El código que escribí está dentro de `lib/features/squad_[X]_[modulo]/`?
 - [ ] ¿Utilicé los tokens de `AppTheme` y no colores genéricos o ad-hoc?

@@ -37,11 +37,11 @@ flowchart TD
 
 ### Paso 1: Definir Identidad y Alcance del Squad
 * Consultar la asignación de responsabilidades:
-  * **Squad 1 (Brandon Montero):** M1, M2, M3, M12 (RF-01 al RF-14, RF-65 al RF-68, RF-72, RF-73) — Core, Seguridad, RBAC, Auditoría.
-  * **Squad 2 (Sebastián Paipay):** M4, M5, M6, M7 (RF-15 al RF-35, RF-74) — Matrícula, Kiosco Offline-First, QR, Horas SSU.
-  * **Squad 3 (Steve Ovalle):** M8 (RF-36 al RF-46) — Planilla "Modo Excel", Debounce 400ms, Conclusiones MINEDU, Escala Dual.
-  * **Squad 4 (Aracely Rodríguez):** M9, M10 (RF-47 al RF-58) — Mapas de Calor Drill-Down, Ficha 360°, Deserción, Tablero SSU.
-  * **Squad 5 (Cesar Leon):** M11, M13 (RF-59 al RF-64, RF-69 al RF-71) — Libretas PDF, Verificación QR SHA-256, Portal Web.
+  * **Squad 1 (Brandon Montero):** M1, M2, M3, M12 (RF-01 al RF-14, RF-65 al RF-68, RF-72, RF-73, RF-75, RF-76) — Core, Seguridad, RBAC, Auditoría.
+  * **Squad 2 (Sebastián Paipay):** M4, M5, M6, M7 (RF-15 al RF-35, RF-74, RF-77, RF-78) — Matrícula, Kiosco Offline-First, QR, Horas SSU.
+  * **Squad 3 (Steve Ovalle):** M8 (RF-36 al RF-46, RF-79 al RF-82) — Planilla "Modo Excel", Debounce 400ms, Conclusiones MINEDU, Escala Dual.
+  * **Squad 4 (Aracely Rodríguez):** M9, M10 (RF-47 al RF-58, RF-83, RF-89) — Mapas de Calor Drill-Down, Ficha 360°, Deserción, Tablero SSU.
+  * **Squad 5 (Cesar Leon):** M11, M13 (RF-59 al RF-64, RF-69 al RF-71, RF-84 al RF-88) — Libretas PDF, Verificación QR SHA-256, Portal Web.
 
 ### Paso 2: Vistas Arquitecturales y Diagramas C4
 * Generar diagrama Mermaid de contexto y componentes:

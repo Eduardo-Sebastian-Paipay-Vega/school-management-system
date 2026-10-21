@@ -10,7 +10,7 @@
 
 ## 1. RESUMEN EJECUTIVO DEL STACK TECNOLÓGICO
 
-El ecosistema tecnológico ha sido seleccionado bajo criterios rigurosos de **rendimiento, mantenibilidad, portabilidad multiplataforma, seguridad criptográfica y resiliencia operativa Offline-First**, garantizando el soporte integral a los **74 Requisitos Funcionales (`RF-01` al `RF-74`)** y **20 Requisitos No Funcionales (RNF)** distribuidos en los 5 squads de desarrollo.
+El ecosistema tecnológico ha sido seleccionado bajo criterios rigurosos de **rendimiento, mantenibilidad, portabilidad multiplataforma, seguridad criptográfica y resiliencia operativa Offline-First**, garantizando el soporte integral a los **89 Requisitos Funcionales (`RF-01` al `RF-89`)** y **20 Requisitos No Funcionales (RNF)** distribuidos en los 5 squads de desarrollo.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
@@ -202,4 +202,4 @@ El despliegue está estandarizado mediante `Docker` y orquestado con `docker-com
 
 ## 9. CONCLUSIÓN
 
-El stack tecnológico seleccionado garantiza un balance óptimo entre **modernidad, rendimiento, simplicidad operativa y rigor académico**. Permite que el equipo de desarrollo cumpla con los 74 Requisitos Funcionales en el tiempo estipulado para el **Servicio Social Universitario IS-480**, entregando a los **Planteles de Aplicación "Guamán Poma de Ayala"** un sistema de alta calidad técnica y operativa.
+El stack tecnológico seleccionado garantiza un balance óptimo entre **modernidad, rendimiento, simplicidad operativa y rigor académico**. Permite que el equipo de desarrollo cumpla con los 89 Requisitos Funcionales en el tiempo estipulado para el **Servicio Social Universitario IS-480**, entregando a los **Planteles de Aplicación "Guamán Poma de Ayala"** un sistema de alta calidad técnica y operativa.

@@ -1,7 +1,7 @@
 # Requisitos Funcionales - Squad 4: Inteligencia de Datos, Mapas de Calor y Dashboards 360°
 
 **Responsable Técnico:** Grissel Arascely Rodríguez Quispe (`@Arascely`)  
-**Total de Requisitos:** 12 Requisitos Funcionales  
+**Total de Requisitos:** 14 Requisitos Funcionales  
 
 En esta carpeta se encuentra la especificación formal individual (estándar IEEE 830) de cada uno de los requisitos a cargo de este equipo:
 
@@ -21,7 +21,9 @@ En esta carpeta se encuentra la especificación formal individual (estándar IEE
 * **[RF-56](RF-56.md)**: Ficha Integral y Radiografía Escolar 360° del Estudiante en 1 Clic
 * **[RF-57](RF-57.md)**: Tablero de Seguimiento, Impacto y Acreditación del SSU (IS-480)
 * **[RF-58](RF-58.md)**: Generador de Reportes de Diagnóstico Integral para Consejos Académicos
+* **[RF-83](RF-83.md)**: Tablero de Cumplimiento y Puntualidad del Registro de Notas por Docente
+* **[RF-89](RF-89.md)**: Agenda de Citas entre Apoderados y Tutores o Docentes
 
 ---
 
-> Para consultar la arquitectura, modelos de base de datos y endpoints asociados a estos requisitos, ver [`../../Arquitectura/Squad 4 - Analitica y Dashboards/Diseno Tecnico/README.md`](../../Arquitectura/Squad%204%20-%20Analitica%20y%20Dashboards/Diseno%20Tecnico/README.md).
+> Para consultar la arquitectura, modelos de base de datos y endpoints asociados a estos requisitos, ver [`esquema_datos.sql`](../../Arquitectura/Squad%204%20-%20Analitica%20y%20Dashboards/esquema_datos.sql) y [`contratos_api.md`](../../Arquitectura/Squad%204%20-%20Analitica%20y%20Dashboards/contratos_api.md).

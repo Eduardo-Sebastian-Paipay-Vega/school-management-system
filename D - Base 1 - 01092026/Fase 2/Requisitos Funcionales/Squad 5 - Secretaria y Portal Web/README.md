@@ -1,7 +1,7 @@
 # Requisitos Funcionales - Squad 5: Secretaría Digital, Criptografía Documental y Portal Web
 
 **Responsable Técnico:** Cesar Antonio Leon Reyna (`@cesarleon27-ai`)  
-**Total de Requisitos:** 9 Requisitos Funcionales  
+**Total de Requisitos:** 14 Requisitos Funcionales  
 
 En esta carpeta se encuentra la especificación formal individual (estándar IEEE 830) de cada uno de los requisitos a cargo de este equipo:
 
@@ -18,7 +18,12 @@ En esta carpeta se encuentra la especificación formal individual (estándar IEE
 * **[RF-69](RF-69.md)**: Cartelera Digital y Publicación de Comunicados Institucionales
 * **[RF-70](RF-70.md)**: Publicación y Consulta del Calendario Cívico y Escolar Interactivo
 * **[RF-71](RF-71.md)**: Portal Informativo Institucional y Normas de Convivencia Escolar
+* **[RF-84](RF-84.md)**: Gestor de Noticias Institucionales con Editor, Galería y Publicación Programada
+* **[RF-85](RF-85.md)**: Publicación en la Página Oficial de Facebook y Feed Integrado en el Portal
+* **[RF-86](RF-86.md)**: Mesa de Partes Virtual para Solicitudes, Consultas y Quejas
+* **[RF-87](RF-87.md)**: Solicitud y Emisión Rápida de Certificados y Constancias en Línea
+* **[RF-88](RF-88.md)**: Generación de Archivos de Carga para el SIAGIE con Validación y Control de Envíos
 
 ---
 
-> Para consultar la arquitectura, modelos de base de datos y endpoints asociados a estos requisitos, ver [`../../Arquitectura/Squad 5 - Secretaria y Portal Web/Diseno Tecnico/README.md`](../../Arquitectura/Squad%205%20-%20Secretaria%20y%20Portal%20Web/Diseno%20Tecnico/README.md).
+> Para consultar la arquitectura, modelos de base de datos y endpoints asociados a estos requisitos, ver [`esquema_datos.sql`](../../Arquitectura/Squad%205%20-%20Secretaria%20y%20Portal%20Web/esquema_datos.sql) y [`contratos_api.md`](../../Arquitectura/Squad%205%20-%20Secretaria%20y%20Portal%20Web/contratos_api.md).

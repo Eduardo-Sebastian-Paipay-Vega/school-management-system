@@ -2,7 +2,7 @@
 
 **Responsable Técnico:** Cesar Antonio Leon Reyna (`@cesarleon27-ai`)  
 **Rama de Desarrollo:** `feature/squad-5/secretary-portal`  
-**Total de Casos de Uso:** 9 Casos de Uso Formatos UML  
+**Total de Casos de Uso:** 14 Casos de Uso Formatos UML  
 **Enfoque de Arquitectura:** Secretaría y Portal Web: Emisión de boletas/libretas en PDF, actas y registros auxiliares, verificación documental pública con hash SHA-256 + QR, cartelera digital y portal web institucional.  
 
 En esta carpeta se encuentra la especificación formal individual (estándar UML / Cockburn) de cada uno de los casos de uso asignados a este equipo:
@@ -23,6 +23,11 @@ flowchart LR
     Actor --> CU_PUB_01("CU-PUB-01: Cartelera Digital y Publicación de Comunicados Institucionales")
     Actor --> CU_PUB_02("CU-PUB-02: Publicación y Consulta del Calendario Cívico y Escolar Interactivo")
     Actor --> CU_PUB_03("CU-PUB-03: Navegación Pública en Portal Institucional Responsivo y Accesible")
+    Actor --> CU_PUB_04("CU-PUB-04: Gestor de Noticias Institucionales con Editor, Galería y Publicación Programada")
+    Actor --> CU_PUB_05("CU-PUB-05: Publicación en la Página Oficial de Facebook y Feed Integrado en el Portal")
+    Actor --> CU_TRA_01("CU-TRA-01: Mesa de Partes Virtual para Solicitudes, Consultas y Quejas")
+    Actor --> CU_TRA_02("CU-TRA-02: Solicitud y Emisión Rápida de Certificados y Constancias en Línea")
+    Actor --> CU_REP_07("CU-REP-07: Generación de Archivos de Carga para el SIAGIE con Validación y Control de Envíos")
 ```
 
 ---
@@ -40,6 +45,11 @@ flowchart LR
 | [CU-PUB-01](CU-PUB-01.md) | [RF-69](../../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-69.md) | Cartelera Digital y Publicación de Comunicados Institucionales | Alta |
 | [CU-PUB-02](CU-PUB-02.md) | [RF-70](../../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-70.md) | Publicación y Consulta del Calendario Cívico y Escolar Interactivo | Alta |
 | [CU-PUB-03](CU-PUB-03.md) | [RF-71](../../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-71.md) | Navegación Pública en Portal Institucional Responsivo y Accesible | Muy Alta |
+| [CU-PUB-04](CU-PUB-04.md) | [RF-84](../../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-84.md) | Gestor de Noticias Institucionales con Editor, Galería y Publicación Programada | Media (Varias veces por semana) |
+| [CU-PUB-05](CU-PUB-05.md) | [RF-85](../../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-85.md) | Publicación en la Página Oficial de Facebook y Feed Integrado en el Portal | Media |
+| [CU-TRA-01](CU-TRA-01.md) | [RF-86](../../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-86.md) | Mesa de Partes Virtual para Solicitudes, Consultas y Quejas | Alta |
+| [CU-TRA-02](CU-TRA-02.md) | [RF-87](../../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-87.md) | Solicitud y Emisión Rápida de Certificados y Constancias en Línea | Alta (Picos a fin de año y en traslados) |
+| [CU-REP-07](CU-REP-07.md) | [RF-88](../../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-88.md) | Generación de Archivos de Carga para el SIAGIE con Validación y Control de Envíos | Bimestral (Al cierre de cada periodo) |
 
 ---
 

@@ -2,7 +2,7 @@
 
 ### Planteles de Aplicación "Guamán Poma de Ayala" — UNSCH (SSU IS-480)
 
-Este directorio documenta la especificación formal de los **74 Casos de Uso del Sistema** que implementan la totalidad de los Requisitos Funcionales (`RF-01` al `RF-74`), organizados modularmente en **5 Squads Técnicos Especializados**.
+Este directorio documenta la especificación formal de los **89 Casos de Uso del Sistema** que implementan la totalidad de los Requisitos Funcionales (`RF-01` al `RF-89`), organizados modularmente en **5 Squads Técnicos Especializados**.
 
 ---
 
@@ -10,11 +10,11 @@ Este directorio documenta la especificación formal de los **74 Casos de Uso del
 
 | Squad | Responsable Técnico | Módulos a Cargo | Casos de Uso | Requisitos Trazables | Enfoque Principal |
 |---|---|---|---|---|---|
-| [**Squad 1: Core y Seguridad**](Squad%201%20-%20Core%20y%20Seguridad/README.md) | Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`) | M1, M2, M3, M12 | **20 CUs** (CU-SEG, CU-USR, CU-INS, CU-AUD) | `RF-01` al `RF-14`<br>`RF-65` al `RF-68`<br>`RF-72` y `RF-73` | Seguridad, JWT, RBAC, configuración escolar, multi-tenant y auditoría inmutable (Ley 29733). |
-| [**Squad 2: Matrícula y Asistencia**](Squad%202%20-%20Matricula%20y%20Asistencia/README.md) | Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`) | M4, M5, M6, M7 | **22 CUs** (CU-ACD, CU-AST, CU-PRA, CU-DOC) | `RF-15` al `RF-35`<br>`RF-74` | Matrícula, Kiosco de portería Offline-First (IndexedDB/Hive), carnés QR, WebSockets y control de horas. |
-| [**Squad 3: Calificaciones y Modo Excel**](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/README.md) | Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`) | M8 | **11 CUs** (CU-NOT) | `RF-36` al `RF-46` | Planilla interactiva "Modo Excel", debounce 400ms, banco de conclusiones MINEDU y conversión dual. |
-| [**Squad 4: Analítica y Dashboards**](Squad%204%20-%20Analitica%20y%20Dashboards/README.md) | Grissel Arascely Rodríguez Quispe (`@Arascely`) | M9, M10 | **12 CUs** (CU-MAP, CU-DSH) | `RF-47` al `RF-58` | Mapas de calor con navegación Drill-Down, alertas de deserción, Ficha 360° y tablero SSU IS-480. |
-| [**Squad 5: Secretaría y Portal Web**](Squad%205%20-%20Secretaria%20y%20Portal%20Web/README.md) | Cesar Antonio Leon Reyna (`@cesarleon27-ai`) | M11, M13 | **9 CUs** (CU-REP, CU-PUB) | `RF-59` al `RF-64`<br>`RF-69` al `RF-71` | Libretas y actas en PDF, verificación criptográfica SHA-256 + QR público, cartelera y portal web. |
+| [**Squad 1: Core y Seguridad**](Squad%201%20-%20Core%20y%20Seguridad/README.md) | Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`) | M1, M2, M3, M12 | **22 CUs** (CU-SEG, CU-USR, CU-INS, CU-AUD) | `RF-01` al `RF-14`<br>`RF-65` al `RF-68`<br>`RF-72`, `RF-73`, `RF-75` y `RF-76` | Seguridad, JWT, RBAC, configuración escolar, multi-tenant y auditoría inmutable (Ley 29733). |
+| [**Squad 2: Matrícula y Asistencia**](Squad%202%20-%20Matricula%20y%20Asistencia/README.md) | Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`) | M4, M5, M6, M7 | **24 CUs** (CU-ACD, CU-AST, CU-PRA, CU-DOC) | `RF-15` al `RF-35`<br>`RF-74`, `RF-77`, `RF-78` | Matrícula, Kiosco de portería Offline-First (IndexedDB), carnés QR, WebSockets y control de horas. |
+| [**Squad 3: Calificaciones y Modo Excel**](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/README.md) | Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`) | M8 | **15 CUs** (CU-NOT) | `RF-36` al `RF-46`, `RF-79` al `RF-82` | Planilla interactiva "Modo Excel", debounce 400ms, banco de conclusiones MINEDU y conversión dual. |
+| [**Squad 4: Analítica y Dashboards**](Squad%204%20-%20Analitica%20y%20Dashboards/README.md) | Grissel Arascely Rodríguez Quispe (`@Arascely`) | M9, M10 | **14 CUs** (CU-MAP, CU-DSH) | `RF-47` al `RF-58`, `RF-83`, `RF-89` | Mapas de calor con navegación Drill-Down, alertas de deserción, Ficha 360° y tablero SSU IS-480. |
+| [**Squad 5: Secretaría y Portal Web**](Squad%205%20-%20Secretaria%20y%20Portal%20Web/README.md) | Cesar Antonio Leon Reyna (`@cesarleon27-ai`) | M11, M13 | **14 CUs** (CU-REP, CU-PUB) | `RF-59` al `RF-64`, `RF-86` al `RF-88`<br>`RF-69` al `RF-71`, `RF-84`, `RF-85` | Libretas y actas en PDF, verificación criptográfica SHA-256 + QR público, cartelera y portal web. |
 
 ---
 
@@ -36,7 +36,7 @@ Este directorio documenta la especificación formal de los **74 Casos de Uso del
 
 ### [Squad 1: Core, Seguridad, Configuración y Auditoría](Squad%201%20-%20Core%20y%20Seguridad/README.md)
 
-**Responsable:** Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`) | **Total:** 20 Casos de Uso
+**Responsable:** Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`) | **Total:** 22 Casos de Uso
 
 | ID | Requisito | Título del Caso de Uso | Frecuencia |
 |---|---|---|---|
@@ -60,10 +60,12 @@ Este directorio documenta la especificación formal de los **74 Casos de Uso del
 | [CU-AUD-02](Squad%201%20-%20Core%20y%20Seguridad/CU-AUD-02.md) | [RF-66](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-66.md) | Trazabilidad Histórica de Modificaciones en Notas y Asistencias | Muy Alta (En cada guardado de notas o cambios de asistencia) |
 | [CU-AUD-03](Squad%201%20-%20Core%20y%20Seguridad/CU-AUD-03.md) | [RF-67](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-67.md) | Módulo de Búsqueda y Monitoreo de Bitácoras de Auditoría | Media |
 | [CU-AUD-04](Squad%201%20-%20Core%20y%20Seguridad/CU-AUD-04.md) | [RF-68](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-68.md) | Cumplimiento y Protección de Datos Personales (Ley N.° 29733) | Baja |
+| [CU-USR-08](Squad%201%20-%20Core%20y%20Seguridad/CU-USR-08.md) | [RF-75](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-75.md) | Cuenta del Apoderado con Vínculo Verificado y Consentimiento de Datos | Alta (Inicio del año escolar) |
+| [CU-USR-09](Squad%201%20-%20Core%20y%20Seguridad/CU-USR-09.md) | [RF-76](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-76.md) | Centro de Notificaciones Internas y por Correo Electrónico | Constante |
 
 ### [Squad 2: Gestión Académica, Matrícula y Asistencia Offline-First](Squad%202%20-%20Matricula%20y%20Asistencia/README.md)
 
-**Responsable:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`) | **Total:** 22 Casos de Uso
+**Responsable:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`) | **Total:** 24 Casos de Uso
 
 | ID | Requisito | Título del Caso de Uso | Frecuencia |
 |---|---|---|---|
@@ -89,10 +91,12 @@ Este directorio documenta la especificación formal de los **74 Casos de Uso del
 | [CU-DOC-02](Squad%202%20-%20Matricula%20y%20Asistencia/CU-DOC-02.md) | [RF-33](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-33.md) | Registro de Justificaciones y Reprogramación de Clases Docentes | Media |
 | [CU-DOC-03](Squad%202%20-%20Matricula%20y%20Asistencia/CU-DOC-03.md) | [RF-34](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-34.md) | Consolidación Mensual de Cumplimiento de Horas Lectivas Dictadas | Mensual (Al cierre de cada mes) |
 | [CU-DOC-04](Squad%202%20-%20Matricula%20y%20Asistencia/CU-DOC-04.md) | [RF-35](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-35.md) | Supervisión y Monitoreo de Cobertura y Puntualidad de Clases | Diaria / Continua |
+| [CU-AST-09](Squad%202%20-%20Matricula%20y%20Asistencia/CU-AST-09.md) | [RF-77](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-77.md) | Aviso Automático de Inasistencias y Tardanzas al Apoderado | Diaria (Al cierre de cada turno) |
+| [CU-ACD-06](Squad%202%20-%20Matricula%20y%20Asistencia/CU-ACD-06.md) | [RF-78](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-78.md) | Importación Masiva de Estudiantes y Matrícula desde Nóminas Excel (Formato SIAGIE) | Baja (Inicio del año escolar) |
 
 ### [Squad 3: Evaluación Pedagógica, Planilla Rápida y Motor CNEB](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/README.md)
 
-**Responsable:** Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`) | **Total:** 11 Casos de Uso
+**Responsable:** Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`) | **Total:** 15 Casos de Uso
 
 | ID | Requisito | Título del Caso de Uso | Frecuencia |
 |---|---|---|---|
@@ -107,10 +111,14 @@ Este directorio documenta la especificación formal de los **74 Casos de Uso del
 | [CU-NOT-09](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-09.md) | [RF-44](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-44.md) | Consulta Inmediata y Transparente de Calificaciones para Estudiantes | Alta |
 | [CU-NOT-10](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-10.md) | [RF-45](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-45.md) | Llenado Asistido con Auto-Guardado en Segundo Plano (Debounce 400ms) | Constante durante la edición de notas |
 | [CU-NOT-11](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-11.md) | [RF-46](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-46.md) | Motor de Conversión Escala Vigesimal (0-20) a Literal CNEB (AD, A, B, C) | Muy Alta |
+| [CU-NOT-12](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-12.md) | [RF-79](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-79.md) | Programación de Tareas, Exámenes y Actividades Evaluativas con Calendario | Alta (Semanal) |
+| [CU-NOT-13](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-13.md) | [RF-80](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-80.md) | Carga Masiva de Calificaciones desde Plantilla Excel Precargada | Alta (Cierre de evaluaciones) |
+| [CU-NOT-14](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-14.md) | [RF-81](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-81.md) | Control de Plazos de Registro de Notas y Alertas Escalonadas a Docentes | Diaria (Proceso programado) |
+| [CU-NOT-15](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/CU-NOT-15.md) | [RF-82](../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-82.md) | Consulta de Notas, Tareas y Exámenes por el Apoderado | Alta |
 
 ### [Squad 4: Inteligencia de Datos, Mapas de Calor y Dashboards 360°](Squad%204%20-%20Analitica%20y%20Dashboards/README.md)
 
-**Responsable:** Grissel Arascely Rodríguez Quispe (`@Arascely`) | **Total:** 12 Casos de Uso
+**Responsable:** Grissel Arascely Rodríguez Quispe (`@Arascely`) | **Total:** 14 Casos de Uso
 
 | ID | Requisito | Título del Caso de Uso | Frecuencia |
 |---|---|---|---|
@@ -126,10 +134,12 @@ Este directorio documenta la especificación formal de los **74 Casos de Uso del
 | [CU-DSH-05](Squad%204%20-%20Analitica%20y%20Dashboards/CU-DSH-05.md) | [RF-56](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-56.md) | Ficha Integral y Radiografía Escolar 360° del Estudiante en 1 Clic | Alta durante atención a padres o consejos de grado |
 | [CU-DSH-06](Squad%204%20-%20Analitica%20y%20Dashboards/CU-DSH-06.md) | [RF-57](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-57.md) | Tablero de Seguimiento, Impacto y Acreditación del SSU (IS-480) | Semanal / Al cierre de ciclo |
 | [CU-DSH-07](Squad%204%20-%20Analitica%20y%20Dashboards/CU-DSH-07.md) | [RF-58](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-58.md) | Generador de Reportes de Diagnóstico Integral para Consejos Académicos | Bimestral |
+| [CU-DSH-08](Squad%204%20-%20Analitica%20y%20Dashboards/CU-DSH-08.md) | [RF-83](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-83.md) | Tablero de Cumplimiento y Puntualidad del Registro de Notas por Docente | Semanal / Al cierre de periodo |
+| [CU-DSH-09](Squad%204%20-%20Analitica%20y%20Dashboards/CU-DSH-09.md) | [RF-89](../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-89.md) | Agenda de Citas entre Apoderados y Tutores o Docentes | Media |
 
 ### [Squad 5: Secretaría Digital, Criptografía Documental y Portal Web](Squad%205%20-%20Secretaria%20y%20Portal%20Web/README.md)
 
-**Responsable:** Cesar Antonio Leon Reyna (`@cesarleon27-ai`) | **Total:** 9 Casos de Uso
+**Responsable:** Cesar Antonio Leon Reyna (`@cesarleon27-ai`) | **Total:** 14 Casos de Uso
 
 | ID | Requisito | Título del Caso de Uso | Frecuencia |
 |---|---|---|---|
@@ -142,6 +152,11 @@ Este directorio documenta la especificación formal de los **74 Casos de Uso del
 | [CU-PUB-01](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-PUB-01.md) | [RF-69](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-69.md) | Cartelera Digital y Publicación de Comunicados Institucionales | Alta |
 | [CU-PUB-02](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-PUB-02.md) | [RF-70](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-70.md) | Publicación y Consulta del Calendario Cívico y Escolar Interactivo | Alta |
 | [CU-PUB-03](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-PUB-03.md) | [RF-71](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-71.md) | Navegación Pública en Portal Institucional Responsivo y Accesible | Muy Alta |
+| [CU-PUB-04](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-PUB-04.md) | [RF-84](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-84.md) | Gestor de Noticias Institucionales con Editor, Galería y Publicación Programada | Media (Varias veces por semana) |
+| [CU-PUB-05](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-PUB-05.md) | [RF-85](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-85.md) | Publicación en la Página Oficial de Facebook y Feed Integrado en el Portal | Media |
+| [CU-TRA-01](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-TRA-01.md) | [RF-86](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-86.md) | Mesa de Partes Virtual para Solicitudes, Consultas y Quejas | Alta |
+| [CU-TRA-02](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-TRA-02.md) | [RF-87](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-87.md) | Solicitud y Emisión Rápida de Certificados y Constancias en Línea | Alta (Picos a fin de año y en traslados) |
+| [CU-REP-07](Squad%205%20-%20Secretaria%20y%20Portal%20Web/CU-REP-07.md) | [RF-88](../Requisitos%20Funcionales/Squad%205%20-%20Secretaria%20y%20Portal%20Web/RF-88.md) | Generación de Archivos de Carga para el SIAGIE con Validación y Control de Envíos | Bimestral (Al cierre de cada periodo) |
 
 ---
 

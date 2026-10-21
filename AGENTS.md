@@ -12,7 +12,7 @@
 > 2. **Activar la skill de navegación:** [`.agents/skills/guia-lectura-proyecto/SKILL.md`](.agents/skills/guia-lectura-proyecto/SKILL.md).
 > 3. **Secuencia de 5 Fases:**
 >    * **Paso 0:** Límites y Out-of-Scope (`limites_y_alcance_proyecto.md`).
->    * **Paso 1:** 74 Requisitos Funcionales (`requisitos_funcionales.md`) y 74 Casos de Uso.
+>    * **Paso 1:** 89 Requisitos Funcionales (`requisitos_funcionales.md`) y 89 Casos de Uso.
 >    * **Paso 2:** Stack Tecnológico (`stack_tecnologico_proyecto.md`) y Arquitectura C4 (`arquitectura_sistema.md`).
 >    * **Paso 3:** Diseño de Detalle por Squad (Reglas SDD y SDD del Squad asignado).
 >    * **Paso 4:** Código Frontend en Next.js (`frontend/app/` y `frontend/modules/squads/squad_[X]_[modulo]/`) y Backend en Node.js (`backend/src/`).
@@ -21,26 +21,26 @@
 
 ## 1. Contexto del Proyecto y Squads
 
-El proyecto cuenta con **74 Requisitos Funcionales (`RF-01` al `RF-74`)** y **74 Casos de Uso** distribuidos en **5 Squads Técnicos Especializados**:
+El proyecto cuenta con **89 Requisitos Funcionales (`RF-01` al `RF-89`)** y **89 Casos de Uso** distribuidos en **5 Squads Técnicos Especializados**:
 
 1. **Squad 1 - Core y Seguridad:** Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`)  
-   *M1, M2, M3, M12 (RF-01 al RF-14, RF-65 al RF-68, RF-72, RF-73)* — JWT, RBAC, Configuración escolar y Auditoría Ley 29733.
+   *M1, M2, M3, M12 (RF-01 al RF-14, RF-65 al RF-68, RF-72, RF-73, RF-75, RF-76)* — JWT, RBAC, Configuración escolar y Auditoría Ley 29733.
    * **Entrega (Outputs):** módulo core compartido (frontend), middlewares `authenticateJwt` y `requireRoles` (Node.js), endpoints `/api/v1/auth`, `/api/v1/users`, `/api/v1/audit`.
    * **Consume (Inputs):** `docker-compose.yml` (PostgreSQL 16, Redis 7) y `database/init/01_esquema_consolidado.sql`.
 2. **Squad 2 - Matrícula y Asistencia:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`) — *Líder de Proyecto*  
-   *M4, M5, M6, M7 (RF-15 al RF-35, RF-74)* — Matrícula, Kiosco Offline-First (IndexedDB), Carnés QR y Horas SSU.
+   *M4, M5, M6, M7 (RF-15 al RF-35, RF-74, RF-77, RF-78)* — Matrícula, Kiosco Offline-First (IndexedDB), Carnés QR y Horas SSU.
    * **Entrega (Outputs):** Kiosco de portería (<200ms), carné QR (`RF-26`), endpoint de sync masivo (`POST /api/v1/attendance/sync-batch`), WebSocket Gateway (`RF-27`).
    * **Consume (Inputs):** módulo core del Squad 1 (`AccessControlService`, sesiones), tablas `instituciones`, `usuarios` y `anios_lectivos`.
 3. **Squad 3 - Calificaciones y Modo Excel:** Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`) — *Sub Líder*  
-   *M8 (RF-36 al RF-46)* — Planilla "Modo Excel", Debounce 400ms, Conclusiones MINEDU y Conversión Dual.
+   *M8 (RF-36 al RF-46, RF-79 al RF-82)* — Planilla "Modo Excel", Debounce 400ms, Conclusiones MINEDU y Conversión Dual.
    * **Entrega (Outputs):** Planilla ágil a 60 FPS por teclado (`RF-38`), asistente de conclusiones (`RF-39`), endpoint en lote (`PATCH /api/v1/grades/batch`) y motor CNEB (`RF-46`).
    * **Consume (Inputs):** `GradingScaleService` (escala CNEB AD, A, B, C de Squad 1), lista de `matriculas` (Squad 2) y tablas `calificaciones` / `evaluaciones`.
 4. **Squad 4 - Analítica y Dashboards:** Grissel Arascely Rodríguez Quispe (`@Arascely`)  
-   *M9, M10 (RF-47 al RF-58)* — Mapas de Calor Drill-Down, Ficha 360°, Deserción y Métricas SSU IS-480.
+   *M9, M10 (RF-47 al RF-58, RF-83, RF-89)* — Mapas de Calor Drill-Down, Ficha 360°, Deserción y Métricas SSU IS-480.
    * **Entrega (Outputs):** Mapas de calor interactivos, radar chart Ficha 360° (`RF-56`), endpoints de agregación (`/api/v1/analytics/*`).
    * **Consume (Inputs):** Récord de asistencia (Squad 2), notas (Squad 3), vistas materializadas `vm_rendimiento_seccion` y `vm_asistencia_mensual`.
 5. **Squad 5 - Secretaría y Portal Web:** Cesar Antonio Leon Reyna (`@cesarleon27-ai`)  
-   *M11, M13 (RF-59 al RF-64, RF-69 al RF-71)* — Libretas PDF, Verificación QR SHA-256 y Portal Web Institucional.
+   *M11, M13 (RF-59 al RF-64, RF-69 al RF-71, RF-84 al RF-88)* — Libretas PDF, Verificación QR SHA-256 y Portal Web Institucional.
    * **Entrega (Outputs):** Libretas escolares en PDF vectorial (`RF-59`), Verificador Público QR sin autenticación (`GET /api/v1/public/verify/:token` — `RF-60`), Portal Web en Vercel (`RF-71`).
    * **Consume (Inputs):** Membrete oficial (Squad 1), actas/notas consolidadas (Squad 3), cuadros de mérito (Squad 4), configuración `vercel.json`.
 

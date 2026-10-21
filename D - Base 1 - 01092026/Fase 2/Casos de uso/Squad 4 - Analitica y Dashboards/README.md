@@ -2,7 +2,7 @@
 
 **Responsable Técnico:** Grissel Arascely Rodríguez Quispe (`@Arascely`)  
 **Rama de Desarrollo:** `feature/squad-4/analytics-dashboards`  
-**Total de Casos de Uso:** 12 Casos de Uso Formatos UML  
+**Total de Casos de Uso:** 14 Casos de Uso Formatos UML  
 **Enfoque de Arquitectura:** Analítica, Inteligencia y Métricas: Mapas de calor con navegación interactiva Drill-Down, detección temprana de deserción/repitencia, radiografía escolar Ficha 360° y tablero de impacto SSU IS-480.  
 
 En esta carpeta se encuentra la especificación formal individual (estándar UML / Cockburn) de cada uno de los casos de uso asignados a este equipo:
@@ -26,6 +26,8 @@ flowchart LR
     Actor --> CU_DSH_05("CU-DSH-05: Ficha Integral y Radiografía Escolar 360° del Estudiante en 1 Clic")
     Actor --> CU_DSH_06("CU-DSH-06: Tablero de Seguimiento, Impacto y Acreditación del SSU (IS-480)")
     Actor --> CU_DSH_07("CU-DSH-07: Generador de Reportes de Diagnóstico Integral para Consejos Académicos")
+    Actor --> CU_DSH_08("CU-DSH-08: Tablero de Cumplimiento y Puntualidad del Registro de Notas por Docente")
+    Actor --> CU_DSH_09("CU-DSH-09: Agenda de Citas entre Apoderados y Tutores o Docentes")
 ```
 
 ---
@@ -46,6 +48,8 @@ flowchart LR
 | [CU-DSH-05](CU-DSH-05.md) | [RF-56](../../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-56.md) | Ficha Integral y Radiografía Escolar 360° del Estudiante en 1 Clic | Alta durante atención a padres o consejos de grado |
 | [CU-DSH-06](CU-DSH-06.md) | [RF-57](../../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-57.md) | Tablero de Seguimiento, Impacto y Acreditación del SSU (IS-480) | Semanal / Al cierre de ciclo |
 | [CU-DSH-07](CU-DSH-07.md) | [RF-58](../../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-58.md) | Generador de Reportes de Diagnóstico Integral para Consejos Académicos | Bimestral |
+| [CU-DSH-08](CU-DSH-08.md) | [RF-83](../../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-83.md) | Tablero de Cumplimiento y Puntualidad del Registro de Notas por Docente | Semanal / Al cierre de periodo |
+| [CU-DSH-09](CU-DSH-09.md) | [RF-89](../../Requisitos%20Funcionales/Squad%204%20-%20Analitica%20y%20Dashboards/RF-89.md) | Agenda de Citas entre Apoderados y Tutores o Docentes | Media |
 
 ---
 

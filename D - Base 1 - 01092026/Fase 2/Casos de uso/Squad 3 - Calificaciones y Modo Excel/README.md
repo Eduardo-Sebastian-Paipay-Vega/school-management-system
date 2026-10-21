@@ -2,7 +2,7 @@
 
 **Responsable Técnico:** Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`)  
 **Rama de Desarrollo:** `feature/squad-3/grades-engine`  
-**Total de Casos de Uso:** 11 Casos de Uso Formatos UML  
+**Total de Casos de Uso:** 15 Casos de Uso Formatos UML  
 **Enfoque de Arquitectura:** Calificaciones y Motor CNEB: Planilla matricial ultra-rápida ('Modo Excel'), auto-guardado en segundo plano con debounce de 400 ms, conclusiones descriptivas MINEDU, escala dual (0-20 a AD/A/B/C) y cierre de periodos.  
 
 En esta carpeta se encuentra la especificación formal individual (estándar UML / Cockburn) de cada uno de los casos de uso asignados a este equipo:
@@ -25,6 +25,10 @@ flowchart LR
     Actor --> CU_NOT_09("CU-NOT-09: Consulta Inmediata y Transparente de Calificaciones para Estudiantes")
     Actor --> CU_NOT_10("CU-NOT-10: Llenado Asistido con Auto-Guardado en Segundo Plano (Debounce 400ms)")
     Actor --> CU_NOT_11("CU-NOT-11: Motor de Conversión Escala Vigesimal (0-20) a Literal CNEB (AD, A, B, C)")
+    Actor --> CU_NOT_12("CU-NOT-12: Programación de Tareas, Exámenes y Actividades Evaluativas con Calendario")
+    Actor --> CU_NOT_13("CU-NOT-13: Carga Masiva de Calificaciones desde Plantilla Excel Precargada")
+    Actor --> CU_NOT_14("CU-NOT-14: Control de Plazos de Registro de Notas y Alertas Escalonadas a Docentes")
+    Actor --> CU_NOT_15("CU-NOT-15: Consulta de Notas, Tareas y Exámenes por el Apoderado")
 ```
 
 ---
@@ -44,6 +48,10 @@ flowchart LR
 | [CU-NOT-09](CU-NOT-09.md) | [RF-44](../../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-44.md) | Consulta Inmediata y Transparente de Calificaciones para Estudiantes | Alta |
 | [CU-NOT-10](CU-NOT-10.md) | [RF-45](../../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-45.md) | Llenado Asistido con Auto-Guardado en Segundo Plano (Debounce 400ms) | Constante durante la edición de notas |
 | [CU-NOT-11](CU-NOT-11.md) | [RF-46](../../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-46.md) | Motor de Conversión Escala Vigesimal (0-20) a Literal CNEB (AD, A, B, C) | Muy Alta |
+| [CU-NOT-12](CU-NOT-12.md) | [RF-79](../../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-79.md) | Programación de Tareas, Exámenes y Actividades Evaluativas con Calendario | Alta (Semanal) |
+| [CU-NOT-13](CU-NOT-13.md) | [RF-80](../../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-80.md) | Carga Masiva de Calificaciones desde Plantilla Excel Precargada | Alta (Cierre de evaluaciones) |
+| [CU-NOT-14](CU-NOT-14.md) | [RF-81](../../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-81.md) | Control de Plazos de Registro de Notas y Alertas Escalonadas a Docentes | Diaria (Proceso programado) |
+| [CU-NOT-15](CU-NOT-15.md) | [RF-82](../../Requisitos%20Funcionales/Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/RF-82.md) | Consulta de Notas, Tareas y Exámenes por el Apoderado | Alta |
 
 ---
 

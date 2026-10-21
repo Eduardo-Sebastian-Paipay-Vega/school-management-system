@@ -19,7 +19,7 @@ Permite a la computadora de portería continuar escaneando carnés y registrando
 ## 2. Actores Involucrados
 
 * **Actor Primario:** Personal de Portería / Vigilante ('Wachiman')
-* **Actores Secundarios / Sistemas:** Búfer Local (IndexedDB / Hive), Servicio Background Sync
+* **Actores Secundarios / Sistemas:** Búfer Local (IndexedDB), Servicio Background Sync
 
 ---
 
@@ -44,7 +44,7 @@ Permite a la computadora de portería continuar escaneando carnés y registrando
 1. Se interrumpe la conexión a internet en la garita de portería.
 2. El sistema detecta el estado offline y cambia la insignia de estado a 'Modo Sin Conexión (Offline)' en color naranja.
 3. El vigilante continúa escaneando carnés con el lector QR con normalidad.
-4. El sistema valida el código contra el padrón local cifrado en IndexedDB/Hive.
+4. El sistema valida el código contra el padrón local cifrado en IndexedDB.
 5. Registra la asistencia en la cola local de pendientes con timestamp UTC.
 6. Muestra el feedback sonoro y visual normal al alumno.
 7. Al restablecerse la conexión a red, el sincronizador en segundo plano detecta la señal.

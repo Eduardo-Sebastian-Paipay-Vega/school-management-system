@@ -63,15 +63,15 @@ graph TD
 
 ## 2. REPARTO ESTRATÉGICO DE FUNCIONALIDADES POR EQUIPOS (SQUADS)
 
-Para la ejecución eficiente durante las **Semanas 4 a 8 (Fase II)**, los **74 Requisitos Funcionales** y los **13 Módulos** se dividen en **5 Squads Técnicos Especializados**. Cada integrante del equipo lidera un squad con responsabilidades directas en Frontend, Backend y Base de Datos.
+Para la ejecución eficiente durante las **Semanas 4 a 8 (Fase II)**, los **89 Requisitos Funcionales** y los **13 Módulos** se dividen en **5 Squads Técnicos Especializados**. Cada integrante del equipo lidera un squad con responsabilidades directas en Frontend, Backend y Base de Datos.
 
 ```mermaid
-pie title Distribución de los 74 Requisitos Funcionales
-    "Squad 1: Core, Seguridad & Admin (20 RFs)" : 20
-    "Squad 2: Matrícula & Asistencia Offline (22 RFs)" : 22
-    "Squad 3: Notas, Modo Excel & CNEB (11 RFs)" : 11
-    "Squad 4: Analítica & Dashboards 360° (12 RFs)" : 12
-    "Squad 5: Reportes QR & Portal Web (9 RFs)" : 9
+pie title Distribución de los 89 Requisitos Funcionales
+    "Squad 1: Core, Seguridad & Admin (22 RFs)" : 22
+    "Squad 2: Matrícula & Asistencia Offline (24 RFs)" : 24
+    "Squad 3: Notas, Modo Excel & CNEB (15 RFs)" : 15
+    "Squad 4: Analítica & Dashboards 360° (14 RFs)" : 14
+    "Squad 5: Reportes QR & Portal Web (14 RFs)" : 14
 ```
 
 ---
@@ -80,10 +80,10 @@ pie title Distribución de los 74 Requisitos Funcionales
 * **Líder Técnico:** Montero Gutiérrez, Brandon Fernando (`@brandonmontero27-g`)
 * **Módulos a Cargo:** 
   * **Módulo 1:** Acceso, Autenticación JWT y RBAC (`RF-01` a `RF-04`)
-  * **Módulo 2:** Administración de Usuarios y Directorio (`RF-05` a `RF-09`, `RF-72`, `RF-73`)
+  * **Módulo 2:** Administración de Usuarios y Directorio (`RF-05` a `RF-09`, `RF-72`, `RF-73`, `RF-75`, `RF-76`)
   * **Módulo 3:** Configuración Escolar, Periodos y Escalas (`RF-10` a `RF-14`)
   * **Módulo 12:** Trazabilidad, Auditoría y Protección de Datos Ley 29733 (`RF-65` a `RF-68`)
-* **Total de Requisitos:** **20 RFs**
+* **Total de Requisitos:** **22 RFs**
 
 | Capa | Entregables y Responsabilidades Técnicas |
 |---|---|
@@ -96,11 +96,11 @@ pie title Distribución de los 74 Requisitos Funcionales
 ### SQUAD 2: Gestión Académica, Matrícula y Asistencia Offline-First
 * **Líder Técnico:** Paipay Vega, Eduardo Sebastian (`@Eduardo-Sebastian-Paipay-Vega`)
 * **Módulos a Cargo:**
-  * **Módulo 4:** Gestión Académica, Matrícula y Carga Lectiva (`RF-15` a `RF-19`)
-  * **Módulo 5:** Asistencia Estudiantil, Kiosco Offline-First, App Rápida y Carnés QR (`RF-20` a `RF-27`)
+  * **Módulo 4:** Gestión Académica, Matrícula y Carga Lectiva (`RF-15` a `RF-19`, `RF-78`)
+  * **Módulo 5:** Asistencia Estudiantil, Kiosco Offline-First, App Rápida y Carnés QR (`RF-20` a `RF-27`, `RF-77`)
   * **Módulo 6:** Asistencia y Cómputo de Horas de Practicantes EPIS (`RF-28` a `RF-31`, `RF-74`)
   * **Módulo 7:** Horas de Docentes Contratados y Reprogramación (`RF-32` a `RF-35`)
-* **Total de Requisitos:** **22 RFs**
+* **Total de Requisitos:** **24 RFs**
 
 | Capa | Entregables y Responsabilidades Técnicas |
 |---|---|
@@ -113,8 +113,8 @@ pie title Distribución de los 74 Requisitos Funcionales
 ### SQUAD 3: Evaluación Pedagógica, Planilla Rápida y Motor CNEB
 * **Líder Técnico:** Ovalle Luyo, Steve Smith (`@steveovalle27-lgtm`)
 * **Módulos a Cargo:**
-  * **Módulo 8:** Calificaciones en Tiempo Real, Modo Excel, Auto-Guardado y Conversión CNEB (`RF-36` a `RF-46`)
-* **Total de Requisitos:** **11 RFs** *(Núcleo de Innovación y Alta Complejidad UX)*
+  * **Módulo 8:** Calificaciones en Tiempo Real, Modo Excel, Auto-Guardado y Conversión CNEB (`RF-36` a `RF-46`, `RF-79` al `RF-82`)
+* **Total de Requisitos:** **15 RFs** *(Núcleo de Innovación y Alta Complejidad UX)*
 
 | Capa | Entregables y Responsabilidades Técnicas |
 |---|---|
@@ -128,8 +128,8 @@ pie title Distribución de los 74 Requisitos Funcionales
 * **Líder Técnico:** Rodríguez Quispe, Grissel Arascely (`@Arascely`)
 * **Módulos a Cargo:**
   * **Módulo 9:** Mapas de Calor con Navegación Drill-Down (`RF-47` a `RF-51`)
-  * **Módulo 10:** Dashboards, Ficha 360° del Alumno y Métricas SSU IS-480 (`RF-52` a `RF-58`)
-* **Total de Requisitos:** **12 RFs**
+  * **Módulo 10:** Dashboards, Ficha 360° del Alumno y Métricas SSU IS-480 (`RF-52` a `RF-58`, `RF-83`, `RF-89`)
+* **Total de Requisitos:** **14 RFs**
 
 | Capa | Entregables y Responsabilidades Técnicas |
 |---|---|
@@ -142,9 +142,9 @@ pie title Distribución de los 74 Requisitos Funcionales
 ### SQUAD 5: Secretaría Digital, Criptografía Documental y Portal Web
 * **Líder Técnico:** Leon Reyna, Cesar Antonio (`@cesarleon27-ai`)
 * **Módulos a Cargo:**
-  * **Módulo 11:** Emisión de Reportes y Verificación Criptográfica QR (`RF-59` a `RF-64`)
-  * **Módulo 13:** Plataforma de Difusión Digital y Portal Institucional (`RF-69` a `RF-71`)
-* **Total de Requisitos:** **9 RFs**
+  * **Módulo 11:** Emisión de Reportes y Verificación Criptográfica QR (`RF-59` a `RF-64`, `RF-86` al `RF-88`)
+  * **Módulo 13:** Plataforma de Difusión Digital y Portal Institucional (`RF-69` a `RF-71`, `RF-84`, `RF-85`)
+* **Total de Requisitos:** **14 RFs**
 
 | Capa | Entregables y Responsabilidades Técnicas |
 |---|---|
@@ -154,7 +154,7 @@ pie title Distribución de los 74 Requisitos Funcionales
 
 ---
 
-## 3. MAPA MAESTRO DE ASIGNACIÓN (74 REQUISITOS FUNCIONALES)
+## 3. MAPA MAESTRO DE ASIGNACIÓN (89 REQUISITOS FUNCIONALES)
 
 | Rango de RFs | Módulo | Squad Asignado | Responsable Principal |
 |:---:|---|:---:|---|
@@ -173,6 +173,11 @@ pie title Distribución de los 74 Requisitos Funcionales
 | `RF-69` a `RF-71` | M13: Difusión Digital y Portal Web | **Squad 5** | Cesar Antonio Leon Reyna |
 | `RF-72` a `RF-73` | M2: Administración de Usuarios y Directorio | **Squad 1** | Brandon Fernando Montero Gutiérrez |
 | `RF-74` | M6: Asistencia de Practicantes EPIS | **Squad 2** | Eduardo Sebastian Paipay Vega |
+| `RF-75`, `RF-76` | M2: Cuentas de Apoderados y Notificaciones | **Squad 1** | Brandon Fernando Montero Gutiérrez |
+| `RF-77`, `RF-78` | M5 / M4: Aviso de Inasistencias e Importación SIAGIE | **Squad 2** | Eduardo Sebastian Paipay Vega |
+| `RF-79` a `RF-82` | M8: Actividades, Carga Excel, Plazos y Vista del Apoderado | **Squad 3** | Steve Smith Ovalle Luyo |
+| `RF-83`, `RF-89` | M10: Cumplimiento Docente y Agenda de Citas | **Squad 4** | Grissel Arascely Rodríguez Quispe |
+| `RF-84` a `RF-88` | M13 / M11: Noticias, Facebook, Mesa de Partes, Certificados y SIAGIE | **Squad 5** | Cesar Antonio Leon Reyna |
 
 ---
 

@@ -24,7 +24,7 @@
 
 Plataforma Web integral orientada a la **modernización de la gestión académica, asistencia escolar en tiempo real, planilla de calificaciones ágil y difusión digital** para los Planteles de Aplicación "Guamán Poma de Ayala" de la Universidad Nacional de San Cristóbal de Huamanga (UNSCH), en la ciudad de Ayacucho, Perú.
 
-Desarrollada por **5 Squads Técnicos Especializados** de la Escuela Profesional de Ingeniería de Sistemas (EPIS) en el marco del **Servicio Social Universitario (IS-480)**, abarcando **71 Requisitos Funcionales (`RF-01` al `RF-71`)**, **20 Requisitos No Funcionales (ISO/IEC 25010)** y el cumplimiento estricto de la normativa de protección de datos personales (**Ley N.° 29733**).
+Desarrollada por **5 Squads Técnicos Especializados** de la Escuela Profesional de Ingeniería de Sistemas (EPIS) en el marco del **Servicio Social Universitario (IS-480)**, abarcando **74 Requisitos Funcionales (`RF-01` al `RF-74`)**, **20 Requisitos No Funcionales (ISO/IEC 25010)** y el cumplimiento estricto de la normativa de protección de datos personales (**Ley N.° 29733**).
 
 ---
 
@@ -38,16 +38,16 @@ Desarrollada por **5 Squads Técnicos Especializados** de la Escuela Profesional
 
 ---
 
-## 🚀 Funcionalidades y Módulos del Sistema (71 RFs)
+## 🚀 Funcionalidades y Módulos del Sistema (74 RFs)
 
 El sistema integra **13 módulos funcionales** distribuidos estratégicamente entre los 5 squads técnicos:
 
 1. 🔐 **Módulo 1: Acceso, Autenticación JWT y RBAC** (`RF-01` al `RF-04`) — Squad 1
-2. 👥 **Módulo 2: Administración de Usuarios y Directorio** (`RF-05` al `RF-09`) — Squad 1
+2. 👥 **Módulo 2: Administración de Usuarios y Directorio** (`RF-05` al `RF-09`, `RF-72`, `RF-73`) — Squad 1
 3. 🏫 **Módulo 3: Configuración Escolar, Periodos y Escalas** (`RF-10` al `RF-14`) — Squad 1
 4. 📚 **Módulo 4: Gestión Académica, Matrícula y Carga Lectiva** (`RF-15` al `RF-19`) — Squad 2
 5. ⏱️ **Módulo 5: Asistencia Estudiantil, Kiosco Offline-First y Carnés QR** (`RF-20` al `RF-27`) — Squad 2
-6. 🎓 **Módulo 6: Asistencia y Cómputo de Horas de Practicantes SSU** (`RF-28` al `RF-31`) — Squad 2
+6. 🎓 **Módulo 6: Asistencia y Cómputo de Horas de Practicantes SSU** (`RF-28` al `RF-31`, `RF-74`) — Squad 2
 7. 👨‍🏫 **Módulo 7: Horas de Docentes Contratados y Reprogramación** (`RF-32` al `RF-35`) — Squad 2
 8. 📊 **Módulo 8: Calificaciones en Tiempo Real, Modo Excel y Motor CNEB** (`RF-36` al `RF-46`) — Squad 3
 9. 🗺️ **Módulo 9: Mapas de Calor con Navegación Drill-Down** (`RF-47` al `RF-51`) — Squad 4
@@ -244,9 +244,9 @@ El proyecto se desarrolla bajo el marco del **Servicio Social Universitario (SSU
 
 | Integrante | Rol en el Proyecto | Squad Asignado | Módulos & RFs | 📦 Qué debe Entregar / Desarrollar (Outputs) | 📥 Qué debe Usar / Consumir (Inputs) |
 |---|---|---|:---:|---|---|
-| **Paipay Vega, Eduardo Sebastian**<br>([@Eduardo-Sebastian-Paipay-Vega](https://github.com/Eduardo-Sebastian-Paipay-Vega)) | **Líder de Proyecto** | **Squad 2:<br>Matrícula y Asistencia** | **M4, M5, M6, M7**<br>(RF-15 al RF-35) | • **Frontend:** Kiosco Offline-First (`RF-21`, `RF-25`) en IndexedDB, escaneo QR (<200ms), carnés escolares (`RF-26`), matrícula y nóminas.<br>• **Backend:** Endpoint de matrícula ACID, sync masivo del Kiosco (`POST /api/v1/attendance/sync-batch`), WebSocket Gateway (`RF-27`), control de practicantes y docentes contratados. | • **De Squad 1:** módulo core del Squad 1 (`AccessControlService`, sesiones y sedes).<br>• **De BD:** Tablas `instituciones`, `usuarios`, `anios_lectivos`.<br>• **De Docker:** `docker compose up -d` para PostgreSQL y Redis. |
+| **Paipay Vega, Eduardo Sebastian**<br>([@Eduardo-Sebastian-Paipay-Vega](https://github.com/Eduardo-Sebastian-Paipay-Vega)) | **Líder de Proyecto** | **Squad 2:<br>Matrícula y Asistencia** | **M4, M5, M6, M7**<br>(RF-15 al RF-35,<br>RF-74) | • **Frontend:** Kiosco Offline-First (`RF-21`, `RF-25`) en IndexedDB, escaneo QR (<200ms), carnés escolares (`RF-26`), matrícula y nóminas.<br>• **Backend:** Endpoint de matrícula ACID, sync masivo del Kiosco (`POST /api/v1/attendance/sync-batch`), WebSocket Gateway (`RF-27`), control de practicantes y docentes contratados. | • **De Squad 1:** módulo core del Squad 1 (`AccessControlService`, sesiones y sedes).<br>• **De BD:** Tablas `instituciones`, `usuarios`, `anios_lectivos`.<br>• **De Docker:** `docker compose up -d` para PostgreSQL y Redis. |
 | **Ovalle Luyo, Steve Smith**<br>([@steveovalle27-lgtm](https://github.com/steveovalle27-lgtm)) | **Sub Líder de Proyecto** | **Squad 3:<br>Calificaciones y Modo Excel** | **M8**<br>(RF-36 al RF-46) | • **Frontend:** Planilla ágil tipo Excel (`RF-38`) a 60 FPS con navegación 100% por teclado, debounce 400ms (`RF-45`), asistente de conclusiones CNEB (`RF-39`).<br>• **Backend:** Endpoint de guardado en lote idempotente (`PATCH /api/v1/grades/batch`), motor canónico CNEB (`RF-46`), bloqueo de cierre de actas (`RF-42`). | • **De Squad 1:** `GradingScaleService` (escala CNEB AD, A, B, C de `RF-13`) y `AcademicCalendarService` (fechas límites).<br>• **De Squad 2:** Lista de estudiantes matriculados (`matriculas`).<br>• **De BD:** Tablas `evaluaciones`, `calificaciones`, `banco_conclusiones_cneb`. |
-| **Montero Gutiérrez, Brandon Fernando**<br>([@brandonmontero27-g](https://github.com/brandonmontero27-g)) | **Desarrollador** | **Squad 1:<br>Core y Seguridad** | **M1, M2, M3, M12**<br>(RF-01 al RF-14,<br>RF-65 al RF-68) | • **Frontend:** Login, Perfil, Sedes, Configuración Escolar, Matriz RBAC, Bitácora de Auditoría y exportador PDF sellado.<br>• **Backend:** Endpoints de Auth JWT (`/api/v1/auth`), CRUD de usuarios y carga masiva (`/api/v1/users`), configuración y servicio inmutable Ley 29733.<br>• **Core:** Middlewares `authenticateJwt`, `requireRoles` y módulo core compartido del Squad 1. | • **De BD:** Tablas `instituciones`, `usuarios`, `roles`, `periodos_academicos`, `logs_auditoria`.<br>• **De Infra:** Redis para token blacklist y Docker Compose local. |
+| **Montero Gutiérrez, Brandon Fernando**<br>([@brandonmontero27-g](https://github.com/brandonmontero27-g)) | **Desarrollador** | **Squad 1:<br>Core y Seguridad** | **M1, M2, M3, M12**<br>(RF-01 al RF-14,<br>RF-65 al RF-68,<br>RF-72, RF-73) | • **Frontend:** Login, Perfil, Sedes, Configuración Escolar, Matriz RBAC, Bitácora de Auditoría y exportador PDF sellado.<br>• **Backend:** Endpoints de Auth JWT (`/api/v1/auth`), CRUD de usuarios y carga masiva (`/api/v1/users`), configuración y servicio inmutable Ley 29733.<br>• **Core:** Middlewares `authenticateJwt`, `requireRoles` y módulo core compartido del Squad 1. | • **De BD:** Tablas `instituciones`, `usuarios`, `roles`, `periodos_academicos`, `logs_auditoria`.<br>• **De Infra:** Redis para token blacklist y Docker Compose local. |
 | **Rodríguez Quispe, Grissel Arascely**<br>([@Arascely](https://github.com/Arascely)) | **Desarrolladora** | **Squad 4:<br>Analítica y Dashboards** | **M9, M10**<br>(RF-47 al RF-58) | • **Frontend:** Mapas de calor interactivos Drill-Down, Gráfico de Radar de la Ficha 360° (`RF-56`), Dashboards para Dirección (`RF-52`), Coordinación (`RF-53`), Docentes y panel de impacto SSU IS-480 (`RF-57`).<br>• **Backend:** Endpoints de analítica agregada (`/api/v1/analytics/heatmap`, `/student-360/:id`). | • **De Squad 2:** Récord de asistencia acumulada para ausentismo crónico (`RF-24`).<br>• **De Squad 3:** Calificaciones y notas vigesimales.<br>• **De BD:** Vistas materializadas `vm_rendimiento_seccion`, `vm_asistencia_mensual` y `metricas_impacto_ssu`. |
 | **Leon Reyna, Cesar Antonio**<br>([@cesarleon27-ai](https://github.com/cesarleon27-ai)) | **Desarrollador** | **Squad 5:<br>Secretaría y Portal Web** | **M11, M13**<br>(RF-59 al RF-64,<br>RF-69 al RF-71) | • **Frontend:** Maquetación vectorial e impresión de Libretas Escolares PDF (`RF-59`), Cuadros de Mérito (`RF-61`), y Portal Web Institucional responsive con cartelera y calendario cívico.<br>• **Backend:** Servicio de firma SHA-256 de documentos y Verificador Público QR sin autenticación (`GET /api/v1/public/verify/:token` — `RF-60`). | • **De Squad 1:** Membrete oficial y escudo institucional.<br>• **De Squad 3:** Notas y conclusiones consolidadas para boletas PDF.<br>• **De Squad 4:** Cuadro de méritos.<br>• **De Cloud:** `vercel.json` para entrega CDN estática. |
 
@@ -310,9 +310,9 @@ cd ../backend && npm run build
 
 El proyecto cuenta con documentación formal de ingeniería de software con trazabilidad bidireccional:
 
-* 📋 **Requisitos Funcionales (RF):** [Catálogo Maestro de 71 RFs (IEEE 830)](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) y [SRS Técnico con Contratos JSON](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md).
+* 📋 **Requisitos Funcionales (RF):** [Catálogo Maestro de 74 RFs (IEEE 830)](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) y [SRS Técnico con Contratos JSON](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md).
 * ⚙️ **Requisitos No Funcionales (RNF):** [Especificación de 20 RNFs Cuantificables (ISO/IEC 25010)](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20No%20Funcionales/requisitos_no_funcionales.md) y [Navegación por Squads](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20No%20Funcionales/README.md).
-* 🎭 **Casos de Uso UML (CU):** [Catálogo Maestro de 71 Casos de Uso por Squad](D%20-%20Base%201%20-%2001092026/Fase%202/Casos%20de%20uso/README.md).
+* 🎭 **Casos de Uso UML (CU):** [Catálogo Maestro de 74 Casos de Uso por Squad](D%20-%20Base%201%20-%2001092026/Fase%202/Casos%20de%20uso/README.md).
 * 📐 **Diseño de Software (SDD - IEEE 1016):**
   * 📖 **[Guía Rápida: ¿Cómo y Dónde se elabora el SDD?](D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/GUIA_RAPIDA_SDD.md)**
   * 📋 **[Plantilla Canónica SDD (IEEE 1016)](.agents/skills/sdd-authoring/resources/plantilla_sdd.md)**

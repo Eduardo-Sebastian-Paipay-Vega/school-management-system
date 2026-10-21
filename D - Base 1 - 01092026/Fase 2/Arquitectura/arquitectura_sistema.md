@@ -63,12 +63,12 @@ graph TD
 
 ## 2. REPARTO ESTRATÉGICO DE FUNCIONALIDADES POR EQUIPOS (SQUADS)
 
-Para la ejecución eficiente durante las **Semanas 4 a 8 (Fase II)**, los **71 Requisitos Funcionales** y los **13 Módulos** se dividen en **5 Squads Técnicos Especializados**. Cada integrante del equipo lidera un squad con responsabilidades directas en Frontend, Backend y Base de Datos.
+Para la ejecución eficiente durante las **Semanas 4 a 8 (Fase II)**, los **74 Requisitos Funcionales** y los **13 Módulos** se dividen en **5 Squads Técnicos Especializados**. Cada integrante del equipo lidera un squad con responsabilidades directas en Frontend, Backend y Base de Datos.
 
 ```mermaid
-pie title Distribución de los 71 Requisitos Funcionales
-    "Squad 1: Core, Seguridad & Admin (18 RFs)" : 18
-    "Squad 2: Matrícula & Asistencia Offline (21 RFs)" : 21
+pie title Distribución de los 74 Requisitos Funcionales
+    "Squad 1: Core, Seguridad & Admin (20 RFs)" : 20
+    "Squad 2: Matrícula & Asistencia Offline (22 RFs)" : 22
     "Squad 3: Notas, Modo Excel & CNEB (11 RFs)" : 11
     "Squad 4: Analítica & Dashboards 360° (12 RFs)" : 12
     "Squad 5: Reportes QR & Portal Web (9 RFs)" : 9
@@ -80,10 +80,10 @@ pie title Distribución de los 71 Requisitos Funcionales
 * **Líder Técnico:** Montero Gutiérrez, Brandon Fernando (`@brandonmontero27-g`)
 * **Módulos a Cargo:** 
   * **Módulo 1:** Acceso, Autenticación JWT y RBAC (`RF-01` a `RF-04`)
-  * **Módulo 2:** Administración de Usuarios y Directorio (`RF-05` a `RF-09`)
+  * **Módulo 2:** Administración de Usuarios y Directorio (`RF-05` a `RF-09`, `RF-72`, `RF-73`)
   * **Módulo 3:** Configuración Escolar, Periodos y Escalas (`RF-10` a `RF-14`)
   * **Módulo 12:** Trazabilidad, Auditoría y Protección de Datos Ley 29733 (`RF-65` a `RF-68`)
-* **Total de Requisitos:** **18 RFs**
+* **Total de Requisitos:** **20 RFs**
 
 | Capa | Entregables y Responsabilidades Técnicas |
 |---|---|
@@ -98,9 +98,9 @@ pie title Distribución de los 71 Requisitos Funcionales
 * **Módulos a Cargo:**
   * **Módulo 4:** Gestión Académica, Matrícula y Carga Lectiva (`RF-15` a `RF-19`)
   * **Módulo 5:** Asistencia Estudiantil, Kiosco Offline-First, App Rápida y Carnés QR (`RF-20` a `RF-27`)
-  * **Módulo 6:** Asistencia y Cómputo de Horas de Practicantes EPIS (`RF-28` a `RF-31`)
+  * **Módulo 6:** Asistencia y Cómputo de Horas de Practicantes EPIS (`RF-28` a `RF-31`, `RF-74`)
   * **Módulo 7:** Horas de Docentes Contratados y Reprogramación (`RF-32` a `RF-35`)
-* **Total de Requisitos:** **21 RFs**
+* **Total de Requisitos:** **22 RFs**
 
 | Capa | Entregables y Responsabilidades Técnicas |
 |---|---|
@@ -154,7 +154,7 @@ pie title Distribución de los 71 Requisitos Funcionales
 
 ---
 
-## 3. MAPA MAESTRO DE ASIGNACIÓN (71 REQUISITOS FUNCIONALES)
+## 3. MAPA MAESTRO DE ASIGNACIÓN (74 REQUISITOS FUNCIONALES)
 
 | Rango de RFs | Módulo | Squad Asignado | Responsable Principal |
 |:---:|---|:---:|---|
@@ -171,6 +171,8 @@ pie title Distribución de los 71 Requisitos Funcionales
 | `RF-59` a `RF-64` | M11: Reportes Oficiales y Criptografía QR | **Squad 5** | Cesar Antonio Leon Reyna |
 | `RF-65` a `RF-68` | M12: Auditoría Inmutable y Ley 29733 | **Squad 1** | Brandon Fernando Montero Gutiérrez |
 | `RF-69` a `RF-71` | M13: Difusión Digital y Portal Web | **Squad 5** | Cesar Antonio Leon Reyna |
+| `RF-72` a `RF-73` | M2: Administración de Usuarios y Directorio | **Squad 1** | Brandon Fernando Montero Gutiérrez |
+| `RF-74` | M6: Asistencia de Practicantes EPIS | **Squad 2** | Eduardo Sebastian Paipay Vega |
 
 ---
 

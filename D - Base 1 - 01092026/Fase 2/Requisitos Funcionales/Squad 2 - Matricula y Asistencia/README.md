@@ -1,7 +1,7 @@
 # Requisitos Funcionales - Squad 2: Gestión Académica, Matrícula y Asistencia Offline-First
 
 **Responsable Técnico:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`)  
-**Total de Requisitos:** 21 Requisitos Funcionales  
+**Total de Requisitos:** 22 Requisitos Funcionales  
 
 En esta carpeta se encuentra la especificación formal individual (estándar IEEE 830) de cada uno de los requisitos a cargo de este equipo:
 
@@ -30,6 +30,7 @@ En esta carpeta se encuentra la especificación formal individual (estándar IEE
 * **[RF-33](RF-33.md)**: Registro de Justificaciones y Reprogramación de Clases Docentes
 * **[RF-34](RF-34.md)**: Consolidación Mensual de Cumplimiento de Horas Lectivas Dictadas
 * **[RF-35](RF-35.md)**: Supervisión y Monitoreo de Cobertura y Puntualidad de Clases
+* **[RF-74](RF-74.md)**: Conformidad y Validación Periódica de Horas por el Docente Tutor
 
 ---
 

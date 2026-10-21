@@ -2,7 +2,7 @@
 
 **Responsable Técnico:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`)  
 **Rama de Desarrollo:** `feature/squad-2/academic-attendance`  
-**Total de Casos de Uso:** 21 Casos de Uso Formatos UML  
+**Total de Casos de Uso:** 22 Casos de Uso Formatos UML  
 **Enfoque de Arquitectura:** Académico y Asistencia Offline-First: Matrícula, Kiosco de portería con búfer local (IndexedDB/Hive), carnés QR, asistencia por WebSockets y control de horas practicantes/docentes.  
 
 En esta carpeta se encuentra la especificación formal individual (estándar UML / Cockburn) de cada uno de los casos de uso asignados a este equipo:
@@ -31,6 +31,7 @@ flowchart LR
     Actor --> CU_PRA_02("CU-PRA-02: Asignación de Docente Guía y Asesor Institucional")
     Actor --> CU_PRA_03("CU-PRA-03: Cómputo Acumulado de Horas Efectivas de Prácticas Universitarias")
     Actor --> CU_PRA_04("CU-PRA-04: Emisión de Fichas Oficiales de Prácticas para la UNSCH")
+    Actor --> CU_PRA_05("CU-PRA-05: Conformidad y Validación Periódica de Horas por el Docente Tutor")
     Actor --> CU_DOC_01("CU-DOC-01: Registro y Marcación de Horas Lectivas de Docentes Contratados")
     Actor --> CU_DOC_02("CU-DOC-02: Registro de Justificaciones y Reprogramación de Clases Docentes")
     Actor --> CU_DOC_03("CU-DOC-03: Consolidación Mensual de Cumplimiento de Horas Lectivas Dictadas")
@@ -60,6 +61,7 @@ flowchart LR
 | [CU-PRA-02](CU-PRA-02.md) | [RF-29](../../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-29.md) | Asignación de Docente Guía y Asesor Institucional | Baja (Inicio de ciclo universitario) |
 | [CU-PRA-03](CU-PRA-03.md) | [RF-30](../../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-30.md) | Cómputo Acumulado de Horas Efectivas de Prácticas Universitarias | Alta |
 | [CU-PRA-04](CU-PRA-04.md) | [RF-31](../../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-31.md) | Emisión de Fichas Oficiales de Prácticas para la UNSCH | Baja (Cierre de ciclo universitario) |
+| [CU-PRA-05](CU-PRA-05.md) | [RF-74](../../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-74.md) | Conformidad y Validación Periódica de Horas por el Docente Tutor | Semanal |
 | [CU-DOC-01](CU-DOC-01.md) | [RF-32](../../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-32.md) | Registro y Marcación de Horas Lectivas de Docentes Contratados | Diaria (Por cada bloque pedagógico) |
 | [CU-DOC-02](CU-DOC-02.md) | [RF-33](../../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-33.md) | Registro de Justificaciones y Reprogramación de Clases Docentes | Media |
 | [CU-DOC-03](CU-DOC-03.md) | [RF-34](../../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-34.md) | Consolidación Mensual de Cumplimiento de Horas Lectivas Dictadas | Mensual (Al cierre de cada mes) |

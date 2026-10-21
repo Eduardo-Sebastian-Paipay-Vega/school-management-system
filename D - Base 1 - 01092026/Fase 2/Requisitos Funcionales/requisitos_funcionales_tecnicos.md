@@ -748,7 +748,7 @@ MÓDULO TÉCNICO 13: DIFUSIÓN DIGITAL Y CONTENIDOS INSTITUCIONALES (RF-TEC-DIF)
 
 ---
 
-## 4. MATRIZ DE TRAZABILIDAD TÉCNICA INTEGRAL (RF-01 AL RF-71)
+## 4. MATRIZ DE TRAZABILIDAD TÉCNICA INTEGRAL (RF-01 AL RF-74)
 
 | Requisito Documental | Requisito Técnico | Endpoint / Componente | Método HTTP | Tablas Principales | Rol Mínimo |
 |:---:|:---:|---|:---:|---|:---:|
@@ -823,6 +823,9 @@ MÓDULO TÉCNICO 13: DIFUSIÓN DIGITAL Y CONTENIDOS INSTITUCIONALES (RF-TEC-DIF)
 | `RF-69` | `RF-TEC-DIF-01` | `/api/v1/public/announcements` | GET | `announcements`, S3 | Toda la comunidad |
 | `RF-70` | `RF-TEC-DIF-01` | `/api/v1/public/academic-calendar` | GET | `academic_events` | Toda la comunidad |
 | `RF-71` | `RF-TEC-DIF-01` | `/api/v1/public/institutional-info` | GET | `institutional_pages` | Público General |
+| `RF-72` | `RF-TEC-USU-04` | `/api/v1/users/:id` | PATCH / DELETE | `users` (Soft Delete), `audit_logs` | Admin |
+| `RF-73` | `RF-TEC-USU-05` | `/api/v1/users/:id/roles` | PUT | `users`, `roles`, `audit_logs` | Admin, Director |
+| `RF-74` | `RF-TEC-PRA-02` | `/api/v1/practitioners/batch-approve` | POST | `practitioner_logs`, `audit_logs` | Docentes Tutores |
 
 ---
 

@@ -2,7 +2,7 @@
 
 ### Planteles de Aplicación "Guamán Poma de Ayala" — UNSCH (SSU IS-480)
 
-Este directorio documenta la especificación formal de los **71 Casos de Uso del Sistema** que implementan la totalidad de los Requisitos Funcionales (`RF-01` al `RF-71`), organizados modularmente en **5 Squads Técnicos Especializados**.
+Este directorio documenta la especificación formal de los **74 Casos de Uso del Sistema** que implementan la totalidad de los Requisitos Funcionales (`RF-01` al `RF-74`), organizados modularmente en **5 Squads Técnicos Especializados**.
 
 ---
 
@@ -10,8 +10,8 @@ Este directorio documenta la especificación formal de los **71 Casos de Uso del
 
 | Squad | Responsable Técnico | Módulos a Cargo | Casos de Uso | Requisitos Trazables | Enfoque Principal |
 |---|---|---|---|---|---|
-| [**Squad 1: Core y Seguridad**](Squad%201%20-%20Core%20y%20Seguridad/README.md) | Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`) | M1, M2, M3, M12 | **18 CUs** (CU-SEG, CU-USR, CU-INS, CU-AUD) | `RF-01` al `RF-14`<br>`RF-65` al `RF-68` | Seguridad, JWT, RBAC, configuración escolar, multi-tenant y auditoría inmutable (Ley 29733). |
-| [**Squad 2: Matrícula y Asistencia**](Squad%202%20-%20Matricula%20y%20Asistencia/README.md) | Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`) | M4, M5, M6, M7 | **21 CUs** (CU-ACD, CU-AST, CU-PRA, CU-DOC) | `RF-15` al `RF-35` | Matrícula, Kiosco de portería Offline-First (IndexedDB/Hive), carnés QR, WebSockets y control de horas. |
+| [**Squad 1: Core y Seguridad**](Squad%201%20-%20Core%20y%20Seguridad/README.md) | Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`) | M1, M2, M3, M12 | **20 CUs** (CU-SEG, CU-USR, CU-INS, CU-AUD) | `RF-01` al `RF-14`<br>`RF-65` al `RF-68`<br>`RF-72` y `RF-73` | Seguridad, JWT, RBAC, configuración escolar, multi-tenant y auditoría inmutable (Ley 29733). |
+| [**Squad 2: Matrícula y Asistencia**](Squad%202%20-%20Matricula%20y%20Asistencia/README.md) | Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`) | M4, M5, M6, M7 | **22 CUs** (CU-ACD, CU-AST, CU-PRA, CU-DOC) | `RF-15` al `RF-35`<br>`RF-74` | Matrícula, Kiosco de portería Offline-First (IndexedDB/Hive), carnés QR, WebSockets y control de horas. |
 | [**Squad 3: Calificaciones y Modo Excel**](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/README.md) | Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`) | M8 | **11 CUs** (CU-NOT) | `RF-36` al `RF-46` | Planilla interactiva "Modo Excel", debounce 400ms, banco de conclusiones MINEDU y conversión dual. |
 | [**Squad 4: Analítica y Dashboards**](Squad%204%20-%20Analitica%20y%20Dashboards/README.md) | Grissel Arascely Rodríguez Quispe (`@Arascely`) | M9, M10 | **12 CUs** (CU-MAP, CU-DSH) | `RF-47` al `RF-58` | Mapas de calor con navegación Drill-Down, alertas de deserción, Ficha 360° y tablero SSU IS-480. |
 | [**Squad 5: Secretaría y Portal Web**](Squad%205%20-%20Secretaria%20y%20Portal%20Web/README.md) | Cesar Antonio Leon Reyna (`@cesarleon27-ai`) | M11, M13 | **9 CUs** (CU-REP, CU-PUB) | `RF-59` al `RF-64`<br>`RF-69` al `RF-71` | Libretas y actas en PDF, verificación criptográfica SHA-256 + QR público, cartelera y portal web. |
@@ -36,7 +36,7 @@ Este directorio documenta la especificación formal de los **71 Casos de Uso del
 
 ### [Squad 1: Core, Seguridad, Configuración y Auditoría](Squad%201%20-%20Core%20y%20Seguridad/README.md)
 
-**Responsable:** Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`) | **Total:** 18 Casos de Uso
+**Responsable:** Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`) | **Total:** 20 Casos de Uso
 
 | ID | Requisito | Título del Caso de Uso | Frecuencia |
 |---|---|---|---|
@@ -49,6 +49,8 @@ Este directorio documenta la especificación formal de los **71 Casos de Uso del
 | [CU-USR-03](Squad%201%20-%20Core%20y%20Seguridad/CU-USR-03.md) | [RF-07](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-07.md) | Gestión de Sedes y Planteles Escolares Multi-Tenant | Muy Baja (Configuración inicial) |
 | [CU-USR-04](Squad%201%20-%20Core%20y%20Seguridad/CU-USR-04.md) | [RF-08](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-08.md) | Directorio Escolar y Búsqueda Rápida de Personal | Alta |
 | [CU-USR-05](Squad%201%20-%20Core%20y%20Seguridad/CU-USR-05.md) | [RF-09](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-09.md) | Gestión de Perfil Personal y Cambio Autónomo de Credenciales | Baja |
+| [CU-USR-06](Squad%201%20-%20Core%20y%20Seguridad/CU-USR-06.md) | [RF-72](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-72.md) | Modificación de Datos y Baja Lógica de Usuarios del Plantel | Media |
+| [CU-USR-07](Squad%201%20-%20Core%20y%20Seguridad/CU-USR-07.md) | [RF-73](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-73.md) | Reasignación Dinámica de Roles y Jerarquías del Personal | Baja (Inicio de año o cambios de cargo) |
 | [CU-INS-01](Squad%201%20-%20Core%20y%20Seguridad/CU-INS-01.md) | [RF-10](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-10.md) | Parametrización del Año Lectivo y Calendario Escolar | Baja (Anual) |
 | [CU-INS-02](Squad%201%20-%20Core%20y%20Seguridad/CU-INS-02.md) | [RF-11](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-11.md) | Apertura, Parametrización y Cierre de Periodos Académicos | Media (4 veces al año en régimen bimestral) |
 | [CU-INS-03](Squad%201%20-%20Core%20y%20Seguridad/CU-INS-03.md) | [RF-12](../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-12.md) | Estructuración de Niveles Educativos, Grados y Secciones | Baja |
@@ -61,7 +63,7 @@ Este directorio documenta la especificación formal de los **71 Casos de Uso del
 
 ### [Squad 2: Gestión Académica, Matrícula y Asistencia Offline-First](Squad%202%20-%20Matricula%20y%20Asistencia/README.md)
 
-**Responsable:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`) | **Total:** 21 Casos de Uso
+**Responsable:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`) | **Total:** 22 Casos de Uso
 
 | ID | Requisito | Título del Caso de Uso | Frecuencia |
 |---|---|---|---|
@@ -82,6 +84,7 @@ Este directorio documenta la especificación formal de los **71 Casos de Uso del
 | [CU-PRA-02](Squad%202%20-%20Matricula%20y%20Asistencia/CU-PRA-02.md) | [RF-29](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-29.md) | Asignación de Docente Guía y Asesor Institucional | Baja (Inicio de ciclo universitario) |
 | [CU-PRA-03](Squad%202%20-%20Matricula%20y%20Asistencia/CU-PRA-03.md) | [RF-30](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-30.md) | Cómputo Acumulado de Horas Efectivas de Prácticas Universitarias | Alta |
 | [CU-PRA-04](Squad%202%20-%20Matricula%20y%20Asistencia/CU-PRA-04.md) | [RF-31](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-31.md) | Emisión de Fichas Oficiales de Prácticas para la UNSCH | Baja (Cierre de ciclo universitario) |
+| [CU-PRA-05](Squad%202%20-%20Matricula%20y%20Asistencia/CU-PRA-05.md) | [RF-74](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-74.md) | Conformidad y Validación Periódica de Horas por el Docente Tutor | Semanal |
 | [CU-DOC-01](Squad%202%20-%20Matricula%20y%20Asistencia/CU-DOC-01.md) | [RF-32](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-32.md) | Registro y Marcación de Horas Lectivas de Docentes Contratados | Diaria (Por cada bloque pedagógico) |
 | [CU-DOC-02](Squad%202%20-%20Matricula%20y%20Asistencia/CU-DOC-02.md) | [RF-33](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-33.md) | Registro de Justificaciones y Reprogramación de Clases Docentes | Media |
 | [CU-DOC-03](Squad%202%20-%20Matricula%20y%20Asistencia/CU-DOC-03.md) | [RF-34](../Requisitos%20Funcionales/Squad%202%20-%20Matricula%20y%20Asistencia/RF-34.md) | Consolidación Mensual de Cumplimiento de Horas Lectivas Dictadas | Mensual (Al cierre de cada mes) |

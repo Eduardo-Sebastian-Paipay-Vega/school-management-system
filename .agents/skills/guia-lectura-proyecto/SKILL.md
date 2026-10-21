@@ -33,8 +33,8 @@ flowchart TD
     end
 
     subgraph PASO_1 ["1. NEGOCIO Y REQUISITOS (15 min)"]
-        B1["Fase 2/README.md<br>(Índice Maestro)"] --> B2["requisitos_funcionales.md<br>(71 RFs oficiales)"]
-        B2 --> B3["Casos de uso/README.md<br>(71 CUs de actores)"]
+        B1["Fase 2/README.md<br>(Índice Maestro)"] --> B2["requisitos_funcionales.md<br>(74 RFs oficiales)"]
+        B2 --> B3["Casos de uso/README.md<br>(74 CUs de actores)"]
         B3 --> B4["requisitos_no_funcionales.md<br>(20 RNFs de calidad)"]
     end
 
@@ -66,7 +66,7 @@ flowchart TD
 |---|---|---|
 | **¿Quién hace qué en mi equipo?** | [AGENTS.md](file:///d:/zapata%202026%20-%20II/school-management-system/AGENTS.md) | Raíz del proyecto |
 | **¿Qué funciones están prohibidas y dónde termina el proyecto?** | [limites_y_alcance_proyecto.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/limites_y_alcance_proyecto.md) | `D - Base 1 - 01092026/Fase 2/` |
-| **¿Cuáles son los 71 requerimientos del colegio?** | [requisitos_funcionales.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) | `D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/` |
+| **¿Cuáles son los 74 requerimientos del colegio?** | [requisitos_funcionales.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) | `D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/` |
 | **¿Cómo interactúan los profesores y alumnos?** | [Casos de uso/README.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Casos%20de%20uso/README.md) | `D - Base 1 - 01092026/Fase 2/Casos de uso/` |
 | **¿Qué versiones de Flutter, Node, Postgres y Redis usamos?** | [stack_tecnologico_proyecto.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/stack_tecnologico_proyecto.md) | `D - Base 1 - 01092026/Fase 2/` |
 | **¿Cómo se conectan el Frontend, Backend, Redis y PostgreSQL?** | [arquitectura_sistema.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/arquitectura_sistema.md) | `D - Base 1 - 01092026/Fase 2/Arquitectura/` |
@@ -78,7 +78,7 @@ flowchart TD
 
 ## 4. Los 5 Errores Fatales que Provocan Desorientación
 
-1. **Error 1: Programar antes de leer los 71 RFs.**  
+1. **Error 1: Programar antes de leer los 74 RFs.**  
    *Consecuencia:* Crear pantallas bonitas que no cumplen con los criterios de aceptación del MINEDU ni del colegio.
 2. **Error 2: Inventar funcionalidades financieras o de pagos.**  
    *Consecuencia:* Infringir el documento de límites. El sistema no maneja dinero, matrículas pagadas ni facturación SUNAT.

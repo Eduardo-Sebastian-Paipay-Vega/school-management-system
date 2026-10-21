@@ -1,7 +1,7 @@
 # Requisitos Funcionales - Squad 1: Core, Seguridad, Configuración y Auditoría
 
 **Responsable Técnico:** Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`)  
-**Total de Requisitos:** 18 Requisitos Funcionales  
+**Total de Requisitos:** 20 Requisitos Funcionales  
 
 En esta carpeta se encuentra la especificación formal individual (estándar IEEE 830) de cada uno de los requisitos a cargo de este equipo:
 
@@ -27,6 +27,8 @@ En esta carpeta se encuentra la especificación formal individual (estándar IEE
 * **[RF-66](RF-66.md)**: Trazabilidad Histórica de Modificaciones en Notas y Asistencias
 * **[RF-67](RF-67.md)**: Módulo de Búsqueda y Monitoreo de Bitácoras de Auditoría
 * **[RF-68](RF-68.md)**: Cumplimiento y Protección de Datos Personales (Ley N.° 29733)
+* **[RF-72](RF-72.md)**: Modificación de Datos y Baja Lógica de Usuarios del Plantel
+* **[RF-73](RF-73.md)**: Reasignación Dinámica de Roles y Jerarquías del Personal
 
 ---
 

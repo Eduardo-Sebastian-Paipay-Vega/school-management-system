@@ -13,19 +13,19 @@ El presente documento define formalmente la **línea de demarcación final** del
 
 > [!CAUTION]
 > **DECLARACIÓN DE ALCANCE CERRADO:**  
-> Ningún squad ni desarrollador tiene autorización para implementar requerimientos, módulos, botones o servicios que no formen parte de la lista cerrada de los **71 Requisitos Funcionales (`RF-01` al `RF-71`)** y los **20 Requisitos No Funcionales (RNF)**.
+> Ningún squad ni desarrollador tiene autorización para implementar requerimientos, módulos, botones o servicios que no formen parte de la lista cerrada de los **74 Requisitos Funcionales (`RF-01` al `RF-74`)** y los **20 Requisitos No Funcionales (RNF)**.
 
 ---
 
 ## 2. FRONTERA DE ACABADO: ¿DÓNDE TERMINA EL SISTEMA?
 
-El sistema finaliza exactamente en el límite de los **13 módulos y 71 Requisitos Funcionales**, distribuidos en los 5 squads técnicos:
+El sistema finaliza exactamente en el límite de los **13 módulos y 74 Requisitos Funcionales**, distribuidos en los 5 squads técnicos:
 
 ```mermaid
 graph TD
     subgraph IN_SCOPE["DENTRO DEL ALCANCE (El Proyecto TERMINA Aquí)"]
-        S1["Squad 1: Core & Seguridad<br>(RF-01 a RF-14, RF-65 a RF-68)<br>JWT, RBAC, Config Escolar, Auditoría Ley 29733"]
-        S2["Squad 2: Matrícula & Asistencia<br>(RF-15 a RF-35)<br>Kiosco Offline-First, Carnés QR, Asistencia Alumnos/Practicantes/Docentes"]
+        S1["Squad 1: Core & Seguridad<br>(RF-01 a RF-14, RF-65 a RF-68, RF-72, RF-73)<br>JWT, RBAC, Config Escolar, Auditoría Ley 29733"]
+        S2["Squad 2: Matrícula & Asistencia<br>(RF-15 a RF-35, RF-74)<br>Kiosco Offline-First, Carnés QR, Asistencia Alumnos/Practicantes/Docentes"]
         S3["Squad 3: Calificaciones<br>(RF-36 a RF-46)<br>Planilla Modo Excel, Debounce 400ms, CNEB, Conclusiones"]
         S4["Squad 4: Analítica & Dashboards<br>(RF-47 a RF-58)<br>Mapas Calor Drill-Down, Ficha 360°, Métricas SSU IS-480"]
         S5["Squad 5: Secretaría & Portal Web<br>(RF-59 a RF-64, RF-69 a RF-71)<br>Boletas PDF, Verificación QR SHA-256, Portal Web"]
@@ -122,7 +122,7 @@ graph TD
 
 El proyecto se considera **100% CULMINADO** y el equipo de desarrollo debe **detener la construcción de código** en cuanto se verifiquen los siguientes 5 puntos:
 
-1. **Catálogo de Requisitos Cerrado:** Los 71 Requisitos Funcionales (`RF-01` al `RF-71`) y 20 Requisitos No Funcionales (RNF) han sido completados y probados.
+1. **Catálogo de Requisitos Cerrado:** Los 74 Requisitos Funcionales (`RF-01` al `RF-74`) y 20 Requisitos No Funcionales (RNF) han sido completados y probados.
 2. **Control de Calidad Estricto:**
    * `flutter analyze` reporta **0 errores y 0 advertencias (warnings)**.
    * `flutter test` aprueba todas las pruebas automatizadas sin fallos.
@@ -134,5 +134,5 @@ El proyecto se considera **100% CULMINADO** y el equipo de desarrollo debe **det
 
 ## 6. CONCLUSIÓN
 
-> **"Lo que no está en los 71 Requisitos Funcionales, NO SE HACE."**  
+> **"Lo que no está en los 74 Requisitos Funcionales, NO SE HACE."**  
 > Cualquier solicitud adicional planteada por terceros durante el desarrollo será clasificada como *"Propuesta de Mejora para Fase 3 (Post-Piloto)"* y no formará parte del alcance del presente proyecto.

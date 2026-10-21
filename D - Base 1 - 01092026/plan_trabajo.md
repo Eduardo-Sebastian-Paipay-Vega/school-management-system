@@ -20,7 +20,7 @@
 
 ### In Scope (Incluido en el proyecto)
 
-- Levantamiento, especificación formal y catálogo estructurado de **71 Requisitos Funcionales (`RF-01` al `RF-71`)** organizados en **13 módulos** operativos.
+- Levantamiento, especificación formal y catálogo estructurado de **74 Requisitos Funcionales (`RF-01` al `RF-74`)** organizados en **13 módulos** operativos.
 - Diseño y desarrollo de la arquitectura de software: Frontend (Flutter Web / PWA), Backend (API REST), Base de Datos relacional (PostgreSQL Multi-Tenant), Caché (Redis) y Sockets en tiempo real.
 - Incorporación de **capacidades de innovación operativa y pedagógica de alto impacto**:
   1. *Kiosco Offline-First de Asistencia* con buffer de contingencia local y carnetización QR.
@@ -83,7 +83,7 @@ La asignatura se desarrolla en 16 semanas académicas, distribuidas para otorgar
 
 | Sem. | Actividades / Contenidos | Hrs. | Artefactos de Entrada | Artefactos de Salida | Producto Esperado |
 |:---:|---|:---:|---|---|---|
-| 4 | • Especificación formal de requisitos (SRS IEEE 830 - 71 RFs). • Diseño de arquitectura de software y BD multi-tenant. | 6 | Plan de Trabajo aprobado. | Documentos de Requisitos (Fase 1 y Fase 2: Funcionales y Técnicos), Diagramas UML/MER/C4. | Requisitos y Arquitectura formalizados. |
+| 4 | • Especificación formal de requisitos (SRS IEEE 830 - 74 RFs). • Diseño de arquitectura de software y BD multi-tenant. | 6 | Plan de Trabajo aprobado. | Documentos de Requisitos (Fase 1 y Fase 2: Funcionales y Técnicos), Diagramas UML/MER/C4. | Requisitos y Arquitectura formalizados. |
 | 5 | • Prototipado navegable UI/UX. • Aprobación del diseño por el cliente. | 6 | Documento SRS. | Wireframes, Prototipos de alta fidelidad (Mockups). | Prototipo validado. |
 | 6 | • Desarrollo del Frontend (interfaz de usuario). • Integración de estilos corporativos. | 6 | Prototipos de alta fidelidad. | Repositorio inicial, Código Frontend estructurado. | Avance Frontend. |
 | 7 | • Desarrollo del Backend (lógica de negocio). • Creación de APIs y conexión a Base de Datos. | 6 | Código Frontend estructurado. | Código Backend, Endpoints funcionales. | Avance Backend. |

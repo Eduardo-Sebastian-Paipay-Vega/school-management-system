@@ -19,40 +19,40 @@ El catálogo integra formalmente los **módulos de innovación operativa, pedag�
 
 ---
 
-## 2. TABLA MAESTRA Y LISTA ESTRUCTURADA DE REQUISITOS FUNCIONALES (71 RF)
+## 2. TABLA MAESTRA Y LISTA ESTRUCTURADA DE REQUISITOS FUNCIONALES (74 RF)
 
 | ID | Denominación Oficial del Requisito Funcional | Módulo de Trabajo | Actor Principal | Prioridad |
 |:---:|---|---|---|:---:|
-| **RF-01** | Autenticación Segura de Usuarios mediante Credenciales Institucionales | M1: Acceso y Seguridad | Toda la comunidad escolar | Esencial |
+| **RF-01** | Autenticación Segura de Usuarios mediante Credenciales Institucionales | M1: Acceso y Seguridad | Toda la comunidad escolar (Directivos, Docentes, Alumnos, Portería) | Esencial |
 | **RF-02** | Cierre de Sesión Seguro y Terminación Automática por Inactividad | M1: Acceso y Seguridad | Toda la comunidad escolar | Esencial |
 | **RF-03** | Restablecimiento Asistido de Contraseñas de Acceso | M1: Acceso y Seguridad | Usuarios / Administrador TI | Deseable |
 | **RF-04** | Control de Privilegios y Acceso Basado en Roles (RBAC) | M1: Acceso y Seguridad | Administrador TI / Directivos | Esencial |
-| **RF-05** | Registro y Alta Formal de Cuentas de Personal Institucional | M2: Gestión de Usuarios | Administrador TI / Dirección | Esencial |
-| **RF-06** | Modificación de Datos y Baja Lógica de Usuarios del Plantel | M2: Gestión de Usuarios | Administrador TI / Coordinación | Esencial |
-| **RF-07** | Reasignación Dinámica de Roles y Jerarquías del Personal | M2: Gestión de Usuarios | Administrador TI / Dirección | Deseable |
-| **RF-08** | Directorio y Búsqueda Avanzada de Personal Institucional | M2: Gestión de Usuarios | Dirección / Coordinación / Secretaría | Deseable |
-| **RF-09** | Gestión de Perfil Personal y Actualización de Medios de Contacto | M2: Gestión de Usuarios | Todos los usuarios autenticados | Deseable |
-| **RF-10** | Parametrización de Datos Institucionales del Plantel y Sedes | M3: Configuración Escolar | Dirección General / Administrador | Esencial |
-| **RF-11** | Apertura, Configuración y Cierre de Periodos Académicos | M3: Configuración Escolar | Coordinación / Dirección General | Esencial |
+| **RF-05** | Registro y Alta Formal de Cuentas de Personal Institucional | M2: Gestión de Usuarios | Administrador TI / Dirección General | Esencial |
+| **RF-06** | Importación Masiva de Usuarios desde Archivos Excel / CSV | M2: Gestión de Usuarios | Administrador TI / Secretaría | Esencial |
+| **RF-07** | Gestión de Sedes y Planteles Escolares Multi-Tenant | M2: Gestión de Usuarios | SuperAdmin / Dirección General | Esencial |
+| **RF-08** | Directorio Escolar y Búsqueda Rápida de Personal | M2: Gestión de Usuarios | Dirección / Coordinación / Secretaría | Deseable |
+| **RF-09** | Gestión de Perfil Personal y Cambio Autónomo de Credenciales | M2: Gestión de Usuarios | Todos los usuarios autenticados | Deseable |
+| **RF-10** | Parametrización del Año Lectivo y Calendario Escolar | M3: Configuración Escolar | Dirección General / Administrador | Esencial |
+| **RF-11** | Apertura, Parametrización y Cierre de Periodos Académicos | M3: Configuración Escolar | Coordinación Académica / Dirección | Esencial |
 | **RF-12** | Estructuración de Niveles Educativos, Grados y Secciones | M3: Configuración Escolar | Coordinación Académica / Secretaría | Esencial |
-| **RF-13** | Parametrización del Plan de Estudios y Competencias Curriculares | M3: Configuración Escolar | Coordinación Académica | Esencial |
-| **RF-14** | Definición de Escalas de Calificación Oficiales (Vigesimal y Literal) | M3: Configuración Escolar | Coordinación / Dirección General | Esencial |
+| **RF-13** | Definición de Escalas de Calificación Institucionales (Dual CNEB) | M3: Configuración Escolar | Coordinación / Dirección General | Esencial |
+| **RF-14** | Parámetros Globales del Sistema y Membretes Institucionales | M3: Configuración Escolar | Dirección General / Administrador | Esencial |
 | **RF-15** | Registro, Filiación y Actualización del Padrón de Estudiantes | M4: Gestión Académica | Secretaría Académica / Dirección | Esencial |
 | **RF-16** | Matrícula Escolar y Asignación de Estudiantes a Secciones | M4: Gestión Académica | Secretaría Académica / Coordinación | Esencial |
-| **RF-17** | Asignación y Distribución de Carga Lectiva Docente | M4: Gestión Académica | Coordinación Académica / Dirección | Esencial |
-| **RF-18** | Vinculación y Asignación Pedagógica de Practicantes de Educación | M4: Gestión Académica | Coordinación / Docentes Tutores | Esencial |
+| **RF-17** | Catálogo Curricular y Planes de Estudio oficiales según CNEB | M4: Gestión Académica | Coordinación Académica | Esencial |
+| **RF-18** | Asignación y Distribución de Carga Lectiva Docente | M4: Gestión Académica | Coordinación Académica / Dirección | Esencial |
 | **RF-19** | Consulta y Generación de Nóminas Oficiales de Aula | M4: Gestión Académica | Docentes / Coordinación / Secretaría | Deseable |
 | **RF-20** | Registro Ordinario de Asistencia Escolar en el Aula | M5: Asistencia Estudiantil | Docentes Titulares y Contratados | Esencial |
-| **RF-21** | Registro de Ingreso Físico en Modo Kiosco de Portería ("Wachiman") | M5: Asistencia Estudiantil | Personal de Vigilancia / Auxiliares | Deseable |
-| **RF-22** | Gestión y Justificación Formal de Inasistencias y Tardanzas Escolares | M5: Asistencia Estudiantil | Coordinación Académica / Auxiliares | Deseable |
+| **RF-21** | Registro de Ingreso Físico en Modo Kiosco de Portería | M5: Asistencia Estudiantil | Personal de Vigilancia / Auxiliares | Deseable |
+| **RF-22** | Gestión y Justificación Formal de Inasistencias y Tardanzas | M5: Asistencia Estudiantil | Coordinación Académica / Auxiliares | Deseable |
 | **RF-23** | Consolidación y Consulta del Récord de Asistencia por Estudiante | M5: Asistencia Estudiantil | Estudiantes / Docentes / Dirección | Esencial |
 | **RF-24** | Detección y Generación de Alertas por Ausentismo Crónico | M5: Asistencia Estudiantil | Coordinación Académica / Tutores | Esencial |
 | **RF-25** | Kiosco de Portería Resiliente con Modo Desconectado (Offline-First) | M5: Asistencia Estudiantil | Personal de Vigilancia / Portería | Esencial |
 | **RF-26** | Generación y Emisión Masiva de Carnés Escolares con Código QR/Barras| M5: Asistencia Estudiantil | Secretaría Académica / Dirección | Deseable |
 | **RF-27** | Toma Rápida en App Móvil y Difusión en Tiempo Real (WebSockets) | M5: Asistencia Estudiantil | Docentes / Auxiliares / Dirección | Esencial |
-| **RF-28** | Registro Diario de Jornada y Permanencia de Practicantes | M6: Practicantes | Practicantes de Educación | Esencial |
-| **RF-29** | Cómputo Acumulado de Horas Efectivas de Prácticas Universitarias | M6: Practicantes | Practicantes / Coordinación / EPIS | Esencial |
-| **RF-30** | Conformidad y Validación Periódica de Horas por el Docente Tutor | M6: Practicantes | Docentes Tutores / Coordinación | Esencial |
+| **RF-28** | Registro Diario de Jornada y Permanencia de Practicantes EPIS-UNSCH | M6: Practicantes | Practicantes de Educación / EPIS | Esencial |
+| **RF-29** | Asignación de Docente Guía y Asesor Institucional | M6: Practicantes | Coordinación / Docentes Tutores | Esencial |
+| **RF-30** | Cómputo Acumulado de Horas Efectivas de Prácticas Universitarias | M6: Practicantes | Practicantes / Coordinación / EPIS | Esencial |
 | **RF-31** | Emisión de Fichas Oficiales de Prácticas para la UNSCH | M6: Practicantes | Coordinación Académica / Practicantes| Deseable |
 | **RF-32** | Registro y Marcación de Horas Lectivas de Docentes Contratados | M7: Docentes Contratados | Docentes Contratados / Coordinación | Esencial |
 | **RF-33** | Registro de Justificaciones y Reprogramación de Clases Docentes | M7: Docentes Contratados | Docentes Contratados / Coordinación | Deseable |
@@ -65,9 +65,9 @@ El catálogo integra formalmente los **módulos de innovación operativa, pedag�
 | **RF-40** | Colaboración Supervisada de Practicantes en el Registro de Notas | M8: Calificaciones | Practicantes / Docentes Tutores | Deseable |
 | **RF-41** | Cálculo Automatizado de Promedios Parciales, Bimestrales y Finales | M8: Calificaciones | Sistema / Coordinación Académica | Esencial |
 | **RF-42** | Cierre Oficial de Periodo Académico y Bloqueo de Modificación | M8: Calificaciones | Coordinación / Dirección General | Esencial |
-| **RF-43** | Flujo Extraordinario de Solicitud y Aprobación de Rectificación | M8: Calificaciones | Docentes / Coordinación / Dirección | Deseable |
-| **RF-44** | Consulta Inmediata y Transparente de Calificaciones para Estudiantes | M8: Calificaciones | Estudiantes del Plantel | Esencial |
-| **RF-45** | Llenado Asistido con Auto-Guardado y Conexión Automática | M8: Calificaciones | Docentes / Coordinación | Esencial |
+| **RF-43** | Flujo Extraordinario de Solicitud y Aprobación de Rectificación de Notas | M8: Calificaciones | Docentes / Coordinación / Dirección | Deseable |
+| **RF-44** | Consulta Inmediata y Transparente de Calificaciones para Estudiantes | M8: Calificaciones | Estudiantes y Padres de Familia | Esencial |
+| **RF-45** | Llenado Asistido con Auto-Guardado y Conexión Automática en Segundo Plano | M8: Calificaciones | Docentes / Coordinación | Esencial |
 | **RF-46** | Motor de Conversión Escala Vigesimal (0-20) a Literal CNEB (AD, A, B, C) | M8: Calificaciones | Docentes / Dirección / Coordinación | Esencial |
 | **RF-47** | Generación de Mapa de Calor de Rendimiento Académico por Sección | M9: Mapas de Calor | Dirección / Coordinación / Docentes | Esencial |
 | **RF-48** | Generación de Mapa de Calor de Asistencia y Puntualidad | M9: Mapas de Calor | Dirección / Coordinación / Auxiliares | Esencial |
@@ -77,23 +77,26 @@ El catálogo integra formalmente los **módulos de innovación operativa, pedag�
 | **RF-52** | Tablero de Control Ejecutivo de Indicadores Clave para Dirección | M10: Monitoreo y Dashboards | Dirección General | Esencial |
 | **RF-53** | Tablero de Control Curricular y Cumplimiento para Coordinación | M10: Monitoreo y Dashboards | Coordinación Académica | Esencial |
 | **RF-54** | Tablero de Resumen Pedagógico y Clases Diarias para el Docente | M10: Monitoreo y Dashboards | Docentes Nombrados y Contratados | Esencial |
-| **RF-55** | Tablero de Resumen de Situación Escolar para el Estudiante | M10: Monitoreo y Dashboards | Estudiantes del Plantel | Esencial |
+| **RF-55** | Generación Automatizada de Alertas de Deserción y Repitencia | M10: Monitoreo y Dashboards | Coordinación Académica / Tutores | Esencial |
 | **RF-56** | Ficha Integral y Radiografía Escolar 360° del Estudiante en 1 Clic | M10: Monitoreo y Dashboards | Dirección / Coordinación / Tutores | Esencial |
 | **RF-57** | Tablero de Seguimiento, Impacto y Acreditación del SSU (IS-480) | M10: Monitoreo y Dashboards | Tutor SSU - UNSCH / Líder Proyecto | Esencial |
-| **RF-58** | Generación Automatizada de Alertas de Deserción y Repitencia | M10: Monitoreo y Dashboards | Coordinación Académica / Tutores | Esencial |
+| **RF-58** | Generador de Reportes de Diagnóstico Integral para Consejos Académicos | M10: Monitoreo y Dashboards | Dirección General / Coordinación | Esencial |
 | **RF-59** | Emisión Oficial de Boletas de Información Escolar / Libretas en PDF | M11: Reportes Oficiales | Secretaría / Docentes / Alumnos | Esencial |
-| **RF-60** | Verificación Pública Criptográfica de Documentos con Código QR | M11: Reportes Oficiales | Comunidad / Entidades Externas | Esencial |
+| **RF-60** | Verificación Pública Criptográfica de Documentos Escolares mediante Código QR | M11: Reportes Oficiales | Comunidad / Entidades Externas | Esencial |
 | **RF-61** | Generación del Cuadro de Mérito y Puestos de Honor Institucionales | M11: Reportes Oficiales | Dirección General / Coordinación | Deseable |
 | **RF-62** | Emisión y Descarga del Registro Auxiliar Oficial y Actas Finales | M11: Reportes Oficiales | Docentes / Secretaría Académica | Esencial |
 | **RF-63** | Reportes Consolidados de Asistencia Multiactor del Plantel | M11: Reportes Oficiales | Dirección / Coordinación / Secretaría | Deseable |
-| **RF-64** | Exportación de Datos en Formatos Estándar Abiertos (PDF y Excel) | M11: Reportes Oficiales | Toda la comunidad autorizada | Esencial |
-| **RF-65** | Registro Inmutable de Auditoría de Accesos y Eventos de Seguridad | M12: Auditoría y Seguridad | Administrador TI / Dirección | Esencial |
-| **RF-66** | Trazabilidad Histórica de Modificaciones en Notas y Asistencias | M12: Auditoría y Seguridad | Administrador TI / Dirección / Coord. | Esencial |
-| **RF-67** | Módulo de Búsqueda y Monitoreo de Bitácoras de Auditoría | M12: Auditoría y Seguridad | Administrador TI / Dirección | Deseable |
+| **RF-64** | Exportación de Datos en Formatos Estándar Abiertos (PDF y Excel SIAGIE) | M11: Reportes Oficiales | Toda la comunidad autorizada | Esencial |
+| **RF-65** | Registro Inmutable de Auditoría de Eventos y Seguridad | M12: Auditoría y Seguridad | Sistema / Administrador TI | Esencial |
+| **RF-66** | Trazabilidad Histórica de Modificaciones en Notas y Asistencias | M12: Auditoría y Seguridad | Administrador TI / Dirección / Coordinación | Esencial |
+| **RF-67** | Módulo de Búsqueda y Monitoreo de Bitácoras de Auditoría | M12: Auditoría y Seguridad | Administrador TI / Dirección General | Deseable |
 | **RF-68** | Cumplimiento y Protección de Datos Personales (Ley N.° 29733) | M12: Auditoría y Seguridad | Toda la comunidad escolar | Esencial |
 | **RF-69** | Cartelera Digital y Publicación de Comunicados Institucionales | M13: Difusión Digital | Dirección / Toda la comunidad | Deseable |
 | **RF-70** | Publicación y Consulta del Calendario Cívico y Escolar Interactivo | M13: Difusión Digital | Toda la comunidad escolar | Deseable |
 | **RF-71** | Portal Informativo Institucional y Normas de Convivencia Escolar | M13: Difusión Digital | Toda la comunidad y público general | Opcional |
+| **RF-72** | Modificación de Datos y Baja Lógica de Usuarios del Plantel | M2: Gestión de Usuarios | Administrador TI / Dirección General | Esencial |
+| **RF-73** | Reasignación Dinámica de Roles y Jerarquías del Personal | M2: Gestión de Usuarios | Administrador TI / Dirección General | Deseable |
+| **RF-74** | Conformidad y Validación Periódica de Horas por el Docente Tutor | M6: Practicantes | Docentes Tutores / Coordinación | Esencial |
 
 ---
 
@@ -297,7 +300,7 @@ AMPLIACIÓN MÓDULO 11: SEGURIDAD Y VERIFICACIÓN DOCUMENTAL CRIPTOGRÁFICA
 
 ---
 
-## 4. MATRIZ DE TRAZABILIDAD DOCUMENTAL EXPANDIDA (RF-01 AL RF-71)
+## 4. MATRIZ DE TRAZABILIDAD DOCUMENTAL EXPANDIDA (RF-01 AL RF-74)
 
 | ID Fase II | Nombre Oficial del Requisito Funcional | Módulo | Actor Primario | Prioridad | Carácter de Innovación |
 |:---:|---|:---:|---|:---:|:---:|
@@ -320,15 +323,18 @@ AMPLIACIÓN MÓDULO 11: SEGURIDAD Y VERIFICACIÓN DOCUMENTAL CRIPTOGRÁFICA
 | `RF-47` a `RF-48` | Mapas de Calor de Rendimiento y Asistencia | M9 | Dirección / Coordinación | Esencial | Analítica Visual |
 | **`RF-49`** | **Mapas de Calor con Navegación Drill-Down** | **M9** | **Coordinación / Dirección**| **Esencial** | **Diagnóstico Profundo** |
 | `RF-50` a `RF-51` | Comparativas entre Secciones y Riesgo | M9 | Dirección General | Deseable | Macro-Diagnóstico |
-| `RF-52` a `RF-55` | Dashboards para Directivos, Docentes y Alumnos | M10 | Todos los estamentos | Esencial | Monitoreo Operativo |
+| `RF-52` a `RF-54` | Dashboards para Dirección, Coordinación y Docentes | M10 | Directivos / Docentes | Esencial | Monitoreo Operativo |
+| `RF-55` | Alertas Automatizadas de Deserción y Repitencia | M10 | Coordinación / Tutores | Esencial | Prevención Temprana |
 | **`RF-56`** | **Ficha Integral y Radiografía Escolar 360°** | **M10** | **Tutores / Directivos** | **Esencial** | **Visión Holística** |
 | **`RF-57`** | **Tablero de Impacto y Acreditación SSU** | **M10** | **Tutor SSU / Comisión** | **Esencial** | **Acreditación IS-480** |
-| `RF-58` | Alertas Automatizadas de Deserción Escolar | M10 | Coordinación / Tutores | Esencial | Prevención Temprana |
+| `RF-58` | Reportes de Diagnóstico Integral para Consejos Académicos | M10 | Dirección / Coordinación | Esencial | Diagnóstico Colegiado |
 | `RF-59` | Boletas de Calificaciones Oficiales PDF | M11 | Secretaría / Alumnos | Esencial | Documento Oficial |
 | **`RF-60`** | **Verificación Pública Criptográfica QR** | **M11** | **Público / Entidades** | **Esencial** | **Anti-Falsificación** |
 | `RF-61` a `RF-64` | Cuadro de Mérito, Actas y Exportación Excel | M11 | Secretaría / Dirección | Esencial | Gestión Documental |
 | `RF-65` a `RF-68` | Auditoría Inmutable y Ley N.° 29733 | M12 | Administrador / Legal | Esencial | Seguridad Jurídica |
 | `RF-69` a `RF-71` | Cartelera, Calendario Cívico y Portal Web | M13 | Toda la comunidad | Deseable | Difusión Digital |
+| `RF-72` a `RF-73` | Edición, Baja Lógica y Reasignación de Roles de Usuarios | M2 | Administración / Dirección | Esencial | Control de Personal |
+| `RF-74` | Conformidad de Horas de Practicantes por el Docente Tutor | M6 | Docentes Tutores / Coordinación | Esencial | Convenio UNSCH |
 
 ---
 
@@ -338,7 +344,7 @@ Para evitar el desvío del alcance (*scope creep*) y garantizar la culminación 
 
 > [!IMPORTANT]
 > **REGLA DE ORO DE PARADA TÉCNICA:**  
-> El proyecto concluye de forma estricta y definitiva cuando los **71 Requisitos Funcionales (`RF-01` al `RF-71`)** y los **20 Requisitos No Funcionales (RNF)** estén implementados, integrados y aprobados según sus criterios de aceptación. **Queda terminantemente prohibido incorporar cualquier funcionalidad que no esté catalogada en esta especificación.**
+> El proyecto concluye de forma estricta y definitiva cuando los **74 Requisitos Funcionales (`RF-01` al `RF-74`)** y los **20 Requisitos No Funcionales (RNF)** estén implementados, integrados y aprobados según sus criterios de aceptación. **Queda terminantemente prohibido incorporar cualquier funcionalidad que no esté catalogada en esta especificación.**
 
 ---
 
@@ -361,7 +367,7 @@ Para evitar el desvío del alcance (*scope creep*) y garantizar la culminación 
 
 ### 5.2 Las 10 Reglas de "Alto al Alcance" (Límites Infranqueables)
 
-1. **Límite de los 71 Requisitos Funcionales:** Ningún integrante de los 5 squads tiene autorización para programar vistas, tablas o controladores que no respondan directamente a un `RF` entre el `RF-01` y el `RF-71`.
+1. **Límite de los 74 Requisitos Funcionales:** Ningún integrante de los 5 squads tiene autorización para programar vistas, tablas o controladores que no respondan directamente a un `RF` entre el `RF-01` y el `RF-74`.
 2. **Límite de No-Dinero:** Toda funcionalidad vinculada al dinero (matrícula pagada, pensiones, deudas, cobros) queda **100% excluida**. El sistema es estrictamente de gestión académica e institucional.
 3. **Límite de Conectividad en Kiosco:** La capacidad Offline-First está restringida **únicamente** al módulo de Asistencia de Portería (`RF-25` con IndexedDB/Hive). El resto de módulos requiere conexión al backend.
 4. **Límite de Calificaciones:** El sistema maneja exclusivamente el registro dual (Vigesimal 0-20 y CNEB Literal AD, A, B, C) con auto-guardado debounce (400ms) y planilla ágil ("Modo Excel"). No se admiten configuraciones curriculares internacionales ni escalas no oficiales.
@@ -378,7 +384,7 @@ Para evitar el desvío del alcance (*scope creep*) y garantizar la culminación 
 
 El proyecto se declarará oficialmente **FINALIZADO Y CERRADO** cuando se verifiquen todos y cada uno de los siguientes hitos técnicos:
 
-* [ ] **Cobertura Funcional 100%:** Los 71 Requisitos Funcionales (`RF-01` al `RF-71`) desarrollados y operando según sus especificaciones.
+* [ ] **Cobertura Funcional 100%:** Los 74 Requisitos Funcionales (`RF-01` al `RF-74`) desarrollados y operando según sus especificaciones.
 * [ ] **Control de Calidad de Código:** `flutter analyze` ejecutado con **0 errores y 0 warnings**.
 * [ ] **Batería de Pruebas Automatizadas:** `flutter test` ejecutado exitosamente con todas las pruebas unitarias y de widgets aprobadas.
 * [ ] **Cumplimiento de los 5 Squads:**

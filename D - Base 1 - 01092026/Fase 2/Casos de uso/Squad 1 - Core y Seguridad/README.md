@@ -2,7 +2,7 @@
 
 **Responsable Técnico:** Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`)  
 **Rama de Desarrollo:** `feature/squad-1/auth-core`  
-**Total de Casos de Uso:** 18 Casos de Uso Formatos UML  
+**Total de Casos de Uso:** 20 Casos de Uso Formatos UML  
 **Enfoque de Arquitectura:** Seguridad, Core y Auditoría: Autenticación JWT, control de roles (RBAC), configuración escolar, multi-tenant y trazabilidad inmutable (Ley 29733).  
 
 En esta carpeta se encuentra la especificación formal individual (estándar UML / Cockburn) de cada uno de los casos de uso asignados a este equipo:
@@ -23,6 +23,8 @@ flowchart LR
     Actor --> CU_USR_03("CU-USR-03: Gestión de Sedes y Planteles Escolares Multi-Tenant")
     Actor --> CU_USR_04("CU-USR-04: Directorio Escolar y Búsqueda Rápida de Personal")
     Actor --> CU_USR_05("CU-USR-05: Gestión de Perfil Personal y Cambio Autónomo de Credenciales")
+    Actor --> CU_USR_06("CU-USR-06: Modificación de Datos y Baja Lógica de Usuarios del Plantel")
+    Actor --> CU_USR_07("CU-USR-07: Reasignación Dinámica de Roles y Jerarquías del Personal")
     Actor --> CU_INS_01("CU-INS-01: Parametrización del Año Lectivo y Calendario Escolar")
     Actor --> CU_INS_02("CU-INS-02: Apertura, Parametrización y Cierre de Periodos Académicos")
     Actor --> CU_INS_03("CU-INS-03: Estructuración de Niveles Educativos, Grados y Secciones")
@@ -49,6 +51,8 @@ flowchart LR
 | [CU-USR-03](CU-USR-03.md) | [RF-07](../../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-07.md) | Gestión de Sedes y Planteles Escolares Multi-Tenant | Muy Baja (Configuración inicial) |
 | [CU-USR-04](CU-USR-04.md) | [RF-08](../../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-08.md) | Directorio Escolar y Búsqueda Rápida de Personal | Alta |
 | [CU-USR-05](CU-USR-05.md) | [RF-09](../../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-09.md) | Gestión de Perfil Personal y Cambio Autónomo de Credenciales | Baja |
+| [CU-USR-06](CU-USR-06.md) | [RF-72](../../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-72.md) | Modificación de Datos y Baja Lógica de Usuarios del Plantel | Media |
+| [CU-USR-07](CU-USR-07.md) | [RF-73](../../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-73.md) | Reasignación Dinámica de Roles y Jerarquías del Personal | Baja |
 | [CU-INS-01](CU-INS-01.md) | [RF-10](../../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-10.md) | Parametrización del Año Lectivo y Calendario Escolar | Baja (Anual) |
 | [CU-INS-02](CU-INS-02.md) | [RF-11](../../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-11.md) | Apertura, Parametrización y Cierre de Periodos Académicos | Media (4 veces al año en régimen bimestral) |
 | [CU-INS-03](CU-INS-03.md) | [RF-12](../../Requisitos%20Funcionales/Squad%201%20-%20Core%20y%20Seguridad/RF-12.md) | Estructuración de Niveles Educativos, Grados y Secciones | Baja |

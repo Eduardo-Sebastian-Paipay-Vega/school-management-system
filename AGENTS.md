@@ -12,7 +12,7 @@
 > 2. **Activar la skill de navegación:** [`.agents/skills/guia-lectura-proyecto/SKILL.md`](.agents/skills/guia-lectura-proyecto/SKILL.md).
 > 3. **Secuencia de 5 Fases:**
 >    * **Paso 0:** Límites y Out-of-Scope (`limites_y_alcance_proyecto.md`).
->    * **Paso 1:** 71 Requisitos Funcionales (`requisitos_funcionales.md`) y 71 Casos de Uso.
+>    * **Paso 1:** 74 Requisitos Funcionales (`requisitos_funcionales.md`) y 74 Casos de Uso.
 >    * **Paso 2:** Stack Tecnológico (`stack_tecnologico_proyecto.md`) y Arquitectura C4 (`arquitectura_sistema.md`).
 >    * **Paso 3:** Diseño de Detalle por Squad (Reglas SDD y SDD del Squad asignado).
 >    * **Paso 4:** Código Frontend en Next.js (`frontend/app/` y `frontend/modules/squads/squad_[X]_[modulo]/`) y Backend en Node.js (`backend/src/`).
@@ -21,14 +21,14 @@
 
 ## 1. Contexto del Proyecto y Squads
 
-El proyecto cuenta con **71 Requisitos Funcionales (`RF-01` al `RF-71`)** y **71 Casos de Uso** distribuidos en **5 Squads Técnicos Especializados**:
+El proyecto cuenta con **74 Requisitos Funcionales (`RF-01` al `RF-74`)** y **74 Casos de Uso** distribuidos en **5 Squads Técnicos Especializados**:
 
 1. **Squad 1 - Core y Seguridad:** Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`)  
-   *M1, M2, M3, M12 (RF-01 al RF-14, RF-65 al RF-68)* — JWT, RBAC, Configuración escolar y Auditoría Ley 29733.
+   *M1, M2, M3, M12 (RF-01 al RF-14, RF-65 al RF-68, RF-72, RF-73)* — JWT, RBAC, Configuración escolar y Auditoría Ley 29733.
    * **Entrega (Outputs):** módulo core compartido (frontend), middlewares `authenticateJwt` y `requireRoles` (Node.js), endpoints `/api/v1/auth`, `/api/v1/users`, `/api/v1/audit`.
    * **Consume (Inputs):** `docker-compose.yml` (PostgreSQL 16, Redis 7) y `database/init/01_esquema_consolidado.sql`.
 2. **Squad 2 - Matrícula y Asistencia:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`) — *Líder de Proyecto*  
-   *M4, M5, M6, M7 (RF-15 al RF-35)* — Matrícula, Kiosco Offline-First (IndexedDB), Carnés QR y Horas SSU.
+   *M4, M5, M6, M7 (RF-15 al RF-35, RF-74)* — Matrícula, Kiosco Offline-First (IndexedDB), Carnés QR y Horas SSU.
    * **Entrega (Outputs):** Kiosco de portería (<200ms), carné QR (`RF-26`), endpoint de sync masivo (`POST /api/v1/attendance/sync-batch`), WebSocket Gateway (`RF-27`).
    * **Consume (Inputs):** módulo core del Squad 1 (`AccessControlService`, sesiones), tablas `instituciones`, `usuarios` y `anios_lectivos`.
 3. **Squad 3 - Calificaciones y Modo Excel:** Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`) — *Sub Líder*  

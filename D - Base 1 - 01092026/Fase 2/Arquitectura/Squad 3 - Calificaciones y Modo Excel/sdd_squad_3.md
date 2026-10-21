@@ -22,11 +22,11 @@ Definir la implementación de la evaluación docente, la planilla por teclado, e
 
 ### 1.2 Alcance funcional
 
-Docente titular: define evaluaciones, competencias y criterios; registra notas; revisa borradores; redacta conclusiones y publica. Practicante asignado: registra borradores, sin capacidad de publicación. Coordinación o dirección: cierre del periodo. Dirección: decisión sobre rectificaciones. Estudiante: consulta exclusivamente sus notas publicadas. El portal de padres permanece fuera del piloto según el documento de límites, pese a su mención en RF-44.
+Docente titular: define evaluaciones, competencias y criterios; registra notas; revisa borradores; redacta conclusiones y publica. Practicante asignado: registra borradores, sin capacidad de publicación. Coordinación o dirección: cierre del periodo. Dirección: decisión sobre rectificaciones. Estudiante: consulta exclusivamente sus notas publicadas. Apoderado vinculado: consulta en solo lectura las notas publicadas y las actividades de sus hijos (RF-75, RF-82).
 
 ### 1.3 Supuestos y restricciones
 
-- Flutter/Dart Material 3, Node.js/TypeScript, PostgreSQL y JWT. Los patrones Table, Dialog y estados visuales de PrimeNG se adaptan a Flutter; no se incorpora Angular.
+- Next.js 15 (React 19, TypeScript), Node.js/TypeScript, PostgreSQL y JWT. Los patrones Table, Dialog y estados visuales de PrimeNG se aplican con PrimeReact; no se incorpora Angular.
 - No existían un backend ejecutable, autenticación real ni proveedores de matrícula en este checkout. Se implementa un servicio autónomo del Squad 3 con puntos de integración explícitos, sin fingir que los otros squads ya están conectados.
 - La pantalla predeterminada es una demostración con datos ficticios y almacenamiento volátil identificado. Producción exige inyectar sesión autenticada y repositorio REST.
 - El contrato canónico de escritura es `PATCH /api/v1/grades/batch`. Los nombres anteriores `batch-save`, `auto-save` y `batch-upsert` se aceptan como alias con **el nuevo cuerpo uniforme**; no se reinterpretan silenciosamente los payloads históricos incompatibles.
@@ -39,7 +39,7 @@ Docente titular: define evaluaciones, competencias y criterios; registra notas; 
 
 ```mermaid
 flowchart TD
-    Docente["Docente / practicante / dirección / estudiante"] --> UI["Squad3Screen + GradeMatrix (Flutter)"]
+    Docente["Docente / practicante / dirección / estudiante"] --> UI["CalificacionesModuleView + GradeMatrix (Next.js)"]
     UI --> Controller["GradebookController: validación, debounce, cola local"]
     Controller --> Repo["GradesRepository"]
     Repo --> Demo["DemoGradesRepository: memoria ficticia"]
@@ -160,29 +160,30 @@ Ver [contratos_api.md](contratos_api.md) para cuerpos, códigos y configuración
 
 La respuesta REST es `{success:true,data:{...},timestamp:"ISO-8601"}`. Los errores usan `{success:false,error:{code,message},timestamp:"ISO-8601"}` y HTTP 400, 401, 403, 404, 409, 413, 422 o 500. No se exponen detalles SQL. `/health` es una comprobación de proceso, no una prueba de conexión a BD.
 
-## 5. Diseño de interfaz de usuario en Flutter
+## 5. Diseño de interfaz de usuario en Next.js
 
 ### 5.1 Estructura Feature-First
 
 ```text
-lib/features/squad_3_calificaciones/
-  domain/models/gradebook.dart
-  data/repositories/grades_repository.dart
-  data/repositories/demo_grades_repository.dart
-  data/repositories/api_grades_repository.dart
-  presentation/controllers/gradebook_controller.dart
-  presentation/screens/squad_3_screen.dart
-  presentation/widgets/grade_matrix.dart
-  squad_3_grades.dart
+frontend/modules/squads/squad_3_calificaciones/
+  types.ts                          # Gradebook, Evaluation, Grade (espejo de los contratos)
+  services/gradesApi.ts             # Cliente REST y WebSocket de M8
+  hooks/useGradebook.ts             # Estado de la planilla, debounce de 400 ms, conflictos
+  components/GradeMatrix.tsx        # Grilla virtualizada con navegación por teclado
+  components/ActivityCalendar.tsx   # Tareas y exámenes (RF-79)
+  components/ExcelImportDialog.tsx  # Carga desde plantilla Excel (RF-80)
+  CalificacionesModuleView.tsx      # Vista del módulo
 ```
+
+> La implementación anterior en Flutter se retiró del repositorio (commit `6a955c25`); su lógica de dominio sigue documentada en este SDD y en el servicio `backend/squad_3_calificaciones/`.
 
 ### 5.2 Ergonomía y estados
 
-Tabla desplazable horizontalmente, encabezado fijo y `ListView.builder` con extensión de fila fija. Solo se construyen las filas cercanas al viewport. Flechas mueven entre celdas, Enter baja, Tab/Shift+Tab recorren la matriz, Esc restaura el valor al entrar en edición, Ctrl/Cmd+V admite TSV y CRLF. Se valida todo el bloque antes de aplicar cambios y se rechaza el desbordamiento. El pegado masivo se deshabilita con filtro de búsqueda para evitar reasignar notas a filas ocultas.
+Tabla desplazable horizontalmente, encabezado fijo y filas virtualizadas de altura fija: solo se renderizan las filas cercanas al viewport. Flechas mueven entre celdas, Enter baja, Tab/Shift+Tab recorren la matriz, Esc restaura el valor al entrar en edición, Ctrl/Cmd+V admite TSV y CRLF (evento `paste` del navegador). Se valida todo el bloque antes de aplicar cambios y se rechaza el desbordamiento. El pegado masivo se deshabilita con filtro de búsqueda para evitar reasignar notas a filas ocultas.
 
 Cada entrada inválida tiene mensaje local y detiene el lote. No se transforma una celda vacía o inválida en cero. La UI distingue pendiente, guardando, guardado confirmado, error y conflicto. Una respuesta antigua no borra una edición posterior. Los conflictos requieren recarga explícita con confirmación del descarte; no se reenvían ciegamente. Ante fallos no conflictivos hay hasta tres reintentos con esperas de 1, 2 y 4 segundos, más reintento manual.
 
-Se muestran los pesos y rúbricas en las cabeceras, promedios calculados, asistente editable de conclusiones y bandeja de rectificaciones. Los controles se restringen por rol, estado y cambios pendientes. Las sugerencias de la demostración son ejemplos pedagógicos, no un banco MINEDU certificado. Colores tomados exclusivamente de `AppTheme`.
+Se muestran los pesos y rúbricas en las cabeceras, promedios calculados, asistente editable de conclusiones y bandeja de rectificaciones. Los controles se restringen por rol, estado y cambios pendientes. Las sugerencias de la demostración son ejemplos pedagógicos, no un banco MINEDU certificado. Colores tomados exclusivamente de los tokens de `globals.css` y la escala CNEB.
 
 ## 6. Seguridad, resiliencia y atributos de calidad
 
@@ -194,7 +195,7 @@ Se muestran los pesos y rúbricas en las cabeceras, promedios calculados, asiste
 - **Evidencia y confirmación electrónica:** la solicitud conserva referencia al documento institucional y el director confirma con texto identificatorio asociado a su JWT y fecha. No se implementa firma digital PKI ni almacenamiento de archivos; la referencia debe corresponder a un expediente custodiado por la institución.
 - **Sincronización:** WebSocket autenticado avisa cambios; REST devuelve la vista autorizada. Refresco de respaldo cada 10 segundos si no hay cambios locales. La instancia actual difunde eventos en un solo proceso; un despliegue con varias réplicas requiere conectar el bus Redis institucional. No se declara esa integración como realizada.
 - **Resiliencia:** las ediciones fallidas se conservan mientras vive el controlador. No hay cola duradera offline en este módulo ni garantía frente al cierre de la pestaña; el modo demo lo informa. El kiosco offline de Squad 2 no forma parte de M8.
-- **Rendimiento:** virtualización comprobable con 5000 estudiantes; objetivo de cuadro inferior a 16,67 ms a validar en modo profile. Las pruebas de widgets no demuestran 60 FPS. Se incluye procedimiento de medición y no se inventan resultados de hardware.
+- **Rendimiento:** virtualización comprobable con 5000 estudiantes; objetivo de cuadro inferior a 16,67 ms a validar con el perfilador de React y Chrome DevTools sobre un build de producción. Las pruebas de componentes no demuestran 60 FPS. Se incluye procedimiento de medición y no se inventan resultados de hardware.
 - **Persistencia:** almacenar estados completos simplifica la integración inicial y la auditoría, pero aumenta tamaño de respuesta e historial para planillas grandes. La granularidad del agregado debe reevaluarse con las mediciones de producción.
 
 ## 7. Matriz de trazabilidad bidireccional

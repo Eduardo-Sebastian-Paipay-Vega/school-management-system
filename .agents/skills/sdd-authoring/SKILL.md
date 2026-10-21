@@ -18,7 +18,7 @@ Esta skill proporciona el procedimiento paso a paso, los estándares normativos 
 
 Activa esta skill cuando:
 * Un desarrollador o squad pregunte: *"¿Cómo empiezo mi SDD?"*, *"Crea el SDD para el Squad X"*, o *"Estructura el documento de diseño de software"*.
-* Se requiera formalizar la arquitectura de detalle antes de implementar código en Flutter o Backend.
+* Se requiera formalizar la arquitectura de detalle antes de implementar código en el frontend (Next.js) o el backend.
 * Se necesite auditar o verificar que un SDD cumple con la trazabilidad hacia los Requisitos Funcionales (`RF-XX`) y Casos de Uso (`CU-XXX`).
 
 ---
@@ -30,7 +30,7 @@ flowchart TD
     P1["1. Identificar Squad y Alcance<br/>(RFs y Casos de Uso)"] --> P2["2. Diagramar Arquitectura C4<br/>(Contenedor y Componentes)"]
     P2 --> P3["3. Diseñar Modelo de Datos<br/>(PostgreSQL DDL y Restricciones)"]
     P3 --> P4["4. Especificar Contratos de API<br/>(REST JSON, WebSockets)"]
-    P4 --> P5["5. Arquitectura de UI en Flutter<br/>(Feature-First, Estados, Widgets)"]
+    P4 --> P5["5. Arquitectura de UI en Next.js<br/>(Feature-First, Estados, Componentes)"]
     P5 --> P6["6. Seguridad, NFRs y Resiliencia<br/>(JWT, RBAC, Offline, Ley 29733)"]
     P6 --> P7["7. Matriz de Trazabilidad Bidireccional<br/>(RF ↔ CU ↔ BD ↔ API ↔ UI)"]
 ```
@@ -45,7 +45,7 @@ flowchart TD
 
 ### Paso 2: Vistas Arquitecturales y Diagramas C4
 * Generar diagrama Mermaid de contexto y componentes:
-  * Interacción entre Frontend Flutter (Web/Desktop/Mobile).
+  * Interacción entre el frontend Next.js (Web / PWA / Móvil).
   * API Gateway / Capa de Controladores REST y WebSockets.
   * Capa de Servicios de Dominio y Lógica de Negocio.
   * Capa de Persistencia: PostgreSQL Multi-Tenant (`tenant_id`), Redis y Almacenamiento Local (Hive/IndexedDB para Offline).
@@ -66,13 +66,13 @@ flowchart TD
   * `DELETE /api/v1/{recurso}/:id` (Baja lógica `is_active = false`)
 * Formato JSON estricto: Incluir esquema de solicitud (`Request`) y respuesta exitosa (`200/201 OK`) y de error (`400/401/403/422`).
 
-### Paso 5: Diseño Frontend en Flutter (Feature-First)
-* Estructurar el módulo bajo `lib/features/{squad_name}/`:
-  * `presentation/screens/`: Pantallas principales de la funcionalidad.
-  * `presentation/widgets/`: Widgets interactivos especializados.
-  * `presentation/controllers/`: Manejador de estado reactivo.
-  * `domain/models/`: Entidades inmutables de negocio.
-  * `data/repositories/`: Consumo de API y persistencia local.
+### Paso 5: Diseño Frontend en Next.js (Feature-First)
+* Estructurar el módulo bajo `frontend/modules/squads/{squad_name}/`:
+  * `components/`: Componentes de vista de la funcionalidad.
+  * `hooks/`: Estado reactivo y efectos.
+  * `services/`: Consumo de API, WebSocket y persistencia local.
+  * `types.ts`: Tipos del dominio alineados con los contratos.
+  * `index.ts`: Exportación pública del módulo.
 
 ### Paso 6: Requisitos No Funcionales (NFR) y Seguridad
 * Latencia: < 500 ms en consultas comunes; < 300 ms en escaneo Kiosco; 60 FPS en planilla Excel.
@@ -98,4 +98,4 @@ Antes de dar por concluido un SDD, verificar:
 2. ¿Los diagramas Mermaid compilan sin errores de sintaxis?
 3. ¿Los contratos JSON incluyen tipos de datos válidos?
 4. ¿El esquema SQL respeta el aislamiento multi-tenant (`tenant_id`)?
-5. ¿La estructura de Flutter se alinea con `lib/features/{squad}/`?
+5. ¿La estructura del frontend se alinea con `frontend/modules/squads/{squad}/`?

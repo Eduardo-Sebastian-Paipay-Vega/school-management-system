@@ -8,7 +8,7 @@
 ---
 
 ## 1. Descripción del Requisito
-Compilación limpia sin errores para Flutter Web (PWA instalable) y ejecutables nativos de Windows Desktop.
+Compilación limpia sin errores de la aplicación Next.js (`npm run build`), instalable como PWA en navegadores de escritorio y móvil.
 
 ---
 

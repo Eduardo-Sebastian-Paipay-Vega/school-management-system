@@ -24,12 +24,12 @@ Cada carpeta contiene el documento de arquitectura técnica del squad, su script
 2. ⏱️ **[Squad 2 - Matricula y Asistencia](Squad%202%20-%20Matricula%20y%20Asistencia/README.md)**
    * **Líder Técnico:** Eduardo Sebastian Paipay Vega (`@Eduardo-Sebastian-Paipay-Vega`)
    * **Artefactos:** [Arquitectura](Squad%202%20-%20Matricula%20y%20Asistencia/README.md) | [Esquema DDL SQL](Squad%202%20-%20Matricula%20y%20Asistencia/esquema_datos.sql) | [Contratos API](Squad%202%20-%20Matricula%20y%20Asistencia/contratos_api.md)
-   * **Enfoque:** Kiosco portería Offline-First (Hive/IndexedDB), cola de sincronización, carnés QR y WebSockets de aula (< 500 ms).
+   * **Enfoque:** Kiosco portería Offline-First (IndexedDB), cola de sincronización, carnés QR y WebSockets de aula (< 500 ms).
 
 3. 📊 **[Squad 3 - Calificaciones y Modo Excel](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/README.md)**
    * **Líder Técnico:** Steve Smith Ovalle Luyo (`@steveovalle27-lgtm`)
    * **Artefactos:** [Arquitectura](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/README.md) | [Esquema DDL SQL](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/esquema_datos.sql) | [Contratos API](Squad%203%20-%20Calificaciones%20y%20Modo%20Excel/contratos_api.md)
-   * **Enfoque:** Planilla matricial Flutter con navegación por teclado y pegado masivo (Ctrl+V), auto-guardado debounce (400 ms) y motor de conversión dual CNEB.
+   * **Enfoque:** Planilla matricial en React con navegación por teclado y pegado masivo (Ctrl+V), auto-guardado debounce (400 ms) y motor de conversión dual CNEB.
 
 4. 🗺️ **[Squad 4 - Analitica y Dashboards](Squad%204%20-%20Analitica%20y%20Dashboards/README.md)**
    * **Líder Técnico:** Grissel Arascely Rodríguez Quispe (`@Arascely`)

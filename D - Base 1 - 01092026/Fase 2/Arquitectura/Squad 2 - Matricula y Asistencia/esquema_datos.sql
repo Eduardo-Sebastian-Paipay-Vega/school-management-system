@@ -84,3 +84,44 @@ CREATE TABLE IF NOT EXISTS asistencias_docentes_contratados (
     tema_sesion VARCHAR(200),
     es_reprogramacion BOOLEAN DEFAULT FALSE
 );
+
+-- =============================================================================
+-- AMPLIACIÓN RF-72 A RF-89 (RF-74, RF-77, RF-78)
+-- Copia de las secciones correspondientes de database/init/01_esquema_consolidado.sql,
+-- que es la fuente de verdad. Si cambias algo aquí, cámbialo también allí.
+-- =============================================================================
+
+-- Conformidad de horas por el docente tutor (RF-74); reemplaza el uso de validado_por_tutor
+ALTER TABLE asistencias_practicantes ADD COLUMN IF NOT EXISTS estado_validacion VARCHAR(10) DEFAULT 'PENDIENTE'
+    CHECK (estado_validacion IN ('PENDIENTE', 'VALIDADA', 'OBSERVADA'));
+ALTER TABLE asistencias_practicantes ADD COLUMN IF NOT EXISTS comentario_tutor TEXT;
+ALTER TABLE asistencias_practicantes ADD COLUMN IF NOT EXISTS validado_por UUID REFERENCES usuarios(id);
+ALTER TABLE asistencias_practicantes ADD COLUMN IF NOT EXISTS validado_en TIMESTAMP WITH TIME ZONE;
+CREATE INDEX IF NOT EXISTS idx_practicantes_pendientes ON asistencias_practicantes(tutor_docente_id, fecha) WHERE estado_validacion = 'PENDIENTE';
+
+-- Avisos de inasistencia al apoderado, uno por estudiante, día y tipo (RF-77)
+CREATE TABLE IF NOT EXISTS avisos_inasistencia (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    asistencia_id UUID NOT NULL REFERENCES asistencias_alumnos(id),
+    apoderado_id UUID NOT NULL REFERENCES usuarios(id),
+    tipo VARCHAR(12) NOT NULL CHECK (tipo IN ('AVISO', 'RECTIFICACION')),
+    notificacion_id UUID REFERENCES notificaciones(id),
+    enviado_en TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_aviso_inasistencia UNIQUE (asistencia_id, apoderado_id, tipo)
+);
+
+-- Importaciones de nóminas SIAGIE (RF-78)
+CREATE TABLE IF NOT EXISTS importaciones_nomina (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES instituciones(id),
+    anio_lectivo_id UUID NOT NULL REFERENCES anios_lectivos(id),
+    archivo_nombre VARCHAR(200) NOT NULL,
+    archivo_hash CHAR(64) NOT NULL,
+    total_filas INT NOT NULL,
+    creados INT DEFAULT 0,
+    actualizados INT DEFAULT 0,
+    rechazados INT DEFAULT 0,
+    detalle_rechazos JSONB DEFAULT '[]'::jsonb,
+    importado_por UUID REFERENCES usuarios(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

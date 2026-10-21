@@ -43,12 +43,12 @@
 
 ---
 
-## 4. Reglas de Frontend (Flutter)
+## 4. Reglas de Frontend (Next.js)
 
 1. **Feature-First Estricto:**
-   * Ningún archivo de pantalla o modelo de un squad debe ubicarse fuera de `lib/features/squad_[X]_[modulo]/`.
+   * Ningún archivo de pantalla o modelo de un squad debe ubicarse fuera de `frontend/modules/squads/squad_[X]_[modulo]/`.
 2. **Separación de Responsabilidades:**
-   * Las vistas (`presentation/screens`) no deben realizar llamadas HTTP directas ni contener SQL; deben comunicarse a través de controladores y repositorios.
+   * Los componentes de vista no deben realizar llamadas HTTP directas ni contener SQL; deben comunicarse a través de hooks y servicios del módulo (`hooks/`, `services/`).
 3. **Experiencia de Usuario (UX):**
    * Todo botón de acción debe contemplar estados: inactivo, cargando (spinner), éxito y error.
    * Planillas de notas deben respetar debounce de 400 ms antes de enviar al servidor.
@@ -62,4 +62,4 @@ Cada elemento de diseño del SDD debe contar con su identificador cruzado:
 * Caso de Uso: `CU-XXX-YY`
 * Endpoint: `VERBO /ruta`
 * Tabla SQL: `nombre_tabla`
-* Widget Flutter: `NombreScreen`
+* Componente Next.js: `NombreComponente`

@@ -32,7 +32,7 @@ El SDD **unifica** los artefactos que el Squad ya tiene preparados en el reposit
      [esquema_datos.sql] ---> [ SDD DEL SQUAD ] <--- [contratos_api.md]
                                    |
                                    v
-                      [Código Flutter en lib/features/]
+                      [Código Next.js en frontend/modules/squads/]
 ```
 
 1. **Paso 1: Copiar la Plantilla**
@@ -41,12 +41,12 @@ El SDD **unifica** los artefactos que el Squad ya tiene preparados en el reposit
 2. **Paso 2: Rellenar Metadatos y Alcance**
    * Poner nombre del responsable, módulos a cargo y lista de RFs/CUs.
 3. **Paso 3: Pegar el Diagrama C4 y Componentes**
-   * El diagrama de cómo interactúa Flutter con los controladores y la BD.
+   * El diagrama de cómo interactúa el frontend Next.js con los controladores y la BD.
 4. **Paso 4: Integrar el Esquema SQL y Contratos API**
    * Copiar las tablas del archivo `esquema_datos.sql` del squad.
    * Copiar los endpoints JSON del archivo `contratos_api.md`.
 5. **Paso 5: Trazabilidad**
-   * Rellenar la tabla final: `RF-XX` ↔ `CU-XXX` ↔ `Tabla BD` ↔ `Endpoint` ↔ `Pantalla Flutter`.
+   * Rellenar la tabla final: `RF-XX` ↔ `CU-XXX` ↔ `Tabla BD` ↔ `Endpoint` ↔ `Componente Next.js`.
 
 ---
 

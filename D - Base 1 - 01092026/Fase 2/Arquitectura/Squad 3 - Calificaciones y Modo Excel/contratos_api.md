@@ -133,3 +133,54 @@ Proveedor curricular: `{success:true,data:{tenantId,scale:{ad,a,b},competencies:
 Proveedor de matrícula/asignación: `{success:true,data:{tenantId,courseId,sectionId,periodId,teacherId,practitionerIds:[UUID],students:[{id:UUID,userId:UUID,name}]}}`.
 
 Estas formas son el límite de integración propuesto de M8; los servicios concretos de otros squads deben adaptar o confirmar el contrato. `validateBook` valida el resultado antes de insertarlo. No se considera una integración institucional probada hasta ejecutarla con esos proveedores reales.
+
+<!-- AMPLIACIÓN RF-72 A RF-89 -->
+## Ampliación RF-79 a RF-82
+
+## POST `/api/v1/courses/:courseId/activities`
+Programa una tarea, examen o actividad (RF-79). Crea también su evaluación y su columna en la planilla.
+
+* **Request Body:**
+```json
+{ "seccionId": "UUID", "periodoId": "UUID", "tipo": "EXAMEN", "titulo": "Examen de fracciones", "descripcion": "Capítulos 3 y 4", "competencia": "Resuelve problemas de cantidad", "peso": 0.30, "fechaProgramada": "2026-05-15T08:00:00-05:00", "adjuntoUrl": null }
+```
+* **Response 201 Created:** `{ "success": true, "data": { "actividadId": "UUID", "evaluacionId": "UUID", "advertencias": ["SECTION_EXAM_OVERLOAD"] } }`
+* **Errores:** `DATE_OUTSIDE_PERIOD`, `403 NOT_COURSE_TEACHER` (RN-NOT-16). `SECTION_EXAM_OVERLOAD` es advertencia, no bloquea (RN-NOT-15).
+
+## GET `/api/v1/sections/:sectionId/activities?from=2026-05-01&to=2026-05-31`
+Calendario de la sección para docentes, estudiantes y apoderados vinculados.
+
+## PATCH `/api/v1/activities/:id`
+Reprograma (`{ "fechaProgramada": "..." }`) o anula (`{ "estado": "ANULADA", "motivo": "..." }`). Con notas registradas no se elimina (RN-NOT-17). Notifica el cambio a la sección.
+
+## GET `/api/v1/grades/template?courseId=UUID&sectionId=UUID&periodId=UUID`
+Descarga la plantilla `.xlsx` precargada (RF-80): hoja protegida, códigos de estudiante bloqueados y firma oculta (HMAC de curso, sección y periodo).
+
+## POST `/api/v1/grades/import-excel` (multipart/form-data)
+Campo `archivo`. Valida la firma y cada nota con el motor dual; devuelve la vista previa.
+
+* **Response 200 OK:**
+```json
+{ "success": true, "data": { "importacionId": "UUID", "nuevas": 30, "modificadas": 3, "rechazadas": [{ "fila": 12, "estudiante": "Pérez Rojas, Ana", "valor": "21", "motivo": "Fuera de escala 0-20" }] } }
+```
+* **Errores:** `TEMPLATE_SIGNATURE_MISMATCH` (plantilla de otro curso, RN-NOT-18), `PERIOD_CLOSED` (usar RF-43).
+
+## POST `/api/v1/grades/import-excel/:importacionId/confirm`
+Aplica las notas confirmadas, recalcula promedios (RF-41) y registra auditoría (RF-66). Las celdas vacías no borran notas (RN-NOT-19).
+
+## POST `/api/v1/grade-deadlines`
+Coordinación configura plazos (RF-81). Body: `{ "periodoId": "UUID", "evaluacionId": null, "fechaLimite": "2026-07-25T23:59:00-05:00", "diasRecordatorio": 3, "umbralLlamadoDias": 2 }`.
+
+## GET `/api/v1/teachers/me/grade-alerts`
+Alertas del docente autenticado: `{ "data": [{ "nivel": "AVISO", "curso": "Matemática", "seccion": "4.° C", "avance": 40.0, "fechaLimite": "..." }] }`. El job diario `GradeDeadlineMonitor` crea las alertas en `alertas_docentes` y las notifica (RF-76); los llamados de atención copian a Coordinación.
+
+## GET `/api/v1/guardian/students/:studentId/grades?periodId=UUID`
+Rol `APODERADO` (RF-82). Solo notas con `publicada = true` (RN-NOT-22).
+
+* **Response 200 OK:**
+```json
+{ "success": true, "data": { "periodo": "2.° Bimestre", "cursos": [{ "curso": "Matemática", "promedio": { "vigesimal": 15, "literal": "A" }, "conclusion": "Resuelve problemas...", "actividades": [{ "titulo": "Examen de fracciones", "fecha": "2026-05-15", "nota": { "vigesimal": 16, "literal": "A" } }, { "titulo": "Tarea 4", "fecha": "2026-05-20", "estado": "PENDIENTE_PUBLICACION" }] }] } }
+```
+
+## GET `/api/v1/guardian/students/:studentId/activities?from=...&to=...`
+Próximas tareas y exámenes del hijo. `403 GUARDIAN_NOT_LINKED` si no está vinculado; cada consulta se registra en la bitácora (RN-NOT-23).

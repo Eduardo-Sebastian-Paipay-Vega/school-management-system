@@ -8,7 +8,7 @@
 ---
 
 ## 1. Descripción del Requisito
-100% de las rutas en Flutter y endpoints en el Backend deben validar los permisos del rol del usuario (Administrador, Director, Coordinador, Docente, Auxiliar, Secretaría). Intentos no autorizados retornan HTTP 403 Forbidden y se auditan.
+100% de las rutas del frontend y endpoints en el Backend deben validar los permisos del rol del usuario (Administrador, Director, Coordinador, Docente, Auxiliar, Secretaría). Intentos no autorizados retornan HTTP 403 Forbidden y se auditan.
 
 ---
 

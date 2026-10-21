@@ -27,7 +27,7 @@
 
 ```mermaid
 graph TD
-    Client["Flutter Client (Web / Desktop / Mobile)"] -->|HTTPS / REST| Nginx["Nginx Reverse Proxy + SSL"]
+    Client["Cliente Next.js (Web / PWA / Móvil)"] -->|HTTPS / REST| Nginx["Nginx Reverse Proxy + SSL"]
     Nginx -->|Proxy Pass| RateLimiter["Rate Limiting Middleware (Redis)"]
     RateLimiter -->|Valida IP / Conexiones| AuthMiddleware["Auth Interceptor (JWT Guard)"]
     AuthMiddleware -->|Verifica Blacklist| Redis[(Redis: Session & Blacklist)]
@@ -46,7 +46,7 @@ graph TD
 
 ```mermaid
 sequenceDiagram
-    participant C as Flutter Client (Dio Interceptor)
+    participant C as Cliente Next.js (interceptor fetch)
     participant G as API Gateway (JWT Middleware)
     participant R as Redis (Token Blacklist)
     participant B as Auth Service
@@ -74,13 +74,13 @@ sequenceDiagram
 
 ---
 
-## 4. Arquitectura de Estado en Frontend (Flutter)
+## 4. Arquitectura de Estado en Frontend (Next.js)
 
-* **Gestión de Estado:** `flutter_bloc` / BLoC Pattern.
+* **Gestión de Estado:** contexto de React (`SessionProvider`) para la sesión; estado local y hooks por módulo.
 * **Módulos:**
-  * `lib/features/auth/domain/bloc/auth_bloc.dart`: Estados (`AuthInitial`, `AuthLoading`, `Authenticated`, `Unauthenticated`, `AuthError`).
-  * `lib/core/network/auth_interceptor.dart`: Interceptor de `Dio` que intercepta respuestas `401 Unauthorized`, pausa las peticiones en cola, llama al endpoint de refresh y reintenta la petición fallida sin intervención del usuario.
-  * `lib/core/storage/secure_storage_service.dart`: Encapsulamiento de `flutter_secure_storage` para el Access Token en memoria cifrada.
+  * `frontend/modules/squads/squad_1_core/hooks/useSession.ts`: Estados de sesión (`idle`, `loading`, `authenticated`, `unauthenticated`, `error`) y roles del usuario.
+  * `frontend/lib/apiClient.ts`: Envoltorio de `fetch` que intercepta respuestas `401 Unauthorized`, pausa las peticiones en cola, llama a `/auth/refresh-token` y reintenta la petición fallida sin intervención del usuario.
+  * El Access Token se mantiene solo en memoria; el Refresh Token viaja en cookie `HttpOnly`, inaccesible para JavaScript.
 
 ---
 

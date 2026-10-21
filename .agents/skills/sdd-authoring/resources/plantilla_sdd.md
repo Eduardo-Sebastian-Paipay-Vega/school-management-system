@@ -24,14 +24,14 @@
 ## 1. Introducción y Alcance del Módulo
 
 ### 1.1. Propósito del Documento
-El presente Documento de Diseño de Software (SDD) describe la arquitectura técnica, el diseño detallado de componentes, los modelos de persistencia relacional, los contratos de comunicación API y la estructura de presentación en Flutter para implementar los requisitos asignados al **[Squad X]**.
+El presente Documento de Diseño de Software (SDD) describe la arquitectura técnica, el diseño detallado de componentes, los modelos de persistencia relacional, los contratos de comunicación API y la estructura de presentación en Next.js para implementar los requisitos asignados al **[Squad X]**.
 
 ### 1.2. Alcance Funcional
 * [Resumen de funcionalidades que cubre el squad].
 * [Población objetivo: Docentes, Estudiantes, Directivos, Portería, etc.].
 
 ### 1.3. Supuestos y Restricciones Técnicas
-* **Framework Frontend:** Flutter 3.35+ (WebAssembly / Web / Mobile) bajo patrón Feature-First.
+* **Framework Frontend:** Next.js 15 (React 19, TypeScript) bajo patrón Feature-First.
 * **Backend:** Arquitectura RESTful con autenticación JWT y WebSockets para eventos reactivos.
 * **Base de Datos:** PostgreSQL 16 con particionamiento lógico multi-tenant (`tenant_id`).
 * **Estándar de Seguridad:** Cumplimiento de la Ley N.° 29733 (Protección de Datos Personales del Perú) y OWASP Top 10.
@@ -44,8 +44,8 @@ El presente Documento de Diseño de Software (SDD) describe la arquitectura téc
 
 ```mermaid
 flowchart TD
-    subgraph Frontend["Capa de Presentación (Flutter)"]
-        UI["Pantallas y Widgets del Squad<br/>(lib/features/squad_X_...)"]
+    subgraph Frontend["Capa de Presentación (Next.js)"]
+        UI["Páginas y Componentes del Squad<br/>(frontend/modules/squads/squad_X_...)"]
         Controller["Gestor de Estado<br/>(Controller / BLoC / Riverpod)"]
         LocalStore["Almacenamiento Local<br/>(Hive / IndexedDB / SecureStorage)"]
     end
@@ -74,8 +74,8 @@ flowchart TD
 
 | Componente | Responsabilidad | Tecnologías / Librerías |
 |---|---|---|
-| `[NombreComponenteUI]` | [Responsabilidad visual] | Flutter Widget, Material 3 |
-| `[NombreService]` | [Lógica de negocio y reglas del CNEB] | Dart / Node.js / Python |
+| `[NombreComponenteUI]` | [Responsabilidad visual] | Componente React, PrimeReact / Tailwind |
+| `[NombreService]` | [Lógica de negocio y reglas del CNEB] | TypeScript / Node.js |
 | `[NombreRepository]` | [Acceso a datos y caché local] | Dio, Hive, Http |
 
 ---
@@ -161,22 +161,18 @@ CREATE INDEX idx_nombre_tabla_codigo ON esquema_squad.nombre_tabla (codigo_insti
 
 ---
 
-## 5. Diseño de Interfaz de Usuario en Flutter (Feature-First)
+## 5. Diseño de Interfaz de Usuario en Next.js (Feature-First)
 
 ### 5.1. Estructura de Directorios del Feature
 
 ```text
-lib/features/squad_[X]_[nombre]/
-├── presentation/
-│   ├── screens/                  # Vistas principales del módulo
-│   ├── widgets/                  # Componentes reutilizables internos
-│   └── controllers/              # Notificadores de estado reactivo
-├── domain/
-│   └── models/                   # Entidades inmutables de negocio
-├── data/
-│   ├── datasources/              # Clientes HTTP / Local Storage
-│   └── repositories/             # Implementación de repositorios
-└── squad_[X]_[nombre].dart        # Barrel file de exportación
+frontend/modules/squads/squad_[X]_[nombre]/
+├── components/                   # Componentes de vista del módulo
+├── hooks/                        # Estado y efectos (React hooks)
+├── services/                     # Clientes HTTP / WebSocket / IndexedDB
+├── types.ts                      # Tipos del dominio (espejo de los contratos)
+├── [Nombre]ModuleView.tsx        # Vista principal del módulo
+└── index.ts                      # Exportación pública del módulo
 ```
 
 ### 5.2. Flujo y Ergonomía Visual de Pantallas
@@ -196,7 +192,7 @@ lib/features/squad_[X]_[nombre]/
 
 ## 7. Matriz de Trazabilidad Bidireccional
 
-| Requisito | Caso de Uso | Tabla(s) PostgreSQL | Endpoint(s) API | Pantalla / Widget Flutter |
+| Requisito | Caso de Uso | Tabla(s) PostgreSQL | Endpoint(s) API | Componente Next.js |
 |---|---|---|---|---|
 | `RF-[XX]` | `CU-[XXX]-[01]` | `tabla_uno` | `POST /api/v1/recurso` | `RecursoScreen` |
-| `RF-[YY]` | `CU-[XXX]-[02]` | `tabla_dos` | `GET /api/v1/recurso` | `RecursoListWidget` |
+| `RF-[YY]` | `CU-[XXX]-[02]` | `tabla_dos` | `GET /api/v1/recurso` | `RecursoList` |

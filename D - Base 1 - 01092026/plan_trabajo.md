@@ -21,7 +21,7 @@
 ### In Scope (Incluido en el proyecto)
 
 - Levantamiento, especificación formal y catálogo estructurado de **89 Requisitos Funcionales (`RF-01` al `RF-89`)** organizados en **13 módulos** operativos.
-- Diseño y desarrollo de la arquitectura de software: Frontend (Flutter Web / PWA), Backend (API REST), Base de Datos relacional (PostgreSQL Multi-Tenant), Caché (Redis) y Sockets en tiempo real.
+- Diseño y desarrollo de la arquitectura de software: Frontend (Next.js / PWA), Backend (API REST), Base de Datos relacional (PostgreSQL Multi-Tenant), Caché (Redis) y Sockets en tiempo real.
 - Incorporación de **capacidades de innovación operativa y pedagógica de alto impacto**:
   1. *Kiosco Offline-First de Asistencia* con buffer de contingencia local y carnetización QR.
   2. *Toma Rápida de Asistencia Móvil/Web* con difusión y visualización en tiempo real vía WebSockets.

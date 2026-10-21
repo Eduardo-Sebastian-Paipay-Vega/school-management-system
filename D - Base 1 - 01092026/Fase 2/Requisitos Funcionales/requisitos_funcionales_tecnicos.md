@@ -18,8 +18,8 @@ El presente documento formaliza la **Especificación Técnica de los Requisitos 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │                        CAPA DE CLIENTE / PRESENTACIÓN (FRONTEND)                       │
-│      Flutter Web / Desktop SPA (Dart 3.x / Material Design 3 / Responsive Layout)      │
-│     [Motor de Teclado "Modo Excel" │ Almacenamiento Local Offline (IndexedDB/Hive)]    │
+│          Next.js 15 / React 19 (TypeScript / Tailwind CSS / PrimeReact / PWA)          │
+│       [Motor de Teclado "Modo Excel" │ Almacenamiento Local Offline (IndexedDB)]       │
 └───────────────────────────────────────────┬────────────────────────────────────────────┘
                                             │ HTTPS / WSS (JSON REST APIs & WebSockets)
 ┌───────────────────────────────────────────▼────────────────────────────────────────────┐
@@ -170,7 +170,7 @@ MÓDULO TÉCNICO 1: SERVICIOS DE AUTENTICACIÓN, JWT, RBAC Y SESIONES (RF-TEC-SE
 - **Lógica Técnica de Procesamiento:**
   1. Al invocar `/logout`, extraer el `jti` (JWT ID) del Access Token y agregarlo a una Lista Negra (Denylist) en Redis con clave `jwt_blacklist:<jti>` y expiración igual al tiempo remanente del token.
   2. Eliminar de Redis el `refreshToken` asociado al usuario.
-  3. En el cliente Flutter, destruir el almacenamiento seguro local (`flutter_secure_storage`).
+  3. En el cliente Next.js, descartar el Access Token en memoria y limpiar el estado de sesión; el servidor borra la cookie `HttpOnly` del Refresh Token.
   4. En el Middleware del Backend: para cada petición entrante, consultar en Redis si el `jti` está en la lista negra. Si existe, denegar con HTTP 401 (`TOKEN_REVOKED`).
   5. Expiración por inactividad: el frontend monitorea eventos de puntero y teclado con un `Timer` de 20 minutos. Al agotarse, ejecuta `/logout` automáticamente y purga el estado de memoria en la aplicación.
 - **Contrato de Salida (HTTP 200 OK):**
@@ -334,7 +334,7 @@ MÓDULO TÉCNICO 5: ASISTENCIA ESTUDIANTIL, KIOSCO OFFLINE-FIRST Y CARNÉS QR (R
 
 ### RF-TEC-AST-03: Arquitectura Resiliente de Sincronización Desconectada (Offline-First Kiosk)
 - **Trazabilidad:** `RF-25`
-- **Capa / Componente:** `KioskStorageService` (Frontend Flutter) → `IndexedDB` / `Hive` → `GateSyncWorker` (Background)
+- **Capa / Componente:** `KioskStorageService` (Frontend Next.js) → `IndexedDB` → `GateSyncWorker` (Service Worker)
 - **Endpoint de Sincronización por Lote:** `POST /api/v1/kiosk/gate-entry/offline-batch-sync`
 - **Contrato de Entrada (JSON Body):**
   ```json
@@ -348,8 +348,8 @@ MÓDULO TÉCNICO 5: ASISTENCIA ESTUDIANTIL, KIOSCO OFFLINE-FIRST Y CARNÉS QR (R
   }
   ```
 - **Lógica Técnica:**
-  1. El cliente Flutter monitorea el estado de conectividad mediante `connectivity_plus`. Al detectar fallo de red, conmuta a modo desconectado.
-  2. Los escaneos se persisten localmente en una base de datos local encriptada (`Hive` con cifrado AES-256).
+  1. El cliente monitorea la conectividad con los eventos `online`/`offline` del navegador y un ping periódico al backend. Al detectar fallo de red, conmuta a modo desconectado.
+  2. Los escaneos se persisten en IndexedDB cifrados con AES-GCM mediante Web Crypto API.
   3. Al restablecerse la conexión, el servicio `GateSyncWorker` despacha la cola acumulada al endpoint de sincronización.
   4. En el backend: transacción idempotente basada en `clientUuid` para evitar duplicados. Cálculo de tardanzas según el `offlineTimestamp` capturado en portería.
 - **Contrato de Salida (HTTP 200 OK):**
@@ -377,7 +377,7 @@ MÓDULO TÉCNICO 5: ASISTENCIA ESTUDIANTIL, KIOSCO OFFLINE-FIRST Y CARNÉS QR (R
 
 ### RF-TEC-AST-05: API de Toma Rápida de Asistencia en Aula y Difusión WebSockets
 - **Trazabilidad:** `RF-27`
-- **Capa / Componente:** `AttendanceFastTapGrid` (Flutter Web / Mobile) → `LiveAttendanceController` → `WebsocketBroadcastService`
+- **Capa / Componente:** `AttendanceFastTapGrid` (Next.js responsive) → `LiveAttendanceController` → `WebsocketBroadcastService`
 - **Endpoint de Registro en Vivo:** `POST /api/v1/attendance/classroom/live-batch`
 - **Roles Autorizados:** `ROLE_TEACHER`, `ROLE_ASSISTANT`, `ROLE_COORDINATOR`.
 - **Contrato de Entrada (JSON Body):**
@@ -456,18 +456,18 @@ MÓDULO TÉCNICO 8: MOTOR DE CALIFICACIONES EN TIEMPO REAL, MODO EXCEL Y CONCLUS
 
 ---
 
-### RF-TEC-NOT-05: Controlador de Matriz de Teclado Rápido ("Modo Excel") y Parser de Portapapeles en Flutter
+### RF-TEC-NOT-05: Controlador de Matriz de Teclado Rápido ("Modo Excel") y Parser de Portapapeles en React
 - **Trazabilidad:** `RF-38`
-- **Capa / Componente:** `FastGradeMatrixWidget` (Frontend Flutter) → `FocusNodeMatrixController` → `ClipboardParserService`
+- **Capa / Componente:** `GradeMatrix` (Frontend React) → `useGridFocus` → `ClipboardParserService`
 - **Lógica Técnica de Frontend:**
-  1. Implementación de matriz de `FocusNode` bidimensional `focusNodes[row][col]`.
-  2. Captura de eventos de hardware mediante `FocusScope` y escucha de teclas `HardwareKeyboard`:
-     - Flecha Arriba (`LogicalKeyboardKey.arrowUp`): `focusNodes[row - 1][col].requestFocus()`
-     - Flecha Abajo / Enter (`LogicalKeyboardKey.enter`): autoguardar y enfocar celda `[row + 1][col]`
+  1. Matriz de referencias bidimensional `cellRefs[row][col]` (`useRef`) y estado de la celda activa.
+  2. Captura de teclado con `onKeyDown` en la grilla:
+     - Flecha Arriba (`ArrowUp`): `cellRefs[row - 1][col].focus()`
+     - Flecha Abajo / Enter (`ArrowDown`, `Enter`): autoguardar y enfocar celda `[row + 1][col]`
      - Flechas Izquierda / Derecha: navegación horizontal entre criterios evaluativos.
-  3. Intercepción del portapapeles (`Clipboard.getData(Clipboard.kTextPlain)`):
+  3. Intercepción del portapapeles (evento `paste`, `clipboardData.getData('text/plain')`):
      - Detección de cadenas tabuladas y saltos de línea (`\t` y `\n` o `\r\n`).
-     - Mapeo secuencial hacia los `TextEditingController` de la columna activa en orden alfabético.
+     - Mapeo secuencial hacia las celdas de la columna activa en orden alfabético.
      - Ejecución de validaciones de rango por celda y activación de botón de guardado masivo en 1 clic.
 
 ---
@@ -509,25 +509,22 @@ MÓDULO TÉCNICO 8: MOTOR DE CALIFICACIONES EN TIEMPO REAL, MODO EXCEL Y CONCLUS
 
 ### RF-TEC-NOT-07: Asistencia de Llenado con Auto-Guardado Silencioso (Debounce 400ms) y Sincronización en Cascada
 - **Trazabilidad:** `RF-45`
-- **Capa / Componente:** `GradeAutoSaveManager` (Flutter) → `PATCH /api/v1/grades/auto-save` → `GradeCalculationPipeline`
+- **Capa / Componente:** `useGradeAutoSave` (React) → `PATCH /api/v1/grades/auto-save` → `GradeCalculationPipeline`
 - **Lógica Técnica de Auto-Guardado en Cliente:**
-  ```dart
-  Timer? _debounceTimer;
-  void onGradeChanged(String studentId, String criteriaId, dynamic newValue) {
-    state = state.updating(studentId, criteriaId, isSaving: true);
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 400), () async {
+  ```ts
+  const timers = new Map<string, ReturnType<typeof setTimeout>>();
+  function onGradeChanged(studentId: string, criteriaId: string, value: number | string) {
+    const key = `${studentId}:${criteriaId}`;
+    setCellState(key, { saving: true });
+    clearTimeout(timers.get(key));
+    timers.set(key, setTimeout(async () => {
       try {
-        final res = await apiClient.patch('/api/v1/grades/auto-save', data: {
-          'studentId': studentId,
-          'criteriaId': criteriaId,
-          'value': newValue,
-        });
-        state = state.updateSuccess(studentId, criteriaId, updatedCompetencyAvg: res.data['competencyAvg']);
-      } catch (err) {
-        state = state.updateError(studentId, criteriaId, error: err);
+        const res = await api.patch('/api/v1/grades/auto-save', { studentId, criteriaId, value });
+        setCellState(key, { saving: false, saved: true, competencyAvg: res.data.competencyAvg });
+      } catch (error) {
+        setCellState(key, { saving: false, error });
       }
-    });
+    }, 400));
   }
   ```
 - **Lógica Backend en Cascada:**
@@ -559,7 +556,7 @@ MÓDULO TÉCNICO 8: MOTOR DE CALIFICACIONES EN TIEMPO REAL, MODO EXCEL Y CONCLUS
   END;
   $$ LANGUAGE plpgsql IMMUTABLE;
   ```
-- **Lógica del Servicio de Conversión en Flutter / TypeScript:**
+- **Lógica del Servicio de Conversión en TypeScript (compartida por frontend y backend):**
   1. Si el usuario ingresa un valor numérico (ej. `16` o `16.5`):
      - El servicio calcula instantáneamente: `achievement_level = 'A'`.
      - Renderiza la celda con la insignia literal verde `A` y un subtexto cuantitativo gris `(16.5)`.
@@ -615,7 +612,7 @@ MÓDULO TÉCNICO 9: MOTOR DE MAPAS DE CALOR CON NAVEGACIÓN DRILL-DOWN (RF-TEC-C
   WHERE g.student_id = :studentId AND ec.course_id = :courseId AND ec.period_id = :periodId
   GROUP BY c.id, c.name;
   ```
-- **Contrato de Salida:** Estructura tipada con el desglose exacto de las competencias evaluadas, permitiendo que la interfaz Flutter pinte el gráfico modal explicativo de por qué la celda térmica es roja o amarilla.
+- **Contrato de Salida:** Estructura tipada con el desglose exacto de las competencias evaluadas, permitiendo que la interfaz web pinte el gráfico modal explicativo de por qué la celda térmica es roja o amarilla.
 
 ---
 
@@ -789,7 +786,7 @@ MÓDULO TÉCNICO 13: DIFUSIÓN DIGITAL Y CONTENIDOS INSTITUCIONALES (RF-TEC-DIF)
 | `RF-35` | `RF-TEC-DOC-01` | `/api/v1/attendance/contracted/real-time`| GET | `teacher_logs` | Coordinación |
 | `RF-36` | `RF-TEC-NOT-01` | `/api/v1/evaluation-criteria` | POST | `evaluation_criteria` | Docentes Titulares |
 | `RF-37` | `RF-TEC-NOT-01` | `/api/v1/grades/batch-upsert` | POST | `grades`, `audit_history` | Docentes Titulares |
-| **`RF-38`**| **`RF-TEC-NOT-05`**| `FastGradeMatrixWidget` (Flutter) | **UI** | **Matrix Keyboard Parser** | **Docentes** |
+| **`RF-38`**| **`RF-TEC-NOT-05`**| `GradeMatrix` (React) | **UI** | **Matrix Keyboard Parser** | **Docentes** |
 | **`RF-39`**| **`RF-TEC-NOT-06`**| `/api/v1/curriculum/competencies/:id/conclusions` | **GET** | **`descriptive_conclusion_bank`**| **Docentes** |
 | `RF-40` | `RF-TEC-NOT-01` | `/api/v1/grades/practitioner-proposals` | POST | `grade_proposals` | Practicantes |
 | `RF-41` | `RF-TEC-NOT-01` | `GradingCalculationEngine` | Lógica | `student_period_summaries` | Sistema |
@@ -823,24 +820,24 @@ MÓDULO TÉCNICO 13: DIFUSIÓN DIGITAL Y CONTENIDOS INSTITUCIONALES (RF-TEC-DIF)
 | `RF-69` | `RF-TEC-DIF-01` | `/api/v1/public/announcements` | GET | `announcements`, S3 | Toda la comunidad |
 | `RF-70` | `RF-TEC-DIF-01` | `/api/v1/public/academic-calendar` | GET | `academic_events` | Toda la comunidad |
 | `RF-71` | `RF-TEC-DIF-01` | `/api/v1/public/institutional-info` | GET | `institutional_pages` | Público General |
-| `RF-72` | `RF-TEC-USU-04` | `/api/v1/users/:id` | PATCH / DELETE | `users` (Soft Delete), `audit_logs` | Admin |
-| `RF-73` | `RF-TEC-USU-05` | `/api/v1/users/:id/roles` | PUT | `users`, `roles`, `audit_logs` | Admin, Director |
-| `RF-74` | `RF-TEC-PRA-02` | `/api/v1/practitioners/batch-approve` | POST | `practitioner_logs`, `audit_logs` | Docentes Tutores |
-| `RF-75` | `RF-TEC-USU-06` | `/api/v1/guardians/invitations` | POST | `guardians`, `guardian_students`, `consents` | Secretaría |
-| `RF-76` | `RF-TEC-NTF-01` | `/api/v1/notifications` | GET / PATCH | `notifications`, `notification_prefs` | Autenticado |
-| `RF-77` | `RF-TEC-AST-09` | `AbsenceGuardianNotifier` (job) | — | `attendance`, `notifications` | Sistema |
-| `RF-78` | `RF-TEC-ACD-06` | `/api/v1/enrollments/import-siagie` | POST | `students`, `enrollments` | Secretaría |
-| `RF-79` | `RF-TEC-NOT-12` | `/api/v1/courses/:id/activities` | POST / GET | `activities`, `evaluations` | Docente |
-| `RF-80` | `RF-TEC-NOT-13` | `/api/v1/grades/import-excel` | POST | `grades`, `audit_logs` | Docente |
-| `RF-81` | `RF-TEC-NOT-14` | `GradeDeadlineMonitor` (job) | — | `grade_deadlines`, `teacher_warnings` | Sistema |
-| `RF-82` | `RF-TEC-NOT-15` | `/api/v1/guardian/students/:id/grades` | GET | `grades`, `activities` | Apoderado |
-| `RF-83` | `RF-TEC-ANA-08` | `/api/v1/analytics/grade-compliance` | GET | `grade_deadlines`, `teacher_warnings` | Coordinación |
-| `RF-84` | `RF-TEC-DIF-02` | `/api/v1/news` | POST / PATCH | `news`, `news_media` | Comunicaciones |
-| `RF-85` | `RF-TEC-DIF-03` | `/api/v1/integrations/facebook` | POST | `integrations`, `news` | Comunicaciones |
-| `RF-86` | `RF-TEC-TRA-01` | `/api/v1/public/mesa-partes` | POST / GET | `expedientes`, `expediente_movimientos` | Público / Secretaría |
-| `RF-87` | `RF-TEC-TRA-02` | `/api/v1/certificates/requests` | POST / PATCH | `certificate_requests`, `documentos_emitidos` | Apoderado / Secretaría |
-| `RF-88` | `RF-TEC-REP-07` | `/api/v1/siagie/exports` | POST / GET | `siagie_exports` | Secretaría |
-| `RF-89` | `RF-TEC-ANA-09` | `/api/v1/appointments` | POST / GET | `appointment_slots`, `appointments` | Apoderado / Tutor |
+| `RF-72` | `RF-TEC-USU-04` | `/api/v1/users/:id`, `/api/v1/users/:id/deactivate` | PATCH / POST | `usuarios` (baja lógica), `logs_auditoria` | Admin |
+| `RF-73` | `RF-TEC-USU-05` | `/api/v1/users/:id/roles` | PUT | `usuario_roles`, `logs_auditoria` | Admin, Director |
+| `RF-74` | `RF-TEC-PRA-02` | `/api/v1/practitioners/batch-approve` | POST | `asistencias_practicantes`, `logs_auditoria` | Docentes Tutores |
+| `RF-75` | `RF-TEC-USU-06` | `/api/v1/guardians/invitations` | POST | `apoderados_estudiantes`, `invitaciones_apoderado`, `consentimientos_datos` | Secretaría |
+| `RF-76` | `RF-TEC-NTF-01` | `/api/v1/notifications` | GET / PATCH | `notificaciones`, `preferencias_notificacion`, `envios_correo` | Autenticado |
+| `RF-77` | `RF-TEC-AST-09` | `AbsenceGuardianNotifier` (job) | — | `asistencias_alumnos`, `avisos_inasistencia` | Sistema |
+| `RF-78` | `RF-TEC-ACD-06` | `/api/v1/enrollments/import-siagie` | POST | `usuarios`, `matriculas`, `importaciones_nomina` | Secretaría |
+| `RF-79` | `RF-TEC-NOT-12` | `/api/v1/courses/:id/activities` | POST / GET | `actividades_evaluativas`, `evaluaciones` | Docente |
+| `RF-80` | `RF-TEC-NOT-13` | `/api/v1/grades/import-excel` | POST | `calificaciones`, `importaciones_notas` | Docente |
+| `RF-81` | `RF-TEC-NOT-14` | `GradeDeadlineMonitor` (job) | — | `plazos_registro_notas`, `alertas_docentes` | Sistema |
+| `RF-82` | `RF-TEC-NOT-15` | `/api/v1/guardian/students/:id/grades` | GET | `calificaciones`, `actividades_evaluativas` | Apoderado |
+| `RF-83` | `RF-TEC-ANA-08` | `/api/v1/analytics/grade-compliance` | GET | `v_avance_registro_notas`, `alertas_docentes` | Coordinación |
+| `RF-84` | `RF-TEC-DIF-02` | `/api/v1/news` | POST / PATCH | `noticias`, `noticias_galeria` | Comunicaciones |
+| `RF-85` | `RF-TEC-DIF-03` | `/api/v1/integrations/facebook` | POST | `integraciones_redes`, `noticias` | Comunicaciones |
+| `RF-86` | `RF-TEC-TRA-01` | `/api/v1/public/mesa-partes` | POST / GET | `expedientes_mesa_partes`, `expedientes_movimientos` | Público / Secretaría |
+| `RF-87` | `RF-TEC-TRA-02` | `/api/v1/certificates/requests` | POST / PATCH | `solicitudes_certificado`, `documentos_emitidos` | Apoderado / Secretaría |
+| `RF-88` | `RF-TEC-REP-07` | `/api/v1/siagie/exports` | POST / GET / PATCH | `exportaciones_siagie` | Secretaría |
+| `RF-89` | `RF-TEC-ANA-09` | `/api/v1/appointments` | POST / GET | `franjas_atencion`, `citas_apoderados` | Apoderado / Tutor |
 
 ---
 

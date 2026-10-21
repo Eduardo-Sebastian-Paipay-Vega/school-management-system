@@ -15,9 +15,9 @@ El sistema está concebido bajo una arquitectura desacoplada, escalable, modular
 ```mermaid
 graph TD
     subgraph Capa_Presentacion ["Capa de Presentación (Multiplataforma)"]
-        A1["Flutter Web / PWA (Dirección, Docentes, Secretaría)"]
-        A2["Flutter Desktop Windows (Kiosco Portería Offline-First)"]
-        A3["Flutter Mobile Android (App Rápida Asistencia / Alumnos)"]
+        A1["Next.js Web / PWA (Dirección, Docentes, Secretaría)"]
+        A2["Kiosco de Portería en navegador (PWA Offline-First)"]
+        A3["Vista móvil responsive (Toma rápida, Estudiantes, Apoderados)"]
     end
 
     subgraph Capa_Seguridad_Enrutamiento ["Gateway & Seguridad"]
@@ -34,7 +34,7 @@ graph TD
     subgraph Capa_Persistencia ["Capa de Datos e Infraestructura"]
         DB[(PostgreSQL 16/18 Multi-Tenant)]
         CACHE[(Redis: Caché de Sesiones y Locks)]
-        LOCAL[(IndexedDB / Hive: Almacenamiento Local Offline)]
+        LOCAL[(IndexedDB: Almacenamiento Local Offline)]
         STORAGE["File Storage (PDFs Oficiales, Carnés QR)"]
     end
 
@@ -55,7 +55,7 @@ graph TD
 ### Principios Fundamentales del Diseño
 1. **Clean Architecture en Frontend y Backend:** Separación tajante entre entidades de dominio, casos de uso, repositorios y capas de presentación.
 2. **Aislamiento Multi-Tenant:** Persistencia en PostgreSQL asegurada por clave discriminadora `tenant_id` en todas las consultas y tablas compartidas.
-3. **Estrategia Offline-First:** Para el Kiosco de Asistencia (`RF-25`), las transacciones se almacenan localmente en búfer (`IndexedDB`/`Hive`) y se sincronizan atómicamente al restablecer conexión.
+3. **Estrategia Offline-First:** Para el Kiosco de Asistencia (`RF-25`), las transacciones se almacenan localmente en búfer (`IndexedDB`) y se sincronizan atómicamente al restablecer conexión.
 4. **Reactividad en Tiempo Real:** Canales WebSockets bidireccionales para propagación de asistencia de aula (`RF-27`) y auto-guardado en segundo plano con cálculo en cascada (`RF-45`).
 5. **Inmutabilidad y Sello Criptográfico:** Generación de digests SHA-256 inmutables para documentos oficiales verificables públicamente mediante códigos QR (`RF-60`).
 
@@ -106,7 +106,7 @@ pie title Distribución de los 89 Requisitos Funcionales
 |---|---|
 | **Base de Datos** | Tablas: `grados_secciones`, `cursos`, `matriculas`, `carga_docente`, `asistencias_alumnos`, `asistencias_practicantes`, `asistencias_docentes_contratados`, `carnes_qr_log`. |
 | **Backend** | API REST de Matrícula y Asignación de carga lectiva; Gateway WebSockets para difusión en tiempo real de asistencia (< 500 ms); Endpoints de sincronización por lotes (`/sync-bulk-attendance`); Lógica de cómputo de horas para el convenio UNSCH. |
-| **Frontend** | Pantallas de Matrícula y gestión de secciones; **Módulo Kiosco de Portería Offline-First** (modo pantalla completa, lector de código de barras/QR físico, persistencia en IndexedDB/Hive, cola de reintentos); App móvil/web de toma rápida de asistencia en 1 toque; Generador de carnés escolares QR en PDF masivo. |
+| **Frontend** | Pantallas de Matrícula y gestión de secciones; **Módulo Kiosco de Portería Offline-First** (modo pantalla completa, lector de código de barras/QR físico, persistencia en IndexedDB, cola de reintentos); App móvil/web de toma rápida de asistencia en 1 toque; Generador de carnés escolares QR en PDF masivo. |
 
 ---
 
@@ -120,7 +120,7 @@ pie title Distribución de los 89 Requisitos Funcionales
 |---|---|
 | **Base de Datos** | Tablas: `evaluaciones`, `criterios_rubricas`, `calificaciones` (campos duales: `nota_vigesimal` NUMERIC(4,2), `nota_literal` VARCHAR(2)), `conclusiones_descriptivas`, `banco_conclusiones_cneb`, `cierres_periodo`. |
 | **Backend** | Motor de conversión dual automática (algoritmo vigesimal 0-20 a literales AD, A, B, C oficial MINEDU); Endpoints de auto-guardado concurrente con bloqueo optimista (`debounce` 400 ms); Lógica de cierre formal de periodos con congelamiento de actas; Banco taxonómico de conclusiones descriptivas contextuales. |
-| **Frontend** | **Planilla Rápida de Notas ("Modo Excel"):** Componente matricial avanzado en Flutter con soporte completo de navegación por teclado (flechas, Tab, Enter), validación en caliente, pegado masivo desde portapapeles (Ctrl+V); Asistente predictivo de conclusiones descriptivas; Indicador visual de auto-guardado en tiempo real ("Guardado en la nube"). |
+| **Frontend** | **Planilla Rápida de Notas ("Modo Excel"):** Componente matricial avanzado en React con soporte completo de navegación por teclado (flechas, Tab, Enter), validación en caliente, pegado masivo desde portapapeles (Ctrl+V); Asistente predictivo de conclusiones descriptivas; Indicador visual de auto-guardado en tiempo real ("Guardado en la nube"). |
 
 ---
 
@@ -183,28 +183,30 @@ pie title Distribución de los 89 Requisitos Funcionales
 
 ## 4. ESTRUCTURA DE CARPETAS Y ARQUITECTURA DE CÓDIGO
 
-Para evitar colisiones en Git y garantizar independencia de trabajo entre squads, se implementa una arquitectura modular limpia tanto en el Frontend Flutter como en el Backend:
+Para evitar colisiones en Git y garantizar independencia de trabajo entre squads, se implementa una arquitectura modular limpia tanto en el Frontend (Next.js) como en el Backend:
 
-### Frontend (Flutter Clean Architecture)
+### Frontend (Next.js — Feature-First)
 ```
-lib/
-├── core/                         # Núcleo transversal compartido
-│   ├── network/                  # Clientes HTTP (Dio), interceptores JWT, WebSocket Client
-│   ├── theme/                    # Material 3 Design System, tokens, paletas institucionales
-│   ├── utils/                    # Criptografía SHA-256, formateadores de fecha, validadores
-│   └── database/                 # Hive / IndexedDB para soporte Offline-First
-├── features/                     # Módulos encapsulados por Squad
-│   ├── auth/                     # [Squad 1] Login, Recuperación, Guards
-│   ├── admin_config/             # [Squad 1] Usuarios, Sedes, Años Lectivos, Auditoría
-│   ├── academic_management/      # [Squad 2] Matrícula, Carga Lectiva, Secciones
-│   ├── attendance_kiosk/         # [Squad 2] Kiosco Portería, Scanner QR, Offline Sync
-│   ├── attendance_staff/         # [Squad 2] Practicantes EPIS y Docentes Contratados
-│   ├── gradebook_excel/          # [Squad 3] Planilla Matricial, Auto-guardado, Conclusiones
-│   ├── analytics_heatmaps/       # [Squad 4] Mapas de calor interactivos, Drill-Down
-│   ├── dashboards_360/           # [Squad 4] Ficha 360°, Deserción, Métricas SSU
-│   ├── reports_verification/     # [Squad 5] Emisión Boletas, Visor de Verificación QR
-│   └── public_portal/            # [Squad 5] Portal web, Cartelera institucional
-└── main.dart                     # Punto de entrada de la aplicación
+frontend/
+├── app/                          # App Router de Next.js
+│   ├── (landing)/                # Portal público: noticias, cartelera, mesa de partes, verificación QR
+│   ├── (intranet)/               # Intranet autenticada por rol (incluye vista del apoderado)
+│   ├── globals.css               # Tokens de diseño (variables CSS)
+│   └── layout.tsx
+├── components/                   # Componentes UI compartidos
+├── lib/                          # Cliente HTTP con interceptor JWT, cliente Socket.IO, utilidades
+├── modules/
+│   ├── shared/                   # Código transversal (sesión, permisos, formato de fechas)
+│   ├── landing/                  # [Squad 5] Portal web institucional
+│   ├── intranet/                 # Login y hub de la intranet
+│   └── squads/
+│       ├── squad_1_core/         # [Squad 1] Usuarios, roles, configuración, auditoría, apoderados
+│       ├── squad_2_asistencia/   # [Squad 2] Matrícula, Kiosco Offline-First, practicantes
+│       ├── squad_3_calificaciones/ # [Squad 3] Planilla Modo Excel, actividades, plazos
+│       ├── squad_4_analitica/    # [Squad 4] Mapas de calor, Ficha 360°, citas
+│       └── squad_5_secretaria/   # [Squad 5] Boletas, certificados, SIAGIE
+├── public/                       # Emblemas e imágenes estáticas
+└── tailwind.config.ts            # Tokens expuestos como clases
 ```
 
 ### Backend (Clean Architecture / Modularity)

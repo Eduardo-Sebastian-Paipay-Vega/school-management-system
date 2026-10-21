@@ -24,7 +24,7 @@
 ## 1. Introducción y Alcance del Módulo
 
 ### 1.1. Propósito del Documento
-El presente Documento de Diseño de Software (SDD) formaliza las decisiones de arquitectura técnica, el diseño de modelos relacionales en PostgreSQL, los contratos de endpoints RESTful y la estructura de componentes en Flutter correspondientes al núcleo de seguridad, administración multi-tenant y auditoría inmutable del Sistema de Gestión Escolar.
+El presente Documento de Diseño de Software (SDD) formaliza las decisiones de arquitectura técnica, el diseño de modelos relacionales en PostgreSQL, los contratos de endpoints RESTful y la estructura de componentes en Next.js correspondientes al núcleo de seguridad, administración multi-tenant y auditoría inmutable del Sistema de Gestión Escolar.
 
 ### 1.2. Alcance Funcional
 * **Autenticación Robusta:** Emisión y rotación de tokens JWT duales (Access Token de 15 minutos en memoria y Refresh Token de 7 días en cookie segura `HttpOnly`).
@@ -36,7 +36,7 @@ El presente Documento de Diseño de Software (SDD) formaliza las decisiones de a
 ### 1.3. Supuestos y Restricciones Técnicas
 * **Motor de Base de Datos:** PostgreSQL 16 con extensiones `uuid-ossp` y `pg_trgm`.
 * **Caché y Rate-Limiting:** Redis 7 para lista negra de tokens revocados y bloqueo por intentos fallidos (máx. 5 intentos cada 15 min).
-* **Frontend:** Flutter 3.35+ bajo arquitectura Feature-First en `lib/features/squad_1_core_seguridad/`.
+* **Frontend:** Next.js 15 (React 19, TypeScript) bajo arquitectura Feature-First en `frontend/modules/squads/squad_1_core/`.
 
 ---
 
@@ -46,8 +46,8 @@ El presente Documento de Diseño de Software (SDD) formaliza las decisiones de a
 
 ```mermaid
 flowchart TD
-    subgraph Cliente["Cliente Flutter (Web / Desktop / Mobile)"]
-        UI["LoginScreen / UserAdminScreen<br/>(lib/features/squad_1_core_seguridad)"]
+    subgraph Cliente["Cliente Next.js (Web / PWA / Móvil)"]
+        UI["LoginForm / UserAdmin<br/>(frontend/modules/squads/squad_1_core)"]
         AuthNotifier["AuthNotifier / StateNotifier<br/>(Gestión de Token en Memoria)"]
         SecureCookie["Cookie Jar Seguro<br/>(HttpOnly SameSite=Strict)"]
     end
@@ -58,7 +58,7 @@ flowchart TD
         AuditInterceptor["Audit Interceptor (Ley 29733)"]
     end
 
-    subgraph Backend["Servicios de Dominio (Node.js / Express / Dart Frog)"]
+    subgraph Backend["Servicios de Dominio (Node.js / Express)"]
         AuthService["AuthService (Bcrypt Cost 12)"]
         UserService["UserService (Directorio y Búsqueda Trigram)"]
         TenantService["TenantConfigService (Multi-Tenant)"]
@@ -87,7 +87,7 @@ flowchart TD
 
 | Componente | Capa | Responsabilidad |
 |---|---|---|
-| `AuthNotifier` | Flutter Presentation | Controla el ciclo de vida de la sesión en el cliente y la renovación automática del Access Token. |
+| `useSession` | Frontend Next.js | Controla el ciclo de vida de la sesión en el cliente y la renovación automática del Access Token. |
 | `AuthMiddleware` | Backend Gateway | Intercepta peticiones protegidas, valida la firma HMAC-SHA256 del JWT y consulta Redis. |
 | `AuditService` | Backend Domain | Construye el registro diferencial (payload JSONB) y ejecuta la inserción inmutable. |
 | `instituciones` | PostgreSQL Data | Tabla raíz del modelo multi-tenant que particiona lógicamente los datos de las sedes escolares. |
@@ -298,35 +298,33 @@ FOR EACH ROW EXECUTE FUNCTION fn_prevent_audit_tampering();
 
 ---
 
-## 5. Diseño Frontend en Flutter (Feature-First)
+## 5. Diseño Frontend en Next.js (Feature-First)
 
 ### 5.1. Organización del Código
 
 ```text
-lib/features/squad_1_core_seguridad/
-├── presentation/
-│   ├── screens/
-│   │   ├── squad_1_screen.dart           # Dashboard maestro del Squad 1
-│   │   ├── login_screen.dart             # Formulario de inicio de sesión reactivo
-│   │   └── audit_viewer_screen.dart      # Visor paginado de bitácoras de auditoría
-│   └── widgets/
-│       ├── rbac_role_chip.dart           # Selector visual interactivo de roles
-│       └── session_timer_widget.dart     # Contador regresivo de inactividad (30 min)
-├── domain/
-│   └── models/
-│       ├── user_model.dart               # Entidad inmutable User
-│       └── audit_log_entry.dart          # Entidad de registro de auditoría
-├── data/
-│   ├── datasources/
-│   │   └── auth_remote_datasource.dart   # Cliente HTTP Dio con interceptor JWT
-│   └── repositories/
-│       └── auth_repository_impl.dart     # Implementación de repositorio
-└── squad_1_core.dart                     # Barrel file de exportación pública
+frontend/modules/squads/squad_1_core/
+├── components/
+│   ├── LoginForm.tsx                 # Formulario de inicio de sesión
+│   ├── AuditViewer.tsx               # Visor paginado de bitácoras de auditoría (DataTable)
+│   ├── RbacRoleChip.tsx              # Selector visual de roles
+│   ├── UserEditDialog.tsx            # Edición y baja lógica de usuarios (RF-72)
+│   ├── RoleManagerPanel.tsx          # Reasignación de roles con diferencia de permisos (RF-73)
+│   ├── GuardianInviteDialog.tsx      # Invitación de apoderados (RF-75)
+│   └── NotificationBell.tsx          # Campana y bandeja de notificaciones (RF-76)
+├── hooks/
+│   ├── useSession.ts                 # Sesión, roles y renovación silenciosa del Access Token
+│   └── useIdleTimeout.ts             # Cierre por inactividad (30 min)
+├── services/
+│   └── authApi.ts                    # Llamadas a /auth, /users, /guardians, /notifications
+├── types.ts                          # Tipos de User, Role, AuditLogEntry, Notification
+└── CoreModuleView.tsx                # Vista maestra del Squad 1
 ```
 
 ### 5.2. Manejo de Sesión y Expiración por Inactividad
-* El cliente Flutter implementa un `GestureDetector` global que reinicia un temporizador de 30 minutos ante eventos táctiles o de teclado.
+* El hook `useIdleTimeout` escucha eventos de teclado, ratón y toque en el documento y reinicia un temporizador de 30 minutos.
 * Al minuto 29 sin actividad, despliega un diálogo de advertencia de 60 segundos antes del cierre forzoso.
+* El Access Token vive en memoria; el Refresh Token viaja en cookie `HttpOnly` (`SameSite=Strict`), nunca en `localStorage`.
 
 ---
 
@@ -344,17 +342,21 @@ lib/features/squad_1_core_seguridad/
 
 ## 7. Matriz de Trazabilidad Bidireccional
 
-| Requisito | Caso de Uso | Tabla PostgreSQL | Endpoint API | Componente Flutter |
+| Requisito | Caso de Uso | Tabla PostgreSQL | Endpoint API | Componente Next.js |
 |---|---|---|---|---|
 | `RF-01` | `CU-SEG-01` | `usuarios`, `instituciones` | `POST /auth/login` | `LoginScreen` |
-| `RF-02` | `CU-SEG-02` | `Redis Blacklist` | `POST /auth/logout` | `SessionTimerWidget` |
-| `RF-03` | `CU-SEG-03` | `usuarios` | `POST /auth/reset-password` | `ResetPasswordScreen` |
+| `RF-02` | `CU-SEG-02` | `Redis Blacklist` | `POST /auth/logout` | `useIdleTimeout` |
+| `RF-03` | `CU-SEG-03` | `usuarios` | `POST /auth/reset-password` | `ResetPasswordForm` |
 | `RF-04` | `CU-SEG-04` | `roles`, `usuario_roles` | `GET /roles`, `PUT /users/:id/roles` | `RbacRoleChip` |
 | `RF-05` | `CU-USR-01` | `usuarios` | `POST /users` | `UserCreateDialog` |
 | `RF-08` | `CU-USR-04` | `usuarios` (gin_trgm) | `GET /users?query=` | `UserDirectoryList` |
-| `RF-10` | `CU-INS-01` | `anios_lectivos` | `POST /academic-years` | `AcademicYearConfigScreen` |
-| `RF-11` | `CU-INS-02` | `periodos_academicos` | `POST /periods` | `PeriodTimelineWidget` |
-| `RF-65` | `CU-AUD-01` | `audit_logs` | `POST /audit/logs` | `AuditInterceptor` |
-| `RF-66` | `CU-AUD-02` | `audit_logs` | Trigger PostgreSQL | `AuditRowWidget` |
-| `RF-67` | `CU-AUD-03` | `audit_logs` | `GET /audit/logs` | `AuditViewerScreen` |
+| `RF-10` | `CU-INS-01` | `anios_lectivos` | `POST /academic-years` | `AcademicYearConfig` |
+| `RF-11` | `CU-INS-02` | `periodos_academicos` | `POST /periods` | `PeriodTimeline` |
+| `RF-65` | `CU-AUD-01` | `audit_logs` | `POST /audit/logs` | `auditMiddleware` (backend) |
+| `RF-66` | `CU-AUD-02` | `audit_logs` | Trigger PostgreSQL | `AuditRow` |
+| `RF-67` | `CU-AUD-03` | `audit_logs` | `GET /audit/logs` | `AuditViewer` |
 | `RF-68` | `CU-AUD-04` | `audit_logs`, `usuarios` | Políticas de privacidad | `PrivacyPolicyDialog` |
+| `RF-72` | `CU-USR-06` | `usuarios` (baja lógica) | `PATCH /users/:id`, `POST /users/:id/deactivate` | `UserEditDialog` |
+| `RF-73` | `CU-USR-07` | `usuario_roles`, `logs_auditoria` | `PUT /users/:id/roles` | `RoleManagerPanel` |
+| `RF-75` | `CU-USR-08` | `apoderados_estudiantes`, `invitaciones_apoderado`, `consentimientos_datos` | `POST /guardians/invitations`, `POST /public/guardians/activate` | `GuardianInviteDialog` |
+| `RF-76` | `CU-USR-09` | `notificaciones`, `preferencias_notificacion`, `envios_correo` | `GET /notifications`, WS `notification:new` | `NotificationBell` |

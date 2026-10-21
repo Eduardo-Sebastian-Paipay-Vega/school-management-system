@@ -46,7 +46,7 @@ Permite al usuario finalizar su sesión activa o ser desconectado automáticamen
 3. El backend extrae el token JWT, lo añade a la blacklist en Redis con TTL igual a su expiración remanente.
 4. El backend elimina la cookie HttpOnly del Refresh Token configurándola con Max-Age=0.
 5. El backend registra el evento de cierre de sesión en audit_logs.
-6. El frontend limpia todos los estados de sesión en memoria (Riverpod/Bloc) y redirige a /login.
+6. El frontend limpia todos los estados de sesión en memoria (contexto de sesión de React) y redirige a /login.
 
 ---
 

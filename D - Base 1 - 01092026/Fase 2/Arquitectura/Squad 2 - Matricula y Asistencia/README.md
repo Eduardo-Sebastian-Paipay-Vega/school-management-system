@@ -10,7 +10,7 @@
 ## 1. Patrones de Diseño y Decisiones Arquitectónicas (ADRs)
 
 1. **Arquitectura Offline-First para Kiosco de Portería:**
-   * Almacenamiento local en `Hive` (Flutter Desktop) o `IndexedDB` (Flutter Web).
+   * Almacenamiento local en `IndexedDB` del navegador, con Service Worker para operar sin conexión.
    * Cuando se escanea un carné QR, la transacción se persiste localmente en menos de 50 ms en estado `PENDING_SYNC` y se reproduce un pitido/feedback visual inmediato para no detener el flujo peatonal en la puerta.
 2. **Sincronización por Lotes Eventual (Batch Sync):**
    * Un servicio en segundo plano monitorea la conectividad (`connectivity_plus`).
@@ -26,8 +26,8 @@
 
 ```mermaid
 graph TD
-    Scanner["Lector Óptico QR / Código de Barras"] -->|USB HID Emulation| Kiosk["Kiosco Flutter Desktop (Portería)"]
-    Kiosk --> LocalBox[(Búfer Local: Hive / IndexedDB)]
+    Scanner["Lector Óptico QR / Código de Barras"] -->|USB HID Emulation| Kiosk["Kiosco PWA en navegador (Portería)"]
+    Kiosk --> LocalBox[(Búfer Local: IndexedDB)]
     LocalBox --> SyncWorker["Sync Background Worker"]
     SyncWorker -->|HTTP POST /sync-bulk| Backend["AttendanceService API"]
     

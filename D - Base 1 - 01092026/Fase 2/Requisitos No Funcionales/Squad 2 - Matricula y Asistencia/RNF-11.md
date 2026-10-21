@@ -8,7 +8,7 @@
 ---
 
 ## 1. Descripción del Requisito
-El Kiosco de asistencia de portería debe operar al 100% sin conexión a internet utilizando almacenamiento en cliente (IndexedDB / Hive). Al restablecerse la red, se ejecuta una sincronización automática en ráfagas con resolución Last-Write-Wins.
+El Kiosco de asistencia de portería debe operar al 100% sin conexión a internet utilizando almacenamiento en cliente (IndexedDB). Al restablecerse la red, se ejecuta una sincronización automática en ráfagas con resolución Last-Write-Wins.
 
 ---
 

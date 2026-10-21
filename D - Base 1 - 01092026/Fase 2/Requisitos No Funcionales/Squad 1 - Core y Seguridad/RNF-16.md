@@ -8,7 +8,7 @@
 ---
 
 ## 1. Descripción del Requisito
-Estructura de código modular en lib/features/squad_1_core_seguridad/ organizada en capas (presentation, domain, data). Cero dependencias circulares y exportación a través de archivo barril.
+Estructura de código modular en frontend/modules/squads/squad_1_core/ (componentes, hooks, servicios y tipos) y en backend/src/ por capas. Cero dependencias circulares y exportación a través de un index.ts por módulo.
 
 ---
 

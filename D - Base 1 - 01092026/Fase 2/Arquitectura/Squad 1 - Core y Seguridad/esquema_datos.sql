@@ -119,3 +119,97 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trg_protect_audit_logs
 BEFORE UPDATE OR DELETE ON logs_auditoria
 FOR EACH ROW EXECUTE FUNCTION fn_prevent_audit_tampering();
+
+-- =============================================================================
+-- AMPLIACIÓN RF-72 A RF-89 (RF-72, RF-73, RF-75, RF-76)
+-- Copia de las secciones correspondientes de database/init/01_esquema_consolidado.sql,
+-- que es la fuente de verdad. Si cambias algo aquí, cámbialo también allí.
+-- =============================================================================
+
+ALTER TYPE rol_usuario_enum ADD VALUE IF NOT EXISTS 'APODERADO';
+
+-- Baja lógica de usuarios (RF-72) e identificador SIAGIE del estudiante (RF-78, RF-88)
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS fecha_baja TIMESTAMP WITH TIME ZONE;
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS motivo_baja TEXT;
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS baja_por UUID REFERENCES usuarios(id);
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS codigo_siagie VARCHAR(20);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_usuarios_codigo_siagie ON usuarios(tenant_id, codigo_siagie) WHERE codigo_siagie IS NOT NULL;
+
+-- Vínculo apoderado-estudiante verificado (RF-75)
+CREATE TABLE IF NOT EXISTS apoderados_estudiantes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES instituciones(id),
+    apoderado_id UUID NOT NULL REFERENCES usuarios(id),
+    estudiante_id UUID NOT NULL REFERENCES usuarios(id),
+    parentesco VARCHAR(20) NOT NULL CHECK (parentesco IN ('PADRE', 'MADRE', 'TUTOR_LEGAL')),
+    activo BOOLEAN DEFAULT TRUE,
+    vinculado_por UUID REFERENCES usuarios(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_apoderado_estudiante UNIQUE (apoderado_id, estudiante_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_apoderados_estudiante ON apoderados_estudiantes(estudiante_id);
+
+-- Invitaciones de activación de un solo uso, vigencia 72 h (RF-75)
+CREATE TABLE IF NOT EXISTS invitaciones_apoderado (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES instituciones(id),
+    apoderado_id UUID NOT NULL REFERENCES usuarios(id),
+    estudiante_id UUID NOT NULL REFERENCES usuarios(id),
+    token_hash CHAR(64) NOT NULL UNIQUE,
+    expira_en TIMESTAMP WITH TIME ZONE NOT NULL,
+    usada_en TIMESTAMP WITH TIME ZONE,
+    creada_por UUID REFERENCES usuarios(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Consentimiento informado de datos personales (RF-75, Ley N.° 29733)
+CREATE TABLE IF NOT EXISTS consentimientos_datos (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES instituciones(id),
+    usuario_id UUID NOT NULL REFERENCES usuarios(id),
+    version_texto VARCHAR(20) NOT NULL,
+    aceptado_en TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    ip_origen VARCHAR(45) NOT NULL,
+    revocado_en TIMESTAMP WITH TIME ZONE
+);
+
+CREATE INDEX IF NOT EXISTS idx_consentimientos_usuario ON consentimientos_datos(usuario_id);
+
+-- Centro de notificaciones (RF-76)
+CREATE TABLE IF NOT EXISTS notificaciones (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES instituciones(id),
+    usuario_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    categoria VARCHAR(40) NOT NULL, -- SEGURIDAD, RECORDATORIO, ASISTENCIA, NOTAS, TRAMITES, CITAS
+    prioridad VARCHAR(10) DEFAULT 'NORMAL' CHECK (prioridad IN ('ALTA', 'NORMAL', 'BAJA')),
+    titulo VARCHAR(150) NOT NULL,
+    mensaje TEXT NOT NULL,
+    enlace TEXT,
+    leida_en TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_notificaciones_no_leidas ON notificaciones(usuario_id, created_at DESC) WHERE leida_en IS NULL;
+
+CREATE TABLE IF NOT EXISTS preferencias_notificacion (
+    usuario_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    categoria VARCHAR(40) NOT NULL,
+    por_correo BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY (usuario_id, categoria)
+);
+
+CREATE TABLE IF NOT EXISTS envios_correo (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    notificacion_id UUID NOT NULL REFERENCES notificaciones(id) ON DELETE CASCADE,
+    estado VARCHAR(10) DEFAULT 'PENDIENTE' CHECK (estado IN ('PENDIENTE', 'ENVIADO', 'FALLIDO')),
+    intentos INT DEFAULT 0,
+    ultimo_error TEXT,
+    enviado_en TIMESTAMP WITH TIME ZONE
+);
+
+CREATE INDEX IF NOT EXISTS idx_envios_pendientes ON envios_correo(estado) WHERE estado = 'PENDIENTE';
+
+INSERT INTO roles (codigo, nombre, descripcion) VALUES
+('APODERADO', 'Apoderado', 'Consulta de solo lectura de notas, actividades y asistencia de sus hijos vinculados')
+ON CONFLICT (codigo) DO NOTHING;

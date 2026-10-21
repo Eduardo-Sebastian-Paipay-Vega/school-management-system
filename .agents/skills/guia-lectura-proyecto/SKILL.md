@@ -39,7 +39,7 @@ flowchart TD
     end
 
     subgraph PASO_2 ["2. ARQUITECTURA Y TECNOLOGÍAS (15 min)"]
-        C1["stack_tecnologico_proyecto.md<br>(Flutter, Node, Postgres, Redis)"] --> C2["arquitectura_sistema.md<br>(Diagramas C4 y Reparto por Squad)"]
+        C1["stack_tecnologico_proyecto.md<br>(Next.js, Node, Postgres, Redis)"] --> C2["arquitectura_sistema.md<br>(Diagramas C4 y Reparto por Squad)"]
         C2 --> C3["requisitos_funcionales_tecnicos.md<br>(APIs REST, SQL, Offline-First)"]
     end
 
@@ -47,9 +47,9 @@ flowchart TD
         D1[".agents/rules/sdd_rules.md<br>(Reglas canónicas SDD)"] --> D2["sdd_squad_[X].md<br>(SDD del Squad asignado)"]
     end
 
-    subgraph PASO_4 ["4. IMPLEMENTACIÓN EN FLUTTER"]
-        E1["lib/core/theme/app_theme.dart<br>(Tokens de diseño institucional)"] --> E2["lib/features/squad_[X]_[modulo]/<br>(Código Feature-First)"]
-        E2 --> E3["flutter analyze & flutter test<br>(0 errores, 0 warnings)"]
+    subgraph PASO_4 ["4. IMPLEMENTACIÓN EN NEXT.JS Y NODE.JS"]
+        E1["frontend/app/globals.css<br>(Tokens de diseño institucional)"] --> E2["frontend/modules/squads/squad_[X]_[modulo]/<br>(Código Feature-First)"]
+        E2 --> E3["npm run lint & npm run build<br>(0 errores)"]
     end
 
     PASO_0 --> PASO_1
@@ -68,11 +68,11 @@ flowchart TD
 | **¿Qué funciones están prohibidas y dónde termina el proyecto?** | [limites_y_alcance_proyecto.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/limites_y_alcance_proyecto.md) | `D - Base 1 - 01092026/Fase 2/` |
 | **¿Cuáles son los 89 requerimientos del colegio?** | [requisitos_funcionales.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) | `D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/` |
 | **¿Cómo interactúan los profesores y alumnos?** | [Casos de uso/README.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Casos%20de%20uso/README.md) | `D - Base 1 - 01092026/Fase 2/Casos de uso/` |
-| **¿Qué versiones de Flutter, Node, Postgres y Redis usamos?** | [stack_tecnologico_proyecto.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/stack_tecnologico_proyecto.md) | `D - Base 1 - 01092026/Fase 2/` |
+| **¿Qué versiones de Next.js, Node, Postgres y Redis usamos?** | [stack_tecnologico_proyecto.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/stack_tecnologico_proyecto.md) | `D - Base 1 - 01092026/Fase 2/` |
 | **¿Cómo se conectan el Frontend, Backend, Redis y PostgreSQL?** | [arquitectura_sistema.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/arquitectura_sistema.md) | `D - Base 1 - 01092026/Fase 2/Arquitectura/` |
 | **¿Cuáles son los endpoints JSON y estructuras de tablas SQL?** | [requisitos_funcionales_tecnicos.md](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md) | `D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/` |
 | **¿Cómo redactar el Documento de Diseño de Software (SDD)?** | [.agents/rules/sdd_rules.md](file:///d:/zapata%202026%20-%20II/school-management-system/.agents/rules/sdd_rules.md) | `.agents/rules/` |
-| **¿Qué colores, fuentes y espaciados debo usar en Flutter?** | [lib/core/theme/app_theme.dart](file:///d:/zapata%202026%20-%20II/school-management-system/lib/core/theme/app_theme.dart) | `lib/core/theme/` |
+| **¿Qué colores, fuentes y espaciados debo usar en el frontend?** | [frontend/app/globals.css](../../../frontend/app/globals.css) y [tailwind.config.ts](../../../frontend/tailwind.config.ts) | `lib/core/theme/` |
 
 ---
 
@@ -82,9 +82,9 @@ flowchart TD
    *Consecuencia:* Crear pantallas bonitas que no cumplen con los criterios de aceptación del MINEDU ni del colegio.
 2. **Error 2: Inventar funcionalidades financieras o de pagos.**  
    *Consecuencia:* Infringir el documento de límites. El sistema no maneja dinero, matrículas pagadas ni facturación SUNAT.
-3. **Error 3: Colocar pantallas fuera de `lib/features/squad_[X]_[modulo]/`.**  
+3. **Error 3: Colocar pantallas fuera de `frontend/modules/squads/squad_[X]_[modulo]/`.**  
    *Consecuencia:* Romper la arquitectura modular Feature-First y generar conflictos de merge en Git.
-4. **Error 4: Hardcodear colores o estilos en los widgets.**  
+4. **Error 4: Hardcodear colores o estilos en los componentes.**  
    *Consecuencia:* Romper la identidad visual institucional (Verde botella, Azul UNSCH y escala CNEB oficial). Usar siempre `AppTheme`.
-5. **Error 5: Enviar código sin ejecutar `flutter analyze` y `flutter test`.**  
+5. **Error 5: Enviar código sin ejecutar `npm run lint` y `npm run build`.**  
    *Consecuencia:* Bloquear la integración continua (`dev`) con warnings o tests rotos.

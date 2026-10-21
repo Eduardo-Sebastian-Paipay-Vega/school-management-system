@@ -38,15 +38,15 @@ Los Requisitos No Funcionales (RNF) determinan los atributos de calidad, rendimi
 | **RNF-08** | Protección de Datos Personales (Ley 29733) | Seguridad | Squad 1 (Core/Seguridad) | Cifrado AES-256 para campos sensibles de menores (DNI, diagnósticos, observaciones conductuales). |
 | **RNF-09** | Verificación Criptográfica Documental QR | Seguridad | Squad 5 (Secretaría/Portal) | Hash SHA-256 generado con salt institucional incrustado en el QR de libretas y certificados. |
 | **RNF-10** | Alta Disponibilidad del Servicio | Fiabilidad | Squad 1 / Infraestructura | Uptime del 99.5% durante el periodo escolar lectivo (lunes a viernes 07:00 a 19:00 hrs). |
-| **RNF-11** | Resiliencia Offline-First en Kiosco | Fiabilidad | Squad 2 (Matrícula/Asistencia) | Capacidad de operar 100% desconectado en portería usando IndexedDB/Hive y sincronización en ráfagas. |
+| **RNF-11** | Resiliencia Offline-First en Kiosco | Fiabilidad | Squad 2 (Matrícula/Asistencia) | Capacidad de operar 100% desconectado en portería usando IndexedDB y sincronización en ráfagas. |
 | **RNF-12** | Integridad Transaccional ACID | Fiabilidad | Transversal / Squad 2 y 3 | Operaciones de matrícula masiva y cierre bimestral de notas envueltas en transacciones atómicas. |
 | **RNF-13** | Diseño Responsivo y Soporte Multi-Dispositivo | Usabilidad | Squad 5 / Transversal | Adaptabilidad fluida (Fluid Layout) para resoluciones desde 360px (móvil) hasta 1920px (escritorio). |
 | **RNF-14** | Ergonomía de Teclado ("Modo Excel") | Usabilidad | Squad 3 (Calificaciones) | Navegación 100% por teclado (flechas, Enter, Tab, Esc) sin requerir uso obligatorio del mouse. |
 | **RNF-15** | Accesibilidad Visual y Contraste (WCAG 2.1 AA) | Usabilidad | Squad 4 / Transversal | Razón de contraste mínima de 4.5:1 para texto normal, paleta semántica institucional accesible. |
-| **RNF-16** | Arquitectura Modular Feature-First | Mantenibilidad | Transversal (Squads 1 al 5) | Estructura de código aislada por squad en `lib/features/squad_[X]_[modulo]/` con bajo acoplamiento. |
-| **RNF-17** | Análisis Estático y Cobertura de Pruebas | Mantenibilidad | Transversal (Squads 1 al 5) | 0 errores y 0 advertencias en `flutter analyze`; suite automatizada ejecutando con `flutter test`. |
+| **RNF-16** | Arquitectura Modular Feature-First | Mantenibilidad | Transversal (Squads 1 al 5) | Estructura de código aislada por squad en `frontend/modules/squads/squad_[X]_[modulo]/` y `backend/` con bajo acoplamiento. |
+| **RNF-17** | Análisis Estático y Cobertura de Pruebas | Mantenibilidad | Transversal (Squads 1 al 5) | 0 errores en `npm run lint` y compilación limpia con `npm run build`; suite automatizada ejecutando con `npm test`. |
 | **RNF-18** | Estandarización Documental de Software (SDD) | Mantenibilidad | Transversal (Squads 1 al 5) | Cada squad debe mantener su SDD conforme al estándar IEEE 1016 con trazabilidad a RFs y CUs. |
-| **RNF-19** | Portabilidad y Despliegue Multiplataforma | Portabilidad | Transversal | Soporte compilado nativo en Flutter Web (PWA), Windows Desktop y preconfiguración móvil. |
+| **RNF-19** | Portabilidad y Despliegue Multiplataforma | Portabilidad | Transversal | Aplicación web Next.js instalable como PWA y operable desde navegadores de escritorio, tablet y móvil. |
 | **RNF-20** | Compatibilidad con Navegadores Modernos | Compatibilidad | Squad 5 / Transversal | Ejecución garantizada en Google Chrome >= 100, Microsoft Edge >= 100, Firefox >= 100 y Safari >= 15. |
 
 ---
@@ -65,12 +65,12 @@ Los Requisitos No Funcionales (RNF) determinan los atributos de calidad, rendimi
 
 ### RNF-03: Latencia de Decodificación y Registro en Kiosco Offline
 - **Descripción:** El Kiosco de asistencia de portería debe procesar el flujo de ingreso de estudiantes sin generar filas ni aglomeraciones en la puerta de la institución.
-- **Métrica:** Tiempo total entre la captura óptica del código QR por la cámara o lector óptico, su decodificación, la validación del hash del carné y el almacenamiento en base de datos local (IndexedDB/Hive) <= 300 milisegundos. Confirmación audiovisual simultánea (beep + indicador verde/rojo).
+- **Métrica:** Tiempo total entre la captura óptica del código QR por la cámara o lector óptico, su decodificación, la validación del hash del carné y el almacenamiento en base de datos local (IndexedDB) <= 300 milisegundos. Confirmación audiovisual simultánea (beep + indicador verde/rojo).
 - **Trazabilidad:** RF-20, RF-21, RF-22 (Squad 2).
 
 ### RNF-04: Rendimiento de Renderizado de Dashboards Analíticos y Mapas de Calor
 - **Descripción:** Los directores y coordinadores deben acceder a resúmenes analíticos y mapas de calor multidimensionales sin retardos computacionales.
-- **Métrica:** El procesamiento matemático de matrices de rendimiento y su representación gráfica vectorial en Flutter debe renderizarse en un tiempo <= 2.0 segundos para un conjunto de datos de hasta 5,000 registros históricos bimestrales.
+- **Métrica:** El procesamiento matemático de matrices de rendimiento y su representación gráfica vectorial en el navegador debe renderizarse en un tiempo <= 2.0 segundos para un conjunto de datos de hasta 5,000 registros históricos bimestrales.
 - **Trazabilidad:** RF-47 al RF-51 (Squad 4).
 
 ### RNF-05: Autenticación Segura con JWT (Tokens de Acceso y Refresco)
@@ -79,7 +79,7 @@ Los Requisitos No Funcionales (RNF) determinan los atributos de calidad, rendimi
 - **Trazabilidad:** RF-01, RF-02, RF-03 (Squad 1).
 
 ### RNF-06: Control de Acceso Basado en Roles (RBAC Estricto)
-- **Descripción:** Cada acción, ruta en Flutter y endpoint en el backend debe validar de forma independiente los permisos del usuario activo.
+- **Descripción:** Cada acción, ruta del frontend y endpoint en el backend debe validar de forma independiente los permisos del usuario activo.
 - **Métrica:** 100% de las rutas protegidas y endpoints REST deben pasar por un middleware interceptor RBAC. Cualquier solicitud sin permisos suficientes debe retornar código HTTP 403 Forbidden y registrar un evento en la bitácora de auditoría.
 - **Trazabilidad:** RF-04, RF-05, RF-06 (Squad 1).
 
@@ -105,7 +105,7 @@ Los Requisitos No Funcionales (RNF) determinan los atributos de calidad, rendimi
 
 ### RNF-11: Resiliencia Operativa y Persistencia Local Offline-First
 - **Descripción:** La toma de asistencia en portería no debe interrumpirse si ocurre una caída del enlace de internet o corte temporal de energía en la institución.
-- **Métrica:** La aplicación del Kiosco debe operar con autonomía total en modo desconectado, persistiendo los registros en el almacenamiento local del cliente (IndexedDB en navegador / Hive en desktop). Al recuperar la conexión a internet, el sistema debe sincronizar automáticamente en ráfagas (background sync) resolviendo conflictos mediante la política Last-Write-Wins y garantizando cero pérdida de marcaciones.
+- **Métrica:** La aplicación del Kiosco debe operar con autonomía total en modo desconectado, persistiendo los registros en el almacenamiento local del cliente (IndexedDB en el navegadortop). Al recuperar la conexión a internet, el sistema debe sincronizar automáticamente en ráfagas (background sync) resolviendo conflictos mediante la política Last-Write-Wins y garantizando cero pérdida de marcaciones.
 - **Trazabilidad:** RF-20, RF-21, RF-22, RF-23 (Squad 2).
 
 ### RNF-12: Integridad Transaccional y Consistencia ACID
@@ -115,7 +115,7 @@ Los Requisitos No Funcionales (RNF) determinan los atributos de calidad, rendimi
 
 ### RNF-13: Diseño Responsivo y Soporte Multi-Dispositivo
 - **Descripción:** La interfaz de usuario debe adaptarse fluidamente a diversos factores de forma y tamaños de pantalla.
-- **Métrica:** Soporte verificado mediante layouts fluidos (`LayoutBuilder`, `MediaQuery`) para resoluciones desde teléfonos móviles (>= 360px), tablets (>= 768px), laptops (>= 1024px) y monitores de escritorio (>= 1920px). No deben producirse desbordamientos visuales (overflows amarillos/negros en Flutter).
+- **Métrica:** Soporte verificado mediante layouts fluidos (CSS Grid/Flexbox y media queries de Tailwind) para resoluciones desde teléfonos móviles (>= 360px), tablets (>= 768px), laptops (>= 1024px) y monitores de escritorio (>= 1920px). No deben producirse desbordamientos visuales (desbordamientos horizontales o contenido recortado).
 - **Trazabilidad:** Transversal a los 5 Squads (liderado por Squad 5).
 
 ### RNF-14: Ergonomía de Entrada de Datos y Navegación de Teclado ("Modo Excel")
@@ -126,16 +126,16 @@ Los Requisitos No Funcionales (RNF) determinan los atributos de calidad, rendimi
 ### RNF-15: Accesibilidad Visual y Contraste (WCAG 2.1 Nivel AA)
 - **Descripción:** Las personas con visión reducida o daltonismo deben poder distinguir claramente estados, notas y advertencias.
 - **Métrica:** Cumplimiento del ratio de contraste mínimo de 4.5:1 para texto normal y 3:1 para texto grande/componentes gráficos interactivos. En la escala CNEB (AD, A, B, C) y mapas de calor, los estados no deben identificarse únicamente por color, sino acompañarse de iconos, etiquetas textuales o patrones visuales.
-- **Trazabilidad:** RF-47 al RF-51 (Squad 4) y `lib/core/theme/app_theme.dart`.
+- **Trazabilidad:** RF-47 al RF-51 (Squad 4) y los tokens de `frontend/app/globals.css`.
 
 ### RNF-16: Arquitectura Modular Feature-First y Clean Architecture
 - **Descripción:** El código fuente debe estructurarse modularmente para que los 5 desarrolladores puedan trabajar en paralelo sin colisiones en Git ni dependencias circulares.
-- **Métrica:** Cada módulo de squad debe residir exclusivamente en su subcarpeta `lib/features/squad_[X]_[modulo]/`, estructurado internamente en capas (`presentation`, `domain`, `data`). Ningún squad puede importar archivos internos de otro squad sin pasar por contratos públicos expuestos en su archivo barril o en `lib/core/`.
+- **Métrica:** Cada módulo de squad debe residir exclusivamente en su subcarpeta `frontend/modules/squads/squad_[X]_[modulo]/`, con componentes, hooks, servicios y tipos separados. Ningún squad puede importar archivos internos de otro squad sin pasar por contratos públicos expuestos en el `index.ts` de cada módulo o en `frontend/modules/shared/`.
 - **Trazabilidad:** AGENTS.md, Directivas de Ingeniería.
 
 ### RNF-17: Aseguramiento de Calidad Estática y Cobertura de Pruebas
 - **Descripción:** Todo código incorporado al repositorio debe cumplir con las normas de estilo y calidad del equipo.
-- **Métrica:** Cero (0) errores y cero (0) advertencias en el análisis estático ejecutado con `flutter analyze`. Todo Pull Request debe contar con pruebas unitarias o de widgets asociadas que se ejecuten y aprueben al 100% mediante `flutter test`.
+- **Métrica:** Cero (0) errores y cero (0) advertencias en el análisis estático ejecutado con `npm run lint`. Todo Pull Request debe contar con pruebas unitarias o de componentes asociadas que se ejecuten y aprueben al 100% mediante `npm test`.
 - **Trazabilidad:** Políticas de CI/CD y QA.
 
 ### RNF-18: Estandarización Documental de Software (SDD según IEEE 1016)
@@ -145,8 +145,8 @@ Los Requisitos No Funcionales (RNF) determinan los atributos de calidad, rendimi
 
 ### RNF-19: Portabilidad y Despliegue Multiplataforma
 - **Descripción:** La plataforma debe ejecutarse como aplicación web progresiva y contar con capacidad de empaquetado nativo para escritorio.
-- **Métrica:** La compilación en modo producción (`flutter build web --release` y `flutter build windows --release`) debe generar binarios y paquetes web completamente funcionales sin errores de enlace ni dependencias de plataforma no soportadas.
-- **Trazabilidad:** Configuración de `web/`, `windows/` y `pubspec.yaml`.
+- **Métrica:** La compilación en modo producción (`npm run build` en `frontend/` y `backend/`) debe generar binarios y paquetes web completamente funcionales sin errores de enlace ni dependencias de plataforma no soportadas.
+- **Trazabilidad:** Configuración de `frontend/next.config.mjs`, `frontend/package.json`, `backend/package.json` y `vercel.json`.
 
 ### RNF-20: Compatibilidad con Motores de Navegación Web Modernos
 - **Descripción:** Los usuarios deben poder acceder a la plataforma desde los navegadores más utilizados en las instituciones educativas sin pérdida de funcionalidad.

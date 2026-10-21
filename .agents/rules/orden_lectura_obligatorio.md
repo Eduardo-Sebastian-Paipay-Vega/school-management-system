@@ -17,7 +17,7 @@ graph TD
     F0["Fase 0: Reglas y Fronteras<br>(AGENTS.md + Límites del Proyecto)"] --> F1["Fase 1: Negocio y Requerimientos<br>(README F2 + 89 RFs + 89 Casos de Uso)"]
     F1 --> F2["Fase 2: Arquitectura y Tecnologías<br>(Stack Tecnológico + Arquitectura C4)"]
     F2 --> F3["Fase 3: Diseño de Software SDD<br>(Reglas SDD + SDD específico del Squad)"]
-    F3 --> F4["Fase 4: Código Flutter<br>(lib/core/theme + lib/features/squad_X)"]
+    F3 --> F4["Fase 4: Código Next.js<br>(frontend/app/globals.css + frontend/modules/squads/squad_X)"]
 ```
 
 ---
@@ -26,7 +26,7 @@ graph TD
 
 ### FASE 0: Reglas Maestras y Límites del Alcance (Primero que nada — 5 minutos)
 Antes de responder preguntas o escribir código, se deben fijar las reglas del juego:
-1. 📄 [`AGENTS.md`](file:///d:/zapata%202026%20-%20II/school-management-system/AGENTS.md): Contexto general del SSU IS-480, distribución de los 5 squads, GitFlow y directivas Flutter.
+1. 📄 [`AGENTS.md`](file:///d:/zapata%202026%20-%20II/school-management-system/AGENTS.md): Contexto general del SSU IS-480, distribución de los 5 squads, GitFlow y directivas de código (Next.js / Node.jsr.
 2. 📄 [`D - Base 1 - 01092026/Fase 2/limites_y_alcance_proyecto.md`](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/limites_y_alcance_proyecto.md): Conocer la **matriz Out-of-Scope** y las **10 reglas de alto al alcance** para no construir funcionalidades prohibidas (sin pasarelas de pago, sin apps nativas, sin módulos de biblioteca/comedor).
 
 ---
@@ -42,7 +42,7 @@ Comprender la lógica institucional de los Planteles de Aplicación:
 
 ### FASE 2: Arquitectura y Ecosistema Tecnológico (Cómo está construido)
 Conocer la infraestructura y tecnologías aprobadas:
-7. 📄 [`D - Base 1 - 01092026/Fase 2/stack_tecnologico_proyecto.md`](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/stack_tecnologico_proyecto.md): Ecosistema oficial (Flutter 3.35, Dart 3.9, Node.js/TypeScript, PostgreSQL Multi-Tenant, Redis, Hive Offline-First, SHA-256).
+7. 📄 [`D - Base 1 - 01092026/Fase 2/stack_tecnologico_proyecto.md`](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/stack_tecnologico_proyecto.md): Ecosistema oficial (Next.js 15, React 19, Node.js/TypeScript, PostgreSQL Multi-Tenant, Redis, Hive Offline-First, SHA-256).
 8. 📄 [`D - Base 1 - 01092026/Fase 2/Arquitectura/arquitectura_sistema.md`](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/arquitectura_sistema.md): Diagramas C4, Clean Architecture y reparto técnico de responsabilidades en los 5 squads.
 9. 📄 [`D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/requisitos_funcionales_tecnicos.md`](file:///d:/zapata%202026%20-%20II/school-management-system/D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md): Contratos de API REST JSON, esquema multi-tenant (`tenant_id`), schemas SQL y WebSockets.
 
@@ -60,18 +60,19 @@ Antes de codificar o refactorizar un módulo en particular:
 
 ---
 
-### FASE 4: Construcción de Código en Flutter (Manos a la obra)
-Directivas para implementar pantallas, widgets y lógica:
-12. 📄 [`lib/core/theme/app_theme.dart`](file:///d:/zapata%202026%20-%20II/school-management-system/lib/core/theme/app_theme.dart): Usar únicamente los colores y estilos definidos (Verde Botella `#1B4D3E`, Azul UNSCH `#0B2F64`, CNEB AD/A/B/C).
+### FASE 4: Construcción de Código en Next.js y Node.js (Manos a la obra)
+Directivas para implementar pantallas, componentes y lógica:
+12. 📄 [`frontend/app/globals.css`](../../frontend/app/globals.css) y [`frontend/tailwind.config.ts`](../../frontend/tailwind.config.ts): Usar únicamente los tokens de color y estilo definidos allí, más la escala CNEB AD/A/B/C.
 13. 📄 Ubicar el código **exclusivamente** en su respectiva carpeta Feature-First:
-    * `lib/features/squad_1_core_seguridad/`
-    * `lib/features/squad_2_matricula_asistencia/`
-    * `lib/features/squad_3_calificaciones/`
-    * `lib/features/squad_4_analitica_dashboards/`
-    * `lib/features/squad_5_secretaria_portal/`
+    * `frontend/modules/squads/squad_1_core/`
+    * `frontend/modules/squads/squad_2_asistencia/`
+    * `frontend/modules/squads/squad_3_calificaciones/`
+    * `frontend/modules/squads/squad_4_analitica/`
+    * `frontend/modules/squads/squad_5_secretaria/`
+    * Backend del squad en `backend/src/` (rutas, controladores y servicios).
 14. 🛠️ **Comandos de Verificación Obligatorios:**
-    * `flutter analyze`: Debe finalizar con **0 errores y 0 warnings**.
-    * `flutter test`: Todas las pruebas deben pasar al 100%.
+    * `npm run lint`: Debe finalizar con **0 errores** en `frontend/` y `backend/`.
+    * `npm run build`: Debe compilar sin errores; `npm test` debe pasar al 100%.
 
 ---
 
@@ -80,6 +81,6 @@ Directivas para implementar pantallas, widgets y lógica:
 Antes de dar por concluida cualquier tarea, responder afirmativamente:
 - [ ] ¿El requerimiento que toqué está entre el `RF-01` y el `RF-89`?
 - [ ] ¿Verifiqué que no está en la lista de prohibiciones de `limites_y_alcance_proyecto.md`?
-- [ ] ¿El código que escribí está dentro de `lib/features/squad_[X]_[modulo]/`?
-- [ ] ¿Utilicé los tokens de `AppTheme` y no colores genéricos o ad-hoc?
-- [ ] ¿Ejecuté `flutter analyze` y obtuve *"No issues found!"*?
+- [ ] ¿El código que escribí está dentro de `frontend/modules/squads/squad_[X]_[modulo]/` (o del backend de su squad)?
+- [ ] ¿Utilicé los tokens de `globals.css` / Tailwind y no colores genéricos o ad-hoc?
+- [ ] ¿Ejecuté `npm run lint` y `npm run build` sin errores?

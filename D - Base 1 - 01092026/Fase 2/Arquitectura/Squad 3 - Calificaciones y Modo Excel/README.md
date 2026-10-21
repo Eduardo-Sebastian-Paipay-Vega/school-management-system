@@ -10,10 +10,10 @@
 ## 1. Patrones de Diseño y Decisiones Arquitectónicas (ADRs)
 
 1. **Componente Matricial Optimizado ("Modo Excel"):**
-   * Grid reactivo virtualizado en Flutter que renderiza únicamente las celdas visibles en pantalla.
+   * Grid virtualizado en React que renderiza únicamente las celdas visibles en pantalla.
    * Manejador de focos customizado (`FocusNode`) que intercepta teclas de dirección (flechas), Tab y Enter para desplazamiento bidireccional instantáneo sin retrasos de renderizado.
 2. **Parser de Portapapeles para Pegado Masivo (Ctrl+V):**
-   * Intercepta la combinación de teclas en Flutter, extrae el texto del portapapeles del sistema operativo, parsea la matriz separada por tabulaciones (`\t`) y saltos de línea (`\n`), y mapea los valores masivamente sobre las filas de alumnos.
+   * Intercepta el evento `paste` del navegador, extrae el texto del portapapeles, parsea la matriz separada por tabulaciones (`\t`) y saltos de línea (`\n`), y mapea los valores masivamente sobre las filas de alumnos.
 3. **Auto-Guardado en Segundo Plano con Debounce (400 ms):**
    * Cada digitación inicia un temporizador de 400 ms. Si el docente continúa digitando, el timer se reinicia.
    * Al detenerse, emite una petición HTTP PATCH por lotes con bloqueo optimista (`version_lock`), cambiando el icono superior a verde: *"Guardado en la nube"*.
@@ -27,7 +27,7 @@
 ```mermaid
 sequenceDiagram
     participant Docente as Teclado / Ctrl+V
-    participant Grid as ExcelGradebookGrid (Flutter)
+    participant Grid as GradeMatrix (React)
     participant Debounce as RxDebounce (400 ms)
     participant Backend as GradesController (API)
     participant Motor as CNEB Conversion Engine

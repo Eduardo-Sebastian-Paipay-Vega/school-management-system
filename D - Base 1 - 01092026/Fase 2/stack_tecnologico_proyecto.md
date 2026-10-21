@@ -4,7 +4,7 @@
 ### Planteles de Aplicación "Guamán Poma de Ayala" — UNSCH
 **Servicio Social Universitario (SSU IS-480, Semestre 2026-II)**  
 **Escuela Profesional de Ingeniería de Sistemas — EPIS UNSCH**  
-**Versión:** 1.0 | **Fecha:** Septiembre de 2026  
+**Versión:** 1.1 | **Fecha:** Octubre de 2026 (frontend migrado de Flutter a Next.js)  
 
 ---
 
@@ -15,8 +15,8 @@ El ecosistema tecnológico ha sido seleccionado bajo criterios rigurosos de **re
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │                               CAPA DE CLIENTE / FRONTEND                               │
-│        Flutter 3.35.x (Dart 3.9.x) • Material Design 3 • Clean Architecture            │
-│  [Flutter Web Responsive (PWA) │ Flutter Desktop (Kiosco) │ Mobile-Friendly Layout]    │
+│     Next.js 15 (App Router) • React 19 • TypeScript 5 • Tailwind CSS • PrimeReact      │
+│  [Web Responsive (PWA) │ Kiosco de Portería en navegador │ Vista móvil del apoderado]  │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │                          CAPA DE SEGURIDAD, GATEWAY Y RED                              │
 │       Nginx Reverse Proxy • TLS 1.3 (HTTPS) • WSS (WebSockets) • JWT Interceptor       │
@@ -26,10 +26,10 @@ El ecosistema tecnológico ha sido seleccionado bajo criterios rigurosos de **re
 │   [Auth JWT/RBAC │ Kiosco Sync Worker │ Engine Modo Excel │ Motor CNEB │ Validador QR] │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │                       CAPA DE DATOS, PERSISTENCIA Y CACHÉ                              │
-│  PostgreSQL 16+ (Multi-Tenant `tenant_id`) │ Redis 7+ (Caché & PubSub) │ Hive/IndexedDB│
+│   PostgreSQL 16+ (Multi-Tenant `tenant_id`) │ Redis 7+ (Caché & PubSub) │ IndexedDB    │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │                           DEVOPS, CALIDAD Y ENTORNOS                                   │
-│    Docker & Compose • Git / GitFlow • GitHub Actions CI/CD • flutter_lints 5.0.0       │
+│      Docker & Compose • Git / GitFlow • GitHub Actions CI/CD • ESLint • PR-Agent       │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -39,12 +39,12 @@ El ecosistema tecnológico ha sido seleccionado bajo criterios rigurosos de **re
 
 | Capa del Sistema | Tecnología Principal | Versión Base | Propósito en el Proyecto |
 |---|---|:---:|---|
-| **Frontend Framework** | **Flutter** | `3.35.x Stable` | Framework UI multiplataforma reactivo para Web, Desktop y PWA. |
-| **Lenguaje Frontend** | **Dart** | `3.9.x` | Lenguaje orientado a objetos fuertemente tipado con Sound Null Safety. |
-| **Arquitectura Frontend** | **Feature-First + Clean Architecture** | Estándar | Modularización estricta por squad (`lib/features/squad_[X]_[modulo]`). |
-| **Gestor de Estado** | **Riverpod / Provider** | Reciente | Inyección de dependencias desacoplada y estado predecible sin fugas. |
-| **Diseño y Estilos** | **Material Design 3 (M3)** | M3 Spec | Sistema de diseño institucional (`app_theme.dart`) con tokens oficiales. |
-| **Persistencia Local (Offline)** | **Hive / IndexedDB** | `2.x / W3C` | Búfer local cifrado en navegador/desktop para Kiosco Offline-First (`RF-25`). |
+| **Frontend Framework** | **Next.js (App Router)** | `15.x` | Renderizado en servidor y cliente, rutas por grupos `(landing)` e `(intranet)`, PWA. |
+| **Biblioteca de UI** | **React** | `19.x` | Componentes declarativos con Server Components y Suspense. |
+| **Lenguaje Frontend** | **TypeScript** | `5.x` | Tipado estricto compartido con los contratos JSON del backend. |
+| **Arquitectura Frontend** | **Feature-First** | Estándar | Modularización por squad en `frontend/modules/squads/squad_[X]_[modulo]/`. |
+| **Componentes y Estilos** | **PrimeReact + Tailwind CSS** | `10.x / 3.x` | Componentes de datos (tablas, calendarios, diálogos) y tokens de diseño en `tailwind.config.ts` y `app/globals.css`. |
+| **Persistencia Local (Offline)** | **IndexedDB** | W3C | Búfer local del Kiosco Offline-First (`RF-25`), con sincronización al reconectar. |
 | **Protocolo en Tiempo Real** | **WebSockets (`wss://`)** | RFC 6455 | Difusión instantánea de asistencia de aula (`RF-27`) y sincronización. |
 | **Backend Runtime** | **Node.js** | `v20+ LTS` | Entorno de ejecución asíncrono y de alta concurrencia para API RESTful. |
 | **Lenguaje Backend** | **TypeScript** | `5.x` | Tipado estricto de contratos JSON, DTOs y lógica de negocio. |
@@ -56,38 +56,48 @@ El ecosistema tecnológico ha sido seleccionado bajo criterios rigurosos de **re
 
 ---
 
-## 3. CAPA DE PRESENTACIÓN: FLUTTER & DART
+## 3. CAPA DE PRESENTACIÓN: NEXT.JS & REACT
 
-### 3.1 Justificación Técnica de Flutter
-1. **Un Solo Código Base (*Single Codebase*):** Permite desplegar el sistema como **Aplicación Web Responsive** para docentes/directivos y compilar para **Windows Desktop** en el caso del Kiosco de Portería de alta velocidad, garantizando 100% de coherencia lógica y visual.
-2. **Alto Rendimiento en Vistas Complejas:** El motor de renderizado de Flutter (CanvasKit / Skia / Impeller) permite manipular la planilla de notas ("Modo Excel") con cientos de celdas interactivas manteniendo 60 FPS estables sin bloqueos del DOM tradicional.
-3. **Soporte PWA (Progressive Web App):** Capacidad de instalación local en navegadores web en tabletas y laptops de los docentes, facilitando el acceso directo sin descargas de tiendas externas.
+### 3.1 Justificación Técnica de Next.js
+1. **Un solo frontend web para todos los actores:** El portal público, la intranet, el Kiosco de Portería y la vista móvil del apoderado se sirven desde la misma aplicación, con rutas separadas por grupos (`app/(landing)`, `app/(intranet)`).
+2. **Rendimiento y SEO:** El renderizado en servidor entrega el portal y las noticias (`RF-71`, `RF-84`) indexables por buscadores, y los Server Components reducen el JavaScript enviado al navegador.
+3. **Planilla "Modo Excel" fluida:** La grilla de notas (`RF-38`) se implementa con virtualización de filas y manejo de foco por teclado, manteniendo 60 FPS en secciones de 35 estudiantes y decenas de columnas.
+4. **PWA y Offline-First:** Un Service Worker y una cola en IndexedDB permiten que el Kiosco siga registrando ingresos sin conexión (`RF-25`).
 
-### 3.2 Paquetes y Librerías Flutter Clave
+### 3.2 Dependencias Clave del Frontend
 
-| Paquete / Dependencia | Versión Referencial | Justificación y Uso Funcional en el Proyecto |
+**Instaladas en `frontend/package.json`:**
+
+| Paquete | Versión | Uso en el Proyecto |
 |---|:---:|---|
-| **`flutter`** | `sdk: flutter` | Núcleo del framework y motor gráfico. |
-| **`cupertino_icons`** | `^1.0.8` | Iconografía complementaria de alta legibilidad. |
-| **`http` / `dio`** | `^1.x / ^5.x` | Cliente HTTP avanzado con interceptores para inyección automática de tokens JWT (`Bearer`), manejo de timeouts y refresco silencioso de sesión. |
-| **`web_socket_channel`** | `^3.0.x` | Canal bidireccional en tiempo real para la toma rápida de asistencia en aula y difusión instantánea hacia la pantalla de portería y dirección (`RF-27`). |
-| **`hive` / `hive_flutter`** | `^2.2.x` | Base de datos local NoSQL ultrarrápida y ligera para almacenar el búfer de asistencias en el Kiosco Offline-First (`RF-25`), compatible con IndexedDB en Web y almacenamiento local en Windows. |
-| **`shared_preferences`** | `^2.2.x` | Persistencia de preferencias del usuario local (modo de tema, ID de sección seleccionada, credenciales de sesión en caché). |
-| **`fl_chart`** | `^0.68.x` | Librería reactiva de visualización de datos: Mapas de Calor con navegación Drill-Down (`RF-49`), Gráfico de Radar de la Ficha 360° (`RF-56`) y Gráficas de impacto del SSU IS-480 (`RF-57`). |
-| **`qr_flutter`** | `^4.1.x` | Generación y renderizado dinámico de códigos QR en pantalla para carnés escolares y tokens de verificación documental (`RF-26`, `RF-60`). |
-| **`pdf` / `printing`** | `^3.10.x` | Maquetación programática vectorial en cliente para previsualizar e imprimir carnés escolares, fichas de practicantes y boletas oficiales. |
-| **`flutter_lints`** | `^5.0.0` | Conjunto oficial de reglas de análisis estático activadas en `analysis_options.yaml` para asegurar 0 errores y 0 advertencias de calidad. |
+| **`next`** / **`react`** / **`react-dom`** | `^15.5` / `^19.1` | Framework, App Router y renderizado. |
+| **`primereact`** / **`primeicons`** | `^10.9` / `^7.0` | Tablas de datos, calendarios, diálogos y formularios (patrones de la skill `primeng`). |
+| **`tailwindcss`** | `^3.4` | Utilidades de estilo y tokens de diseño. |
+| **`framer-motion`** | `^14.2` | Microinteracciones y transiciones. |
+| **`lucide-react`** | `^0.468` | Iconografía. |
+| **`next-themes`** | `^0.4` | Tema claro y oscuro. |
+| **`class-variance-authority`** / **`clsx`** / **`tailwind-merge`** | — | Variantes y composición de clases de componentes. |
 
-### 3.3 Sistema de Diseño e Identidad Visual (`AppTheme`)
-El frontend implementa una identidad visual propia basada en **Material Design 3 (M3)** centralizada en [`lib/core/theme/app_theme.dart`](lib/core/theme/app_theme.dart):
-* **Verde Botella Institucional (`#1B4D3E`):** Representa la identidad institucional de los Planteles de Aplicación "Guamán Poma de Ayala".
-* **Azul UNSCH (`#0B2F64`):** Color heráldico de la Universidad Nacional de San Cristóbal de Huamanga.
-* **Escala Normativa Oficial CNEB (MINEDU):**
+**Propuestas para los módulos pendientes (a confirmar por cada squad antes de instalarlas):**
+
+| Necesidad | Opción propuesta | RF |
+|---|---|---|
+| Mapas de calor y radar | `echarts` + `echarts-for-react` | RF-47 a RF-51, RF-56, RF-83 |
+| Cola offline del Kiosco | `idb` (envoltorio de IndexedDB) + Service Worker | RF-25 |
+| Tiempo real | `socket.io-client` | RF-27, RF-76 |
+| Lectura y generación de Excel | `exceljs` (en el backend) | RF-06, RF-78, RF-80, RF-88 |
+| QR en pantalla | `qrcode.react` | RF-26, RF-60 |
+| PDF oficiales | generación en el backend (`pdfkit` o `@react-pdf/renderer`) | RF-26, RF-59, RF-87 |
+| Editor de noticias | `primereact/editor` (Quill) | RF-84 |
+
+### 3.3 Sistema de Diseño e Identidad Visual
+Los tokens visuales se definen como variables CSS en [`frontend/app/globals.css`](../../frontend/app/globals.css) y se exponen como clases en [`frontend/tailwind.config.ts`](../../frontend/tailwind.config.ts). La escala normativa CNEB (MINEDU) usa colores fijos en toda la plataforma:
   * `AD` (Logro Destacado): Verde Esmeralda (`#2E7D32`)
   * `A` (Logro Esperado): Azul Cobalto (`#1565C0`)
   * `B` (En Proceso): Amarillo Ámbar (`#F9A825`)
   * `C` (En Inicio): Rojo Carmesí (`#C62828`)
-* **Tipografía:** Tipografía moderna sans-serif legible con jerarquía de encabezados (H1 a H6) y textos de alta densidad para tablas analíticas.
+
+> **Pendiente de decisión:** este documento definía como colores institucionales el Verde Botella (`#1B4D3E`) y el Azul UNSCH (`#0B2F64`), pero el frontend actual usa una paleta granate (`--primary-colors-primary-brand: #500000`). El equipo debe fijar una sola paleta institucional y actualizar `globals.css` o este documento.
 
 ---
 
@@ -145,9 +155,9 @@ erDiagram
 * **Pub/Sub para WebSockets:** Permite escalar los eventos en tiempo real entre múltiples instancias del servidor sin perder mensajes.
 * **Gestión de Sesiones:** Control activo de listas negras de tokens invalidados (*token revocation blacklist*).
 
-### 5.3 Persistencia de Contingencia Local: IndexedDB / Hive
+### 5.3 Persistencia de Contingencia Local: IndexedDB
 * **Kiosco Offline-First (`RF-25`):** Cuando la portera o vigilante escanea carnés QR en la puerta del colegio y no hay conexión a internet, el evento de ingreso se escribe en una cola local atómica.
-* Al recuperar conectividad (detección mediante evento de red en Flutter), un worker en segundo plano envía las transacciones acumuladas en lote (*batch sync*) con resolución de duplicados mediante clave `idempotency_key`.
+* Al recuperar conectividad (eventos `online`/`offline` del navegador y Service Worker), un worker en segundo plano envía las transacciones acumuladas en lote (*batch sync*) con resolución de duplicados mediante clave `idempotency_key`.
 
 ---
 
@@ -167,7 +177,7 @@ erDiagram
 
 ### 7.1 Contenedorización con Docker
 El despliegue está estandarizado mediante `Docker` y orquestado con `docker-compose.yml`:
-* **Contenedor 1 (Frontend):** Flutter Web compilado en estáticos servido por **Nginx Alpine** (imagen ligera < 30 MB).
+* **Frontend:** aplicación Next.js desplegada en **Vercel** (CDN global). En local se ejecuta con `npm run dev`, o en un contenedor `node:20-alpine` con `next start`.
 * **Contenedor 2 (Backend API):** Node.js LTS en Alpine Linux ejecutando el servicio REST y WebSocket Gateway.
 * **Contenedor 3 (Base de Datos):** `postgres:16-alpine` con volúmenes persistentes y scripts de migración inicial.
 * **Contenedor 4 (Caché):** `redis:7-alpine` configurado con persistencia AOF/RDB.
@@ -183,8 +193,9 @@ El despliegue está estandarizado mediante `Docker` y orquestado con `docker-com
   * `feature/squad-5-verificacion-qr`
 
 ### 7.3 Calidad de Código y Pruebas Automatizadas
-* **Análisis Estático:** Validación obligatoria mediante `flutter analyze` configurado en `analysis_options.yaml` (0 errores, 0 warnings).
-* **Pruebas Unitarias y de Widgets:** Suite de `flutter_test` para validar lógica de promedios CNEB, debounce de 400ms, transiciones de estado y renderizado de componentes.
+* **Análisis Estático:** `npm run lint` (ESLint) en `frontend/` y `backend/` con 0 errores, y compilación TypeScript estricta (`npm run build`).
+* **Pruebas:** Jest en el backend para promedios CNEB, conversión dual, cómputo de horas y reglas de negocio; pruebas de componentes en el frontend (React Testing Library) para la planilla, el debounce de 400 ms y los formularios.
+* **Revisión automática:** PR-Agent revisa cada Pull Request hacia `dev` (`.github/workflows/pr_agent.yml`).
 
 ---
 
@@ -192,12 +203,11 @@ El despliegue está estandarizado mediante `Docker` y orquestado con `docker-com
 
 | Squad Técnico | Líder Técnico | Tecnologías y Librerías Principales |
 |---|---|---|
-| **Squad 1: Core y Seguridad** | Brandon Montero (`@brandonmontero27-g`) | • Flutter Material 3 (Login, Perfil, Configuración)<br>• Node.js / TypeScript (AuthService, JWT HS256, bcrypt)<br>• PostgreSQL 16 (RBAC, Multi-Tenant, Auditoría Ley 29733)<br>• Redis 7 (Tokens blacklist, Rate Limiting) |
-| **Squad 2: Matrícula y Asistencia** | Eduardo Paipay (`@Eduardo-Sebastian-Paipay-Vega`) | • Flutter Web + Desktop (Kiosco Portería)<br>• `hive` / `indexeddb` (Búfer Offline-First)<br>• `web_socket_channel` (Transmisión en tiempo real en aula)<br>• `qr_flutter` & `pdf` (Generación masiva de carnés QR) |
-| **Squad 3: Calificaciones y Modo Excel** | Steve Ovalle (`@steveovalle27-lgtm`) | • Flutter Data Grid / Custom Table (Planilla Modo Excel)<br>• `FocusNode` & `HardwareKeyboard` (Navegación ágil por celdas)<br>• Debounce 400ms (`dart:async` Timer / Stream)<br>• Motor de reglas Dart/TypeScript (Conversión Vigesimal a CNEB) |
-| **Squad 4: Analítica y Dashboards** | Grissel Rodríguez (`@Arascely`) | • `fl_chart` (Mapas de calor interactivos Drill-Down)<br>• Custom Radar Chart (Ficha 360° del estudiante)<br>• PostgreSQL Aggregations & Views (Métricas SSU IS-480)<br>• Algoritmos de semaforización diagnóstica (Verde, Amarillo, Rojo) |
-| **Squad 5: Secretaría y Portal Web** | Cesar Leon (`@cesarleon27-ai`) | • `pdf` & `printing` (Boletas oficiales y actas consolidadas)<br>• Motor Criptográfico SHA-256 (Sello de verificación)<br>• Flutter Web Responsive (Portal web público y cartelera)<br>• Endpoint público de validación de códigos QR |
-
+| **Squad 1: Core y Seguridad** | Brandon Montero (`@brandonmontero27-g`) | • Next.js (Login, Perfil, Configuración, Matriz RBAC, cuentas de apoderado)<br>• Node.js / TypeScript (AuthService, JWT HS256, bcrypt, NotificationService)<br>• PostgreSQL 16 (RBAC, Multi-Tenant, Auditoría Ley 29733)<br>• Redis 7 (Tokens blacklist, Rate Limiting, Pub/Sub de notificaciones) |
+| **Squad 2: Matrícula y Asistencia** | Eduardo Paipay (`@Eduardo-Sebastian-Paipay-Vega`) | • Next.js PWA (Kiosco de Portería en navegador)<br>• IndexedDB + Service Worker (Búfer Offline-First)<br>• Socket.IO (Toma rápida en aula en tiempo real)<br>• Carnés QR en PDF e importación de nóminas SIAGIE (exceljs) |
+| **Squad 3: Calificaciones y Modo Excel** | Steve Ovalle (`@steveovalle27-lgtm`) | • Grilla de notas virtualizada con navegación por teclado (Planilla Modo Excel)<br>• Debounce 400 ms con autoguardado (`PATCH /grades/batch`)<br>• Motor de conversión vigesimal a CNEB en TypeScript (compartido backend/frontend)<br>• Plantillas Excel firmadas y calendario de actividades |
+| **Squad 4: Analítica y Dashboards** | Grissel Rodríguez (`@Arascely`) | • ECharts (Mapas de calor Drill-Down, radar de la Ficha 360°)<br>• Vistas y vistas materializadas de PostgreSQL (Métricas SSU IS-480, cumplimiento docente)<br>• Algoritmos de semaforización diagnóstica (Verde, Amarillo, Rojo)<br>• Agenda de citas con apoderados |
+| **Squad 5: Secretaría y Portal Web** | Cesar Leon (`@cesarleon27-ai`) | • PDF oficiales generados en el backend (boletas, actas, certificados)<br>• Motor Criptográfico SHA-256 y QR (Sello de verificación)<br>• Next.js con renderizado en servidor (Portal, noticias, mesa de partes)<br>• Graph API de Meta (Facebook) y archivos de carga para el SIAGIE |
 ---
 
 ## 9. CONCLUSIÓN

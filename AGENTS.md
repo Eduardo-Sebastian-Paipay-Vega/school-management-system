@@ -88,6 +88,10 @@ Por solicitud del usuario, usar la skill local [`primeng`](.agents/skills/primen
 
 PrimeNG pertenece al ecosistema Angular. En el frontend Next.js, adaptar sus patrones de componentes e interacción a componentes React y a los tokens de tema del frontend. Esta preferencia no cambia el stack tecnológico ni autoriza por sí misma una migración a Angular. Para tareas sin interfaz, continuar con las skills y reglas que correspondan.
 
+### 5.1 Protocolo PrimeReact Guardian (obligatorio en UI React)
+
+Para cada edición de interfaz en el frontend Next.js con PrimeReact, aplicar el protocolo de [`.claude/skills/primereact-guardian/SKILL.md`](.claude/skills/primereact-guardian/SKILL.md) (fases G0–G6), aun cuando no se mencione la skill: convertir el pedido en matriz Rn, detectar versión/modo instalados (hoy PrimeReact 10.9.9, styled, tema `unsch-lara.css`), verificar la API contra los `.d.ts` locales, reutilizar wrappers y componentes existentes, ejecutar el auditor (`py -I .claude/skills/primereact-guardian/scripts/audit_primereact.py frontend`), `npm run lint` y `npm run build`, releer el diff y reportar si no fue posible inspeccionar la UI. No aplicar a Angular/PrimeNG ni Vue/PrimeVue. Invocación explícita: `/primereact-guardian`.
+
 ---
 
 ## 6. Skills de Vercel Labs y Frontend Engineering (Open Agents)

@@ -85,8 +85,8 @@ flowchart LR
 |---|---|---|---|
 | [ADR-001](ADR/ADR-001-topologia-backend.md) | Topología del backend | **Monolito modular** en `backend/src/modules/*` como destino. M8 (`backend/squad_3_calificaciones/`) sigue como proceso aparte detrás de un **gateway** del backend común, sin cambios de código. Solo se integra como módulo si cumple los criterios del ADR (D-05) | H5 |
 | [ADR-002](ADR/ADR-002-tipo-tenant-id.md) | Tipo de `tenant_id` | `UUID NOT NULL REFERENCES instituciones(id)`, como el consolidado; tenant = institución; después del login el tenant sale **solo** del JWT; se actualiza `sdd_rules.md` §2.1 (D-04) | H2 |
-| ADR-003 | Aislamiento multi-tenant | Doble barrera: `tenant.middleware.ts` fija el tenant del JWT y PostgreSQL aplica RLS con `SET LOCAL app.tenant_id` por transacción | H2 |
-| ADR-004 | Migraciones | SQL versionado (`database/migrations/NNNN_descripcion.sql`) con un ejecutor ligero (p. ej. `node-pg-migrate`), sin ORM. `01_esquema_consolidado.sql` pasa a ser la migración `0001` | H3, H4 |
+| [ADR-003](ADR/ADR-003-aislamiento-rls.md) | Aislamiento multi-tenant | Doble barrera: el backend fija el tenant del JWT por transacción (`set_config('app.tenant_id', ..., true)`) y PostgreSQL aplica RLS con un rol de aplicación sin `BYPASSRLS` | H2 |
+| [ADR-004](ADR/ADR-004-migraciones.md) | Migraciones | SQL versionado en `database/migrations/` con marca de tiempo y ejecutor ligero (`node-pg-migrate` o `dbmate`), sin ORM. Los archivos actuales son la línea base, sin reescribirlos | H3, H4 |
 | [ADR-005](ADR/ADR-005-contratos-api.md) | Contratos API | OpenAPI 3.1 en `packages/contracts/openapi/` como fuente única, tipos generados y `zod` como validación en tiempo de ejecución (D-18) | H8 |
 | ADR-006 | Librería JWT | Una sola (`jsonwebtoken` o `jose`). Access token de 15 min, refresh de 7 días en cookie HttpOnly con rotación y lista de revocación en Redis (RNF-05) | H5 |
 | ADR-007 | Tiempo real | Socket.IO con adaptador Redis (escala horizontal, RF-27, RF-76) **o** `ws` nativo. Elegir uno; el plan recomienda Socket.IO por coherencia con el stack declarado | H6 |
@@ -115,7 +115,7 @@ flowchart LR
 | 3.1.2 | Agregar `created_by UUID NOT NULL` y `updated_at` en todas las tablas; trigger genérico `set_updated_at()` | Migración `0003_auditoria_columnas.sql` |
 | 3.1.3 | Incorporar `asistencias_docentes_contratados` y `cuadros_merito` (H4) y conciliar `calificaciones`/`evaluaciones` con el modelo del Squad 3 (H5) | Esquema único sin divergencias |
 | 3.1.4 | Políticas RLS por tabla con `tenant_id` | `0004_rls.sql` + prueba que demuestre que el tenant A no lee al tenant B |
-| 3.1.5 | Diagrama ER global (`erDiagram`) del núcleo y diccionario de datos (tabla, columna, tipo, nulidad, clasificación de privacidad) | `modelo_datos_canonico.md` |
+| 3.1.5 | Diagrama ER global (`erDiagram`) del núcleo y diccionario de datos (tabla, columna, tipo, nulidad, clasificación de privacidad) | [`modelo_datos_canonico.md`](modelo_datos_canonico.md) (v0.1) |
 | 3.1.6 | Catálogos normalizados: roles, escala CNEB (AD, A, B, C), estados de matrícula, tipos de documento | Seeds en `database/seeds/` |
 | 3.1.7 | Volumetría y estrategia de índices: estimar filas/año de `asistencias_alumnos` (alumnos × días lectivos) y decidir particionamiento por año lectivo | Sección "Volumetría" del modelo |
 | 3.1.8 | Política de retención y borrado lógico (`is_active`), respaldos (RPO ≤ 24 h, RTO ≤ 4 h) y refresco de vistas materializadas (`vm_rendimiento_seccion`, `vm_asistencia_mensual`) | Sección "Ciclo de vida del dato" |

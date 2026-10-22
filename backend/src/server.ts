@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import healthRoutes from './routes/health.routes';
+import authRoutes from './routes/auth.routes';
+import auditRoutes from './routes/audit.routes';
 import { connectRedis } from './config/redis';
 
 dotenv.config();
@@ -31,8 +33,10 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(morgan('dev'));
 
-// Rutas Base
+// Rutas Base y Core del Sistema
 app.use('/api/v1', healthRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/audit', auditRoutes);
 
 // Ruta Raíz
 app.get('/', (_req, res) => {

@@ -1,23 +1,15 @@
-'use client';
-
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import {
   GraduationCap,
   Building2,
   Trophy,
   Microscope,
-  CheckCircle2,
   ArrowRight,
-  ChevronDown,
   Quote,
   Calendar,
-  Sparkles,
-  ArrowUpRight,
-  ShieldCheck,
-  Users,
-  Compass,
 } from 'lucide-react';
+import HeroSection from '@/modules/landing/components/HeroSection';
+import StatsSection from '@/modules/landing/components/StatsSection';
 
 const stats = [
   { number: '62+', label: 'Años de Trayectoria', detail: 'Fundado en 1964 en Ayacucho' },
@@ -81,130 +73,14 @@ const homeNews = [
 export default function HomePage() {
   return (
     <div className="bg-white">
-      {/* SECTION 1: HERO SECTION */}
-      <section className="relative flex min-h-[580px] items-center overflow-hidden text-white hero-one md:min-h-[660px]">
-        <div className="content-width relative z-10 w-full py-20 fade-in">
-          <div className="max-w-[760px]">
-            {/* Institution Badge with Engraved Logo for Sharp Contrast */}
-            <motion.div
-              initial={{ opacity: 0, y: -16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="mb-6 inline-flex items-center gap-3 rounded-full border border-accent-gold/60 bg-black/55 py-2 pl-2.5 pr-5 backdrop-blur-md shadow-xl"
-            >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-0.5 shadow-md">
-                <img
-                  src="/emblema-unsch-grabado.png"
-                  alt="Escudo Oficial UNSCH Grabado"
-                  width={28}
-                  height={28}
-                  className="h-full w-full object-contain"
-                />
-              </div>
-              <span className="text-xs font-black uppercase tracking-[.22em] text-accent-cream">
-                62 Años de Excelencia Académica · UNSCH Ayacucho
-              </span>
-            </motion.div>
+      {/* SECTION 1: HERO SECTION (Optimized Client Leaf Component) */}
+      <HeroSection />
 
-            {/* H1 Main Title with Negative Tracking */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="hero-text-shadow text-4xl font-black leading-[1.08] tracking-[-0.03em] sm:text-5xl md:text-6xl"
-            >
-              Educación de Excelencia con{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cream via-accent-gold to-white">
-                Respaldo Universitario
-              </span>{' '}
-              en Ayacucho.
-            </motion.h1>
+      {/* QUICK STATS BAR (Optimized Client Leaf Component) */}
+      <StatsSection stats={stats} />
 
-            {/* Subtitle */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-6 max-w-2xl text-base font-medium leading-relaxed text-accent-cream/95 md:text-lg"
-            >
-              Más de 62 años formando líderes e investigadores desde Inicial hasta Secundaria en los{' '}
-              <strong className="text-white">Planteles de Aplicación Guamán Poma de Ayala</strong>, 
-              adscritos a la histórica{' '}
-              <strong className="text-accent-gold">
-                Universidad Nacional de San Cristóbal de Huamanga (UNSCH)
-              </strong>.
-            </motion.p>
-
-            {/* CTAs with Framer Motion spring physics */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-8 flex flex-col gap-3.5 sm:flex-row sm:items-center"
-            >
-              <Link
-                href="/admision"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-8 py-4 text-sm font-extrabold uppercase tracking-wider text-brand shadow-2xl transition hover:bg-accent-cream hover:text-brand-dark active:scale-[0.98]"
-              >
-                <span>Proceso de Admisión 2027</span>
-                <ArrowRight size={18} />
-              </Link>
-              <Link
-                href="/por-que-elegirnos"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/60 bg-black/35 px-7 py-4 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20 hover:border-white active:scale-[0.98]"
-              >
-                <span>¿Por qué elegirnos?</span>
-                <ArrowUpRight size={18} />
-              </Link>
-            </motion.div>
-
-            {/* Highlights pill tags */}
-            <div className="mt-10 flex flex-wrap items-center gap-4 text-xs font-semibold text-accent-cream/90">
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 size={16} className="text-accent-gold" />
-                <span>Ingreso preferencial a la UNSCH</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 size={16} className="text-accent-gold" />
-                <span>4 Losas deportivas techadas 2026</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 size={16} className="text-accent-gold" />
-                <span>Prácticas en laboratorios científicos</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* QUICK STATS BAR */}
-      <section className="relative z-20 -mt-10 content-width">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="grid grid-cols-2 gap-3 rounded-3xl border border-accent-cream bg-white p-6 shadow-xl md:grid-cols-4 md:p-8"
-        >
-          {stats.map((item, idx) => (
-            <div
-              key={item.label}
-              className={`p-3 text-center ${
-                idx !== stats.length - 1 ? 'md:border-r md:border-gray-200' : ''
-              }`}
-            >
-              <div className="text-3xl font-black tracking-tight text-brand md:text-4xl">{item.number}</div>
-              <div className="mt-1 text-xs font-extrabold uppercase tracking-wider text-gray-800">
-                {item.label}
-              </div>
-              <div className="mt-0.5 text-[11px] text-gray-500">{item.detail}</div>
-            </div>
-          ))}
-        </motion.div>
-      </section>
-
-      {/* SECTION 2: BENTO GRID ¿POR QUÉ ELEGIRNOS? PREVIEW */}
-      <section className="content-width py-28">
+      {/* SECTION 2: BENTO GRID ¿POR QUÉ ELEGIRNOS? PREVIEW (Server-Rendered + content-visibility) */}
+      <section className="content-width py-28 content-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="max-w-2xl">
             <p className="text-xs font-bold uppercase tracking-[.25em] text-accent-gold">
@@ -220,7 +96,7 @@ export default function HomePage() {
           </div>
           <Link
             href="/por-que-elegirnos"
-            className="inline-flex shrink-0 items-center gap-2 rounded-2xl border border-brand bg-white px-6 py-3.5 text-xs font-black uppercase tracking-wider text-brand hover:bg-brand hover:text-white transition shadow-sm"
+            className="inline-flex shrink-0 items-center gap-2 rounded-2xl border border-brand bg-white px-6 py-3.5 text-xs font-black uppercase tracking-wider text-brand hover:bg-brand hover:text-white transition-colors duration-150 shadow-sm active:scale-[0.98]"
           >
             <span>Ver propuesta completa</span>
             <ArrowRight size={15} />
@@ -230,7 +106,7 @@ export default function HomePage() {
         {/* Asymmetrical Bento Box */}
         <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-12">
           {/* Card 1: 7 Cols */}
-          <div className="md:col-span-7 flex flex-col justify-between rounded-3xl border border-gray-200/90 bg-gradient-to-br from-white via-accent-ivory/40 to-accent-cream/20 p-8 shadow-card hover:border-brand hover:shadow-elevated transition-all">
+          <div className="card-hover-lift md:col-span-7 flex flex-col justify-between rounded-3xl border border-gray-200/90 bg-gradient-to-br from-white via-accent-ivory/40 to-accent-cream/20 p-8 shadow-card hover:border-brand hover:shadow-elevated">
             <div>
               <div className="flex items-center justify-between">
                 <div className="inline-flex rounded-2xl bg-brand/10 p-4 text-brand">
@@ -258,7 +134,7 @@ export default function HomePage() {
           </div>
 
           {/* Card 2: 5 Cols */}
-          <div className="md:col-span-5 flex flex-col justify-between rounded-3xl border border-accent-gold/40 bg-accent-ivory/70 p-8 shadow-card hover:border-accent-gold hover:shadow-elevated transition-all">
+          <div className="card-hover-lift md:col-span-5 flex flex-col justify-between rounded-3xl border border-accent-gold/40 bg-accent-ivory/70 p-8 shadow-card hover:border-accent-gold hover:shadow-elevated">
             <div>
               <div className="inline-flex rounded-2xl bg-accent-gold/20 p-4 text-brand-dark">
                 <Trophy size={32} strokeWidth={1.8} />
@@ -281,7 +157,7 @@ export default function HomePage() {
           </div>
 
           {/* Card 3: 6 Cols */}
-          <div className="md:col-span-6 flex flex-col justify-between rounded-3xl border border-gray-200/90 bg-white p-8 shadow-card hover:border-brand hover:shadow-elevated transition-all">
+          <div className="card-hover-lift md:col-span-6 flex flex-col justify-between rounded-3xl border border-gray-200/90 bg-white p-8 shadow-card hover:border-brand hover:shadow-elevated">
             <div>
               <div className="inline-flex rounded-2xl bg-brand/10 p-4 text-brand">
                 <GraduationCap size={32} strokeWidth={1.8} />
@@ -304,7 +180,7 @@ export default function HomePage() {
           </div>
 
           {/* Card 4: 6 Cols */}
-          <div className="md:col-span-6 flex flex-col justify-between rounded-3xl border border-gray-200/90 bg-white p-8 shadow-card hover:border-brand hover:shadow-elevated transition-all">
+          <div className="card-hover-lift md:col-span-6 flex flex-col justify-between rounded-3xl border border-gray-200/90 bg-white p-8 shadow-card hover:border-brand hover:shadow-elevated">
             <div>
               <div className="inline-flex rounded-2xl bg-accent-ivory p-4 text-brand">
                 <Microscope size={32} strokeWidth={1.8} />
@@ -328,8 +204,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 3: NIVELES EDUCATIVOS PREVIEW */}
-      <section className="border-y border-gray-200 bg-accent-ivory/50 py-28">
+      {/* SECTION 3: NIVELES EDUCATIVOS PREVIEW (Server-Rendered + content-visibility) */}
+      <section className="border-y border-gray-200 bg-accent-ivory/50 py-28 content-auto">
         <div className="content-width">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
@@ -345,7 +221,7 @@ export default function HomePage() {
             </div>
             <Link
               href="/niveles"
-              className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-brand px-6 py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-md hover:bg-brand-dark active:scale-95 transition"
+              className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-brand px-6 py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-md hover:bg-brand-dark active:scale-[0.98] transition-colors duration-150"
             >
               <span>Explorar los 3 niveles</span>
               <ArrowRight size={15} />
@@ -356,7 +232,7 @@ export default function HomePage() {
             {levelsPreview.map(lvl => (
               <div
                 key={lvl.id}
-                className="flex flex-col justify-between rounded-3xl border border-gray-200 bg-white p-8 shadow-card hover:border-brand hover:shadow-elevated transition-all"
+                className="card-hover-lift flex flex-col justify-between rounded-3xl border border-gray-200 bg-white p-8 shadow-card hover:border-brand hover:shadow-elevated"
               >
                 <div>
                   <div className="flex items-center justify-between">
@@ -377,7 +253,7 @@ export default function HomePage() {
                 <div className="mt-8 border-t border-gray-100 pt-5">
                   <Link
                     href="/niveles"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-accent-ivory py-3.5 text-xs font-extrabold uppercase tracking-wider text-brand hover:bg-brand hover:text-white transition"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-accent-ivory py-3.5 text-xs font-extrabold uppercase tracking-wider text-brand hover:bg-brand hover:text-white transition-colors duration-150 active:scale-[0.98]"
                   >
                     <span>Ver Currículo y Detalles</span>
                     <ArrowRight size={14} />
@@ -389,8 +265,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 4: TESTIMONIAL PREVIEW */}
-      <section className="content-width py-28">
+      {/* SECTION 4: TESTIMONIAL PREVIEW (Server-Rendered + content-visibility) */}
+      <section className="content-width py-28 content-auto">
         <div className="rounded-3xl border border-accent-cream bg-gradient-to-br from-white via-accent-ivory to-white p-8 sm:p-12 shadow-card">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 text-accent-gold font-bold text-xs uppercase tracking-widest">
@@ -418,8 +294,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 5: ADMISION BANNER */}
-      <section className="border-t border-gray-200 bg-brand-dark py-20 text-white hero-two">
+      {/* SECTION 5: ADMISION BANNER (Server-Rendered + content-visibility) */}
+      <section className="border-t border-gray-200 bg-brand-dark py-20 text-white hero-two content-auto">
         <div className="content-width flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="max-w-2xl">
             <span className="rounded-full bg-accent-gold/20 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-accent-gold">
@@ -435,7 +311,7 @@ export default function HomePage() {
           </div>
           <Link
             href="/admision"
-            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-white px-8 py-4 text-xs font-black uppercase tracking-wider text-brand shadow-2xl hover:bg-accent-cream active:scale-95 transition"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-white px-8 py-4 text-xs font-black uppercase tracking-wider text-brand shadow-2xl hover:bg-accent-cream active:scale-[0.98] transition-colors duration-150"
           >
             <span>Ir a Admisión 2027</span>
             <ArrowRight size={16} />
@@ -443,8 +319,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 6: NOTICIAS PREVIEW */}
-      <section className="content-width py-28">
+      {/* SECTION 6: NOTICIAS PREVIEW (Server-Rendered + content-visibility) */}
+      <section className="content-width py-28 content-auto">
         <div className="mb-12 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-[.25em] text-accent-gold">
@@ -467,7 +343,7 @@ export default function HomePage() {
           {homeNews.map(item => (
             <article
               key={item.title}
-              className="flex flex-col justify-between overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-card hover:border-brand hover:shadow-elevated transition-all"
+              className="card-hover-lift flex flex-col justify-between overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-card hover:border-brand hover:shadow-elevated"
             >
               <div className="card-img relative h-48 flex items-center justify-center p-6">
                 <Building2 size={72} className="text-brand-dark/20" />

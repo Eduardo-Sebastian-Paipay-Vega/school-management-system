@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { JWT_SECRET } from '../config/jwt';
 
 export interface AuthenticatedUser {
   id: string;
@@ -32,10 +30,8 @@ export const authenticateJwt = (
   }
 
   const token = authHeader.split(' ')[1];
-  const secret = process.env.JWT_SECRET || 'super_secret_jwt_key_unsch_2026_school_management_system_change_in_prod';
-
   try {
-    const decoded = jwt.verify(token, secret) as any;
+    const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] }) as any;
     req.user = {
       id: decoded.sub || decoded.id,
       tenantId: decoded.tenantId,

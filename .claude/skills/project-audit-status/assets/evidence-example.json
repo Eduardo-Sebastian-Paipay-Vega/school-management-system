@@ -1,0 +1,39 @@
+{
+  "project": "PROYECTO_FICTICIO_NO_USAR_COMO_AUDITORIA",
+  "audit": {
+    "date": "2026-10-21",
+    "branch": "example-only",
+    "commit": "0123456-example",
+    "dirty_worktree": true,
+    "auditor": "Ejemplo sintético"
+  },
+  "scope": {
+    "inventory_status": "partial",
+    "all_modules_in_scope": false,
+    "expected_modules": ["Demo"],
+    "reviewed_modules": [],
+    "requirements_sources": [],
+    "unresolved_scope_conflicts": ["No existe repositorio en este ejemplo"],
+    "limitations": ["No utilizar estos datos para evaluar proyectos"]
+  },
+  "items": [
+    {
+      "id": "RF-DEMO-1",
+      "title": "Requisito ficticio pendiente",
+      "category": "RF",
+      "module": "Demo",
+      "priority": "high",
+      "state": "not_started",
+      "evidence": []
+    }
+  ],
+  "phases": [],
+  "findings": [{"id":"EXAMPLE-1","severity":"HIGH","title":"Sin evidencia del repositorio", "module":"Demo", "reference":"Sin acceso", "action":"Inspeccionar el repositorio"}],
+  "gates": {
+    "uat_approved": false,
+    "security_approved": false,
+    "deployment_verified": false,
+    "monitoring_verified": false,
+    "release_authorized": false
+  }
+}

@@ -10,7 +10,7 @@ export default function IntranetLayout({ children }: { children: React.ReactNode
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="flex items-center gap-2 rounded-xl border border-gray-200 bg-accent-ivory/60 px-3 py-1.5 text-xs font-bold text-gray-700 hover:text-brand hover:border-brand transition"
+              className="flex items-center gap-2 rounded-xl border border-gray-200 bg-accent-ivory/60 px-3 py-1.5 text-xs font-bold text-gray-700 hover:text-brand hover:border-brand active:scale-[0.98] transition-all duration-150 ease"
             >
               <ArrowLeft size={14} />
               <span>Portal Web</span>

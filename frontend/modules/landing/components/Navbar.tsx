@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Menu,
   X,
@@ -30,6 +31,7 @@ export const navItems = [
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const shouldReduceMotion = useReducedMotion();
 
   const isLinkActive = (href: string) => {
     if (href === '/') {
@@ -83,16 +85,17 @@ export default function Navbar() {
           {/* Institution Logo & Title */}
           <Link href="/" className="group flex items-center gap-2.5 shrink-0">
             <motion.div
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
+              whileHover={shouldReduceMotion ? undefined : { scale: 1.04 }}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
               transition={{ type: 'spring', stiffness: 260, damping: 20 }}
               className="relative flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-white p-1 shadow-sm group-hover:border-accent-gold transition-colors"
             >
-              <img
+              <Image
                 src="/emblema-unsch-grabado.png"
                 alt="Emblema Heráldico Universitario Grabado - UNSCH"
                 width={44}
                 height={44}
+                priority
                 className="h-full w-full object-contain filter drop-shadow-sm"
               />
             </motion.div>
@@ -131,7 +134,11 @@ export default function Navbar() {
                     <motion.div
                       layoutId="activeNavIndicator"
                       className="absolute inset-x-1.5 -bottom-1 h-[2px] rounded-full bg-brand"
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                      transition={
+                        shouldReduceMotion
+                          ? { duration: 0 }
+                          : { type: 'spring', stiffness: 420, damping: 32 }
+                      }
                     />
                   )}
                 </Link>
@@ -168,7 +175,7 @@ export default function Navbar() {
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="rounded-xl border border-gray-300 p-2 text-brand transition hover:bg-accent-ivory active:scale-95 xl:hidden shrink-0"
+              className="rounded-xl border border-gray-300 p-2 text-brand transition-colors hover:bg-accent-ivory active:scale-[0.97] xl:hidden shrink-0"
               aria-label="Abrir menú"
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -183,7 +190,11 @@ export default function Navbar() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              transition={
+                shouldReduceMotion
+                  ? { duration: 0 }
+                  : { duration: 0.22, ease: [0.215, 0.61, 0.355, 1] }
+              }
               className="border-t border-gray-200 bg-white px-6 py-4 shadow-2xl xl:hidden overflow-hidden"
             >
               <div className="grid gap-1">

@@ -1,27 +1,42 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { CheckCircle2, HelpCircle } from 'lucide-react';
 import { LoginForm, UserSession } from '@/modules/intranet';
 
 export default function LoginPage() {
   const router = useRouter();
+  const shouldReduceMotion = useReducedMotion();
 
-  const handleLoginSuccess = (session: UserSession) => {
+  const handleLoginSuccess = (_session: UserSession) => {
     // Redirige directamente al intranet tras iniciar sesión
     router.push('/intranet');
+  };
+
+  // Easing ease-out-cubic / quart según especificación Emil Kowalski
+  const easeOutTransition = {
+    duration: 0.25,
+    ease: [0.215, 0.61, 0.355, 1] as const,
   };
 
   return (
     <div className="mx-auto max-w-5xl py-6">
       <div className="grid gap-8 lg:grid-cols-12 items-center">
-        {/* Left Column: Institutional Info */}
-        <div className="lg:col-span-5 space-y-6">
+        {/* Left Column: Institutional Info (Coordinated Entrance) */}
+        <motion.div
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={easeOutTransition}
+          className="lg:col-span-5 space-y-6"
+        >
           <div className="flex items-center gap-3">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-200 bg-white p-2 shadow-md">
+            <motion.div
+              whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-200 bg-white p-2 shadow-md cursor-default"
+            >
               <img
                 src="/emblema-unsch-grabado.png"
                 alt="Escudo UNSCH Grabado"
@@ -29,7 +44,7 @@ export default function LoginPage() {
                 height={44}
                 className="h-full w-full object-contain"
               />
-            </div>
+            </motion.div>
             <div>
               <span className="rounded bg-brand/10 px-2 py-0.5 text-[10px] font-extrabold text-brand uppercase tracking-wider">
                 Sistema Integrado UNSCH
@@ -65,20 +80,23 @@ export default function LoginPage() {
             </p>
             <p className="mt-1 text-[11px] leading-relaxed">
               Puedes entrar directamente al panel general navegando a{' '}
-              <Link href="/intranet" className="font-bold text-brand underline">
+              <Link href="/intranet" className="font-bold text-brand underline hover:text-brand-dark transition-colors duration-150">
                 /intranet
               </Link>
               .
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right Column: Modular Login Box */}
         <div className="lg:col-span-7">
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 8, scale: 0.99 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{
+              ...easeOutTransition,
+              delay: shouldReduceMotion ? 0 : 0.05,
+            }}
             className="rounded-3xl border border-gray-200 bg-white p-8 sm:p-10 shadow-elevated"
           >
             <LoginForm onSuccess={handleLoginSuccess} />
@@ -88,3 +106,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

@@ -1,0 +1,2465 @@
+{
+  "project": "Sistema de Gestión Escolar — Planteles de Aplicación Guamán Poma de Ayala (UNSCH)",
+  "audit": {
+    "date": "2026-10-22",
+    "branch": "dev",
+    "commit": "d566f4dc",
+    "dirty_worktree": true,
+    "auditor": "Claude Code (skill project-audit-status)"
+  },
+  "scope": {
+    "inventory_status": "complete",
+    "all_modules_in_scope": true,
+    "expected_modules": [
+      "M1",
+      "M2",
+      "M3",
+      "M4",
+      "M5",
+      "M6",
+      "M7",
+      "M8",
+      "M9",
+      "M10",
+      "M11",
+      "M12",
+      "M13"
+    ],
+    "reviewed_modules": [
+      "M1",
+      "M2",
+      "M3",
+      "M4",
+      "M5",
+      "M6",
+      "M7",
+      "M8",
+      "M9",
+      "M10",
+      "M11",
+      "M12",
+      "M13"
+    ],
+    "requirements_sources": [
+      "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/requisitos_funcionales.md (89 RF, tabla maestra)",
+      "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad */RF-XX.md (89 fichas con criterios)",
+      "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (20 RNF)",
+      "D - Base 1 - 01092026/Fase 2/Casos de uso (89 CU)"
+    ],
+    "unresolved_scope_conflicts": [],
+    "limitations": [
+      "Árbol modificado: 18 archivos sin commit, incluido el core de autenticación auditado (backend/src/controllers, services, routes)",
+      "Sin ejecución E2E con PostgreSQL/Redis reales ni revisión visual en navegador",
+      "No se consultaron issues, tableros ni aceptaciones formales fuera del repositorio",
+      "Prioridad mapeada: Esencial=high, Deseable=medium, Opcional=low; RNF sin prioridad oficial = medium",
+      "Controles QA/INT/SEC/ARCH/OPS/DOC definidos por el auditor a partir de RNF y AGENTS.md",
+      "Correcciones PH-001/002/008 comprobadas con pruebas ad hoc fuera del repo (PGlite + pgcrypto; arranque sin secretos); no hay pruebas versionadas del core"
+    ]
+  },
+  "items": [
+    {
+      "id": "RF-01",
+      "title": "Autenticación Segura de Usuarios mediante Credenciales Institucionales",
+      "category": "RF",
+      "module": "M1: Acceso y Seguridad",
+      "priority": "high",
+      "state": "implemented",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-01.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-01.md §3 Criterios de Aceptación"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/src/services/auth.service.ts login: bcrypt vía pgcrypto crypt(), sin usuarios de respaldo (frontend aún no integrado)"
+        }
+      ]
+    },
+    {
+      "id": "RF-02",
+      "title": "Cierre de Sesión Seguro y Terminación Automática por Inactividad",
+      "category": "RF",
+      "module": "M1: Acceso y Seguridad",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-02.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-02.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-03",
+      "title": "Restablecimiento Asistido de Contraseñas de Acceso",
+      "category": "RF",
+      "module": "M1: Acceso y Seguridad",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-03.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-03.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-04",
+      "title": "Control de Privilegios y Acceso Basado en Roles (RBAC)",
+      "category": "RF",
+      "module": "M1: Acceso y Seguridad",
+      "priority": "high",
+      "state": "implemented",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-04.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-04.md §3 Criterios de Aceptación"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/src/middlewares/rbac.middleware.ts:8 requireRoles (sin pruebas; UI no aplica roles reales)"
+        }
+      ]
+    },
+    {
+      "id": "RF-05",
+      "title": "Registro y Alta Formal de Cuentas de Personal Institucional",
+      "category": "RF",
+      "module": "M2: Gestión de Usuarios",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-05.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-05.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-06",
+      "title": "Importación Masiva de Usuarios desde Archivos Excel / CSV",
+      "category": "RF",
+      "module": "M2: Gestión de Usuarios",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-06.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-06.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-07",
+      "title": "Gestión de Sedes y Planteles Escolares Multi-Tenant",
+      "category": "RF",
+      "module": "M2: Gestión de Usuarios",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-07.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-07.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-08",
+      "title": "Directorio Escolar y Búsqueda Rápida de Personal",
+      "category": "RF",
+      "module": "M2: Gestión de Usuarios",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-08.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-08.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-09",
+      "title": "Gestión de Perfil Personal y Cambio Autónomo de Credenciales",
+      "category": "RF",
+      "module": "M2: Gestión de Usuarios",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-09.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-09.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-10",
+      "title": "Parametrización del Año Lectivo y Calendario Escolar",
+      "category": "RF",
+      "module": "M3: Configuración Escolar",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-10.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-10.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-11",
+      "title": "Apertura, Parametrización y Cierre de Periodos Académicos",
+      "category": "RF",
+      "module": "M3: Configuración Escolar",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-11.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-11.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-12",
+      "title": "Estructuración de Niveles Educativos, Grados y Secciones",
+      "category": "RF",
+      "module": "M3: Configuración Escolar",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-12.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-12.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-13",
+      "title": "Definición de Escalas de Calificación Institucionales (Dual CNEB)",
+      "category": "RF",
+      "module": "M3: Configuración Escolar",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-13.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-13.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-14",
+      "title": "Parámetros Globales del Sistema y Membretes Institucionales",
+      "category": "RF",
+      "module": "M3: Configuración Escolar",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-14.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-14.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-15",
+      "title": "Registro, Filiación y Actualización del Padrón de Estudiantes",
+      "category": "RF",
+      "module": "M4: Gestión Académica",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-15.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-15.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-16",
+      "title": "Matrícula Escolar y Asignación de Estudiantes a Secciones",
+      "category": "RF",
+      "module": "M4: Gestión Académica",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-16.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-16.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-17",
+      "title": "Catálogo Curricular y Planes de Estudio oficiales según CNEB",
+      "category": "RF",
+      "module": "M4: Gestión Académica",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-17.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-17.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-18",
+      "title": "Asignación y Distribución de Carga Lectiva Docente",
+      "category": "RF",
+      "module": "M4: Gestión Académica",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-18.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-18.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-19",
+      "title": "Consulta y Generación de Nóminas Oficiales de Aula",
+      "category": "RF",
+      "module": "M4: Gestión Académica",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-19.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-19.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-20",
+      "title": "Registro Ordinario de Asistencia Escolar en el Aula",
+      "category": "RF",
+      "module": "M5: Asistencia Estudiantil",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-20.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-20.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-21",
+      "title": "Registro de Ingreso Físico en Modo Kiosco de Portería",
+      "category": "RF",
+      "module": "M5: Asistencia Estudiantil",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-21.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-21.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-22",
+      "title": "Gestión y Justificación Formal de Inasistencias y Tardanzas",
+      "category": "RF",
+      "module": "M5: Asistencia Estudiantil",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-22.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-22.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-23",
+      "title": "Consolidación y Consulta del Récord de Asistencia por Estudiante",
+      "category": "RF",
+      "module": "M5: Asistencia Estudiantil",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-23.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-23.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-24",
+      "title": "Detección y Generación de Alertas por Ausentismo Crónico",
+      "category": "RF",
+      "module": "M5: Asistencia Estudiantil",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-24.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-24.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-25",
+      "title": "Kiosco de Portería Resiliente con Modo Desconectado (Offline-First)",
+      "category": "RF",
+      "module": "M5: Asistencia Estudiantil",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-25.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-25.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-26",
+      "title": "Generación y Emisión Masiva de Carnés Escolares con Código QR/Barras",
+      "category": "RF",
+      "module": "M5: Asistencia Estudiantil",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-26.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-26.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-27",
+      "title": "Toma Rápida en App Móvil y Difusión en Tiempo Real (WebSockets)",
+      "category": "RF",
+      "module": "M5: Asistencia Estudiantil",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-27.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-27.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-28",
+      "title": "Registro Diario de Jornada y Permanencia de Practicantes EPIS-UNSCH",
+      "category": "RF",
+      "module": "M6: Practicantes",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-28.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-28.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-29",
+      "title": "Asignación de Docente Guía y Asesor Institucional",
+      "category": "RF",
+      "module": "M6: Practicantes",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-29.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-29.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-30",
+      "title": "Cómputo Acumulado de Horas Efectivas de Prácticas Universitarias",
+      "category": "RF",
+      "module": "M6: Practicantes",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-30.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-30.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-31",
+      "title": "Emisión de Fichas Oficiales de Prácticas para la UNSCH",
+      "category": "RF",
+      "module": "M6: Practicantes",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-31.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-31.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-32",
+      "title": "Registro y Marcación de Horas Lectivas de Docentes Contratados",
+      "category": "RF",
+      "module": "M7: Docentes Contratados",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-32.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-32.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-33",
+      "title": "Registro de Justificaciones y Reprogramación de Clases Docentes",
+      "category": "RF",
+      "module": "M7: Docentes Contratados",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-33.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-33.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-34",
+      "title": "Consolidación Mensual de Cumplimiento de Horas Lectivas Dictadas",
+      "category": "RF",
+      "module": "M7: Docentes Contratados",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-34.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-34.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-35",
+      "title": "Supervisión y Monitoreo de Cobertura y Puntualidad de Clases",
+      "category": "RF",
+      "module": "M7: Docentes Contratados",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-35.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-35.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-36",
+      "title": "Parametrización de Rúbricas y Evaluaciones por Asignatura",
+      "category": "RF",
+      "module": "M8: Calificaciones",
+      "priority": "high",
+      "state": "implemented",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-36.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-36.md §3 Criterios de Aceptación"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/squad_3_calificaciones/src/domain.ts:106 acción evaluation (solo backend; UI mock)"
+        },
+        {
+          "kind": "other",
+          "ref": "cmd: npm test en backend/squad_3_calificaciones -> 16/16 OK (2026-10-22, PGlite en memoria) (prueba de dominio; sin recorrido UI integrado)"
+        }
+      ]
+    },
+    {
+      "id": "RF-37",
+      "title": "Ingreso, Edición y Publicación de Calificaciones en Tiempo Real",
+      "category": "RF",
+      "module": "M8: Calificaciones",
+      "priority": "high",
+      "state": "implemented",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-37.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-37.md §3 Criterios de Aceptación"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/squad_3_calificaciones/src/domain.ts:82 applyBatch + :125 publish (solo backend)"
+        },
+        {
+          "kind": "other",
+          "ref": "cmd: npm test en backend/squad_3_calificaciones -> 16/16 OK (2026-10-22, PGlite en memoria) (prueba de dominio; sin recorrido UI integrado)"
+        }
+      ]
+    },
+    {
+      "id": "RF-38",
+      "title": "Planilla Ágil de Notas en Modo Matriz Rápida (\"Modo Excel / Teclado\")",
+      "category": "RF",
+      "module": "M8: Calificaciones",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-38.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-38.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-39",
+      "title": "Asistente de Conclusiones Descriptivas Sugeridas por Logro (MINEDU)",
+      "category": "RF",
+      "module": "M8: Calificaciones",
+      "priority": "medium",
+      "state": "implemented",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-39.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-39.md §3 Criterios de Aceptación"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/squad_3_calificaciones/src/domain.ts:131 conclusion B/C obligatoria (solo backend)"
+        },
+        {
+          "kind": "other",
+          "ref": "cmd: npm test en backend/squad_3_calificaciones -> 16/16 OK (2026-10-22, PGlite en memoria) (prueba de dominio; sin recorrido UI integrado)"
+        }
+      ]
+    },
+    {
+      "id": "RF-40",
+      "title": "Colaboración Supervisada de Practicantes en el Registro de Notas",
+      "category": "RF",
+      "module": "M8: Calificaciones",
+      "priority": "medium",
+      "state": "implemented",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-40.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-40.md §3 Criterios de Aceptación"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/squad_3_calificaciones/src/domain.ts:114-124 approve/reject practicante (solo backend)"
+        },
+        {
+          "kind": "other",
+          "ref": "cmd: npm test en backend/squad_3_calificaciones -> 16/16 OK (2026-10-22, PGlite en memoria) (prueba de dominio; sin recorrido UI integrado)"
+        }
+      ]
+    },
+    {
+      "id": "RF-41",
+      "title": "Cálculo Automatizado de Promedios Parciales, Bimestrales y Finales",
+      "category": "RF",
+      "module": "M8: Calificaciones",
+      "priority": "high",
+      "state": "implemented",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-41.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-41.md §3 Criterios de Aceptación"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/squad_3_calificaciones/src/domain.ts:62 summary y :188 annualSummary (solo backend)"
+        },
+        {
+          "kind": "other",
+          "ref": "cmd: npm test en backend/squad_3_calificaciones -> 16/16 OK (2026-10-22, PGlite en memoria) (prueba de dominio; sin recorrido UI integrado)"
+        }
+      ]
+    },
+    {
+      "id": "RF-42",
+      "title": "Cierre Oficial de Periodo Académico y Bloqueo de Modificación",
+      "category": "RF",
+      "module": "M8: Calificaciones",
+      "priority": "high",
+      "state": "implemented",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-42.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-42.md §3 Criterios de Aceptación"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/squad_3_calificaciones/src/domain.ts:53 isClosed y :137 close (solo backend)"
+        },
+        {
+          "kind": "other",
+          "ref": "cmd: npm test en backend/squad_3_calificaciones -> 16/16 OK (2026-10-22, PGlite en memoria) (prueba de dominio; sin recorrido UI integrado)"
+        }
+      ]
+    },
+    {
+      "id": "RF-43",
+      "title": "Flujo Extraordinario de Solicitud y Aprobación de Rectificación de Notas",
+      "category": "RF",
+      "module": "M8: Calificaciones",
+      "priority": "medium",
+      "state": "implemented",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-43.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-43.md §3 Criterios de Aceptación"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/squad_3_calificaciones/src/domain.ts:142-170 rectification/decide (solo backend)"
+        },
+        {
+          "kind": "other",
+          "ref": "cmd: npm test en backend/squad_3_calificaciones -> 16/16 OK (2026-10-22, PGlite en memoria) (prueba de dominio; sin recorrido UI integrado)"
+        }
+      ]
+    },
+    {
+      "id": "RF-44",
+      "title": "Consulta Inmediata y Transparente de Calificaciones para Estudiantes",
+      "category": "RF",
+      "module": "M8: Calificaciones",
+      "priority": "high",
+      "state": "implemented",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-44.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-44.md §3 Criterios de Aceptación"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/squad_3_calificaciones/src/domain.ts:205 view con aislamiento por estudiante (solo backend)"
+        },
+        {
+          "kind": "other",
+          "ref": "cmd: npm test en backend/squad_3_calificaciones -> 16/16 OK (2026-10-22, PGlite en memoria) (prueba de dominio; sin recorrido UI integrado)"
+        }
+      ]
+    },
+    {
+      "id": "RF-45",
+      "title": "Llenado Asistido con Auto-Guardado y Conexión Automática en Segundo Plano",
+      "category": "RF",
+      "module": "M8: Calificaciones",
+      "priority": "high",
+      "state": "implemented",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-45.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-45.md §3 Criterios de Aceptación"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/squad_3_calificaciones/src/app.ts:66 PATCH /api/v1/grades/auto-save y revisiones (solo backend)"
+        },
+        {
+          "kind": "other",
+          "ref": "cmd: npm test en backend/squad_3_calificaciones -> 16/16 OK (2026-10-22, PGlite en memoria) (prueba de dominio; sin recorrido UI integrado)"
+        }
+      ]
+    },
+    {
+      "id": "RF-46",
+      "title": "Motor de Conversión Escala Vigesimal (0-20) a Literal CNEB (AD, A, B, C)",
+      "category": "RF",
+      "module": "M8: Calificaciones",
+      "priority": "high",
+      "state": "implemented",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-46.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-46.md §3 Criterios de Aceptación"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/squad_3_calificaciones/src/domain.ts:41 literal 0-20 -> AD/A/B/C (solo backend)"
+        },
+        {
+          "kind": "other",
+          "ref": "cmd: npm test en backend/squad_3_calificaciones -> 16/16 OK (2026-10-22, PGlite en memoria) (prueba de dominio; sin recorrido UI integrado)"
+        }
+      ]
+    },
+    {
+      "id": "RF-47",
+      "title": "Generación de Mapa de Calor de Rendimiento Académico por Sección",
+      "category": "RF",
+      "module": "M9: Mapas de Calor",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-47.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-47.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-48",
+      "title": "Generación de Mapa de Calor de Asistencia y Puntualidad",
+      "category": "RF",
+      "module": "M9: Mapas de Calor",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-48.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-48.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-49",
+      "title": "Mapas de Calor Interactivos con Navegación a Detalle (Drill-Down)",
+      "category": "RF",
+      "module": "M9: Mapas de Calor",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-49.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-49.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-50",
+      "title": "Análisis Gráfico Comparativo de Rendimiento entre Secciones",
+      "category": "RF",
+      "module": "M9: Mapas de Calor",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-50.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-50.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-51",
+      "title": "Detección Visual de Asignaturas con Mayor Índice de Riesgo",
+      "category": "RF",
+      "module": "M9: Mapas de Calor",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-51.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-51.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-52",
+      "title": "Tablero de Control Ejecutivo de Indicadores Clave para Dirección",
+      "category": "RF",
+      "module": "M10: Monitoreo y Dashboards",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-52.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-52.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-53",
+      "title": "Tablero de Control Curricular y Cumplimiento para Coordinación",
+      "category": "RF",
+      "module": "M10: Monitoreo y Dashboards",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-53.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-53.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-54",
+      "title": "Tablero de Resumen Pedagógico y Clases Diarias para el Docente",
+      "category": "RF",
+      "module": "M10: Monitoreo y Dashboards",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-54.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-54.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-55",
+      "title": "Generación Automatizada de Alertas de Deserción y Repitencia",
+      "category": "RF",
+      "module": "M10: Monitoreo y Dashboards",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-55.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-55.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-56",
+      "title": "Ficha Integral y Radiografía Escolar 360° del Estudiante en 1 Clic",
+      "category": "RF",
+      "module": "M10: Monitoreo y Dashboards",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-56.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-56.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-57",
+      "title": "Tablero de Seguimiento, Impacto y Acreditación del SSU (IS-480)",
+      "category": "RF",
+      "module": "M10: Monitoreo y Dashboards",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-57.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-57.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-58",
+      "title": "Generador de Reportes de Diagnóstico Integral para Consejos Académicos",
+      "category": "RF",
+      "module": "M10: Monitoreo y Dashboards",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-58.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-58.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-59",
+      "title": "Emisión Oficial de Boletas de Información Escolar / Libretas en PDF",
+      "category": "RF",
+      "module": "M11: Reportes Oficiales",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-59.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-59.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-60",
+      "title": "Verificación Pública Criptográfica de Documentos Escolares mediante Código QR",
+      "category": "RF",
+      "module": "M11: Reportes Oficiales",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-60.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-60.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-61",
+      "title": "Generación del Cuadro de Mérito y Puestos de Honor Institucionales",
+      "category": "RF",
+      "module": "M11: Reportes Oficiales",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-61.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-61.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-62",
+      "title": "Emisión y Descarga del Registro Auxiliar Oficial y Actas Finales",
+      "category": "RF",
+      "module": "M11: Reportes Oficiales",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-62.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-62.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-63",
+      "title": "Reportes Consolidados de Asistencia Multiactor del Plantel",
+      "category": "RF",
+      "module": "M11: Reportes Oficiales",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-63.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-63.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-64",
+      "title": "Exportación de Datos en Formatos Estándar Abiertos (PDF y Excel SIAGIE)",
+      "category": "RF",
+      "module": "M11: Reportes Oficiales",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-64.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-64.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-65",
+      "title": "Registro Inmutable de Auditoría de Eventos y Seguridad",
+      "category": "RF",
+      "module": "M12: Auditoría y Seguridad",
+      "priority": "high",
+      "state": "implemented",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-65.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-65.md §3 Criterios de Aceptación"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/src/services/audit.service.ts:24-60 cadena SHA-256 prev_hash (sin pruebas)"
+        }
+      ]
+    },
+    {
+      "id": "RF-66",
+      "title": "Trazabilidad Histórica de Modificaciones en Notas y Asistencias",
+      "category": "RF",
+      "module": "M12: Auditoría y Seguridad",
+      "priority": "high",
+      "state": "implemented",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-66.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-66.md §3 Criterios de Aceptación"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/squad_3_calificaciones/migrations/001_grades.sql historial inmutable de notas"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/src/services/audit.service.ts registro LOGIN"
+        },
+        {
+          "kind": "other",
+          "ref": "cmd: npm test en backend/squad_3_calificaciones -> 16/16 OK (2026-10-22, PGlite en memoria) (prueba de dominio; sin recorrido UI integrado)"
+        }
+      ]
+    },
+    {
+      "id": "RF-67",
+      "title": "Módulo de Búsqueda y Monitoreo de Bitácoras de Auditoría",
+      "category": "RF",
+      "module": "M12: Auditoría y Seguridad",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-67.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-67.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-68",
+      "title": "Cumplimiento y Protección de Datos Personales (Ley N.° 29733)",
+      "category": "RF",
+      "module": "M12: Auditoría y Seguridad",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-68.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-68.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-69",
+      "title": "Cartelera Digital y Publicación de Comunicados Institucionales",
+      "category": "RF",
+      "module": "M13: Difusión Digital",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-69.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-69.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-70",
+      "title": "Publicación y Consulta del Calendario Cívico y Escolar Interactivo",
+      "category": "RF",
+      "module": "M13: Difusión Digital",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-70.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-70.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-71",
+      "title": "Portal Informativo Institucional y Normas de Convivencia Escolar",
+      "category": "RF",
+      "module": "M13: Difusión Digital",
+      "priority": "low",
+      "state": "implemented",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-71.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-71.md §3 Criterios de Aceptación"
+        },
+        {
+          "kind": "implementation",
+          "ref": "frontend/app/(landing)/* portal estático: niveles, admision, servicios, contacto"
+        }
+      ]
+    },
+    {
+      "id": "RF-72",
+      "title": "Modificación de Datos y Baja Lógica de Usuarios del Plantel",
+      "category": "RF",
+      "module": "M2: Gestión de Usuarios",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-72.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-72.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-73",
+      "title": "Reasignación Dinámica de Roles y Jerarquías del Personal",
+      "category": "RF",
+      "module": "M2: Gestión de Usuarios",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-73.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-73.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-74",
+      "title": "Conformidad y Validación Periódica de Horas por el Docente Tutor",
+      "category": "RF",
+      "module": "M6: Practicantes",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-74.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-74.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-75",
+      "title": "Cuenta del Apoderado con Vínculo Verificado y Consentimiento de Datos",
+      "category": "RF",
+      "module": "M2: Gestión de Usuarios",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-75.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-75.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-76",
+      "title": "Centro de Notificaciones Internas y por Correo Electrónico",
+      "category": "RF",
+      "module": "M2: Gestión de Usuarios",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-76.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 1 - Core y Seguridad/RF-76.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-77",
+      "title": "Aviso Automático de Inasistencias y Tardanzas al Apoderado",
+      "category": "RF",
+      "module": "M5: Asistencia Estudiantil",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-77.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-77.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-78",
+      "title": "Importación Masiva de Estudiantes y Matrícula desde Nóminas Excel (Formato SIAGIE)",
+      "category": "RF",
+      "module": "M4: Gestión Académica",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-78.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 2 - Matricula y Asistencia/RF-78.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-79",
+      "title": "Programación de Tareas, Exámenes y Actividades Evaluativas con Calendario",
+      "category": "RF",
+      "module": "M8: Calificaciones",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-79.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-79.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-80",
+      "title": "Carga Masiva de Calificaciones desde Plantilla Excel Precargada",
+      "category": "RF",
+      "module": "M8: Calificaciones",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-80.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-80.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-81",
+      "title": "Control de Plazos de Registro de Notas y Alertas Escalonadas a Docentes",
+      "category": "RF",
+      "module": "M8: Calificaciones",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-81.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-81.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-82",
+      "title": "Consulta de Notas, Tareas y Exámenes por el Apoderado",
+      "category": "RF",
+      "module": "M8: Calificaciones",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-82.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 3 - Calificaciones y Modo Excel/RF-82.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-83",
+      "title": "Tablero de Cumplimiento y Puntualidad del Registro de Notas por Docente",
+      "category": "RF",
+      "module": "M10: Monitoreo y Dashboards",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-83.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-83.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-84",
+      "title": "Gestor de Noticias Institucionales con Editor, Galería y Publicación Programada",
+      "category": "RF",
+      "module": "M13: Difusión Digital",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-84.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-84.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-85",
+      "title": "Publicación en la Página Oficial de Facebook y Feed Integrado en el Portal",
+      "category": "RF",
+      "module": "M13: Difusión Digital",
+      "priority": "low",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-85.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-85.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-86",
+      "title": "Mesa de Partes Virtual para Solicitudes, Consultas y Quejas",
+      "category": "RF",
+      "module": "M11: Reportes Oficiales",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-86.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-86.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-87",
+      "title": "Solicitud y Emisión Rápida de Certificados y Constancias en Línea",
+      "category": "RF",
+      "module": "M11: Reportes Oficiales",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-87.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-87.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-88",
+      "title": "Generación de Archivos de Carga para el SIAGIE con Validación y Control de Envíos",
+      "category": "RF",
+      "module": "M11: Reportes Oficiales",
+      "priority": "high",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-88.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 5 - Secretaria y Portal Web/RF-88.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RF-89",
+      "title": "Agenda de Citas entre Apoderados y Tutores o Docentes",
+      "category": "RF",
+      "module": "M10: Monitoreo y Dashboards",
+      "priority": "medium",
+      "state": "specified",
+      "acceptance_criteria": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-89.md §3",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos Funcionales/Squad 4 - Analitica y Dashboards/RF-89.md §3 Criterios de Aceptación"
+        }
+      ]
+    },
+    {
+      "id": "RNF-01",
+      "title": "Latencia y Tiempo de Respuesta UI",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-01)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-02",
+      "title": "Auto-guardado con Debounce",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-02)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-03",
+      "title": "Latencia de Decodificación en Kiosco",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-03)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-04",
+      "title": "Renderizado de Dashboards Analíticos",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-04)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-05",
+      "title": "Autenticación Segura con JWT",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-05)"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/src/services/auth.service.ts:25-50 HS256 15m + refresh cookie HttpOnly (secretos con fallback inseguro)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-06",
+      "title": "Control de Acceso Basado en Roles (RBAC)",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-06)"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/src/middlewares/rbac.middleware.ts (solo endpoints de auditoría; UI sin RBAC real)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-07",
+      "title": "Hashing de Contraseñas con Salt Dinámico",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-07)"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/src/services/auth.service.ts: password_hash = crypt(clave, password_hash) con hashes gen_salt('bf', 12)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-08",
+      "title": "Protección de Datos Personales (Ley 29733)",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-08)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-09",
+      "title": "Verificación Criptográfica Documental QR",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-09)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-10",
+      "title": "Alta Disponibilidad del Servicio",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-10)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-11",
+      "title": "Resiliencia Offline-First en Kiosco",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-11)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-12",
+      "title": "Integridad Transaccional ACID",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-12)"
+        },
+        {
+          "kind": "implementation",
+          "ref": "backend/squad_3_calificaciones/test/postgres.test.ts transacción con rollback (solo notas; matrícula masiva no existe)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-13",
+      "title": "Diseño Responsivo y Soporte Multi-Dispositivo",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-13)"
+        },
+        {
+          "kind": "implementation",
+          "ref": "frontend/app/** clases responsive Tailwind (sin verificación visual en esta auditoría)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-14",
+      "title": "Ergonomía de Teclado (\"Modo Excel\")",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-14)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-15",
+      "title": "Accesibilidad Visual y Contraste (WCAG 2.1 AA)",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-15)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-16",
+      "title": "Arquitectura Modular Feature-First",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-16)"
+        },
+        {
+          "kind": "implementation",
+          "ref": "frontend/modules/squads/squad_[1-5]_*/ estructura Feature-First observada"
+        }
+      ]
+    },
+    {
+      "id": "RNF-17",
+      "title": "Análisis Estático y Cobertura de Pruebas",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-17)"
+        },
+        {
+          "kind": "implementation",
+          "ref": "frontend lint 0 errores/78 avisos y build OK; backend tsc OK; backend npm test (jest) no instalado"
+        }
+      ]
+    },
+    {
+      "id": "RNF-18",
+      "title": "Estandarización Documental de Software (SDD)",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-18)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-19",
+      "title": "Portabilidad y Despliegue Multiplataforma",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-19)"
+        }
+      ]
+    },
+    {
+      "id": "RNF-20",
+      "title": "Compatibilidad con Navegadores Modernos",
+      "category": "RNF",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "D - Base 1 - 01092026/Fase 2/Requisitos No Funcionales/requisitos_no_funcionales.md (RNF-20)"
+        }
+      ]
+    },
+    {
+      "id": "QA-01",
+      "title": "Lint frontend sin errores",
+      "category": "QA",
+      "priority": "high",
+      "state": "verified",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "frontend/eslint.config.mjs"
+        },
+        {
+          "kind": "test",
+          "ref": "npm run lint -> 0 errores, 78 avisos (2026-10-22)"
+        }
+      ]
+    },
+    {
+      "id": "QA-02",
+      "title": "Build frontend Next.js",
+      "category": "QA",
+      "priority": "high",
+      "state": "verified",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "frontend/package.json build"
+        },
+        {
+          "kind": "test",
+          "ref": "npm run build -> OK, 18 páginas (2026-10-22)"
+        }
+      ]
+    },
+    {
+      "id": "QA-03",
+      "title": "Compilación TypeScript backend core",
+      "category": "QA",
+      "priority": "high",
+      "state": "verified",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "backend/tsconfig.json"
+        },
+        {
+          "kind": "test",
+          "ref": "npx tsc --noEmit -> OK (2026-10-22)"
+        }
+      ]
+    },
+    {
+      "id": "QA-04",
+      "title": "Suite de pruebas backend core",
+      "category": "QA",
+      "priority": "high",
+      "state": "not_started",
+      "evidence": []
+    },
+    {
+      "id": "QA-05",
+      "title": "Suite de pruebas Squad 3",
+      "category": "QA",
+      "priority": "high",
+      "state": "verified",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "backend/squad_3_calificaciones/test/*.test.ts"
+        },
+        {
+          "kind": "test",
+          "ref": "cmd: npm test en backend/squad_3_calificaciones -> 16/16 OK (2026-10-22, PGlite en memoria)"
+        }
+      ]
+    },
+    {
+      "id": "QA-06",
+      "title": "Pruebas automatizadas frontend",
+      "category": "QA",
+      "priority": "medium",
+      "state": "not_started",
+      "evidence": []
+    },
+    {
+      "id": "QA-07",
+      "title": "CI que ejecute lint/build/test",
+      "category": "QA",
+      "priority": "high",
+      "state": "not_started",
+      "evidence": []
+    },
+    {
+      "id": "QA-08",
+      "title": "Lint backend ejecutable",
+      "category": "QA",
+      "priority": "low",
+      "state": "not_started",
+      "evidence": []
+    },
+    {
+      "id": "INT-01",
+      "title": "Login frontend contra API de autenticación",
+      "category": "INT",
+      "priority": "high",
+      "state": "not_started",
+      "evidence": []
+    },
+    {
+      "id": "INT-02",
+      "title": "Módulos frontend de squads consumen APIs reales",
+      "category": "INT",
+      "priority": "high",
+      "state": "not_started",
+      "evidence": []
+    },
+    {
+      "id": "INT-03",
+      "title": "Contrato JWT común core <-> Squad 3",
+      "category": "INT",
+      "priority": "high",
+      "state": "not_started",
+      "evidence": []
+    },
+    {
+      "id": "INT-04",
+      "title": "REST + WebSocket Squad 3 integrados",
+      "category": "INT",
+      "priority": "medium",
+      "state": "verified",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "backend/squad_3_calificaciones/src/app.ts"
+        },
+        {
+          "kind": "test",
+          "ref": "backend/squad_3_calificaciones/test/http.test.ts -> OK (2026-10-22)"
+        }
+      ]
+    },
+    {
+      "id": "INT-05",
+      "title": "Esquema BD cargado por docker-compose",
+      "category": "INT",
+      "priority": "medium",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "docker-compose.yml:14 monta database/init (no ejecutado)"
+        }
+      ]
+    },
+    {
+      "id": "INT-06",
+      "title": "Revocación de tokens vía Redis aplicada",
+      "category": "INT",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "backend/src/services/auth.service.ts revokeToken (middleware no lo consulta)"
+        }
+      ]
+    },
+    {
+      "id": "SEC-01",
+      "title": "Verificación real de contraseña",
+      "category": "SEC",
+      "priority": "critical",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "backend/src/services/auth.service.ts login con crypt() y sin respaldo"
+        }
+      ]
+    },
+    {
+      "id": "SEC-02",
+      "title": "Secretos JWT sin valores por defecto",
+      "category": "SEC",
+      "priority": "high",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "backend/src/config/jwt.ts exige JWT_SECRET/JWT_REFRESH_SECRET >= 32"
+        }
+      ]
+    },
+    {
+      "id": "SEC-03",
+      "title": "CORS con lista blanca efectiva",
+      "category": "SEC",
+      "priority": "high",
+      "state": "not_started",
+      "evidence": []
+    },
+    {
+      "id": "SEC-04",
+      "title": "Tenant ligado al JWT en core",
+      "category": "SEC",
+      "priority": "high",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "RF-07 / backend/src/middlewares/tenant.middleware.ts"
+        }
+      ]
+    },
+    {
+      "id": "SEC-05",
+      "title": "Autorización y RLS por tenant en Squad 3",
+      "category": "SEC",
+      "priority": "high",
+      "state": "verified",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "backend/squad_3_calificaciones/migrations/001_grades.sql RLS"
+        },
+        {
+          "kind": "test",
+          "ref": "backend/squad_3_calificaciones/test/postgres.test.ts tenant RLS -> OK (2026-10-22)"
+        }
+      ]
+    },
+    {
+      "id": "SEC-06",
+      "title": "Bitácora de auditoría encadenada SHA-256",
+      "category": "SEC",
+      "priority": "medium",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "backend/src/services/audit.service.ts:40"
+        }
+      ]
+    },
+    {
+      "id": "SEC-07",
+      "title": "Cabeceras de seguridad y límite de cuerpo",
+      "category": "SEC",
+      "priority": "low",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "backend/src/server.ts helmet + express.json limit"
+        }
+      ]
+    },
+    {
+      "id": "SEC-08",
+      "title": "Hash de contraseñas bcrypt >= 12",
+      "category": "SEC",
+      "priority": "high",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "pgcrypto gen_salt('bf', 12) verificado en prueba ad hoc ($2a$12$)"
+        }
+      ]
+    },
+    {
+      "id": "ARCH-01",
+      "title": "Esquema consolidado PostgreSQL",
+      "category": "ARCH",
+      "priority": "high",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "database/init/01_esquema_consolidado.sql (42 tablas, pgcrypto)"
+        }
+      ]
+    },
+    {
+      "id": "ARCH-02",
+      "title": "Arquitectura C4 documentada y seguida",
+      "category": "ARCH",
+      "priority": "medium",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "D - Base 1 - 01092026/Fase 2/Arquitectura/arquitectura_sistema.md + estructura monorepo"
+        }
+      ]
+    },
+    {
+      "id": "ARCH-03",
+      "title": "Migraciones versionadas en core",
+      "category": "ARCH",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "solo database/init y squad_3 001_grades.sql"
+        }
+      ]
+    },
+    {
+      "id": "ARCH-04",
+      "title": "Decisión de backend único vs servicios por squad",
+      "category": "ARCH",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "docs/F0_DECISIONES_ARQUITECTURA_PENDIENTES.md"
+        }
+      ]
+    },
+    {
+      "id": "OPS-01",
+      "title": "Entorno local reproducible (Docker Compose)",
+      "category": "OPS",
+      "priority": "medium",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "docker-compose.yml PostgreSQL 16 + Redis 7"
+        }
+      ]
+    },
+    {
+      "id": "OPS-02",
+      "title": "Configuración de despliegue frontend",
+      "category": "OPS",
+      "priority": "medium",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "vercel.json (despliegue no verificado)"
+        }
+      ]
+    },
+    {
+      "id": "OPS-03",
+      "title": "Despliegue backend",
+      "category": "OPS",
+      "priority": "medium",
+      "state": "not_started",
+      "evidence": []
+    },
+    {
+      "id": "OPS-04",
+      "title": "Monitoreo, backup y restore",
+      "category": "OPS",
+      "priority": "medium",
+      "state": "not_started",
+      "evidence": []
+    },
+    {
+      "id": "OPS-05",
+      "title": "Endpoint de salud",
+      "category": "OPS",
+      "priority": "low",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "backend/src/routes/health.routes.ts"
+        }
+      ]
+    },
+    {
+      "id": "DOC-01",
+      "title": "Catálogo RF/CU/RNF completo con criterios",
+      "category": "DOC",
+      "priority": "high",
+      "state": "implemented",
+      "evidence": [
+        {
+          "kind": "implementation",
+          "ref": "D - Base 1 - 01092026/Fase 2: 89 RF con §3 criterios, 89 CU, 20 RNF"
+        }
+      ]
+    },
+    {
+      "id": "DOC-02",
+      "title": "README coherente con el código",
+      "category": "DOC",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "README.md:87 menciona PrimeNG; el código usa PrimeReact"
+        }
+      ]
+    },
+    {
+      "id": "DOC-03",
+      "title": "Acta de cambio de arquitectura aprobada",
+      "category": "DOC",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "docs/F0_ACTA_CAMBIO_ARQUITECTURA_BORRADOR.md (sin firmas)"
+        }
+      ]
+    },
+    {
+      "id": "DOC-04",
+      "title": "SDD por cada squad (IEEE 1016)",
+      "category": "DOC",
+      "priority": "medium",
+      "state": "specified",
+      "evidence": [
+        {
+          "kind": "spec",
+          "ref": "Solo sdd_squad_1.md y sdd_squad_3.md"
+        }
+      ]
+    }
+  ],
+  "phases": [
+    {
+      "id": "F00",
+      "state": "evidenciada",
+      "reference": "docs/F0_*.md y Fase 1 (delimitaciones, limitaciones, stakeholders)"
+    },
+    {
+      "id": "F01",
+      "state": "evidenciada",
+      "reference": "D - Base 1 - 01092026/Fase 1/Requerimientos y stakeholders.md"
+    },
+    {
+      "id": "F02",
+      "state": "evidenciada",
+      "reference": "89 RF con criterios, 89 CU, 20 RNF en Fase 2"
+    },
+    {
+      "id": "F03",
+      "state": "en_progreso",
+      "reference": "plan_trabajo.md; sin backlog/hitos verificables en repo"
+    },
+    {
+      "id": "F04",
+      "state": "en_progreso",
+      "reference": "C4 y arquitectura_sistema.md; acta D-01 sin aprobar"
+    },
+    {
+      "id": "F05",
+      "state": "en_progreso",
+      "reference": "Esquema SQL consolidado; sin OpenAPI ni migraciones del core"
+    },
+    {
+      "id": "F06",
+      "state": "en_progreso",
+      "reference": "Portal e intranet con datos simulados; sin validación de UX/accesibilidad"
+    },
+    {
+      "id": "F07",
+      "state": "en_progreso",
+      "reference": "Git + Docker Compose; CI solo PR-Agent, sin lint/build/test"
+    },
+    {
+      "id": "F08",
+      "state": "en_progreso",
+      "reference": "Login con bcrypt y secretos obligatorios; RBAC parcial, tenant no ligado al JWT, sin pruebas versionadas"
+    },
+    {
+      "id": "F09",
+      "state": "en_progreso",
+      "reference": "Solo Squad 3 tiene dominio backend probado; demás squads sin implementación"
+    },
+    {
+      "id": "F10",
+      "state": "no_iniciada",
+      "reference": "Frontend no consume APIs; contratos JWT incompatibles"
+    },
+    {
+      "id": "F11",
+      "state": "no_iniciada",
+      "reference": "Sin pruebas de seguridad ni rendimiento"
+    },
+    {
+      "id": "F12",
+      "state": "no_iniciada",
+      "reference": "Sin UAT ni piloto"
+    },
+    {
+      "id": "F13",
+      "state": "no_iniciada",
+      "reference": "Sin evidencia de infraestructura, secretos gestionados ni backups"
+    },
+    {
+      "id": "F14",
+      "state": "no_verificable",
+      "reference": "vercel.json existe; despliegue real no comprobado"
+    },
+    {
+      "id": "F15",
+      "state": "no_iniciada",
+      "reference": "Sin monitoreo ni procedimientos de incidentes"
+    }
+  ],
+  "findings": [
+    {
+      "id": "PH-001",
+      "severity": "BLOCKER",
+      "title": "Login acepta cualquier contraseña de 6+ caracteres y concede SUPERADMIN a usuarios con 'admin' en el nombre",
+      "module": "M1 Core",
+      "reference": "backend/src/services/auth.service.ts:76 y :107 (archivo sin commit)",
+      "action": "Validar con bcrypt contra password_hash y eliminar usuarios de respaldo fuera de un modo demo explícito",
+      "state": "closed"
+    },
+    {
+      "id": "PH-002",
+      "severity": "CRITICAL",
+      "title": "Secretos JWT con valor por defecto en código",
+      "module": "M1 Core",
+      "reference": "backend/src/services/auth.service.ts:7-8; auth.middleware.ts:35",
+      "action": "Exigir JWT_SECRET y REFRESH_TOKEN_SECRET al arrancar y fallar si faltan",
+      "state": "closed"
+    },
+    {
+      "id": "PH-003",
+      "severity": "HIGH",
+      "title": "CORS permite cualquier origen con credenciales",
+      "module": "M1 Core",
+      "reference": "backend/src/server.ts:27",
+      "action": "Rechazar orígenes fuera de CORS_ORIGIN",
+      "state": "open"
+    },
+    {
+      "id": "PH-004",
+      "severity": "HIGH",
+      "title": "Tenant tomado de cabecera del cliente con valor por defecto y no contrastado con el JWT",
+      "module": "M2 Multi-tenant",
+      "reference": "backend/src/middlewares/tenant.middleware.ts:18",
+      "action": "Derivar tenant del token y rechazar discrepancias",
+      "state": "open"
+    },
+    {
+      "id": "PH-005",
+      "severity": "HIGH",
+      "title": "Login de la intranet simulado: no llama al backend y el rol lo elige el cliente",
+      "module": "Frontend intranet",
+      "reference": "frontend/modules/intranet/components/LoginForm.tsx:40-52",
+      "action": "Integrar con POST /api/v1/auth/login",
+      "state": "open"
+    },
+    {
+      "id": "PH-006",
+      "severity": "HIGH",
+      "title": "Las 5 vistas de squads usan datos simulados; el frontend no hace ninguna llamada a API",
+      "module": "Frontend squads",
+      "reference": "frontend/modules/squads/*/ (sin fetch); CalificacionesModuleView.tsx:31",
+      "action": "Conectar vistas a endpoints reales",
+      "state": "open"
+    },
+    {
+      "id": "PH-007",
+      "severity": "HIGH",
+      "title": "Contratos JWT incompatibles entre core y Squad 3 (tenantId/roles vs tenant_id/role + iss/aud)",
+      "module": "Integración",
+      "reference": "backend/squad_3_calificaciones/src/app.ts:11 vs backend/src/services/auth.service.ts:28",
+      "action": "Acordar un contrato de token único",
+      "state": "open"
+    },
+    {
+      "id": "PH-008",
+      "severity": "HIGH",
+      "title": "Contraseñas sin bcrypt (RNF-07); comparación en texto plano",
+      "module": "M1 Core",
+      "reference": "backend/src/services/auth.service.ts:76; bcrypt ausente en backend/package.json",
+      "action": "Usar bcrypt cost >= 12",
+      "state": "closed"
+    },
+    {
+      "id": "PH-009",
+      "severity": "MEDIUM",
+      "title": "Logout guarda el JTI en Redis pero el middleware no consulta la lista negra",
+      "module": "M1 Core",
+      "reference": "backend/src/middlewares/auth.middleware.ts:37",
+      "action": "Verificar blacklist en authenticateJwt",
+      "state": "open"
+    },
+    {
+      "id": "PH-010",
+      "severity": "MEDIUM",
+      "title": "GET /audit/logs responde success:true con lista vacía ante cualquier error de BD",
+      "module": "M12 Auditoría",
+      "reference": "backend/src/routes/audit.routes.ts:80-90",
+      "action": "Devolver error 5xx",
+      "state": "open"
+    },
+    {
+      "id": "PH-011",
+      "severity": "MEDIUM",
+      "title": "Backend core: npm test (jest) y npm run lint (eslint) no tienen dependencias instaladas",
+      "module": "QA",
+      "reference": "backend/package.json scripts",
+      "action": "Añadir framework de pruebas y lint",
+      "state": "open"
+    },
+    {
+      "id": "PH-012",
+      "severity": "MEDIUM",
+      "title": "No hay CI de calidad; solo workflow PR-Agent",
+      "module": "QA",
+      "reference": ".github/workflows/pr_agent.yml",
+      "action": "Workflow con lint, build y tests",
+      "state": "open"
+    },
+    {
+      "id": "PH-013",
+      "severity": "MEDIUM",
+      "title": "SDD solo para Squads 1 y 3 (RNF-18)",
+      "module": "Documentación",
+      "reference": "D - Base 1 - 01092026/Fase 2/Arquitectura/Squad */",
+      "action": "Redactar SDD de Squads 2, 4 y 5",
+      "state": "open"
+    },
+    {
+      "id": "PH-014",
+      "severity": "MEDIUM",
+      "title": "Acta de cambio de arquitectura D-01 sin firmar pese a estar implementada",
+      "module": "Gobierno",
+      "reference": "docs/F0_ACTA_CAMBIO_ARQUITECTURA_BORRADOR.md",
+      "action": "Aprobar o revertir",
+      "state": "open"
+    },
+    {
+      "id": "PH-015",
+      "severity": "LOW",
+      "title": "README dice PrimeNG y muestra la insignia Vercel-Deployed sin despliegue verificado; la vista de Secretaría anuncia un endpoint de verificación que no existe",
+      "module": "Documentación",
+      "reference": "README.md:15 y :87; SecretariaModuleView.tsx:58",
+      "action": "Corregir textos",
+      "state": "open"
+    },
+    {
+      "id": "PH-016",
+      "severity": "LOW",
+      "title": "78 avisos de lint (imports sin uso)",
+      "module": "Frontend",
+      "reference": "npm run lint",
+      "action": "Limpiar imports",
+      "state": "open"
+    },
+    {
+      "id": "PH-017",
+      "severity": "MEDIUM",
+      "title": "Debounce de 400 ms simulado con setTimeout sin persistencia",
+      "module": "M8 Calificaciones UI",
+      "reference": "CalificacionesModuleView.tsx:58-65",
+      "action": "Conectar a /api/v1/grades/auto-save",
+      "state": "open"
+    }
+  ],
+  "gates": {
+    "uat_approved": false,
+    "security_approved": false,
+    "deployment_verified": false,
+    "monitoring_verified": false,
+    "release_authorized": false
+  }
+}

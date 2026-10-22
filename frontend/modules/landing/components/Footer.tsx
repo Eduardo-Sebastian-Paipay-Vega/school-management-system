@@ -1,6 +1,5 @@
-'use client';
-
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   MapPin,
   Phone,
@@ -10,9 +9,6 @@ import {
   Facebook,
   Instagram,
   Youtube,
-  GraduationCap,
-  ShieldCheck,
-  Building2,
 } from 'lucide-react';
 
 export default function Footer() {
@@ -23,7 +19,7 @@ export default function Footer() {
         <div className="lg:col-span-5">
           <div className="flex items-center gap-4">
             <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-accent-gold/40 bg-white p-2 shadow-lg">
-              <img
+              <Image
                 src="/emblema-unsch-grabado.png"
                 alt="Emblema Heráldico Grabado de la UNSCH"
                 width={56}
@@ -219,7 +215,7 @@ export default function Footer() {
             className="group inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/5 py-1.5 pl-2 pr-3.5 text-xs text-accent-cream/80 backdrop-blur transition hover:border-accent-gold/50 hover:bg-white/10 hover:text-white active:scale-[0.98]"
           >
             <div className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-0.5 shadow-sm transition group-hover:scale-105">
-              <img
+              <Image
                 src="/democra-emblema.png"
                 alt="Emblema democra.pro"
                 width={20}

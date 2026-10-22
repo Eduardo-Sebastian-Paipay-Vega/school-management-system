@@ -20,6 +20,41 @@
 
 ---
 
+<!-- PROJECT-HEALTH:START -->
+## 📊 ESTADO ACTUAL DEL PROYECTO
+
+### 251 / 1000 — EN DESARROLLO
+
+**Avance verificado:** █████░░░░░░░░░░░░░░░ 25.1% de la rúbrica
+
+| Indicador | Resultado |
+|---|---|
+| RF | 0 aceptados / 89 inventariados |
+| RF probados o aceptados | 0 / 89 |
+| Bloqueadores abiertos | 0 |
+| Inventario del alcance | complete |
+| Última auditoría | 2026-10-22 |
+| Rama / commit | dev / d566f4dc |
+
+**Detalle por área (máximo 1000):**
+
+| Área | Puntos | Máximo |
+|---|---:|---:|
+| Requisitos funcionales | 64 | 400 |
+| Requisitos no funcionales | 22 | 100 |
+| Calidad y pruebas | 69 | 150 |
+| Integraciones y E2E | 18 | 100 |
+| Seguridad e integridad | 39 | 100 |
+| Arquitectura y datos | 21 | 70 |
+| Operación y despliegue | 13 | 50 |
+| Documentación y consistencia | 7 | 30 |
+
+_Esta nota refleja evidencias del snapshot auditado, no una certificación ni una autorización de despliegue._
+_Los requisitos pendientes deben permanecer visibles en el informe; no se asignan puntos sin evidencia._
+
+[Ver auditoría completa](docs/project-health/ESTADO_PROYECTO.md)
+<!-- PROJECT-HEALTH:END -->
+
 ## 📌 Descripción del Proyecto
 
 Plataforma Web integral orientada a la **modernización de la gestión académica, asistencia escolar en tiempo real, planilla de calificaciones ágil y difusión digital** para los Planteles de Aplicación "Guamán Poma de Ayala" de la Universidad Nacional de San Cristóbal de Huamanga (UNSCH), en la ciudad de Ayacucho, Perú.

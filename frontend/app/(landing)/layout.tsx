@@ -1,4 +1,5 @@
-import { Navbar, Footer } from '@/modules/landing';
+import Navbar from '@/modules/landing/components/Navbar';
+import Footer from '@/modules/landing/components/Footer';
 
 export default function LandingLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -1,0 +1,20 @@
+{
+  "name": "school-database",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Migraciones versionadas y pruebas de la base de datos (ADR-004).",
+  "scripts": {
+    "migrate": "node-pg-migrate up --migrations-dir migrations --migration-file-language sql --no-check-order",
+    "migrate:create": "node-pg-migrate create --migrations-dir migrations --migration-file-language sql",
+    "test": "node --test \"tests/**/*.test.mjs\""
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.3.16",
+    "node-pg-migrate": "9.0.0",
+    "pg": "8.16.3"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  }
+}

@@ -673,15 +673,37 @@ Supuestos: hasta 5 000 estudiantes (límite superior de `Fase 1/deliminatacions.
 
 | # | Entregable del plan | Estado |
 |---|---|---|
-| 3.1.1 | Migraciones versionadas | Diseño en [ADR-004](ADR/ADR-004-migraciones.md); se escriben tras su aceptación |
+| 3.1.1 | Migraciones versionadas | **Escritas** en [`database/migrations/`](../../../database/README.md): línea base + 6 migraciones del núcleo. 31 pruebas en verde con PGlite; aplicadas también con `node-pg-migrate` 9.0.0 |
 | 3.1.2 | `created_by` y `updated_at` en todas las tablas | Especificado (C-05, C-06) |
 | 3.1.3 | Tablas faltantes y conciliación de notas | Inventario hecho (§1.2). Conciliación de notas: K1, sin cambios en M8 |
-| 3.1.4 | Políticas RLS | Diseño en [ADR-003](ADR/ADR-003-aislamiento-rls.md) |
+| 3.1.4 | Políticas RLS | Implementadas en toda tabla de `public` con `tenant_id` ([ADR-003](ADR/ADR-003-aislamiento-rls.md)) |
 | 3.1.5 | ER y diccionario | ER hecho (§4.2). Diccionario parcial en el DDL (§5); falta la tabla completa por columna |
 | 3.1.6 | Catálogos | Definidos (§9); escala bloqueada por D-16 |
 | 3.1.7 | Volumetría | Hecho (§7) |
 | 3.1.8 | Ciclo de vida y respaldos | Propuesta (§8), pendiente de la dirección |
 | 3.1.9 | Semillas anonimizadas | Definidas (§9); por escribir |
+
+### 11.1 Ajustes al implementar las migraciones
+
+Diferencias entre el DDL de §5 y lo que quedó en `database/migrations/`, con su motivo:
+
+| Tema | En §5 | En la migración | Motivo |
+|---|---|---|---|
+| `apellido_paterno` / `apellido_materno` | `VARCHAR(60)` | `VARCHAR(100)` | `usuarios.apellidos` es `VARCHAR(100)`: copiarlo a 60 truncaría apellidos compuestos |
+| Identidad en `usuarios` | Columnas retiradas | Se conservan, ahora opcionales | Fase *expand* (ADR-004, regla 5). El DNI en claro no puede cifrarse en SQL; lo migra la aplicación antes de la fase *contract* |
+| UUID de las personas migradas | — | Igual al del usuario de origen | Así, todas las columnas `estudiante_id` existentes siguen siendo válidas al apuntar a `personas` |
+| `grados_secciones.nivel` | `VARCHAR(10)` | `VARCHAR(50)` + `CHECK` | `vm_rendimiento_seccion` depende de la columna y PostgreSQL no permite cambiar su tipo |
+| Cadena de auditoría | Calculada por la aplicación | Calculada en la base por `fn_registrar_auditoria()`; `sms_app` no puede insertar directamente | Ninguna fila puede entrar fuera de la cadena. La verifica `fn_verificar_cadena_auditoria()` |
+| `CHECK` de `fecha_limite_notas` en periodos | Propuesto | No se implementó | No hay una regla de negocio documentada que lo respalde |
+| Columnas `estudiante_id` de otros squads | — | Apuntan a `personas` (FK simple) | Consecuencia directa de DM-01; cada squad las vuelve compuestas al aplicar §3 |
+| `consentimientos_datos.usuario_id` | — | Renombrada a `persona_id` | El consentimiento lo otorga una persona, que puede no tener cuenta |
+| Dueño de los objetos | Rol `sms_owner` | El rol que ejecuta las migraciones | Equivale a `sms_owner` mientras ese rol no sea el de la aplicación, que es lo que exige ADR-003 |
+
+### 11.2 Defecto encontrado en el backend (Squad 1)
+
+`backend/src/services/audit.service.ts` inserta en `logs_auditoria` columnas que **no existen**: `entidad`, `entidad_id`, `datos_anteriores`, `datos_nuevos`, `prev_hash`, `hash_sha256` y `created_at`. El error se captura y solo se emite un `console.warn`. Además, `verifyChain()` devuelve `valid: true` cuando la consulta falla.
+
+**Consecuencia:** hoy ningún evento de auditoría se guarda, y la verificación de RF-65 informa una cadena íntegra que no existe. La corrección es llamar a `fn_registrar_auditoria()` y a `fn_verificar_cadena_auditoria()`, y no ocultar los errores.
 
 ## 12. Preguntas para el consejo de diseño
 

@@ -39,6 +39,8 @@ Se adopta la **opción 3**.
 | `sms_app` | Sí | `SELECT`, `INSERT`, `UPDATE` sobre tablas de negocio; `INSERT` y `SELECT` sobre auditoría; `NOBYPASSRLS`; **no** es dueño de nada | Backend común y M8 |
 | `postgres` | Sí | Superusuario | Solo administración. **Nunca** en una cadena de conexión de la aplicación |
 
+En la implementación, el dueño de los objetos es el rol que ejecuta las migraciones (en desarrollo, `postgres`). Cumple el papel de `sms_owner` mientras no sea el rol de la aplicación. La migración crea `sms_app` como rol de grupo sin login; cada entorno crea su usuario con login y le concede `sms_app`.
+
 `DELETE` no se concede a `sms_app` por defecto (baja lógica, C-10 del modelo). Una tabla que necesite borrado físico lo justifica en su SDD.
 
 ### 2. Contexto por transacción

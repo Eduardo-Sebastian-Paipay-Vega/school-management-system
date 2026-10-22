@@ -78,6 +78,13 @@ database/
 - **CI:** nueva puerta "migraciones desde cero + pruebas de base de datos" (plan §3.4.8).
 - **Línea base verificada (2026-10-22):** `01_esquema_consolidado.sql` y `001_grades.sql` se ejecutaron en PGlite 0.3.16, **cada uno dentro de una sola transacción**, sobre una base vacía. Ambos pasaron: se crearon 44 tablas (42 en `public` y 2 en `squad3`) y los 12 roles. El `ALTER TYPE ... ADD VALUE IF NOT EXISTS` seguido del `INSERT` no falla en una base nueva, porque el valor ya existe desde el `CREATE TYPE`. Falta repetir la prueba con la herramienta elegida.
 
+## Implementación (2026-10-22)
+
+- Paquete [`database/`](../../../../database/README.md) con `node-pg-migrate` 9.0.0 y pruebas en PGlite 0.3.16.
+- `node-pg-migrate` toma un archivo `.sql` sin marcadores `-- Up Migration` como migración completa, sin sección `down`. Por eso las dos copias de la línea base son **idénticas byte a byte** a sus originales (D-04).
+- Se aplicaron las 8 migraciones con `node-pg-migrate up` contra un servidor PGlite por socket. Cada una corrió en su propia transacción y terminó sin errores.
+- La suite `npm test` (31 pruebas) cubre tres caminos: base nueva, actualización de una base con datos existentes y base ya creada por el *init* de Docker. También comprueba que la migración se detiene con un mensaje claro cuando no puede resolver los datos sola.
+
 ## Preguntas abiertas para la revisión
 
 1. ¿`node-pg-migrate` o `dbmate`? El primero no agrega un binario; el segundo es independiente del lenguaje.

@@ -18,7 +18,7 @@ export const connectRedis = async (): Promise<void> => {
   try {
     await redisClient.connect();
     console.log('Conexión exitosa a Redis');
-  } catch (err) {
+  } catch {
     console.warn('No se pudo conectar a Redis. Operando en modo degradado sin caché.');
   }
 };

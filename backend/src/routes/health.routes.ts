@@ -11,8 +11,8 @@ router.get('/health', async (_req: Request, res: Response) => {
   try {
     const dbRes = await pool.query('SELECT NOW()');
     if (dbRes.rows.length > 0) dbStatus = 'CONNECTED';
-  } catch (e: any) {
-    dbStatus = `ERROR: ${e.message}`;
+  } catch {
+    dbStatus = 'DISCONNECTED';
   }
 
   try {
@@ -20,11 +20,11 @@ router.get('/health', async (_req: Request, res: Response) => {
       await redisClient.ping();
       redisStatus = 'CONNECTED';
     }
-  } catch (e: any) {
-    redisStatus = `ERROR: ${e.message}`;
+  } catch {
+    redisStatus = 'DISCONNECTED';
   }
 
-  const isHealthy = dbStatus === 'CONNECTED';
+  const isHealthy = dbStatus === 'CONNECTED' && redisStatus === 'CONNECTED';
 
   res.status(isHealthy ? 200 : 503).json({
     status: isHealthy ? 'OK' : 'DEGRADED',

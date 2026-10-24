@@ -345,6 +345,8 @@ cd ../backend && npm run build
 
 El proyecto cuenta con documentación formal de ingeniería de software con trazabilidad bidireccional:
 
+* 🔐 **Core y seguridad:** [guía de operación e instalación](docs/core/OPERACION_CORE.md), [contrato OpenAPI](packages/contracts/openapi/core.yaml), [matriz RBAC](docs/seguridad/matriz_rbac.md) y [plan de implementación](PLAN.md).
+
 * 📋 **Requisitos Funcionales (RF):** [Catálogo Maestro de 89 RFs (IEEE 830)](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) y [SRS Técnico con Contratos JSON](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md).
 * ⚙️ **Requisitos No Funcionales (RNF):** [Especificación de 20 RNFs Cuantificables (ISO/IEC 25010)](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20No%20Funcionales/requisitos_no_funcionales.md) y [Navegación por Squads](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20No%20Funcionales/README.md).
 * 🎭 **Casos de Uso UML (CU):** [Catálogo Maestro de 89 Casos de Uso por Squad](D%20-%20Base%201%20-%2001092026/Fase%202/Casos%20de%20uso/README.md).

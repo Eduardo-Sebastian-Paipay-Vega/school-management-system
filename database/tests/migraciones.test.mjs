@@ -83,6 +83,36 @@ describe('Base nueva: línea base + núcleo', () => {
     assert.deepEqual(r, { vacia: false, conocida: false });
   });
 
+  it('siembra la matriz RBAC por institución y aísla las concesiones', async () => {
+    const own = await enContexto(db, { tenant: T1, usuario: S1, comoApp: true }, async () =>
+      uno(db, `SELECT count(*)::int AS total FROM rol_permisos_core WHERE tenant_id=$1`, [T1]));
+    assert.ok(own.total > 0);
+    const grants = await enContexto(db, { tenant: T1, usuario: S1, comoApp: true }, async () =>
+      db.query(`SELECT r.codigo::text AS rol FROM rol_permisos_core rp
+        JOIN roles r ON r.id=rp.rol_id WHERE rp.tenant_id=$1 AND rp.permiso_codigo='users:manage'`, [T1]));
+    assert.deepEqual(grants.rows.map((row) => row.rol).sort(), ['DIRECTIVO', 'SUPERADMIN']);
+    const other = await enContexto(db, { tenant: T1, usuario: S1, comoApp: true }, async () =>
+      uno(db, `SELECT count(*)::int AS total FROM rol_permisos_core WHERE tenant_id=$1`, [T2]));
+    assert.equal(other.total, 0);
+  });
+
+  it('aísla sesiones, enlaces y notificaciones por tenant', async () => {
+    const link = await enContexto(db, { tenant: T1, usuario: S1 }, async () => {
+      await db.query(`INSERT INTO sesiones_usuario(tenant_id,usuario_id,refresh_hash,access_jti,version_auth,expira_en)
+        VALUES($1,$2,$3,gen_random_uuid(),1,now()+interval '1 day')`, [T1,S1,'b'.repeat(64)]);
+      await db.query(`INSERT INTO enlaces_acceso(tenant_id,usuario_id,proposito,token_hash,expira_en)
+        VALUES($1,$2,'ACTIVACION',$3,now()+interval '1 day')`, [T1,S1,'c'.repeat(64)]);
+      return (await uno(db, `INSERT INTO notificaciones(tenant_id,usuario_id,categoria,titulo,mensaje)
+        VALUES($1,$2,'SEGURIDAD','Aviso','Mensaje') RETURNING id`, [T1,S1])).id;
+    });
+    const hidden = await enContexto(db, { tenant: T2, usuario: S2, comoApp: true }, async () =>
+      uno(db, `SELECT
+        (SELECT count(*)::int FROM sesiones_usuario WHERE tenant_id=$1) AS sesiones,
+        (SELECT count(*)::int FROM enlaces_acceso WHERE tenant_id=$1) AS enlaces,
+        (SELECT count(*)::int FROM notificaciones WHERE id=$2) AS avisos`, [T1,link]));
+    assert.deepEqual(hidden,{sesiones:0,enlaces:0,avisos:0});
+  });
+
   describe('restricciones del núcleo', () => {
     let A2026, A2027, SEC, EST;
 

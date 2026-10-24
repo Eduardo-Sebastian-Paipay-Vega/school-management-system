@@ -1,0 +1,257 @@
+openapi: 3.1.0
+info:
+  title: Core escolar Guamán Poma de Ayala
+  version: 0.1.0
+  description: Contrato de rutas del Squad 1. Las rutas protegidas usan el tenant del JWT, nunca de una cabecera enviada por el navegador.
+servers:
+  - url: http://localhost:3001/api/v1
+security:
+  - bearerAuth: []
+paths:
+  /auth/login:
+    post:
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+        '401': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+  /auth/refresh-token:
+    post:
+      operationId: refreshSession
+      security: []
+      description: Rota la cookie refresh HttpOnly de un solo uso.
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+        '401': { $ref: '#/components/responses/Error' }
+  /auth/logout:
+    post: { operationId: logout, responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /auth/me:
+    get: { operationId: getSession, responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /auth/forgot-password:
+    post:
+      operationId: requestPasswordReset
+      security: []
+      description: Siempre devuelve la misma respuesta pública para cuentas existentes o ausentes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RecoveryRequest' }
+      responses:
+        '202': { $ref: '#/components/responses/Success' }
+  /auth/reset-password:
+    post:
+      operationId: resetPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AccessLinkRequest' }
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+        '400': { $ref: '#/components/responses/Error' }
+  /auth/activate:
+    post:
+      operationId: activateAccount
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AccessLinkRequest' }
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+        '400': { $ref: '#/components/responses/Error' }
+  /users:
+    get: { operationId: listUsers, description: 'Permiso users:read.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+    post: { operationId: createUser, description: 'Permiso users:manage y rol SUPERADMIN o DIRECTIVO.', responses: { '201': { $ref: '#/components/responses/Success' } } }
+  /users/me:
+    get: { operationId: getOwnUser, responses: { '200': { $ref: '#/components/responses/Success' } } }
+    patch: { operationId: updateOwnProfile, responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /users/me/change-password:
+    post: { operationId: changeOwnPassword, responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /users/persons:
+    get: { operationId: searchPersonsForGuardianLink, description: 'Permiso guardians:manage.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /users/import/preview:
+    post: { operationId: previewUserImport, description: 'CSV/XLSX o filas JSON; máximo 1000 filas y sin contraseñas. Permiso users:import.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /users/import/commit:
+    post: { operationId: commitUserImport, description: 'La importación usa persona_id estable. Permiso users:import.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /users/roles:
+    get: { operationId: listRoles, description: 'Permiso roles:read.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /users/permissions:
+    get: { operationId: listPermissions, description: 'Permiso roles:read.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /users/roles/{id}/permissions:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    put: { operationId: updateRolePermissions, description: 'Permiso roles:manage; motivo obligatorio.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /users/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    patch: { operationId: updateUser, description: 'Permiso users:manage; el cambio de correo deja la cuenta pendiente.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /users/{id}/invite:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { operationId: inviteUser, description: 'Envía enlace de activación a una cuenta pendiente. Permiso users:manage.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /users/{id}/deactivate:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { operationId: deactivateUser, description: 'Permiso users:manage; motivo obligatorio y último administrador protegido.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /users/{id}/reactivate:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { operationId: reactivateUser, description: 'Permiso users:manage; deja la cuenta pendiente de invitación.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /users/{id}/roles:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    put: { operationId: assignUserRoles, description: 'Permiso users:assign-roles; motivo obligatorio y sesiones revocadas.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /users/{id}/document:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { operationId: revealDocument, description: 'Permiso users:unmask; motivo obligatorio y auditoría.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /school/institution:
+    get: { operationId: getInstitution, description: 'Permiso school:read.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+    patch: { operationId: updateInstitution, description: 'Permiso school:manage.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /school/sites:
+    get: { operationId: listSites, responses: { '200': { $ref: '#/components/responses/Success' } } }
+    post: { operationId: createSite, responses: { '201': { $ref: '#/components/responses/Success' } } }
+  /school/years:
+    get: { operationId: listYears, responses: { '200': { $ref: '#/components/responses/Success' } } }
+    post: { operationId: createYear, responses: { '201': { $ref: '#/components/responses/Success' } } }
+  /school/years/{id}/activate:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { operationId: activateYear, responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /school/years/{id}/periods:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get: { operationId: listPeriods, responses: { '200': { $ref: '#/components/responses/Success' } } }
+    post: { operationId: createPeriod, responses: { '201': { $ref: '#/components/responses/Success' } } }
+  /school/periods/{id}/close:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { operationId: closePeriod, responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /school/years/{id}/non-school-days:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get: { operationId: listNonSchoolDays, responses: { '200': { $ref: '#/components/responses/Success' } } }
+    post: { operationId: createNonSchoolDay, responses: { '201': { $ref: '#/components/responses/Success' } } }
+  /school/years/{id}/sections:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get: { operationId: listSections, responses: { '200': { $ref: '#/components/responses/Success' } } }
+    post: { operationId: createSection, responses: { '201': { $ref: '#/components/responses/Success' } } }
+  /school/years/{id}/scales:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get: { operationId: listScales, responses: { '200': { $ref: '#/components/responses/Success' } } }
+    post: { operationId: createScaleDraft, description: 'Crea AD, A, B y C en borrador; D-16 rige cualquier rango numérico.', responses: { '201': { $ref: '#/components/responses/Success' } } }
+  /school/scales/{id}/approve:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { operationId: approveScale, description: 'Requiere fuenteAprobacion documentada por Dirección.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /guardians/consent:
+    get: { operationId: getGuardianConsent, security: [], responses: { '200': { $ref: '#/components/responses/Success' }, '503': { $ref: '#/components/responses/Error' } } }
+  /guardians/activate:
+    post: { operationId: activateGuardian, security: [], description: 'Exige versión vigente del texto y aceptación explícita.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /guardians/students:
+    get: { operationId: listLinkedStudents, description: 'Solo rol APODERADO con vínculo y consentimiento activos.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /guardians/links:
+    get: { operationId: listGuardianLinks, responses: { '200': { $ref: '#/components/responses/Success' } } }
+    post: { operationId: createGuardianLink, responses: { '201': { $ref: '#/components/responses/Success' } } }
+  /guardians/invitations:
+    post: { operationId: inviteGuardian, responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /guardians/links/{guardianId}/{studentId}:
+    parameters:
+      - { $ref: '#/components/parameters/GuardianId' }
+      - { $ref: '#/components/parameters/StudentId' }
+    delete: { operationId: revokeGuardianLink, responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /notifications:
+    get: { operationId: listNotifications, responses: { '200': { $ref: '#/components/responses/Success' } } }
+    post: { operationId: sendNotification, description: 'Permiso notifications:send.', responses: { '201': { $ref: '#/components/responses/Success' } } }
+  /notifications/{id}/read:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    patch: { operationId: markNotificationRead, responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /notifications/preferences:
+    get: { operationId: listNotificationPreferences, responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /notifications/preferences/{category}:
+    parameters: [{ $ref: '#/components/parameters/Category' }]
+    put: { operationId: setNotificationPreference, responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /audit/logs:
+    get: { operationId: listAuditLogs, description: 'Permiso audit:read.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /audit/verify-chain:
+    get: { operationId: verifyAuditChain, description: 'Permiso audit:read.', responses: { '200': { $ref: '#/components/responses/Success' } } }
+  /audit/export.pdf:
+    get:
+      operationId: exportAuditPdf
+      description: Permiso audit:export; hasta 2000 registros.
+      responses:
+        '200':
+          description: Archivo PDF
+          content:
+            application/pdf:
+              schema: { type: string, format: binary }
+  /health:
+    get: { operationId: health, security: [], responses: { '200': { $ref: '#/components/responses/Health' }, '503': { $ref: '#/components/responses/Health' } } }
+components:
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: string } }
+    GuardianId: { name: guardianId, in: path, required: true, schema: { type: string, format: uuid } }
+    StudentId: { name: studentId, in: path, required: true, schema: { type: string, format: uuid } }
+    Category: { name: category, in: path, required: true, schema: { type: string } }
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  schemas:
+    LoginRequest:
+      type: object
+      required: [codigoModular, identifier, password]
+      properties:
+        codigoModular: { type: string, maxLength: 10 }
+        identifier: { type: string, maxLength: 254 }
+        password: { type: string, format: password }
+    RecoveryRequest:
+      type: object
+      required: [codigoModular, identifier]
+      properties:
+        codigoModular: { type: string, maxLength: 10 }
+        identifier: { type: string, maxLength: 254 }
+    AccessLinkRequest:
+      type: object
+      required: [codigoModular, token, password]
+      properties:
+        codigoModular: { type: string, maxLength: 10 }
+        token: { type: string }
+        password: { type: string, format: password, minLength: 8 }
+    Success:
+      type: object
+      required: [success, data, timestamp]
+      properties:
+        success: { const: true }
+        data: {}
+        timestamp: { type: string, format: date-time }
+    Error:
+      type: object
+      required: [success, error, timestamp]
+      properties:
+        success: { const: false }
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
+        timestamp: { type: string, format: date-time }
+  responses:
+    Success:
+      description: Operación completada
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Success' }
+    Error:
+      description: Error de negocio o autorización
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Health:
+      description: Estado de PostgreSQL y Redis
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [status, timestamp, services]
+            properties:
+              status: { type: string, enum: [OK, DEGRADED] }
+              timestamp: { type: string, format: date-time }
+              services: { type: object }

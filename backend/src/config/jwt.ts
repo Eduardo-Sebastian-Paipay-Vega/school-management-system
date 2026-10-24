@@ -25,3 +25,6 @@ function requireSecret(name: string): string {
 
 export const JWT_SECRET = requireSecret('JWT_SECRET');
 export const JWT_REFRESH_SECRET = requireSecret('JWT_REFRESH_SECRET');
+if (JWT_SECRET === JWT_REFRESH_SECRET) {
+  throw new Error('JWT_SECRET y JWT_REFRESH_SECRET deben ser distintos.');
+}

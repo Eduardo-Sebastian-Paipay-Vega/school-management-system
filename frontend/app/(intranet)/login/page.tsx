@@ -1,16 +1,15 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, useReducedMotion } from 'framer-motion';
 import { CheckCircle2, HelpCircle } from 'lucide-react';
-import { LoginForm, UserSession } from '@/modules/intranet';
+import { LoginForm } from '@/modules/intranet';
 
 export default function LoginPage() {
   const router = useRouter();
   const shouldReduceMotion = useReducedMotion();
 
-  const handleLoginSuccess = (_session: UserSession) => {
+  const handleLoginSuccess = () => {
     // Redirige directamente al intranet tras iniciar sesión
     router.push('/intranet');
   };
@@ -29,7 +28,7 @@ export default function LoginPage() {
           initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={easeOutTransition}
-          className="lg:col-span-5 space-y-6"
+          className="order-2 space-y-6 lg:order-1 lg:col-span-5"
         >
           <div className="flex items-center gap-3">
             <motion.div
@@ -76,20 +75,16 @@ export default function LoginPage() {
           <div className="rounded-2xl border border-accent-cream bg-accent-ivory/60 p-4 text-xs text-gray-600">
             <p className="font-bold text-brand-dark flex items-center gap-1.5">
               <HelpCircle size={15} className="text-brand" />
-              <span>Acceso directo sin contraseña:</span>
+              <span>Acceso protegido</span>
             </p>
             <p className="mt-1 text-[11px] leading-relaxed">
-              Puedes entrar directamente al panel general navegando a{' '}
-              <Link href="/intranet" className="font-bold text-brand underline hover:text-brand-dark transition-colors duration-150">
-                /intranet
-              </Link>
-              .
+              La intranet requiere una sesión activa. Su cuenta conserva la misma identidad entre años lectivos.
             </p>
           </div>
         </motion.div>
 
         {/* Right Column: Modular Login Box */}
-        <div className="lg:col-span-7">
+        <div className="order-1 lg:order-2 lg:col-span-7">
           <motion.div
             initial={shouldReduceMotion ? false : { opacity: 0, y: 8, scale: 0.99 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}

@@ -2,108 +2,125 @@ import { Response } from 'express';
 import { z } from 'zod';
 import { AuthService } from '../services/auth.service';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
-import { TenantRequest } from '../middlewares/tenant.middleware';
+import { sendAccessLink } from '../services/mail.service';
+import { redisClient } from '../config/redis';
+import { tokenHash } from '../core/identity-crypto';
 
-const loginSchema = z.object({
-  username: z.string().min(3, 'El usuario o DNI debe tener al menos 3 caracteres'),
-  password: z.string().min(4, 'La contraseña debe tener al menos 4 caracteres'),
+const password = z.string().min(8).refine((value) => Buffer.byteLength(value, 'utf8') <= 72)
+  .refine((value) => /[A-Za-z]/.test(value) && /\d/.test(value));
+const loginSchema = z.object({ codigoModular: z.string().min(1).max(10),
+  identifier: z.string().min(3).max(254), password: z.string().min(1) });
+const linkSchema = z.object({ codigoModular: z.string().min(1).max(10),
+  token: z.string().min(32).max(128), password });
+const ipOf = (req: AuthenticatedRequest) => req.ip ?? req.socket.remoteAddress ?? '127.0.0.1';
+
+function cookie(res: Response, value: string) {
+  res.cookie('refreshToken', value, { httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', sameSite: 'strict',
+    path: '/api/v1/auth', maxAge: 7 * 24 * 60 * 60 * 1000 });
+}
+
+function clearCookie(res: Response) {
+  res.clearCookie('refreshToken', { httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', sameSite: 'strict', path: '/api/v1/auth' });
+}
+
+const success = (res: Response, data: unknown, status = 200) => res.status(status).json({
+  success: true, data, timestamp: new Date().toISOString(),
+});
+const error = (res: Response, status: number, code: string, message: string) => res.status(status).json({
+  success: false, error: { code, message }, timestamp: new Date().toISOString(),
 });
 
 export class AuthController {
-  static async login(req: TenantRequest, res: Response): Promise<void> {
+  static async login(req: AuthenticatedRequest, res: Response): Promise<void> {
+    const parsed = loginSchema.safeParse(req.body);
+    if (!parsed.success) { error(res, 400, 'VALIDATION_ERROR', 'Datos de acceso inválidos.'); return; }
     try {
-      const parsed = loginSchema.safeParse(req.body);
-      if (!parsed.success) {
-        res.status(400).json({
-          success: false,
-          error: {
-            code: 'VALIDATION_ERROR',
-            message: 'Datos de inicio de sesión inválidos.',
-            details: parsed.error.format(),
-          },
-          timestamp: new Date().toISOString(),
-        });
-        return;
+      const session = await AuthService.login(parsed.data.codigoModular, parsed.data.identifier,
+        parsed.data.password, ipOf(req), req.headers['user-agent'] ?? '');
+      if (!session) { error(res, 401, 'INVALID_CREDENTIALS', 'Usuario o contraseña incorrectos.'); return; }
+      cookie(res, session.refreshToken);
+      success(res, { user: session.user, accessToken: session.accessToken, expiresIn: 900 });
+    } catch (cause) {
+      if (cause instanceof Error && cause.message === 'TOO_MANY_ATTEMPTS') {
+        error(res, 429, 'TOO_MANY_ATTEMPTS', 'Espere antes de volver a intentar.'); return;
       }
+      error(res, 503, 'AUTH_UNAVAILABLE', 'Acceso temporalmente no disponible.');
+    }
+  }
 
-      const { username, password } = parsed.data;
-      const tenantId = req.tenantId || 'unsch-guaman-poma-2026';
-      const ip = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '127.0.0.1';
-      const userAgent = req.headers['user-agent'] || 'Unknown';
-
-      const session = await AuthService.login(username, password, tenantId, ip, userAgent);
-      if (!session) {
-        res.status(401).json({
-          success: false,
-          error: {
-            code: 'INVALID_CREDENTIALS',
-            message: 'Usuario o contraseña incorrectos.',
-          },
-          timestamp: new Date().toISOString(),
-        });
-        return;
+  static async refresh(req: AuthenticatedRequest, res: Response): Promise<void> {
+    const token = req.cookies?.refreshToken as string | undefined;
+    if (!token) { error(res, 401, 'SESSION_EXPIRED', 'Inicie sesión nuevamente.'); return; }
+    try {
+      const session = await AuthService.refresh(token, ipOf(req), req.headers['user-agent'] ?? '');
+      if (!session) { clearCookie(res); error(res, 401, 'SESSION_EXPIRED', 'Inicie sesión nuevamente.'); return; }
+      cookie(res, session.refreshToken);
+      success(res, { user: session.user, accessToken: session.accessToken, expiresIn: 900 });
+    } catch (cause) {
+      if (cause instanceof Error && cause.message === 'AUTH_REVOCATION_UNAVAILABLE') {
+        error(res, 503, 'AUTH_UNAVAILABLE', 'Autenticación temporalmente no disponible.'); return;
       }
-      const { user, accessToken, refreshToken } = session;
-
-      // Refresh token enviado como cookie HttpOnly segura (mitigación XSS)
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
-      });
-
-      res.status(200).json({
-        success: true,
-        data: {
-          user,
-          accessToken,
-          expiresIn: 900, // 15 minutos
-        },
-        timestamp: new Date().toISOString(),
-      });
-    } catch (err: any) {
-      res.status(500).json({
-        success: false,
-        error: {
-          code: 'AUTH_ERROR',
-          message: 'Error en el proceso de autenticación.',
-        },
-        timestamp: new Date().toISOString(),
-      });
+      clearCookie(res); error(res, 401, 'SESSION_EXPIRED', 'Inicie sesión nuevamente.');
     }
   }
 
   static async me(req: AuthenticatedRequest, res: Response): Promise<void> {
-    if (!req.user) {
-      res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'No hay una sesión activa.',
-        },
-        timestamp: new Date().toISOString(),
-      });
-      return;
-    }
-
-    res.status(200).json({
-      success: true,
-      data: {
-        user: req.user,
-      },
-      timestamp: new Date().toISOString(),
-    });
+    success(res, { user: req.user });
   }
 
   static async logout(req: AuthenticatedRequest, res: Response): Promise<void> {
-    res.clearCookie('refreshToken');
-    res.status(200).json({
-      success: true,
-      data: {
-        message: 'Sesión cerrada exitosamente.',
-      },
-      timestamp: new Date().toISOString(),
-    });
+    try {
+      await AuthService.logout(req.authClaims!, ipOf(req), req.headers['user-agent'] ?? '');
+      clearCookie(res);
+      success(res, { message: 'Sesión cerrada.' });
+    } catch { error(res, 503, 'AUTH_UNAVAILABLE', 'No se pudo cerrar la sesión.'); }
+  }
+
+  static async forgot(req: AuthenticatedRequest, res: Response): Promise<void> {
+    const parsed = z.object({ codigoModular: z.string().min(1).max(10),
+      identifier: z.string().min(3).max(254) }).safeParse(req.body);
+    if (!parsed.success) { error(res, 400, 'VALIDATION_ERROR', 'Solicitud inválida.'); return; }
+    if (!redisClient.isReady) { error(res, 503, 'AUTH_UNAVAILABLE', 'Servicio temporalmente no disponible.'); return; }
+    const key = `forgot:${tokenHash(`${ipOf(req)}:${parsed.data.identifier.toLowerCase()}`)}`;
+    const count = await redisClient.incr(key);
+    if (count === 1) await redisClient.expire(key, 900);
+    if (count > 5) { error(res, 429, 'TOO_MANY_ATTEMPTS', 'Espere antes de volver a intentar.'); return; }
+    try {
+      const user = await AuthService.requestRecovery(parsed.data.codigoModular, parsed.data.identifier);
+      if (user) {
+        const tenant = await (await import('../config/database')).resolveInstitution(parsed.data.codigoModular);
+        if (tenant) {
+          const token = await AuthService.createAccessLink(tenant, user.id, user.id, 'RECUPERACION');
+          await sendAccessLink(user.email, parsed.data.codigoModular, token, 'RECUPERACION');
+        }
+      }
+    } catch (cause) {
+      console.error('No se pudo completar la recuperación de contraseña:', cause);
+    }
+    success(res, { message: 'Si la cuenta existe, recibirá instrucciones en su correo.' }, 202);
+  }
+
+  static async reset(req: AuthenticatedRequest, res: Response): Promise<void> {
+    const parsed = linkSchema.safeParse(req.body);
+    if (!parsed.success) { error(res, 400, 'VALIDATION_ERROR', 'Datos inválidos.'); return; }
+    try {
+      const applied = await AuthService.consumeAccessLink(parsed.data.codigoModular, parsed.data.token,
+        parsed.data.password, 'RECUPERACION', ipOf(req));
+      if (!applied) { error(res, 400, 'INVALID_LINK', 'El enlace venció o ya se utilizó.'); return; }
+      success(res, { message: 'Contraseña actualizada.' });
+    } catch { error(res, 503, 'AUTH_UNAVAILABLE', 'No se pudo actualizar la contraseña.'); }
+  }
+
+  static async activate(req: AuthenticatedRequest, res: Response): Promise<void> {
+    const parsed = linkSchema.safeParse(req.body);
+    if (!parsed.success) { error(res, 400, 'VALIDATION_ERROR', 'Datos inválidos.'); return; }
+    try {
+      const applied = await AuthService.consumeAccessLink(parsed.data.codigoModular, parsed.data.token,
+        parsed.data.password, 'ACTIVACION', ipOf(req));
+      if (!applied) { error(res, 400, 'INVALID_LINK', 'El enlace venció o ya se utilizó.'); return; }
+      success(res, { message: 'Cuenta activada.' });
+    } catch { error(res, 503, 'AUTH_UNAVAILABLE', 'No se pudo activar la cuenta.'); }
   }
 }

@@ -17,6 +17,9 @@
 >    * **Paso 3:** Diseño de Detalle por Squad (Reglas SDD y SDD del Squad asignado).
 >    * **Paso 4:** Código Frontend en Next.js (`frontend/app/` y `frontend/modules/squads/squad_[X]_[modulo]/`) y Backend en Node.js (`backend/src/`).
 
+> [!NOTE]
+> **Ubicaciones canónicas del código:** antes de crear carpetas, módulos, rutas, endpoints o migraciones, consultar [`docs/architecture/`](docs/architecture/00-auditoria-inicial.md) (mapa modular, reglas de frontend/backend/BD) y la [matriz RF → arquitectura](docs/requirements/matriz-rf-arquitectura.md). Esos documentos aplican los ADR de `D - Base 1 - 01092026/Fase 2/Arquitectura/ADR/`; si discrepan, mandan los ADR y se corrige la documentación.
+
 ---
 
 ## 1. Contexto del Proyecto y Squads

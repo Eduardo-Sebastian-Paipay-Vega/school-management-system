@@ -16,6 +16,7 @@ import { attachRealtime } from './services/realtime.service';
 import { NotificationService } from './services/notifications.service';
 import { assertIdentityKeys } from './core/identity-crypto';
 import { assertRuntimeRole } from './config/database';
+import { errorHandler, notFoundHandler, OriginDeniedError } from './core/http/errors';
 
 dotenv.config();
 
@@ -32,7 +33,7 @@ app.use(
       if (allowed.includes(origin)) {
         return callback(null, true);
       }
-      return callback(new Error('Origen no permitido por CORS'));
+      return callback(new OriginDeniedError());
     },
     credentials: true,
   })
@@ -59,6 +60,10 @@ app.get('/', (_req, res) => {
     docs: '/api/v1/health',
   });
 });
+
+// Siempre al final: rutas inexistentes y errores no controlados con el sobre canónico.
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 // Inicialización del Servidor
 const startServer = async () => {

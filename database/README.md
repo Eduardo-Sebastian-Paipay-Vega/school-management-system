@@ -49,6 +49,8 @@ npm run migrate:create -- s2_asistencia_eventos_kiosco
 | `20261022010300_s2_nucleo_estructura_academica.sql` | Secciones por año, cursos, competencias, plan de estudios, carga lectiva y matrículas |
 | `20261022010400_s1_nucleo_auditoria.sql` | `logs_auditoria` particionada por mes, con cadena de hash calculada en la base |
 | `20261022010500_s1_rls_y_permisos.sql` | RLS en toda tabla con `tenant_id` y privilegios de `sms_app` |
+| `20261023182000_s1_acceso_y_notificaciones.sql` | `sesiones_usuario` y `enlaces_acceso` (activación y recuperación de un uso) |
+| `20261023190000_s1_rbac_y_cola.sql` | `permisos_core`, `rol_permisos_core` y cola de correo |
 
 ## Reglas rápidas
 
@@ -78,7 +80,6 @@ SELECT * FROM fn_verificar_cadena_auditoria();
 
 ## Pendiente
 
-- Conectar el backend con un usuario con login que pertenezca a `sms_app`. Hoy el backend usa `postgres`, que omite RLS.
 - La migración *contract* de identidad: cifrar los DNI existentes en `personas` y eliminar de `usuarios` las columnas de identidad, cuando el login del Squad 1 lea `personas`.
 - Job mensual que ejecute `fn_crear_particion_auditoria()`. La migración deja creados los próximos 12 meses.
 - Cambiar `docker-compose.yml` para que el *init* solo cree roles (ADR-004). Mientras tanto funciona igual: la línea base se puede ejecutar de nuevo sin errores.

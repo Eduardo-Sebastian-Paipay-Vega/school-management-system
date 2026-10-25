@@ -1,0 +1,6 @@
+# Lint de contratos (ADR-005). Falla ante errores estructurales o referencias rotas.
+# operation-summary queda como advertencia hasta que el Squad 1 complete los resúmenes de core.yaml.
+extends:
+  - recommended
+rules:
+  operation-summary: warn

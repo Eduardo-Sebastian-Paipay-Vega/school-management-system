@@ -148,18 +148,25 @@ El sistema implementa una arquitectura desacoplada **Clean Architecture + Featur
 ```text
 school-management-system/
 ├── backend/                       # Servidor API RESTful y Gateway WebSockets
-│   ├── src/
-│   │   ├── config/                # Conexiones a PostgreSQL 16 (pg Pool) y Redis 7 (ioredis)
-│   │   ├── middlewares/           # authenticateJwt (RF-01) y requireRoles (RF-04)
-│   │   ├── routes/                # Rutas REST (/api/v1/health, auth, users, etc.)
+│   ├── src/                       # Backend común (Express): config/, core/, middlewares/, routes/, services/
+│   │   ├── core/http/errors.ts    # 404 y errores con el sobre canónico (ADR-005)
 │   │   └── server.ts              # Servidor Express con Helmet, CORS y Morgan
+│   ├── tests/                     # Pruebas node:test sobre dist/
+│   ├── squad_3_calificaciones/    # Servicio M8 de calificaciones (proceso propio, ADR-001)
 │   ├── .env.example               # Plantilla de variables de entorno cloud
 │   ├── package.json               # Dependencias de producción (Node.js/TypeScript)
 │   └── tsconfig.json              # Configuración estricta de TypeScript 5
 │
-├── database/                      # Esquema de Base de Datos PostgreSQL
-│   └── init/
-│       └── 01_esquema_consolidado.sql # DDL unificado de los 5 Squads con triggers y semillas
+├── database/                      # PostgreSQL 16: migraciones versionadas (ADR-004)
+│   ├── migrations/                # Fuente ejecutable del esquema (node-pg-migrate)
+│   ├── init/                      # Línea base histórica; no se edita
+│   └── tests/                     # Pruebas de migraciones, RLS y auditoría (PGlite)
+│
+├── packages/contracts/            # Contrato OpenAPI 3.1 (fuente única de la API) + lint Redocly
+├── docs/architecture/             # Arquitectura del esqueleto: auditoría, módulos, capas, BD
+├── docs/requirements/             # Matriz de trazabilidad RF → arquitectura
+├── docs/deployment/               # Entornos, variables y preparación de despliegue
+├── .github/workflows/ci.yml       # CI: lint, tipos, pruebas y build de cada proyecto
 │
 ├── docker-compose.yml             # Orquestador local (Postgres 16, Redis 7 y Adminer :8080)
 ├── vercel.json                    # Headers de seguridad para el despliegue en Vercel
@@ -335,15 +342,24 @@ Antes de realizar cualquier commit a la rama `dev`, el código debe superar sati
 # 1. Lint y compilación del Frontend (0 errores requeridos)
 cd frontend && npm run lint && npm run build
 
-# 2. Compilación y verificación del Backend
-cd ../backend && npm run build
+# 2. Lint, compilación y pruebas del Backend común
+cd ../backend && npm run lint && npm test
+
+# 3. Servicio M8, migraciones y contratos
+cd squad_3_calificaciones && npm run check && npm test
+cd ../../database && npm test
+cd ../packages/contracts && npm run lint
 ```
+
+El workflow [`CI`](.github/workflows/ci.yml) ejecuta estas mismas verificaciones en cada PR y push a `dev` y `main`.
 
 ---
 
 ## 📚 Documentación Técnica e Ingeniería de Software
 
 El proyecto cuenta con documentación formal de ingeniería de software con trazabilidad bidireccional:
+
+* 🏗️ **Arquitectura del esqueleto (empezar aquí para desarrollar):** [auditoría inicial](docs/architecture/00-auditoria-inicial.md), [mapa modular](docs/architecture/01-mapa-modular.md), [dependencias](docs/architecture/02-dependencias.md), [frontend](docs/architecture/03-frontend.md), [backend](docs/architecture/04-backend.md), [base de datos](docs/architecture/05-database.md), [verificación y pendientes](docs/architecture/06-verificacion-y-pendientes.md), [matriz RF → arquitectura](docs/requirements/matriz-rf-arquitectura.md) y [guía de despliegue](docs/deployment/guia-despliegue.md).
 
 * 🔐 **Core y seguridad:** [guía de operación e instalación](docs/core/OPERACION_CORE.md), [contrato OpenAPI](packages/contracts/openapi/core.yaml), [matriz RBAC](docs/seguridad/matriz_rbac.md) y [plan de implementación](PLAN.md).
 
@@ -364,7 +380,7 @@ El proyecto cuenta con documentación formal de ingeniería de software con traz
 | Componente | Plataforma / Entorno | Estrategia de Entrega |
 |---|---|---|
 | **Frontend Web (Next.js)** | **Vercel CDN** | Despliegue continuo del App Router de Next.js con headers de seguridad ([`vercel.json`](vercel.json)). |
-| **Backend REST & WebSockets** | **Cloud VPS / Render / Railway** | Contenedor Node.js v20 LTS con TypeScript compilado y proxies Nginx/TLS. |
+| **Backend REST & WebSockets** | **Por decidir (D-19)** | Requiere un proceso persistente con WebSocket. Aún no hay Dockerfiles ni entorno desplegado; ver la [guía de despliegue](docs/deployment/guia-despliegue.md). |
 | **Base de Datos & Caché** | **PostgreSQL 16 + Redis 7** | Aislamiento multi-tenant por `tenant_id`, pools gestionados y triggers de inmutabilidad Ley 29733. |
 
 ---

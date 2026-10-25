@@ -1,0 +1,104 @@
+name: CI
+
+# Puertas de calidad de AGENTS.md §3 y D-13: lint, tipos, pruebas y build de cada proyecto.
+# No despliega nada ni usa secretos. Cada proyecto se instala por separado (no hay workspaces, D-12).
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend (lint + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      NEXT_PUBLIC_CORE_API_URL: http://localhost:3001
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+  backend:
+    name: Backend común (lint + build + pruebas)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      # npm test compila con tsc y ejecuta tests/*.test.cjs sobre dist/.
+      - run: npm test
+
+  grades:
+    name: Servicio M8 (tipos + pruebas)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/squad_3_calificaciones
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/squad_3_calificaciones/package-lock.json
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+
+  database:
+    name: Migraciones (PGlite)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: database
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: database/package-lock.json
+      - run: npm ci
+      - run: npm test
+
+  contracts:
+    name: Contratos OpenAPI (lint)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/contracts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: packages/contracts/package-lock.json
+      - run: npm ci
+      - run: npm run lint

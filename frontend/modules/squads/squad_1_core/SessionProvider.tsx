@@ -2,10 +2,10 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { API_BASE_URL as API, parseEnvelope as parse, publicGet, publicPost } from '@/modules/shared/api';
 
 export type CoreUser = { id:string; tenantId:string; username:string; fullName:string;
   email:string|null; roles:string[]; permissions:string[] };
-type ApiEnvelope<T>={success:boolean;data?:T;error?:{code:string;message:string}};
 type SessionResult={user:CoreUser;accessToken:string};
 type CoreSession={user:CoreUser|null; loading:boolean;
   login:(codigoModular:string,identifier:string,password:string)=>Promise<void>;
@@ -14,23 +14,9 @@ type CoreSession={user:CoreUser|null; loading:boolean;
   download:(path:string,filename:string)=>Promise<void>;
   subscribeNotifications:(listener:()=>void)=>()=>void};
 const Context=createContext<CoreSession|null>(null);
-const API=(process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:3001').replace(/\/$/,'');
 
-async function parse<T>(response:Response):Promise<T>{
-  const body=await response.json() as ApiEnvelope<T>;
-  if(!response.ok || !body.success || body.data===undefined)
-    throw new Error(body.error?.message || 'No se pudo completar la solicitud.');
-  return body.data;
-}
-
-export async function corePublicRequest<T>(path:string,body:object):Promise<T>{
-  return parse<T>(await fetch(`${API}/api/v1${path}`,{method:'POST',credentials:'include',
-    headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}));
-}
-
-export async function corePublicGet<T>(path:string):Promise<T>{
-  return parse<T>(await fetch(`${API}/api/v1${path}`,{credentials:'include'}));
-}
+export const corePublicRequest=publicPost;
+export const corePublicGet=publicGet;
 
 export function SessionProvider({children}:{children:React.ReactNode}){
   const [user,setUser]=useState<CoreUser|null>(null);

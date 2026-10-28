@@ -2,6 +2,20 @@
 
 Estado: **en ejecución, NO aprobado para producción**. Rama: `chore/saas-tenant-foundation`.
 
+> **Actualización 2026-10-28:** evaluación técnica, métricas, hallazgos y responsables documentados en [ESTADO_ACTUAL_2026-10-28.md](ESTADO_ACTUAL_2026-10-28.md). El objetivo es **SaaS multi-tenant**, no Ethernet/LAN. La nota provisional 5.2/10 corresponde a una revisión senior inicial; el 251/1000 y 0/89 aceptados son métricas históricas del README (22/10), no una medición actualizada.
+
+## Responsables y autoridad de ejecución
+
+- **Líder técnico / Arquitecto:** coordina F0–F6, aprueba ADR y contratos, revisa PR y autoriza integración a `dev`; no se fusiona a `main` sin aceptación.
+- **DBA o responsable de datos:** ejecuta F0/F2, migraciones bajo respaldo, rol de BD, RLS, integridad y restauración; aprueba cambios de esquema conjuntamente con Core.
+- **Squad 1 (Core y Seguridad):** ejecuta F1/F3; Contexto de tenant, identidad, membresía, RBAC, provisionamiento y suspensión.
+- **Squad 3 (Calificaciones):** participa en F1/F2/F4 para UUID canónico, adaptación de RLS e integración de M8.
+- **Squad 2:** consume y valida contratos para matrícula y asistencia; squads 4/5 consumen los mismos contratos y evitan implementaciones propias de tenancy.
+- **QA / Seguridad:** responsable de F5 (tests negativos y cross-tenant), revisa F0/F2/F3/F4.
+- **DevOps / Operaciones:** ejecuta F6 (staging, secretos, monitorización, respaldo, recuperación), con aceptación institucional.
+
+Estas son **responsabilidades recomendadas, no asignaciones nominales confirmadas**. El equipo implementa; el liderazgo técnico aprueba; QA verifica de forma independiente; la institución valida reglas de negocio y tratamiento de datos escolares. No se ejecutan cambios destructivos en producción sin autorización explícita.
+
 ## F0 — Inventario / auditoría (evidencias existentes)
 - Fuente ejecutable: `database/migrations/` (no los SQL históricos).
 - Revisar tablas de `public`, `squad3`, vistas y funciones SECURITY DEFINER, incluyendo tablas sin `tenant_id`.

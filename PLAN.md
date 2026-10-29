@@ -175,3 +175,4 @@ E1–E3 habilitan la Fase 1 de accesos. E4 prepara el año siguiente. E5–E6 co
 - Un apoderado no puede consultar estudiantes no vinculados y la falta de consentimiento impide activar la cuenta; la revocación del vínculo surte efecto en la siguiente petición.
 - El año 2027 se configura con sus propias secciones y periodos; ninguna cuenta ni contraseña depende del año. La matrícula anual del Squad 2 referencia la persona existente.
 - El directorio, los avisos, el calendario y los datos institucionales muestran información real, sin cifras ni identidades simuladas. La auditoría incluye registros comprobables y exportación autorizada.
+- El directorio

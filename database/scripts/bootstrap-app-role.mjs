@@ -23,12 +23,12 @@ try {
       existing.rows[0].owns_tables || existing.rows[0].other_membership)) {
     throw new Error('El rol existente tiene privilegios incompatibles con RLS; utilice un rol dedicado.');
   }
-  const statement = await client.query('SELECT format($1, $2, $3) AS sql', [
+  const statement = await client.query('SELECT format($1::text, $2::text, $3::text) AS sql', [
     existing.rowCount ? 'ALTER ROLE %I PASSWORD %L' : 'CREATE ROLE %I LOGIN NOBYPASSRLS PASSWORD %L',
     name, password,
   ]);
   await client.query(statement.rows[0].sql);
-  const grant = await client.query('SELECT format($1,$2) AS sql', ['GRANT sms_app TO %I', name]);
+  const grant = await client.query('SELECT format($1::text,$2::text) AS sql', ['GRANT sms_app TO %I', name]);
   await client.query(grant.rows[0].sql);
   process.stdout.write(`Rol ${name} preparado como miembro de sms_app.\n`);
 } finally {

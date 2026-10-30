@@ -211,6 +211,8 @@ E1–E3 habilitan la Fase 1 de accesos. E4 prepara el año siguiente. E5–E6 co
 | **S2. Contratos y seguridad transversal** | Dividir `packages/contracts/openapi/core.yaml` según ADR-005 y generar tipos compartidos; unificar códigos de error; fijar `AccessControlService`, `GradingScaleService` y `AuditService` como interfaces públicas solo al tener consumidor; revisar todas las consultas, exportaciones y eventos para contexto tenant. | Lint OpenAPI, tipos y builds verdes; ninguna ruta protegida acepta tenant del cliente; prueba automatizada de acceso cruzado en rutas existentes. |
 | **S3. Integración real y datos** | Entorno reproducible PostgreSQL 16 + Redis 7 + SMTP de pruebas; pruebas de login, refresh rotado, permisos, invitación, importación, apoderado y auditoría con dos tenants; respaldo y restauración; backfill de identidades en copia y retirada *contract* solo tras comprobar consumidores. | Suite integrada en CI, restauración cronometrada y documentada, datos cifrados verificables y cero lecturas de columnas legadas antes de *contract*. |
 
+El desglose, responsables, capacidad, secuencia de dos semanas y pruebas de salida de S2 están en [`docs/core/SPRINT_02_PLAN.md`](docs/core/SPRINT_02_PLAN.md). El plan de S2 mantiene las aprobaciones formales de S1 como dependencia para cambios incompatibles de contrato o claim.
+
 ### Fase 2 — Completar los 22 RF y sus dependencias (Sprints 4–5)
 
 | Sprint | Entregables | Puerta de salida |

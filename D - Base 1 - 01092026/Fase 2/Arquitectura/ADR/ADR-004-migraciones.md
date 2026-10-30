@@ -1,6 +1,6 @@
 # ADR-004: Migraciones de base de datos versionadas
 
-- **Estado:** Propuesto (borrador)
+- **Estado:** Aceptado por el líder del proyecto el 2026-10-30 para el cierre de S1/S2; ensayo de restauración pendiente antes de migraciones contract.
 - **Fecha:** 2026-10-22
 - **Decisores:** Líder de proyecto (Squad 2), Squad 1 (Brandon Montero), Squad 3 (Steve Ovalle)
 - **Squads afectados:** S1, S2, S3, S4, S5

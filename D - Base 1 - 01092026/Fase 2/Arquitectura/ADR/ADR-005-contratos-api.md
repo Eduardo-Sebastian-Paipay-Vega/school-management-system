@@ -1,6 +1,6 @@
 # ADR-005: Contratos de API — OpenAPI 3.1 como fuente única, sobre y catálogo de errores
 
-- **Estado:** Propuesto (borrador)
+- **Estado:** Aceptado por el líder del proyecto el 2026-10-30 para el cierre de S1/S2; implementación modular parcial en S2.
 - **Fecha:** 2026-10-22
 - **Decisores:** Líder de proyecto (Squad 2), Squad 1 (Brandon Montero), Squad 3 (Steve Ovalle)
 - **Squads afectados:** S1, S2, S3, S4, S5

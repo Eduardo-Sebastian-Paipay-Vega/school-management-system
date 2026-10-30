@@ -1,6 +1,6 @@
-# Acta propuesta de revisión — Sprint 1 del Core
+# Acta de cierre — Sprint 1 del Core
 
-**Estado:** borrador sin firmas. **Fecha de preparación:** 2026-10-30. **Propósito:** dejar decisiones concretas para el consejo de diseño; este archivo no registra una aprobación. Evidencia: `SPRINT_01_REVISION_ADR.md`, `SPRINT_01_CONTRATOS_CONSUMIDORES.md`, `SPRINT_01_ENMIENDAS_NORMATIVAS.md` y `SPRINT_01_INVENTARIO_Y_DECISIONES.md`.
+**Estado:** Sprint 1 cerrado por decisión expresa del líder del proyecto en esta conversación, 2026-10-30. Su instrucción «ciérralos, que no necesitan revisión del equipo completo, solo mío» sustituye para S1/S2 el requisito anterior de cinco firmas; no se atribuyen firmas ni aprobaciones a otros squads. Evidencia técnica: `SPRINT_01_REVISION_ADR.md`, `SPRINT_01_CONTRATOS_CONSUMIDORES.md`, `SPRINT_01_ENMIENDAS_NORMATIVAS.md` y `SPRINT_01_INVENTARIO_Y_DECISIONES.md`.
 
 ## Resoluciones propuestas para revisión
 
@@ -25,8 +25,10 @@
 
 | Resolución | Decisión (aprobar / ajustar / rechazar) | Responsable y fecha | Evidencia / enlace al acta firmada |
 |---|---|---|---|
-| R1–R5, R8 | Pendiente de revisión formal | Pendiente | Pendiente |
+| R1–R4 | Dirección de arquitectura aprobada; ADR-001–005 aceptados como decisiones, con implementación y deudas documentadas | Eduardo Sebastian Paipay Vega, líder, 2026-10-30 | Instrucción de cierre en esta conversación; PR #1 y revisión técnica S1 |
+| R5 | ADR-014 sigue propuesto; el plano de control SaaS se decide e implementa en S6, sin ampliar el piloto | Eduardo Sebastian Paipay Vega, líder, 2026-10-30 | Instrucción de cierre en esta conversación; `SPRINT_01_REVISION_ADR.md` |
+| R8 | Actualización normativa y trazabilidad 22/22 del SDD trasladadas a S3 como deuda documental; no se declara ejecutada | Eduardo Sebastian Paipay Vega, líder, 2026-10-30 | `SPRINT_01_ENMIENDAS_NORMATIVAS.md` |
 | R6 | Semántica de envío explícito decidida por el líder; revisión normativa pendiente | Líder, 2026-10-30 | Respuesta en esta conversación |
 | R7 | Institución = tenant decidida por el líder; revisión normativa pendiente | Líder, 2026-10-30 | Respuesta en esta conversación |
 
-El Sprint 1 se cierra cuando las resoluciones de arquitectura y contratos que son su puerta de salida tienen decisión registrada por sus responsables. Los bloqueos D-16 y RF-75 se trasladan a S4/S5 con dueño identificado; no se declaran resueltos por cerrar S1.
+**Resolución:** S1 queda cerrado por aprobación del líder. Se aceptan ADR-001–005 como decisiones de arquitectura, sin afirmar que todas sus consecuencias estén implementadas. ADR-014 permanece propuesto para S6. La enmienda normativa RF-05/CU-USR-01, RF-07/CU-USR-03 y el SDD 22/22 pasan a S3; D-16 y RF-75 conservan sus dueños y bloqueos. Estas deudas no se declaran resueltas por el cierre del sprint.

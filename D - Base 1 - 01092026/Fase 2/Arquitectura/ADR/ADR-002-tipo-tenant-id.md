@@ -1,6 +1,6 @@
 # ADR-002: Tipo, origen y alcance del `tenant_id`
 
-- **Estado:** Propuesto (borrador)
+- **Estado:** Aceptado por el líder del proyecto el 2026-10-30 para el cierre de S1/S2; implementación del claim canónico en S2.
 - **Fecha:** 2026-10-22
 - **Decisores:** Líder de proyecto (Squad 2), Squad 1 (Brandon Montero), Squad 3 (Steve Ovalle)
 - **Squads afectados:** S1, S2, S3, S4, S5

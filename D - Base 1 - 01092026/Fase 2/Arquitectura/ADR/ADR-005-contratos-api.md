@@ -1,6 +1,6 @@
 # ADR-005: Contratos de API — OpenAPI 3.1 como fuente única, sobre y catálogo de errores
 
-- **Estado:** Propuesto (borrador)
+- **Estado:** Aceptado por el líder del proyecto el 2026-10-30 para el cierre de S1/S2; implementación modular parcial en S2.
 - **Fecha:** 2026-10-22
 - **Decisores:** Líder de proyecto (Squad 2), Squad 1 (Brandon Montero), Squad 3 (Steve Ovalle)
 - **Squads afectados:** S1, S2, S3, S4, S5
@@ -9,17 +9,17 @@
 
 ## Contexto
 
-Hoy los contratos viven en 5 archivos Markdown (`Squad X/contratos_api.md`, 805 líneas en total), sin validación automática. El código ya se desvía de ellos y de la regla del sobre de respuestas:
+Al redactarse este ADR, los contratos vivían en cinco archivos Markdown (`Squad X/contratos_api.md`) sin validación automática. Al 2026-10-30 existe `packages/contracts/openapi/core.yaml` con lint Redocly en CI; la división en `openapi.yaml`, `components/` y `paths/`, la generación de tipos y las pruebas de contrato siguen pendientes. La tabla distingue reglas y desvíos todavía relevantes:
 
 | Fuente | Forma de error real |
 |---|---|
 | `sdd_rules.md` §3.2 | `{ success: false, error: { code, message }, timestamp }` |
 | M8 (`app.ts`, función `send`) | Cumple la regla |
 | `contratos_api.md` del Squad 1 | Agrega `statusCode` dentro del cuerpo |
-| `auth.middleware.ts` y `rbac.middleware.ts` | `{ error: 'UNAUTHORIZED', message }`: sin `success`, sin `timestamp` y con `error` como texto |
-| `tenant.middleware.ts` y `audit.routes.ts` | Cumplen la regla |
+| `auth.middleware.ts` y `rbac.middleware.ts` | Usan el sobre `{ success: false, error: { code, message }, timestamp }`, pero mantienen códigos como `UNAUTHORIZED`, `TOKEN_INVALID` y `FORBIDDEN` fuera del catálogo propuesto |
+| `core/http/errors.ts` y `audit.routes.ts` | Usan el sobre canónico; el middleware de tenant histórico ya no existe |
 
-Sin un contrato verificable, el frontend no puede tipar las respuestas, los squads consumidores (S3 ← S2, S4 ← S2/S3, S5 ← S3/S4) no pueden probar contra el proveedor, y cada desvío se descubre recién en la integración.
+El lint actual valida el documento OpenAPI, pero todavía no genera tipos compartidos ni comprueba respuestas reales contra el contrato. Los squads consumidores (S3 ← S2, S4 ← S2/S3, S5 ← S3/S4) aún no pueden confiar en pruebas de contrato entre proveedor y consumidor.
 
 ## Opciones consideradas
 
@@ -104,7 +104,7 @@ Se adopta la **opción 3**.
 - **Squad 1:** crea `packages/contracts/` con `components/` y los `paths/` de auth, users y audit, y corrige `auth.middleware.ts` y `rbac.middleware.ts` al sobre canónico. Esto es Etapa 3.2 del plan.
 - **Squad 3:** describe M8 en `paths/grades.yaml` **tal como funciona hoy**, sin cambiar código (§4.1 del plan de migración). Las rutas alias de M8 (`batch-save`, `auto-save`, `batch-upsert`) se documentan como obsoletas, con una sola ruta canónica: `PATCH /api/v1/grades/batch`.
 - **Squads 2, 4 y 5:** su SDD (Etapa 3.3) entrega su `paths/*.yaml` en lugar de solo Markdown.
-- **Frontend:** el cliente HTTP compartido (`frontend/lib/`) usa los tipos generados. Ningún módulo define a mano tipos de respuesta del servidor.
+- **Frontend:** el cliente HTTP compartido ya está en `frontend/modules/shared/api/`; el uso de tipos generados sigue pendiente. Ningún módulo debería definir a mano tipos de respuesta del servidor una vez publicado el contrato tipado.
 - **CI:** se agregan dos puertas: lint del OpenAPI y pruebas de contrato. El PR falla si el YAML no compila o si una respuesta real no cumple su esquema.
 - **`sdd_rules.md` §3:** se agrega que el contrato normativo es `packages/contracts/openapi/` y se incorporan los códigos 404, 409, 413 y 429 a las respuestas requeridas.
 - **Plan de la Fase 3:** las rutas `docs/api/openapi.yaml`, `docs/api/errores.md` y `docs/api/eventos.md` de [`plan_fase_3_diseno.md`](../plan_fase_3_diseno.md) se reemplazan por `packages/contracts/`.

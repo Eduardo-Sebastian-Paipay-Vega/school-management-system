@@ -1,6 +1,6 @@
 # ADR-002: Tipo, origen y alcance del `tenant_id`
 
-- **Estado:** Propuesto (borrador)
+- **Estado:** Aceptado por el líder del proyecto el 2026-10-30 para el cierre de S1/S2; implementación del claim canónico en S2.
 - **Fecha:** 2026-10-22
 - **Decisores:** Líder de proyecto (Squad 2), Squad 1 (Brandon Montero), Squad 3 (Steve Ovalle)
 - **Squads afectados:** S1, S2, S3, S4, S5
@@ -10,21 +10,23 @@
 
 ## Contexto
 
-Las fuentes del repositorio se contradicen sobre qué es un tenant y de qué tipo es:
+Las fuentes históricas del repositorio se contradicen sobre qué es un tenant y de qué tipo es. Las migraciones versionadas y el backend común ya aplican parte de esta propuesta:
 
 | Fuente | Definición |
 |---|---|
 | [`.agents/rules/sdd_rules.md`](../../../../.agents/rules/sdd_rules.md) §2.1 | `tenant_id VARCHAR(50) NOT NULL` |
 | `database/init/01_esquema_consolidado.sql` | `tenant_id UUID NOT NULL REFERENCES instituciones(id) ON DELETE RESTRICT` (44 líneas mencionan `tenant_id`) |
 | `backend/squad_3_calificaciones/migrations/001_grades.sql` | `tenant_id VARCHAR(50)` sin FK, con RLS por `current_setting('app.tenant_id')` |
-| `backend/src/middlewares/tenant.middleware.ts` | Lee `X-Tenant-ID` de la cabecera; si falta, usa `'unsch-guaman-poma-2026'` |
+| Middleware de tenant histórico (archivo retirado) | Leía `X-Tenant-ID` y usaba un identificador por defecto; el backend actual resuelve el código modular en el servidor |
 | Semilla Flutter histórica (D-04) | La **sede** actúa como tenant |
 
-Esto tiene consecuencias concretas en el código actual:
+Las consecuencias que motivaron esta decisión en el código anterior fueron:
 
 1. **El tenant por defecto no es un UUID.** `AuthService.login` compara `u.tenant_id = $2` (columna `UUID`) con `'unsch-guaman-poma-2026'`. PostgreSQL rechaza la consulta con `invalid input syntax for type uuid`.
 2. **El tenant se puede suplantar.** En `GET /api/v1/audit/verify-chain` (`audit.routes.ts`) el código usa `req.tenantId || req.user?.tenantId`: la cabecera enviada por el cliente **tiene prioridad sobre el JWT**. Un usuario autenticado de un colegio podría consultar la auditoría de otro.
-3. **El consolidado no tiene RLS.** El aislamiento depende solo de que cada consulta recuerde filtrar por `tenant_id`.
+3. **El consolidado original no tenía RLS.** Las migraciones posteriores incorporaron políticas y el rol `sms_app`; falta aceptación integrada con PostgreSQL y dos tenants.
+
+Estado comprobado al 2026-10-30: `AuthService.login` resuelve `codigoModular` mediante `fn_resolver_institucion()`; `withTenant()` fija el contexto transaccional. El JWT todavía emite `tenantId` en vez del claim canónico `tenant_id`, y `.agents/rules/sdd_rules.md` aún dice `VARCHAR(50)`. Esos dos desajustes no quedan resueltos por la existencia de RLS.
 
 ## Opciones consideradas
 
@@ -87,7 +89,7 @@ sequenceDiagram
 
 ## Hallazgo colateral (fuera del alcance de este ADR)
 
-`AuthService.login` filtra por `u.activo = true`, pero la tabla `usuarios` del consolidado no tiene columna `activo`: tiene `estado estado_usuario_enum DEFAULT 'ACTIVO'`. El login falla aunque el tenant sea correcto. Lo debe corregir el Squad 1 junto con este cambio.
+Hallazgo histórico: `AuthService.login` filtraba por `u.activo = true`, aunque `usuarios` tiene `estado`. El servicio actual consulta `u.estado='ACTIVO'` y une `personas`; falta probar el flujo con PostgreSQL real.
 
 ## Preguntas abiertas para la revisión
 

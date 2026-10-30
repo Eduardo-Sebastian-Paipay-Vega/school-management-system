@@ -11,7 +11,7 @@ async function denied(req: AuthenticatedRequest, res: Response, requirement: str
         datosNuevos: { method: req.method, path: req.path, requirement }, ipOrigen: req.ip,
         userAgent: req.headers['user-agent'] ?? '' }, client);
     });
-    res.status(403).json({ success: false, error: { code: 'FORBIDDEN',
+    res.status(403).json({ success: false, error: { code: 'ACCESS_DENIED',
       message: 'No tiene permiso para esta acción.' }, timestamp: new Date().toISOString() });
   } catch {
     res.status(503).json({ success: false, error: { code: 'AUDIT_UNAVAILABLE',
@@ -22,7 +22,7 @@ async function denied(req: AuthenticatedRequest, res: Response, requirement: str
 export const requireRoles = (allowedRoles: string[]) =>
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     if (!req.user) {
-      res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Inicie sesión.' }, timestamp: new Date().toISOString() });
+      res.status(401).json({ success: false, error: { code: 'UNAUTHENTICATED', message: 'Inicie sesión.' }, timestamp: new Date().toISOString() });
       return;
     }
     if (!req.user.roles.some((role) => allowedRoles.includes(role))) {
@@ -35,7 +35,7 @@ export const requireRoles = (allowedRoles: string[]) =>
 export const requirePermission = (permission: string) =>
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     if (!req.user) {
-      res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Inicie sesión.' }, timestamp: new Date().toISOString() });
+      res.status(401).json({ success: false, error: { code: 'UNAUTHENTICATED', message: 'Inicie sesión.' }, timestamp: new Date().toISOString() });
       return;
     }
     if (!req.user.permissions.includes('*') && !req.user.permissions.includes(permission)) {

@@ -18,7 +18,7 @@ La cuenta pertenece a la persona y al plantel, no al año lectivo. En la Fase 1 
 
 Las rutas bajo `/api/v1` usan `{success,data|error,timestamp}`, salvo `/health` y el PDF. El tenant procede del JWT validado y la conexión ejecuta `SET LOCAL app.tenant_id` y `app.user_id` para RLS.
 
-El inventario de operaciones y el esquema de respuesta se publica en `packages/contracts/openapi/core.yaml`; los campos de entrada se validan en los controladores con Zod.
+El contrato vigente se publica en `packages/contracts/openapi/openapi.yaml`, con rutas en `paths/` y componentes en `components/`; `core.yaml` permanece como instantánea histórica para comprobar la migración de 46 rutas y 57 operaciones. Los tipos de `school-contracts` se generan desde el contrato vigente. Los campos de entrada se validan en los controladores con Zod.
 
 | Grupo | Rutas principales |
 | --- | --- |

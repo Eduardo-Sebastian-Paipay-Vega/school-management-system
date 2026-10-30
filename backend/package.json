@@ -10,7 +10,8 @@
     "backfill:identities": "npm run build && node dist/scripts/backfill-identities.js",
     "bootstrap:admin": "npm run build && node dist/scripts/bootstrap-admin.js",
     "lint": "eslint src",
-    "test": "npm run build && node --test tests/*.test.cjs"
+    "test": "npm run build && node --test tests/*.test.cjs",
+    "test:integration": "npm run build && node --test tests/integration/*.test.cjs"
   },
   "dependencies": {
     "body-parser": "^1.20.9",
@@ -50,6 +51,7 @@
     "@types/ws": "^8.18.2",
     "@types/yauzl": "^2.10.3",
     "eslint": "^9.39.5",
+    "school-contracts": "file:../packages/contracts",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.5.2",
     "typescript-eslint": "^8.72.0"

@@ -1,3 +1,5 @@
+# Instantánea histórica previa a S2. Fuente vigente: openapi.yaml.
+# Se conserva para verificar equivalencia de 46 rutas y 57 operaciones.
 openapi: 3.1.0
 info:
   title: Core escolar Guamán Poma de Ayala

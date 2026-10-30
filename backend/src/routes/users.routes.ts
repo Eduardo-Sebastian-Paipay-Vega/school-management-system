@@ -46,7 +46,7 @@ router.put('/roles/:id/permissions', requirePermission('roles:manage'), async (r
   const parsed = z.object({ permissions: z.array(z.string().min(1).max(80)).max(30),
     motivo: z.string().min(10).max(500) }).safeParse(req.body);
   if (!parsed.success || new Set(parsed.data.permissions).size !== parsed.data.permissions.length) {
-    fail(res, 400, 'VALIDATION_ERROR', 'Permisos o motivo inválidos.'); return;
+    fail(res, 400, 'VALIDATION_FAILED', 'Permisos o motivo inválidos.'); return;
   }
   const protectedPermissions = ['roles:manage','users:assign-roles','users:unmask','audit:read','audit:export'];
   try {
@@ -94,7 +94,7 @@ router.get('/me', async (req: AuthenticatedRequest, res) => { ok(res, req.user);
 
 router.get('/persons', requirePermission('guardians:manage'), async (req: AuthenticatedRequest, res) => {
   const parsed=z.object({search:z.string().trim().min(2).max(100)}).safeParse(req.query);
-  if(!parsed.success){fail(res,400,'VALIDATION_ERROR','Indique al menos dos caracteres.');return;}
+  if(!parsed.success){fail(res,400,'VALIDATION_FAILED','Indique al menos dos caracteres.');return;}
   try{
     const data=await withTenant(req.user!.tenantId,req.user!.id,async(client)=>
       (await client.query(`SELECT id,nombres,apellido_paterno,apellido_materno,documento_ultimos4
@@ -106,7 +106,7 @@ router.get('/persons', requirePermission('guardians:manage'), async (req: Authen
 
 router.post('/:id/document', requirePermission('users:unmask'), async (req: AuthenticatedRequest, res) => {
   const parsed=z.object({motivo:z.string().min(10).max(500)}).safeParse(req.body);
-  if(!parsed.success){fail(res,400,'VALIDATION_ERROR','Indique un motivo de al menos diez caracteres.');return;}
+  if(!parsed.success){fail(res,400,'VALIDATION_FAILED','Indique un motivo de al menos diez caracteres.');return;}
   try{
     const data=await withTenant(req.user!.tenantId,req.user!.id,async(client)=>{
       const result=await client.query<{documento_cifrado:Buffer;tipo_documento:string}>(
@@ -126,7 +126,7 @@ router.post('/:id/document', requirePermission('users:unmask'), async (req: Auth
 
 router.patch('/me', async (req: AuthenticatedRequest, res) => {
   const parsed = z.object({ telefono: z.string().max(20).optional(), fotoUrl: z.string().url().max(1000).optional() }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_ERROR', 'Datos de perfil inválidos.'); return; }
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Datos de perfil inválidos.'); return; }
   try {
     await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
       const old = await client.query('SELECT telefono,foto_url FROM personas WHERE id=(SELECT persona_id FROM usuarios WHERE id=$1)', [req.user!.id]);
@@ -144,7 +144,7 @@ router.patch('/me', async (req: AuthenticatedRequest, res) => {
 router.post('/me/change-password', async (req: AuthenticatedRequest, res) => {
   const parsed = z.object({ actual: z.string().min(1), nueva: z.string().min(8).max(72)
     .refine((x) => /[A-Za-z]/.test(x) && /\d/.test(x)) }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_ERROR', 'Contraseña nueva inválida.'); return; }
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Contraseña nueva inválida.'); return; }
   try {
     const changed = await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
       const result = await client.query(`UPDATE usuarios SET password_hash=crypt($1,gen_salt('bf',12)),auth_version=auth_version+1
@@ -167,7 +167,7 @@ router.get('/', requirePermission('users:read'),
       limit: z.coerce.number().int().min(1).max(100).default(20),
       offset: z.coerce.number().int().min(0).default(0),
       role: z.string().max(40).optional(), estado: z.string().max(40).optional() }).safeParse(req.query);
-    if (!parsed.success) { fail(res, 400, 'VALIDATION_ERROR', 'Filtros inválidos.'); return; }
+    if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Filtros inválidos.'); return; }
     try {
       const { search, limit, offset, role, estado } = parsed.data;
       const hash = /^\d{8}$/.test(search) ? documentHash(search) : null;
@@ -210,7 +210,7 @@ router.post('/import/commit', requirePermission('users:import'), async (req: Aut
 router.post('/', requirePermission('users:manage'), requireRoles(['SUPERADMIN', 'DIRECTIVO']), async (req: AuthenticatedRequest, res) => {
   try {
     const result = await commitUsers(req.user!.tenantId, req.user!.id, req.user!.roles, [req.body], req.ip ?? '127.0.0.1');
-    if (result.rechazados.length) { fail(res, 400, 'VALIDATION_ERROR', result.rechazados[0].reason); return; }
+    if (result.rechazados.length) { fail(res, 400, 'VALIDATION_FAILED', result.rechazados[0].reason); return; }
     ok(res, result.registros[0], 201);
   } catch (cause) { fail(res, 409, 'USER_CREATE_FAILED', cause instanceof Error ? cause.message : 'No se pudo crear.'); }
 });
@@ -237,7 +237,7 @@ router.patch('/:id', requirePermission('users:manage'), requireRoles(['SUPERADMI
     apellidoPaterno: z.string().min(1).max(100).optional(),
     apellidoMaterno: z.string().max(100).optional(), email: z.string().email().max(254).optional(),
     telefono: z.string().max(20).optional() }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_ERROR', 'Datos inválidos.'); return; }
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Datos inválidos.'); return; }
   if (parsed.data.email && !req.user!.roles.includes('SUPERADMIN')) {
     fail(res, 403, 'EMAIL_PROTECTED', 'Solo Administración TI puede cambiar el correo de acceso.'); return;
   }
@@ -286,7 +286,7 @@ router.patch('/:id', requirePermission('users:manage'), requireRoles(['SUPERADMI
 
 async function setActive(req: AuthenticatedRequest, res: import('express').Response, active: boolean) {
   const parsed = z.object({ motivo: z.string().min(3).max(500) }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_ERROR', 'Indique el motivo.'); return; }
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Indique el motivo.'); return; }
   if (req.params.id === req.user!.id && !active) { fail(res, 409, 'SELF_DEACTIVATION', 'No puede desactivar su propia cuenta.'); return; }
   try {
     const changed = await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
@@ -332,7 +332,7 @@ router.post('/:id/reactivate', requirePermission('users:manage'), requireRoles([
 
 router.put('/:id/roles', requirePermission('users:assign-roles'), async (req: AuthenticatedRequest, res) => {
   const parsed = z.object({ roles: z.array(z.string().min(1)).min(1), motivo: z.string().min(3).max(500) }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_ERROR', 'Roles y motivo requeridos.'); return; }
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Roles y motivo requeridos.'); return; }
   try {
     await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
       await client.query('SELECT id FROM instituciones WHERE id=$1 FOR UPDATE', [req.user!.tenantId]);

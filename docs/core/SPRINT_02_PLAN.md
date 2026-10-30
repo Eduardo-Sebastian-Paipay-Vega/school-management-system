@@ -1,6 +1,6 @@
 # Sprint 2 — Contratos y seguridad transversal del Core
 
-**Plan de trabajo:** 10 días hábiles estimados; ventana sugerida **lunes 2 a viernes 13 de noviembre de 2026**, hora de Lima, si se habilitan las decisiones de S1 a tiempo. **Estado:** listo para ejecución, sin código de S2 implementado. **Rama de planificación:** `codex/core-sprint-2-plan`, basada en el paquete de S1 (`codex/core-sprint-1`, PR #1 en borrador). **Responsable técnico:** Brandon Montero (Squad 1). **Integración y prioridades:** Eduardo Paipay (líder, Squad 2). Steve Ovalle (Squad 3) revisa JWT/escala para M8 y Cesar Leon (Squad 5) revisa membrete/datos de reportes; no se les asigna implementación del Core.
+**Plan de trabajo:** 10 días hábiles estimados; ventana sugerida **lunes 2 a viernes 13 de noviembre de 2026**, hora de Lima, si se habilitan las decisiones de S1 a tiempo. **Estado:** implementación técnica en revisión; resultados y puertas pendientes en `SPRINT_02_RESULTADOS.md`. **Rama:** `codex/core-sprint-2-plan`, basada en el paquete de S1 (`codex/core-sprint-1`, PR #1 en borrador). **Responsable técnico:** Brandon Montero (Squad 1). **Integración y prioridades:** Eduardo Paipay (líder, Squad 2). Steve Ovalle (Squad 3) revisa JWT/escala para M8 y Cesar Leon (Squad 5) revisa membrete/datos de reportes; no se les asigna implementación del Core.
 
 ## Objetivo y límite
 

@@ -1,0 +1,34 @@
+/school/institution:
+  get: { operationId: getInstitution, description: 'Permiso school:read.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  patch: { operationId: updateInstitution, description: 'Permiso school:manage.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/school/sites:
+  get: { operationId: listSites, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  post: { operationId: createSite, responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+/school/years:
+  get: { operationId: listYears, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  post: { operationId: createYear, responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+/school/years/{id}/activate:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  post: { operationId: activateYear, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/school/years/{id}/periods:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  get: { operationId: listPeriods, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  post: { operationId: createPeriod, responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+/school/periods/{id}/close:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  post: { operationId: closePeriod, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/school/years/{id}/non-school-days:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  get: { operationId: listNonSchoolDays, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  post: { operationId: createNonSchoolDay, responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+/school/years/{id}/sections:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  get: { operationId: listSections, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  post: { operationId: createSection, responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+/school/years/{id}/scales:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  get: { operationId: listScales, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  post: { operationId: createScaleDraft, description: 'Crea AD, A, B y C en borrador; D-16 rige cualquier rango numérico.', responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+/school/scales/{id}/approve:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  post: { operationId: approveScale, description: 'Requiere fuenteAprobacion documentada por Dirección.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }

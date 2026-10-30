@@ -1,0 +1,149 @@
+openapi: 3.1.0
+info:
+  title: Core escolar Guamán Poma de Ayala
+  version: 0.1.0
+  description: Contrato de rutas del Squad 1. Las rutas protegidas usan el tenant del JWT, nunca de una cabecera enviada por el navegador.
+servers:
+  - url: http://localhost:3001/api/v1
+security:
+  - bearerAuth: []
+paths:
+  /auth/login:
+    $ref: './paths/auth.yaml#/~1auth~1login'
+  /auth/refresh-token:
+    $ref: './paths/auth.yaml#/~1auth~1refresh-token'
+  /auth/logout:
+    $ref: './paths/auth.yaml#/~1auth~1logout'
+  /auth/me:
+    $ref: './paths/auth.yaml#/~1auth~1me'
+  /auth/forgot-password:
+    $ref: './paths/auth.yaml#/~1auth~1forgot-password'
+  /auth/reset-password:
+    $ref: './paths/auth.yaml#/~1auth~1reset-password'
+  /auth/activate:
+    $ref: './paths/auth.yaml#/~1auth~1activate'
+  /users:
+    $ref: './paths/users.yaml#/~1users'
+  /users/me:
+    $ref: './paths/users.yaml#/~1users~1me'
+  /users/me/change-password:
+    $ref: './paths/users.yaml#/~1users~1me~1change-password'
+  /users/persons:
+    $ref: './paths/users.yaml#/~1users~1persons'
+  /users/import/preview:
+    $ref: './paths/users.yaml#/~1users~1import~1preview'
+  /users/import/commit:
+    $ref: './paths/users.yaml#/~1users~1import~1commit'
+  /users/roles:
+    $ref: './paths/users.yaml#/~1users~1roles'
+  /users/permissions:
+    $ref: './paths/users.yaml#/~1users~1permissions'
+  /users/roles/{id}/permissions:
+    $ref: './paths/users.yaml#/~1users~1roles~1{id}~1permissions'
+  /users/{id}:
+    $ref: './paths/users.yaml#/~1users~1{id}'
+  /users/{id}/invite:
+    $ref: './paths/users.yaml#/~1users~1{id}~1invite'
+  /users/{id}/deactivate:
+    $ref: './paths/users.yaml#/~1users~1{id}~1deactivate'
+  /users/{id}/reactivate:
+    $ref: './paths/users.yaml#/~1users~1{id}~1reactivate'
+  /users/{id}/roles:
+    $ref: './paths/users.yaml#/~1users~1{id}~1roles'
+  /users/{id}/document:
+    $ref: './paths/users.yaml#/~1users~1{id}~1document'
+  /school/institution:
+    $ref: './paths/school.yaml#/~1school~1institution'
+  /school/sites:
+    $ref: './paths/school.yaml#/~1school~1sites'
+  /school/years:
+    $ref: './paths/school.yaml#/~1school~1years'
+  /school/years/{id}/activate:
+    $ref: './paths/school.yaml#/~1school~1years~1{id}~1activate'
+  /school/years/{id}/periods:
+    $ref: './paths/school.yaml#/~1school~1years~1{id}~1periods'
+  /school/periods/{id}/close:
+    $ref: './paths/school.yaml#/~1school~1periods~1{id}~1close'
+  /school/years/{id}/non-school-days:
+    $ref: './paths/school.yaml#/~1school~1years~1{id}~1non-school-days'
+  /school/years/{id}/sections:
+    $ref: './paths/school.yaml#/~1school~1years~1{id}~1sections'
+  /school/years/{id}/scales:
+    $ref: './paths/school.yaml#/~1school~1years~1{id}~1scales'
+  /school/scales/{id}/approve:
+    $ref: './paths/school.yaml#/~1school~1scales~1{id}~1approve'
+  /guardians/consent:
+    $ref: './paths/guardians.yaml#/~1guardians~1consent'
+  /guardians/activate:
+    $ref: './paths/guardians.yaml#/~1guardians~1activate'
+  /guardians/students:
+    $ref: './paths/guardians.yaml#/~1guardians~1students'
+  /guardians/links:
+    $ref: './paths/guardians.yaml#/~1guardians~1links'
+  /guardians/invitations:
+    $ref: './paths/guardians.yaml#/~1guardians~1invitations'
+  /guardians/links/{guardianId}/{studentId}:
+    $ref: './paths/guardians.yaml#/~1guardians~1links~1{guardianId}~1{studentId}'
+  /notifications:
+    $ref: './paths/notifications.yaml#/~1notifications'
+  /notifications/{id}/read:
+    $ref: './paths/notifications.yaml#/~1notifications~1{id}~1read'
+  /notifications/preferences:
+    $ref: './paths/notifications.yaml#/~1notifications~1preferences'
+  /notifications/preferences/{category}:
+    $ref: './paths/notifications.yaml#/~1notifications~1preferences~1{category}'
+  /audit/logs:
+    $ref: './paths/audit.yaml#/~1audit~1logs'
+  /audit/verify-chain:
+    $ref: './paths/audit.yaml#/~1audit~1verify-chain'
+  /audit/export.pdf:
+    $ref: './paths/audit.yaml#/~1audit~1export.pdf'
+  /health:
+    $ref: './paths/health.yaml#/~1health'
+components:
+  parameters:
+    Id:
+      $ref: './components/parameters.yaml#/Id'
+    GuardianId:
+      $ref: './components/parameters.yaml#/GuardianId'
+    StudentId:
+      $ref: './components/parameters.yaml#/StudentId'
+    Category:
+      $ref: './components/parameters.yaml#/Category'
+  securitySchemes:
+    bearerAuth:
+      $ref: './components/securitySchemes.yaml#/bearerAuth'
+  schemas:
+    LoginRequest:
+      $ref: './components/schemas.yaml#/LoginRequest'
+    RecoveryRequest:
+      $ref: './components/schemas.yaml#/RecoveryRequest'
+    AccessLinkRequest:
+      $ref: './components/schemas.yaml#/AccessLinkRequest'
+    Success:
+      $ref: './components/schemas.yaml#/Success'
+    Error:
+      $ref: './components/schemas.yaml#/Error'
+    CoreUser:
+      $ref: './components/schemas.yaml#/CoreUser'
+    SessionData:
+      $ref: './components/schemas.yaml#/SessionData'
+    SessionSuccess:
+      $ref: './components/schemas.yaml#/SessionSuccess'
+    MeSuccess:
+      $ref: './components/schemas.yaml#/MeSuccess'
+    MessageSuccess:
+      $ref: './components/schemas.yaml#/MessageSuccess'
+  responses:
+    Success:
+      $ref: './components/responses.yaml#/Success'
+    Error:
+      $ref: './components/responses.yaml#/Error'
+    Session:
+      $ref: './components/responses.yaml#/Session'
+    Me:
+      $ref: './components/responses.yaml#/Me'
+    Message:
+      $ref: './components/responses.yaml#/Message'
+    Health:
+      $ref: './components/responses.yaml#/Health'

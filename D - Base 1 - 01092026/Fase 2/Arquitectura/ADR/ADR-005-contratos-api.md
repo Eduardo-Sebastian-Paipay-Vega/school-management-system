@@ -6,7 +6,7 @@
 - **Squads afectados:** S1, S2, S3, S4, S5
 - **Formaliza:** decisión D-18 de [`F0_DECISIONES_ARQUITECTURA_PENDIENTES.md`](../../../../docs/F0_DECISIONES_ARQUITECTURA_PENDIENTES.md) y el paquete `packages/contracts` de §5.4 de [`F0_PLAN_MIGRACION_TYPESCRIPT.md`](../../../../docs/F0_PLAN_MIGRACION_TYPESCRIPT.md)
 - **Requisitos relacionados:** RNF-16, RNF-17, RNF-18; [`sdd_rules.md`](../../../../.agents/rules/sdd_rules.md) §3
-- **Estado de implementación S2:** el PR #2 modulariza las 46 rutas y 57 operaciones del Core y genera tipos; la validación completa de cada respuesta contra OpenAPI y los contratos de otros squads siguen pendientes. La decisión permanece propuesta.
+- **Estado de implementación S2:** el PR #2 modulariza las 46 rutas y 57 operaciones del Core y genera tipos; la validación completa de cada respuesta contra OpenAPI y los contratos de otros squads siguen pendientes. La decisión de arquitectura está aceptada por el líder; su implementación completa sigue en curso.
 
 ## Contexto
 

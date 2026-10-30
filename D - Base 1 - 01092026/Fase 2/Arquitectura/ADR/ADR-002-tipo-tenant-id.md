@@ -24,9 +24,9 @@ Las consecuencias que motivaron esta decisión en el código anterior fueron:
 
 1. **El tenant por defecto no es un UUID.** `AuthService.login` compara `u.tenant_id = $2` (columna `UUID`) con `'unsch-guaman-poma-2026'`. PostgreSQL rechaza la consulta con `invalid input syntax for type uuid`.
 2. **El tenant se puede suplantar.** En `GET /api/v1/audit/verify-chain` (`audit.routes.ts`) el código usa `req.tenantId || req.user?.tenantId`: la cabecera enviada por el cliente **tiene prioridad sobre el JWT**. Un usuario autenticado de un colegio podría consultar la auditoría de otro.
-3. **El consolidado original no tenía RLS.** Las migraciones posteriores incorporaron políticas y el rol `sms_app`; falta aceptación integrada con PostgreSQL y dos tenants.
+3. **El consolidado original no tenía RLS.** Las migraciones posteriores incorporaron políticas y el rol `sms_app`; el PR #2 verificó aislamiento con PostgreSQL 16, Redis 7 y dos tenants ficticios en CI. La aceptación formal del ADR sigue pendiente.
 
-Estado comprobado al 2026-10-30: `AuthService.login` resuelve `codigoModular` mediante `fn_resolver_institucion()`; `withTenant()` fija el contexto transaccional. El JWT todavía emite `tenantId` en vez del claim canónico `tenant_id`, y `.agents/rules/sdd_rules.md` aún dice `VARCHAR(50)`. Esos dos desajustes no quedan resueltos por la existencia de RLS.
+Estado comprobado al 2026-10-30: `AuthService.login` resuelve `codigoModular` mediante `fn_resolver_institucion()`; `withTenant()` fija el contexto transaccional. En la rama del PR #2, los JWT nuevos emiten `tenant_id`; el lector de `tenantId` solo funciona durante una ventana explícita de hasta siete días, según `docs/core/SPRINT_02_TRANSICION_CONTRATOS.md`. `.agents/rules/sdd_rules.md` aún dice `VARCHAR(50)` y requiere la corrección documental prevista por esta decisión. El cambio de JWT no está fusionado ni desplegado.
 
 ## Opciones consideradas
 

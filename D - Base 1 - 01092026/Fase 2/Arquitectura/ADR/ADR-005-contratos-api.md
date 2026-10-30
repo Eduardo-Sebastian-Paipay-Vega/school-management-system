@@ -6,20 +6,21 @@
 - **Squads afectados:** S1, S2, S3, S4, S5
 - **Formaliza:** decisión D-18 de [`F0_DECISIONES_ARQUITECTURA_PENDIENTES.md`](../../../../docs/F0_DECISIONES_ARQUITECTURA_PENDIENTES.md) y el paquete `packages/contracts` de §5.4 de [`F0_PLAN_MIGRACION_TYPESCRIPT.md`](../../../../docs/F0_PLAN_MIGRACION_TYPESCRIPT.md)
 - **Requisitos relacionados:** RNF-16, RNF-17, RNF-18; [`sdd_rules.md`](../../../../.agents/rules/sdd_rules.md) §3
+- **Estado de implementación S2:** el PR #2 modulariza las 46 rutas y 57 operaciones del Core y genera tipos; la validación completa de cada respuesta contra OpenAPI y los contratos de otros squads siguen pendientes. La decisión permanece propuesta.
 
 ## Contexto
 
-Al redactarse este ADR, los contratos vivían en cinco archivos Markdown (`Squad X/contratos_api.md`) sin validación automática. Al 2026-10-30 existe `packages/contracts/openapi/core.yaml` con lint Redocly en CI; la división en `openapi.yaml`, `components/` y `paths/`, la generación de tipos y las pruebas de contrato siguen pendientes. La tabla distingue reglas y desvíos todavía relevantes:
+Al redactarse este ADR, los contratos vivían en cinco archivos Markdown (`Squad X/contratos_api.md`) sin validación automática. En el PR #2, el contrato vigente del Core reside en `packages/contracts/openapi/openapi.yaml`, con `components/` y `paths/`; `core.yaml` se conserva como instantánea para comprobar el inventario. Redocly, la generación reproducible de tipos y pruebas HTTP representativas corren en CI. Todavía no se valida cada respuesta real contra su esquema OpenAPI ni se han incorporado las rutas de los otros squads. La tabla distingue reglas y desvíos que motivaron la decisión:
 
 | Fuente | Forma de error real |
 |---|---|
 | `sdd_rules.md` §3.2 | `{ success: false, error: { code, message }, timestamp }` |
 | M8 (`app.ts`, función `send`) | Cumple la regla |
 | `contratos_api.md` del Squad 1 | Agrega `statusCode` dentro del cuerpo |
-| `auth.middleware.ts` y `rbac.middleware.ts` | Usan el sobre `{ success: false, error: { code, message }, timestamp }`, pero mantienen códigos como `UNAUTHORIZED`, `TOKEN_INVALID` y `FORBIDDEN` fuera del catálogo propuesto |
+| `auth.middleware.ts` y `rbac.middleware.ts` antes de S2 | Usaban el sobre `{ success: false, error: { code, message }, timestamp }`, pero mantenían códigos como `UNAUTHORIZED`, `TOKEN_INVALID` y `FORBIDDEN` fuera del catálogo propuesto; el PR #2 normaliza las rutas representativas |
 | `core/http/errors.ts` y `audit.routes.ts` | Usan el sobre canónico; el middleware de tenant histórico ya no existe |
 
-El lint actual valida el documento OpenAPI, pero todavía no genera tipos compartidos ni comprueba respuestas reales contra el contrato. Los squads consumidores (S3 ← S2, S4 ← S2/S3, S5 ← S3/S4) aún no pueden confiar en pruebas de contrato entre proveedor y consumidor.
+El lint y la generación de tipos compartidos del Core pasan en el PR #2. Las pruebas integradas comprueban estado, código y sobre en casos representativos, pero no validan todas las respuestas contra los esquemas OpenAPI. Los squads consumidores (S3 ← S2, S4 ← S2/S3, S5 ← S3/S4) aún requieren revisión de sus DTO y pruebas proveedor-consumidor antes de depender de contratos estables.
 
 ## Opciones consideradas
 
@@ -104,7 +105,7 @@ Se adopta la **opción 3**.
 - **Squad 1:** crea `packages/contracts/` con `components/` y los `paths/` de auth, users y audit, y corrige `auth.middleware.ts` y `rbac.middleware.ts` al sobre canónico. Esto es Etapa 3.2 del plan.
 - **Squad 3:** describe M8 en `paths/grades.yaml` **tal como funciona hoy**, sin cambiar código (§4.1 del plan de migración). Las rutas alias de M8 (`batch-save`, `auto-save`, `batch-upsert`) se documentan como obsoletas, con una sola ruta canónica: `PATCH /api/v1/grades/batch`.
 - **Squads 2, 4 y 5:** su SDD (Etapa 3.3) entrega su `paths/*.yaml` en lugar de solo Markdown.
-- **Frontend:** el cliente HTTP compartido ya está en `frontend/modules/shared/api/`; el uso de tipos generados sigue pendiente. Ningún módulo debería definir a mano tipos de respuesta del servidor una vez publicado el contrato tipado.
+- **Frontend:** el cliente HTTP compartido está en `frontend/modules/shared/api/`; el PR #2 incorpora tipos generados para sesión y sobre. Ningún módulo debería definir a mano tipos de respuesta del servidor una vez publicado el contrato tipado.
 - **CI:** se agregan dos puertas: lint del OpenAPI y pruebas de contrato. El PR falla si el YAML no compila o si una respuesta real no cumple su esquema.
 - **`sdd_rules.md` §3:** se agrega que el contrato normativo es `packages/contracts/openapi/` y se incorporan los códigos 404, 409, 413 y 429 a las respuestas requeridas.
 - **Plan de la Fase 3:** las rutas `docs/api/openapi.yaml`, `docs/api/errores.md` y `docs/api/eventos.md` de [`plan_fase_3_diseno.md`](../plan_fase_3_diseno.md) se reemplazan por `packages/contracts/`.

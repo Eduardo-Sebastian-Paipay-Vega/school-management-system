@@ -14,6 +14,6 @@
 
 **Verificaciones:** localmente `backend/npm run lint`, `backend/npm test` (10/10), `database/npm test` (33/33), `frontend/npm run lint` (0 errores, 66 advertencias previas), `frontend/npm run build`, `packages/contracts/npm run lint`, `check:inventory` y `check:generated`. [CI 41134133673](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/actions/runs/41134133673) pasó los seis jobs técnicos, incluida la suite integrada con PostgreSQL 16/Redis 7. El PR #2 permanece en borrador.
 
-**Pendiente para cierre formal de S2:** revisión de los consumidores de los DTO y la transición, y aceptación formal de ADR-002/005 por los responsables exigidos en el índice ADR. No se solicitaron revisiones ni se atribuyen firmas. Hasta entonces S2-03/04 no se fusionan a `dev` ni se despliegan.
+**Pendiente para cierre formal de S2:** revisión de los consumidores de los DTO y la transición, y aceptación formal de ADR-002/005 por los responsables exigidos en el índice ADR. El paquete de decisión y el registro de conformidad están en [SPRINT_02_ACTA_CIERRE_FORMAL.md](SPRINT_02_ACTA_CIERRE_FORMAL.md). No se solicitaron revisiones ni se atribuyen firmas. Hasta entonces S2-03/04 no se fusionan a `dev` ni se despliegan.
 
 **Riesgos transferidos:** SMTP y migración *contract* de identidad (S3); aislamiento completo de WebSocket, colas, archivos y exportaciones (S7); advertencias de rutas ambiguas y DTO de operaciones aún genéricas antes de que otros squads dependan de ellas.

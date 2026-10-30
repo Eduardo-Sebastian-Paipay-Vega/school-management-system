@@ -19,6 +19,7 @@ Cada ADR formaliza, cuando existe, una decisión del registro F0 ([`docs/F0_DECI
 | ADR-011 | Observabilidad | Pendiente | — | — |
 | ADR-012 | Despliegue | Pendiente | D-19 | — |
 | ADR-013 | Meta de latencia del Kiosco | Pendiente | — | — |
+| [ADR-014](ADR-014-plano-control-saas.md) | Plano de control SaaS y ciclo de vida del tenant | Propuesto | Evolución multi tenant de RF-07 | 2026-10-30 |
 
 **Estados:** Propuesto → Aceptado (firmado por los 5 líderes en el consejo de diseño) → Reemplazado por ADR-0YY.
 

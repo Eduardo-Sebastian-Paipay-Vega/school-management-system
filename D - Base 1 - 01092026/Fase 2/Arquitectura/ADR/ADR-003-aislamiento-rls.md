@@ -10,10 +10,12 @@
 
 ## Contexto
 
-- **El consolidado no tiene RLS.** El aislamiento depende de que cada consulta recuerde escribir `WHERE tenant_id = ...`. Un solo olvido expone los datos de menores de otro plantel.
+Las siguientes brechas describen la línea base previa a las migraciones versionadas. Al 2026-10-30, las migraciones del Core habilitan RLS y crean `sms_app NOBYPASSRLS`, y el arranque comprueba que el usuario de la aplicación no sea superusuario, dueño de tablas ni tenga `BYPASSRLS`. Falta una prueba integrada con PostgreSQL/Redis reales y dos tenants.
+
+- **El consolidado original no tenía RLS.** El aislamiento dependía de que cada consulta recordara escribir `WHERE tenant_id = ...`. Un solo olvido podía exponer datos de menores de otro plantel.
 - **M8 ya usa RLS** (`squad3.gradebooks` y `squad3.grade_audit_history`) con `current_setting('app.tenant_id', true)`, y advierte que "los dueños de la tabla omiten RLS".
-- **El backend común se conecta como `postgres`** (`docker-compose.yml`: `POSTGRES_USER: postgres`). Un superusuario omite siempre RLS, así que hoy, aunque existieran políticas, no protegerían nada.
-- **17 tablas transaccionales no tienen `tenant_id`** ([`modelo_datos_canonico.md`](../modelo_datos_canonico.md) §1.1). RLS necesita la columna en cada tabla.
+- **El backend común se conectaba como `postgres`.** El código actual exige un usuario distinto y `assertRuntimeRole()` verifica sus privilegios antes del arranque. `POSTGRES_USER: postgres` en Docker corresponde al rol administrativo de la base, no al usuario de ejecución de la API.
+- **17 tablas transaccionales de la línea base no tenían `tenant_id`** ([`modelo_datos_canonico.md`](../modelo_datos_canonico.md) §1.1). Las migraciones de núcleo corrigen ese punto; las tablas heredadas de los demás squads requieren revisión antes de usarse.
 
 ## Opciones consideradas
 
@@ -39,7 +41,7 @@ Se adopta la **opción 3**.
 | `sms_app` | Sí | `SELECT`, `INSERT`, `UPDATE` sobre tablas de negocio; `INSERT` y `SELECT` sobre auditoría; `NOBYPASSRLS`; **no** es dueño de nada | Backend común y M8 |
 | `postgres` | Sí | Superusuario | Solo administración. **Nunca** en una cadena de conexión de la aplicación |
 
-En la implementación, el dueño de los objetos es el rol que ejecuta las migraciones (en desarrollo, `postgres`). Cumple el papel de `sms_owner` mientras no sea el rol de la aplicación. La migración crea `sms_app` como rol de grupo sin login; cada entorno crea su usuario con login y le concede `sms_app`.
+La tabla anterior expresa el modelo objetivo. En la implementación actual, el dueño de los objetos es el rol que ejecuta las migraciones (en desarrollo, `postgres`); `sms_owner` y `sms_migrator` no existen como roles creados por las migraciones. La migración crea `sms_app` como rol de grupo sin login; cada entorno crea su usuario con login y le concede `sms_app`.
 
 `DELETE` no se concede a `sms_app` por defecto (baja lógica, C-10 del modelo). Una tabla que necesite borrado físico lo justifica en su SDD.
 

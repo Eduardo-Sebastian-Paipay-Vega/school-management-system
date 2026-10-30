@@ -9,7 +9,7 @@
 
 ## Contexto
 
-Hoy el esquema se crea de tres maneras distintas, ninguna versionada:
+Antes de crear `database/migrations/`, el esquema se creaba de tres maneras distintas, ninguna versionada. La tabla conserva el diagnóstico de aquella línea base:
 
 | Mecanismo | Qué hace | Problema |
 |---|---|---|
@@ -18,7 +18,7 @@ Hoy el esquema se crea de tres maneras distintas, ninguna versionada:
 | `backend/squad_3_calificaciones/src/provision.ts migrate` | Ejecuta `001_grades.sql` en una transacción | Usa `CREATE TABLE` sin `IF NOT EXISTS`: falla si se ejecuta dos veces, y no hay registro de lo aplicado |
 | 5 archivos `esquema_datos.sql` | Copias parciales por squad | Ya divergen del consolidado; el del Squad 2 ni siquiera se ejecuta ([modelo canónico](../modelo_datos_canonico.md) §1.2) |
 
-Con 5 squads cambiando el esquema en paralelo durante la Fase 4, sin migraciones versionadas cada integración en `dev` rompería la base de los demás.
+Al 2026-10-30, `database/migrations/` es la fuente ejecutable y contiene diez archivos; `docker-compose.yml` todavía monta `database/init/` para bases nuevas. Las pruebas cubren el camino de migración de una base ya creada por ese *init*. Queda pendiente probar respaldo y restauración antes de una migración *contract* de identidad.
 
 ## Opciones consideradas
 
@@ -34,7 +34,7 @@ Con 5 squads cambiando el esquema en paralelo durante la Fase 4, sin migraciones
 
 Se adopta la **opción 3**, con `node-pg-migrate` como ejecutor sugerido (alternativa: `dbmate`). La herramienta final se confirma al instalarla, verificando que cumple las reglas de esta sección.
 
-### 1. Estructura
+### 1. Estructura prevista al redactar el ADR
 
 ```text
 database/
@@ -78,12 +78,12 @@ database/
 - **CI:** nueva puerta "migraciones desde cero + pruebas de base de datos" (plan §3.4.8).
 - **Línea base verificada (2026-10-22):** `01_esquema_consolidado.sql` y `001_grades.sql` se ejecutaron en PGlite 0.3.16, **cada uno dentro de una sola transacción**, sobre una base vacía. Ambos pasaron: se crearon 44 tablas (42 en `public` y 2 en `squad3`) y los 12 roles. El `ALTER TYPE ... ADD VALUE IF NOT EXISTS` seguido del `INSERT` no falla en una base nueva, porque el valor ya existe desde el `CREATE TYPE`. Falta repetir la prueba con la herramienta elegida.
 
-## Implementación (2026-10-22)
+## Implementación (iniciada el 2026-10-22; estado al 2026-10-30)
 
 - Paquete [`database/`](../../../../database/README.md) con `node-pg-migrate` 9.0.0 y pruebas en PGlite 0.3.16.
 - `node-pg-migrate` toma un archivo `.sql` sin marcadores `-- Up Migration` como migración completa, sin sección `down`. Por eso las dos copias de la línea base son **idénticas byte a byte** a sus originales (D-04).
-- Se aplicaron las 8 migraciones con `node-pg-migrate up` contra un servidor PGlite por socket. Cada una corrió en su propia transacción y terminó sin errores.
-- La suite `npm test` (31 pruebas) cubre tres caminos: base nueva, actualización de una base con datos existentes y base ya creada por el *init* de Docker. También comprueba que la migración se detiene con un mensaje claro cuando no puede resolver los datos sola.
+- Hay diez migraciones versionadas. La verificación documentada más reciente ejecutó 33 pruebas en PGlite (`docs/architecture/06-verificacion-y-pendientes.md`); no equivale a una restauración probada en PostgreSQL real.
+- La suite `npm test` cubre tres caminos: base nueva, actualización de una base con datos existentes y base ya creada por el *init* de Docker. También comprueba que la migración se detiene con un mensaje claro cuando no puede resolver los datos sola.
 
 ## Preguntas abiertas para la revisión
 

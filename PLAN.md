@@ -1,6 +1,6 @@
 # Plan de implementación integral — Core del Squad 1
 
-**Fecha:** 2026-10-23  
+**Fecha:** 2026-10-23 · **Hoja de ruta por sprints actualizada:** 2026-10-30
 **Alcance:** los 22 RF del Squad 1: RF-01–14, RF-65–68, RF-72, RF-73, RF-75 y RF-76; sus RNF de seguridad, privacidad, calidad y accesibilidad.  
 **Estado:** implementación del Core desarrollada y validada con compilación, lint y pruebas locales. La aceptación integrada con PostgreSQL, Redis y SMTP, la aprobación D-16 y el texto oficial de consentimiento siguen pendientes. Las secciones de contexto comprobado describen el estado previo a los cambios; consultar `docs/core/OPERACION_CORE.md` para el arranque actual. La "Fase 1 (2026) / Fase 2 (2027)" describe la puesta en marcha escolar, no las fases documentales del repositorio.
 
@@ -175,4 +175,82 @@ E1–E3 habilitan la Fase 1 de accesos. E4 prepara el año siguiente. E5–E6 co
 - Un apoderado no puede consultar estudiantes no vinculados y la falta de consentimiento impide activar la cuenta; la revocación del vínculo surte efecto en la siguiente petición.
 - El año 2027 se configura con sus propias secciones y periodos; ninguna cuenta ni contraseña depende del año. La matrícula anual del Squad 2 referencia la persona existente.
 - El directorio, los avisos, el calendario y los datos institucionales muestran información real, sin cifras ni identidades simuladas. La auditoría incluye registros comprobables y exportación autorizada.
-- El directorio
+
+
+---
+
+## Hoja de ruta por fases y sprints: Core completo y preparado para SaaS multi tenant
+
+**Horizonte de planificación:** 8 sprints de 2 semanas (16 semanas estimadas), con demostración, revisión de seguridad y cierre verificable al final de cada sprint. La duración es una estimación de trabajo, no una fecha de entrega comprometida. Se parte del código de `dev` al 30-10-2026; E1–E6 de arriba describen capacidades ya desarrolladas, pero sus puertas de aceptación integrada siguen abiertas. No se reimplementan sin evidencia de fallo.
+
+**Objetivo de producto:** completar los 22 RF de Squad 1 y hacer que una misma instalación pueda atender varios planteles con aislamiento comprobable, provisión controlada, operación y recuperación por tenant. El piloto autorizado actualmente se limita a Guamán Poma de Ayala; habilitar otros clientes en producción exige ampliar formalmente el alcance institucional. No se incluyen facturación, cobros ni un superadministrador nacional escolar. El operador de plataforma propuesto gestiona el ciclo técnico de tenants, nunca expedientes, notas o datos personales de estudiantes. Su identidad y permisos deben documentarse en un ADR nuevo antes de implementar el plano de control.
+
+### Arquitectura objetivo e invariantes
+
+| Aspecto | Decisión de trabajo | Prueba de aceptación |
+|---|---|---|
+| Modelo | PostgreSQL compartido, `tenant_id UUID`, RLS y rol de aplicación sin `BYPASSRLS`; no una base por plantel en esta etapa | Tenant A no puede leer, escribir, buscar, exportar ni recibir eventos de B por API, SQL o WebSocket |
+| Fuente de verdad | `instituciones` para tenant y estado; `personas`/`usuarios`/`usuario_roles`/`sesiones_usuario` para identidad y acceso; migraciones versionadas para esquema | Dos planteles se provisionan y operan sin editar datos ni migraciones manualmente |
+| Resolución | Código modular o dominio verificado antes de login; después, tenant desde sesión/JWT validado, nunca cabecera o cuerpo como autoridad | Código, dominio, cookie y token discordantes se rechazan sin fuga de identidad |
+| Administración | Administrador TI `SUPERADMIN` solo de su plantel; operador SaaS fuera del contexto de datos escolares | Ninguna ruta del operador permite consultar o alterar registros de alumnos |
+| Ciclo de vida | `solicitado → aprovisionando → activo → suspendido → archivado`; transiciones idempotentes y auditadas | Reintento de provisión no duplica tenant ni administrador; suspensión corta sesiones y trabajos pendientes |
+| Datos y operaciones | Copias, restauración, retención, claves, correo, jobs y telemetría con `tenant_id`; fallar cerrado cuando falte contexto | Restauración de prueba y búsqueda de fugas en logs, colas, archivos y exportaciones |
+
+**Límite de diseño:** el plano de control solo usa servicios/procedimientos con privilegios mínimos para crear y administrar tenants. No se reutiliza el rol migrador, ni se entrega `BYPASSRLS` al backend de datos. Los dominios personalizados y el autoservicio de alta se posponen hasta tener una necesidad de producto aprobada; el primer alta SaaS es operada y auditada.
+
+### Fase 0 — Alinear contrato y alcance (Sprint 1)
+
+| Sprint | Entregables | Puerta de salida |
+|---|---|---|
+| **S1. Inventario y decisiones** | Matriz RF/CU → API/UI/BD/prueba para los 22 RF; revisión de las brechas reales frente a `PLAN.md` y `docs/requirements/matriz-rf-arquitectura.md`; ADR-001–005 aceptados o corregidos; ADR nuevo para operador SaaS, ciclo de tenant y límites de datos; formalizar RF-05 (activación por enlace). Separar explícitamente «preparado para varios tenants» de «venta/alta de otros planteles». | Backlog priorizado por riesgo, contratos de Squads 2/3/5 acordados, responsable de cada decisión y evidencia de aprobación del alcance SaaS antes del primer tenant externo. |
+
+### Fase 1 — Cerrar la base segura del Core (Sprints 2–3)
+
+| Sprint | Entregables | Puerta de salida |
+|---|---|---|
+| **S2. Contratos y seguridad transversal** | Dividir `packages/contracts/openapi/core.yaml` según ADR-005 y generar tipos compartidos; unificar códigos de error; fijar `AccessControlService`, `GradingScaleService` y `AuditService` como interfaces públicas solo al tener consumidor; revisar todas las consultas, exportaciones y eventos para contexto tenant. | Lint OpenAPI, tipos y builds verdes; ninguna ruta protegida acepta tenant del cliente; prueba automatizada de acceso cruzado en rutas existentes. |
+| **S3. Integración real y datos** | Entorno reproducible PostgreSQL 16 + Redis 7 + SMTP de pruebas; pruebas de login, refresh rotado, permisos, invitación, importación, apoderado y auditoría con dos tenants; respaldo y restauración; backfill de identidades en copia y retirada *contract* solo tras comprobar consumidores. | Suite integrada en CI, restauración cronometrada y documentada, datos cifrados verificables y cero lecturas de columnas legadas antes de *contract*. |
+
+### Fase 2 — Completar los 22 RF y sus dependencias (Sprints 4–5)
+
+| Sprint | Entregables | Puerta de salida |
+|---|---|---|
+| **S4. Administración y configuración** | Recorridos reales de altas/importación, roles y perfil; sedes, año, periodos, secciones, membrete y escalas; quitar estados simulados del Core; aprobar o mantener bloqueada la publicación numérica CNEB según D-16. | Reimportar no duplica personas; último administrador protegido; año nuevo reutiliza cuentas; 22 RF trazados con estado y evidencia, y RF-13 no publica rangos sin decisión institucional. |
+| **S5. Familias, avisos, privacidad y auditoría** | Consentimiento oficial/versionado y vínculos de apoderados; correo con cola/reintentos, WebSocket aislado, búsquedas/exportaciones de auditoría y protección de datos. Integrar RF-66 con las mutaciones de Squad 2/3 mediante contrato y prueba conjunta. | Apoderado desvinculado pierde acceso en la siguiente petición; aviso de A nunca llega a B; cadena de auditoría válida; mutación de notas/asistencia y evento se confirman o revierten juntos. RF-75 queda bloqueado para datos reales hasta aprobar texto de consentimiento. |
+
+### Fase 3 — Capacidades SaaS multi tenant (Sprints 6–7)
+
+| Sprint | Entregables | Puerta de salida |
+|---|---|---|
+| **S6. Plano de control y provisión** | Migración de estado/metadatos técnicos del tenant y operación idempotente de alta, suspensión y reactivación; bootstrap de primer administrador por invitación; configuración de correo, orígenes y límites por tenant sin secretos en BD; auditoría del operador. | Crear dos tenants desde cero, suspender uno sin afectar al otro, reintentar alta tras fallo parcial y demostrar que el operador no lee datos escolares. |
+| **S7. Aislamiento extendido y operación** | Pruebas de aislamiento en pool/conexiones, jobs, Redis, WebSockets, correos, archivos, búsquedas y exportaciones; rotación de claves con versión y plan de recifrado; cuotas técnicas y límites de tasa por tenant; métricas, logs estructurados y alertas sin datos personales. | Matriz de fugas A/B totalmente verde, sin contexto residual al reutilizar conexiones; carga de un tenant no degrada indebidamente al otro; restauración y rotación ensayadas. |
+
+### Fase 4 — Aceptación y salida controlada (Sprint 8)
+
+| Sprint | Entregables | Puerta de salida |
+|---|---|---|
+| **S8. End to end y preparación de despliegue** | Ensayo de operación completa: provisión → invitación → uso → cambio de rol → suspensión → restauración; revisión de accesibilidad y UI real; CI obligatorio en `dev`/`main`, guía de despliegue y runbooks de incidentes, migración y baja de tenant; handoff de contratos a otros squads. | 22 RF del Core aceptados o bloqueados únicamente por decisiones institucionales identificadas; pruebas dos tenants verdes; respaldo/restauración y alertas demostrados; aprobación de seguridad, datos y alcance antes de admitir un cliente distinto al piloto. |
+
+### Trabajo transversal y archivos principales
+
+- `database/migrations/` y `database/tests/`: solo migraciones nuevas; estado y aprovisionamiento de tenant, RLS, índices, restricciones, migración *expand/contract* y pruebas A/B.
+- `backend/src/config/database.ts`, `backend/src/middlewares/`, `backend/src/services/`, `backend/src/routes/` y `backend/src/server.ts`: mantener la organización vigente hasta cerrar E2–E3; consolidar seguridad, contexto, servicios públicos del Core y plano de control separado. No reorganizar todo el backend durante los sprints de seguridad.
+- `packages/contracts/openapi/`, `docs/seguridad/matriz_rbac.md`, `docs/architecture/` y ADR: contratos estables, decisiones de operador/tenant y trazabilidad.
+- `frontend/modules/squads/squad_1_core/`, `frontend/modules/shared/api/` y `frontend/app/(intranet)/`: recorridos reales, sesión y permisos derivados del backend, estados vacíos/carga/error; aplicar `primereact-guardian` G0–G6 en cada cambio de interfaz.
+- `docs/core/OPERACION_CORE.md`, `docs/deployment/guia-despliegue.md`, `.github/workflows/ci.yml`: operación, recuperación y puertas automatizadas.
+
+### Definition of Done por sprint
+
+Cada historia cierra con RF/CU (o ADR SaaS), contrato, migración compatible si aplica, prueba de éxito/error y de aislamiento, auditoría de cambios sensibles, documentación operativa y demostración. Gates: `database/npm test`; `backend/npm run lint`, `npm run build`, `npm test`; `packages/contracts/npm run lint`; `frontend/npm run lint`, `npm run build` y auditor PrimeReact para cambios UI. Las pruebas integradas con servicios reales pasan desde S3. El reporte de sprint distingue código completado, aceptación demostrada, bloqueo institucional y riesgo residual; compilación local por sí sola no marca un RF como aceptado.
+
+### Dependencias que pueden mover el calendario
+
+1. **D-16:** aprobación académica de cortes CNEB para activar RF-13.
+2. **RF-75:** versión y texto legal aprobados del consentimiento de apoderados.
+3. **Alcance SaaS:** acuerdo formal para admitir otros planteles y definición del responsable del operador de plataforma; el diseño y pruebas de dos tenants pueden avanzar antes de esa autorización, la incorporación real de terceros no.
+4. **D-19 y operación:** hosting del backend/WebSocket, correo, copias y protección de ramas para el gate de S8.
+5. **Squads 2/3:** integración de auditoría RF-66 y consumidores de identidad/escala; su desarrollo funcional no pertenece al Core.
+
+### Seguimiento
+
+- **2026-10-30, Sprint 1 en revisión:** inventario RF/CU → evidencia y backlog en `docs/core/SPRINT_01_INVENTARIO_Y_DECISIONES.md`; revisión técnica de ADR-001–005, ADR-014 propuesto, contratos de consumidores, enmiendas normativas y `docs/core/SPRINT_01_ACTA_PROPUESTA.md` preparados. Backend 9/9, base 33/33 y lint de OpenAPI válido (113 advertencias). El líder confirmó institución como tenant, invitación explícita y despliegue limitado al piloto. La revisión formal de ADR-001–005/014 y el acuerdo de consumidores siguen pendientes; no se marca Sprint 1 como cerrado.

@@ -9,16 +9,16 @@
 
 ## Contexto
 
-El repositorio tiene hoy dos backends que no se pueden integrar tal como están:
+El repositorio conserva dos procesos backend. La tabla resume su estado al 2026-10-30; todavía no existe el gateway que permite integrarlos:
 
 | Aspecto | Backend común (`backend/src/`) | Servicio M8 (`backend/squad_3_calificaciones/`) |
 |---|---|---|
 | Servidor HTTP | Express 4 (`server.ts`) | `node:http` nativo (`app.ts`) |
 | Sistema de módulos | CommonJS (`backend/tsconfig.json`) | ESM `NodeNext` |
-| JWT | `jsonwebtoken`, claims `tenantId` y `roles[]`, sin `iss`/`aud` | `jose`, claims `tenant_id` y `role`, exige `iss`, `aud` y `maxTokenAge 30m` |
-| Tiempo real | Ninguno | `ws` en `/api/v1/grades/live` |
+| JWT | `jsonwebtoken`, claim `tenantId` y `iss=sms-core`, `aud=sms-web`/`sms-refresh` | `jose`, claims `tenant_id` y `role`, exige `iss`, `aud` y `maxTokenAge 30m` |
+| Tiempo real | `ws` en `/api/v1/notifications/ws`; gateway M8 pendiente | `ws` en `/api/v1/grades/live` |
 | Datos | Esquema consolidado `public` | Esquema `squad3` con agregado JSONB y RLS |
-| Pruebas | Ninguna (`jest` declarado, sin pruebas) | 4 archivos de prueba (dominio, HTTP, PostgreSQL, proveedores) |
+| Pruebas | `node:test` sobre `dist/`: 9 pruebas locales de cifrado, importación y errores HTTP; falta integración con PostgreSQL/Redis reales | 4 archivos de prueba (dominio, HTTP, PostgreSQL, proveedores) |
 
 Un token emitido por el backend común es **rechazado** por M8 (claims y `aud` distintos).
 
@@ -76,7 +76,7 @@ Los criterios para integrar M8 en el proceso común (opción 3, paso 3) son:
 
 ## Consecuencias
 
-- **Backend común:** se reorganiza de `controllers/`, `routes/` y `services/` planos hacia `core/` + `modules/`. Hoy solo hay auth y auditoría, así que el costo es bajo. Se agrega el gateway a M8.
+- **Backend común:** se reorganiza gradualmente de `controllers/`, `routes/` y `services/` planos hacia `core/` + `modules/`. Ya hay rutas de auth, usuarios, escuela, apoderados, notificaciones y auditoría; la reorganización exige preservar esos consumidores. El gateway a M8 sigue pendiente.
 - **M8:** sin cambios de código. Se configuran `JWT_ISSUER`, `JWT_AUDIENCE=sms-grades` y un secreto propio, distinto del core.
 - **Despliegue:** dos contenedores (común y M8) en la misma red privada, detrás de Nginx. Solo el común se publica. Coherente con ADR-012 (despliegue).
 - **Tiempo real:** el gateway WebSocket del común (ADR-007) reenvía el canal de M8. Los clientes se conectan a un solo origen.

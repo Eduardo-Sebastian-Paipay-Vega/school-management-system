@@ -45,7 +45,7 @@ router.patch('/institution', requireRoles(['SUPERADMIN', 'DIRECTIVO']), async (r
   const parsed = z.object({ nombre: z.string().min(1).max(150).optional(),
     direccion: z.string().max(500).optional(), telefono: z.string().max(20).optional(),
     membreteTexto: z.string().max(2000).optional(), escudoUrl: z.string().url().max(1000).optional() }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_ERROR', 'Parámetros inválidos.'); return; }
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Parámetros inválidos.'); return; }
   try {
     await mutate(req, async (client) => {
       const d = parsed.data;
@@ -70,7 +70,7 @@ router.get('/sites', async (req: AuthenticatedRequest, res) => {
 
 router.post('/sites', requireRoles(['SUPERADMIN']), async (req: AuthenticatedRequest, res) => {
   const parsed = z.object({ nombre: z.string().min(2).max(120), direccion: z.string().max(500).optional() }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_ERROR', 'Sede inválida.'); return; }
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Sede inválida.'); return; }
   try {
     const data = await mutate(req, async (client) =>
       (await client.query('INSERT INTO sedes(tenant_id,nombre,direccion) VALUES($1,$2,$3) RETURNING id,nombre',
@@ -93,7 +93,7 @@ router.post('/years', requireRoles(['SUPERADMIN', 'DIRECTIVO']), async (req: Aut
   const parsed = z.object({ anio: z.number().int().min(2020).max(2100),
     fechaInicio: z.string().date(), fechaFin: z.string().date() }).safeParse(req.body);
   if (!parsed.success || parsed.data.fechaInicio >= parsed.data.fechaFin) {
-    fail(res, 400, 'VALIDATION_ERROR', 'Fechas del año inválidas.'); return;
+    fail(res, 400, 'VALIDATION_FAILED', 'Fechas del año inválidas.'); return;
   }
   try {
     const data = await mutate(req, async (client) =>
@@ -132,10 +132,10 @@ router.post('/years/:id/periods', requireRoles(['SUPERADMIN', 'DIRECTIVO', 'COOR
     const parsed = z.object({ tipo: z.enum(['BIMESTRE', 'TRIMESTRE']), numero: z.number().int().min(1).max(4),
       fechaInicio: z.string().date(), fechaFin: z.string().date(), fechaLimiteNotas: z.string().datetime() }).safeParse(req.body);
     if (!parsed.success || parsed.data.fechaInicio >= parsed.data.fechaFin) {
-      fail(res, 400, 'VALIDATION_ERROR', 'Periodo inválido.'); return;
+      fail(res, 400, 'VALIDATION_FAILED', 'Periodo inválido.'); return;
     }
     if (parsed.data.tipo === 'TRIMESTRE' && parsed.data.numero > 3) {
-      fail(res, 400, 'VALIDATION_ERROR', 'Un año trimestral admite hasta tres periodos.'); return;
+      fail(res, 400, 'VALIDATION_FAILED', 'Un año trimestral admite hasta tres periodos.'); return;
     }
     try {
       const data = await mutate(req, async (client) => {
@@ -182,7 +182,7 @@ router.get('/years/:id/non-school-days', async (req: AuthenticatedRequest, res) 
 router.post('/years/:id/non-school-days', requireRoles(['SUPERADMIN', 'DIRECTIVO']), async (req: AuthenticatedRequest, res) => {
   const parsed = z.object({ fecha: z.string().date(), tipo: z.enum(['FERIADO','VACACIONES','SUSPENSION','INSTITUCIONAL']),
     motivo: z.string().min(2).max(150) }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_ERROR', 'Día no lectivo inválido.'); return; }
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Día no lectivo inválido.'); return; }
   try {
     const data = await mutate(req, async (client) => {
       const year=await client.query<{fecha_inicio:string;fecha_fin:string}>(
@@ -212,7 +212,7 @@ router.post('/years/:id/sections', requireRoles(['SUPERADMIN','DIRECTIVO','COORD
     const parsed = z.object({ nivel: z.enum(['INICIAL','PRIMARIA','SECUNDARIA']), grado: z.number().int().min(1).max(6),
       seccion: z.string().length(1), aforoMaximo: z.number().int().min(1).max(100),
       sedeId: z.string().uuid().optional() }).safeParse(req.body);
-    if (!parsed.success) { fail(res, 400, 'VALIDATION_ERROR', 'Sección inválida.'); return; }
+    if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Sección inválida.'); return; }
     try {
       const d = parsed.data;
       const data = await mutate(req, async (client) =>
@@ -245,11 +245,11 @@ router.post('/years/:id/scales', requireRoles(['SUPERADMIN','DIRECTIVO','COORDIN
         max: z.number().min(0).max(20).nullable(), descripcion: z.string().min(1).max(150),
       })).length(4) }).safeParse(req.body);
     if (!parsed.success || new Set(parsed.data.rangos.map((r) => r.nivel)).size !== 4) {
-      fail(res, 400, 'VALIDATION_ERROR', 'La escala requiere AD, A, B y C.'); return;
+      fail(res, 400, 'VALIDATION_FAILED', 'La escala requiere AD, A, B y C.'); return;
     }
     if(parsed.data.rangos.some(r=>parsed.data.modalidad==='LITERAL'
       ? r.min!==null||r.max!==null : r.min===null||r.max===null)){
-      fail(res,400,'VALIDATION_ERROR','Rangos incompatibles con la modalidad.');return;
+      fail(res,400,'VALIDATION_FAILED','Rangos incompatibles con la modalidad.');return;
     }
     try {
       const d = parsed.data;
@@ -269,7 +269,7 @@ router.post('/years/:id/scales', requireRoles(['SUPERADMIN','DIRECTIVO','COORDIN
 
 router.post('/scales/:id/approve', requireRoles(['SUPERADMIN','DIRECTIVO']), async (req: AuthenticatedRequest, res) => {
   const parsed = z.object({ fuenteAprobacion: z.string().min(5).max(500) }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_ERROR', 'Indique la aprobación académica.'); return; }
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Indique la aprobación académica.'); return; }
   try {
     const data = await mutate(req, async (client) => {
       const found = await client.query<{ id: string; anio_lectivo_id: string; nivel: string; estado: string }>(

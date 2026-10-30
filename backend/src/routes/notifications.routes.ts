@@ -14,7 +14,7 @@ const fail=(res:import('express').Response,status:number,code:string,message:str
 router.get('/',async(req:AuthenticatedRequest,res)=>{
   const parsed=z.object({limit:z.coerce.number().int().min(1).max(100).default(30),
     offset:z.coerce.number().int().min(0).default(0)}).safeParse(req.query);
-  if(!parsed.success){fail(res,400,'VALIDATION_ERROR','Paginación inválida.');return;}
+  if(!parsed.success){fail(res,400,'VALIDATION_FAILED','Paginación inválida.');return;}
   try{
     const data=await withTenant(req.user!.tenantId,req.user!.id,async(client)=>
       (await client.query(`SELECT id,categoria,prioridad,titulo,mensaje,enlace,leida_en,created_at
@@ -47,7 +47,7 @@ router.get('/preferences',async(req:AuthenticatedRequest,res)=>{
 router.put('/preferences/:category',async(req:AuthenticatedRequest,res)=>{
   const parsed=z.object({porCorreo:z.boolean()}).safeParse(req.body);
   if(!parsed.success || !/^[A-Z_]{3,40}$/.test(req.params.category)){
-    fail(res,400,'VALIDATION_ERROR','Preferencia inválida.');return;
+    fail(res,400,'VALIDATION_FAILED','Preferencia inválida.');return;
   }
   try{
     await withTenant(req.user!.tenantId,req.user!.id,async(client)=>{
@@ -66,7 +66,7 @@ router.post('/',requirePermission('notifications:send'),async(req:AuthenticatedR
   const parsed=z.object({userId:z.string().uuid(),categoria:z.string().regex(/^[A-Z_]{3,40}$/),
     prioridad:z.enum(['ALTA','NORMAL','BAJA']).optional(),titulo:z.string().min(1).max(150),
     mensaje:z.string().min(1).max(3000),enlace:z.string().startsWith('/').max(500).optional()}).safeParse(req.body);
-  if(!parsed.success){fail(res,400,'VALIDATION_ERROR','Aviso inválido.');return;}
+  if(!parsed.success){fail(res,400,'VALIDATION_FAILED','Aviso inválido.');return;}
   try{
     const data=await withTenant(req.user!.tenantId,req.user!.id,async(client)=>{
       const created=await NotificationService.create(client,req.user!.tenantId,parsed.data.userId,

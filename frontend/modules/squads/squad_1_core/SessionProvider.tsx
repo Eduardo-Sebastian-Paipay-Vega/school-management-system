@@ -3,10 +3,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { API_BASE_URL as API, parseEnvelope as parse, publicGet, publicPost } from '@/modules/shared/api';
+import type { CoreSessionData, CoreUser } from '@/modules/shared/api';
 
-export type CoreUser = { id:string; tenantId:string; username:string; fullName:string;
-  email:string|null; roles:string[]; permissions:string[] };
-type SessionResult={user:CoreUser;accessToken:string};
+export type { CoreUser } from '@/modules/shared/api';
+type SessionResult = CoreSessionData;
 type CoreSession={user:CoreUser|null; loading:boolean;
   login:(codigoModular:string,identifier:string,password:string)=>Promise<void>;
   logout:()=>Promise<void>;

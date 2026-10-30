@@ -3,11 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "description": "Contratos OpenAPI 3.1 del backend común (ADR-005). Fuente única de rutas, sobre y errores.",
+  "types": "./src/generated.d.ts",
+  "files": ["src/generated.d.ts", "openapi"],
   "scripts": {
-    "lint": "redocly lint openapi/core.yaml"
+    "lint": "redocly lint openapi/openapi.yaml",
+    "generate": "openapi-typescript openapi/openapi.yaml -o src/generated.d.ts",
+    "check:generated": "node scripts/check-generated.mjs",
+    "check:inventory": "node scripts/check-inventory.mjs"
   },
   "devDependencies": {
-    "@redocly/cli": "2.59.0"
+    "@redocly/cli": "2.59.0",
+    "openapi-typescript": "7.13.0"
   },
   "engines": {
     "node": ">=22.12.0"

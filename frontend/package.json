@@ -21,6 +21,7 @@
     "primereact": "^10.9.9",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "school-contracts": "file:../packages/contracts",
     "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {

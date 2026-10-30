@@ -5,6 +5,10 @@ import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import { sendAccessLink } from '../services/mail.service';
 import { redisClient } from '../config/redis';
 import { tokenHash } from '../core/identity-crypto';
+import type { components } from 'school-contracts';
+
+type SessionData = components['schemas']['SessionData'];
+type MeData = components['schemas']['MeSuccess']['data'];
 
 const password = z.string().min(8).refine((value) => Buffer.byteLength(value, 'utf8') <= 72)
   .refine((value) => /[A-Za-z]/.test(value) && /\d/.test(value));
@@ -35,16 +39,17 @@ const error = (res: Response, status: number, code: string, message: string) => 
 export class AuthController {
   static async login(req: AuthenticatedRequest, res: Response): Promise<void> {
     const parsed = loginSchema.safeParse(req.body);
-    if (!parsed.success) { error(res, 400, 'VALIDATION_ERROR', 'Datos de acceso inválidos.'); return; }
+    if (!parsed.success) { error(res, 400, 'VALIDATION_FAILED', 'Datos de acceso inválidos.'); return; }
     try {
       const session = await AuthService.login(parsed.data.codigoModular, parsed.data.identifier,
         parsed.data.password, ipOf(req), req.headers['user-agent'] ?? '');
-      if (!session) { error(res, 401, 'INVALID_CREDENTIALS', 'Usuario o contraseña incorrectos.'); return; }
+      if (!session) { error(res, 401, 'UNAUTHENTICATED', 'Usuario o contraseña incorrectos.'); return; }
       cookie(res, session.refreshToken);
-      success(res, { user: session.user, accessToken: session.accessToken, expiresIn: 900 });
+      const data = { user: session.user, accessToken: session.accessToken, expiresIn: 900 } satisfies SessionData;
+      success(res, data);
     } catch (cause) {
       if (cause instanceof Error && cause.message === 'TOO_MANY_ATTEMPTS') {
-        error(res, 429, 'TOO_MANY_ATTEMPTS', 'Espere antes de volver a intentar.'); return;
+        error(res, 429, 'RATE_LIMITED', 'Espere antes de volver a intentar.'); return;
       }
       error(res, 503, 'AUTH_UNAVAILABLE', 'Acceso temporalmente no disponible.');
     }
@@ -52,22 +57,24 @@ export class AuthController {
 
   static async refresh(req: AuthenticatedRequest, res: Response): Promise<void> {
     const token = req.cookies?.refreshToken as string | undefined;
-    if (!token) { error(res, 401, 'SESSION_EXPIRED', 'Inicie sesión nuevamente.'); return; }
+    if (!token) { error(res, 401, 'UNAUTHENTICATED', 'Inicie sesión nuevamente.'); return; }
     try {
       const session = await AuthService.refresh(token, ipOf(req), req.headers['user-agent'] ?? '');
-      if (!session) { clearCookie(res); error(res, 401, 'SESSION_EXPIRED', 'Inicie sesión nuevamente.'); return; }
+      if (!session) { clearCookie(res); error(res, 401, 'UNAUTHENTICATED', 'Inicie sesión nuevamente.'); return; }
       cookie(res, session.refreshToken);
-      success(res, { user: session.user, accessToken: session.accessToken, expiresIn: 900 });
+      const data = { user: session.user, accessToken: session.accessToken, expiresIn: 900 } satisfies SessionData;
+      success(res, data);
     } catch (cause) {
       if (cause instanceof Error && cause.message === 'AUTH_REVOCATION_UNAVAILABLE') {
         error(res, 503, 'AUTH_UNAVAILABLE', 'Autenticación temporalmente no disponible.'); return;
       }
-      clearCookie(res); error(res, 401, 'SESSION_EXPIRED', 'Inicie sesión nuevamente.');
+      clearCookie(res); error(res, 401, 'UNAUTHENTICATED', 'Inicie sesión nuevamente.');
     }
   }
 
   static async me(req: AuthenticatedRequest, res: Response): Promise<void> {
-    success(res, { user: req.user });
+    const data = { user: req.user! } satisfies MeData;
+    success(res, data);
   }
 
   static async logout(req: AuthenticatedRequest, res: Response): Promise<void> {
@@ -81,12 +88,12 @@ export class AuthController {
   static async forgot(req: AuthenticatedRequest, res: Response): Promise<void> {
     const parsed = z.object({ codigoModular: z.string().min(1).max(10),
       identifier: z.string().min(3).max(254) }).safeParse(req.body);
-    if (!parsed.success) { error(res, 400, 'VALIDATION_ERROR', 'Solicitud inválida.'); return; }
+    if (!parsed.success) { error(res, 400, 'VALIDATION_FAILED', 'Solicitud inválida.'); return; }
     if (!redisClient.isReady) { error(res, 503, 'AUTH_UNAVAILABLE', 'Servicio temporalmente no disponible.'); return; }
     const key = `forgot:${tokenHash(`${ipOf(req)}:${parsed.data.identifier.toLowerCase()}`)}`;
     const count = await redisClient.incr(key);
     if (count === 1) await redisClient.expire(key, 900);
-    if (count > 5) { error(res, 429, 'TOO_MANY_ATTEMPTS', 'Espere antes de volver a intentar.'); return; }
+    if (count > 5) { error(res, 429, 'RATE_LIMITED', 'Espere antes de volver a intentar.'); return; }
     try {
       const user = await AuthService.requestRecovery(parsed.data.codigoModular, parsed.data.identifier);
       if (user) {
@@ -104,7 +111,7 @@ export class AuthController {
 
   static async reset(req: AuthenticatedRequest, res: Response): Promise<void> {
     const parsed = linkSchema.safeParse(req.body);
-    if (!parsed.success) { error(res, 400, 'VALIDATION_ERROR', 'Datos inválidos.'); return; }
+    if (!parsed.success) { error(res, 400, 'VALIDATION_FAILED', 'Datos inválidos.'); return; }
     try {
       const applied = await AuthService.consumeAccessLink(parsed.data.codigoModular, parsed.data.token,
         parsed.data.password, 'RECUPERACION', ipOf(req));
@@ -115,7 +122,7 @@ export class AuthController {
 
   static async activate(req: AuthenticatedRequest, res: Response): Promise<void> {
     const parsed = linkSchema.safeParse(req.body);
-    if (!parsed.success) { error(res, 400, 'VALIDATION_ERROR', 'Datos inválidos.'); return; }
+    if (!parsed.success) { error(res, 400, 'VALIDATION_FAILED', 'Datos inválidos.'); return; }
     try {
       const applied = await AuthService.consumeAccessLink(parsed.data.codigoModular, parsed.data.token,
         parsed.data.password, 'ACTIVACION', ipOf(req));

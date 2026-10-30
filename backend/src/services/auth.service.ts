@@ -19,6 +19,8 @@ export interface UserPayload {
 
 export interface AuthClaims extends JwtPayload {
   sub: string;
+  tenant_id: string;
+  /** Alias interno para consumidores existentes; no se emite en el JWT nuevo. */
   tenantId: string;
   sid: string;
   jti: string;
@@ -56,19 +58,44 @@ async function account(client: PoolClient, userId: string): Promise<AccountRow |
 }
 
 function issueTokens(user: UserPayload, sid: string, version: number, jti: string) {
-  const accessToken = jwt.sign({ tenantId: user.tenantId, sid, jti, version }, JWT_SECRET,
+  const accessToken = jwt.sign({ tenant_id: user.tenantId, sid, jti, version }, JWT_SECRET,
     { subject: user.id, expiresIn: '15m', issuer: 'sms-core', audience: 'sms-web', algorithm: 'HS256' });
-  const refreshToken = jwt.sign({ tenantId: user.tenantId, sid, jti, version }, JWT_REFRESH_SECRET,
+  const refreshToken = jwt.sign({ tenant_id: user.tenantId, sid, jti, version }, JWT_REFRESH_SECRET,
     { subject: user.id, expiresIn: '7d', issuer: 'sms-core', audience: 'sms-refresh', algorithm: 'HS256' });
   return { accessToken, refreshToken };
 }
 
+const legacyUntilRaw = process.env.JWT_LEGACY_TENANT_ACCEPT_UNTIL;
+const legacyWindowMs = 7 * 24 * 60 * 60 * 1000;
+const parsedLegacyUntil = legacyUntilRaw && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(legacyUntilRaw)
+  ? Date.parse(legacyUntilRaw) : NaN;
+// Configuración ausente, inválida o demasiado extensa: los tokens legados fallan cerrados.
+const legacyUntil = Number.isFinite(parsedLegacyUntil) && parsedLegacyUntil <= Date.now() + legacyWindowMs
+  ? parsedLegacyUntil : null;
+
 function decode(token: string, secret: string, audience: string): AuthClaims {
-  const claims = jwt.verify(token, secret, { algorithms: ['HS256'], issuer: 'sms-core', audience }) as AuthClaims;
-  if (!claims.sub || !claims.tenantId || !claims.sid || !claims.jti || !claims.version) {
+  const claims = jwt.verify(token, secret, { algorithms: ['HS256'], issuer: 'sms-core', audience }) as
+    JwtPayload & { tenant_id?: unknown; tenantId?: unknown; sid?: unknown; jti?: unknown; version?: unknown };
+  const canonical = claims.tenant_id;
+  const legacy = claims.tenantId;
+  if ((canonical !== undefined && (typeof canonical !== 'string' || !canonical)) ||
+      (legacy !== undefined && (typeof legacy !== 'string' || !legacy)) ||
+      (canonical && legacy && canonical !== legacy)) {
+    throw new Error('Claims de tenant incompatibles');
+  }
+  const now = Date.now();
+  const legacyAllowed = legacyUntil !== null && legacyUntil > now &&
+    Number.isInteger(claims.iat) && claims.iat! * 1000 <= now + 60_000 &&
+    now - claims.iat! * 1000 <= legacyWindowMs;
+  const tenantId = canonical || (legacyAllowed ? legacy : undefined);
+  if (!claims.sub || typeof tenantId !== 'string' ||
+      !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(tenantId) ||
+      typeof claims.sid !== 'string' || typeof claims.jti !== 'string' ||
+      typeof claims.version !== 'number' || claims.version < 1) {
     throw new Error('Token incompleto');
   }
-  return claims;
+  return { ...claims, tenant_id: tenantId, tenantId, sid: claims.sid, jti: claims.jti,
+    version: claims.version, sub: claims.sub };
 }
 
 export class AuthService {

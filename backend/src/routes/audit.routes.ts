@@ -27,7 +27,7 @@ router.get('/logs', async (req: AuthenticatedRequest, res) => {
     hasta: z.coerce.date().optional(),
   }).safeParse(req.query);
   if (!parsed.success) {
-    res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'Filtros inválidos.' }, timestamp: new Date().toISOString() });
+    res.status(400).json({ success: false, error: { code: 'VALIDATION_FAILED', message: 'Filtros inválidos.' }, timestamp: new Date().toISOString() });
     return;
   }
   const { limit, offset, modulo, desde, hasta } = parsed.data;
@@ -53,12 +53,12 @@ router.get('/logs', async (req: AuthenticatedRequest, res) => {
 
 router.get('/export.pdf', async (req: AuthenticatedRequest, res) => {
   if (!req.user!.permissions.includes('audit:export')) {
-    res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'No tiene permiso de exportación.' },
+    res.status(403).json({ success: false, error: { code: 'ACCESS_DENIED', message: 'No tiene permiso de exportación.' },
       timestamp: new Date().toISOString() }); return;
   }
   const parsed = z.object({ desde: z.coerce.date().optional(), hasta: z.coerce.date().optional(),
     modulo: z.string().max(50).optional() }).safeParse(req.query);
-  if (!parsed.success) { res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'Filtros inválidos.' } }); return; }
+  if (!parsed.success) { res.status(400).json({ success: false, error: { code: 'VALIDATION_FAILED', message: 'Filtros inválidos.' }, timestamp: new Date().toISOString() }); return; }
   try {
     const logs = await withTenant(req.user!.tenantId,req.user!.id,async(client)=>{
       const result=await client.query<{ id:string; timestamp_utc:Date; modulo:string; accion:string;
@@ -92,7 +92,7 @@ router.get('/export.pdf', async (req: AuthenticatedRequest, res) => {
     }
     pdf.end();
   } catch {
-    if(!res.headersSent)res.status(500).json({success:false,error:{code:'AUDIT_EXPORT_FAILED',message:'No se pudo exportar la auditoría.'}});
+    if(!res.headersSent)res.status(500).json({success:false,error:{code:'AUDIT_EXPORT_FAILED',message:'No se pudo exportar la auditoría.'},timestamp:new Date().toISOString()});
     else res.end();
   }
 });

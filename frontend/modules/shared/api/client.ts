@@ -1,5 +1,9 @@
 // Punto único de acceso HTTP al backend común (ADR-005). Los módulos no crean su propio cliente:
 // las rutas autenticadas usan useCoreSession().request y las públicas las funciones de este archivo.
+import type { components, paths } from 'school-contracts';
+
+export type CoreUser = components['schemas']['CoreUser'];
+export type CoreSessionData = paths['/auth/login']['post']['responses'][200]['content']['application/json']['data'];
 
 export const API_BASE_URL = (process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
@@ -8,12 +12,13 @@ export function apiUrl(path: string): string {
 }
 
 /** Sobre canónico de respuesta: `{ success, data | error: { code, message }, timestamp }`. */
-export type ApiEnvelope<T> = { success: boolean; data?: T; error?: { code: string; message: string } };
+export type ApiEnvelope<T> =
+  { success: true; data: T; timestamp: string } | components['schemas']['Error'];
 
 export async function parseEnvelope<T>(response: Response): Promise<T> {
   const body = await response.json() as ApiEnvelope<T>;
   if (!response.ok || !body.success || body.data === undefined)
-    throw new Error(body.error?.message || 'No se pudo completar la solicitud.');
+    throw new Error(!body.success ? body.error.message : 'No se pudo completar la solicitud.');
   return body.data;
 }
 

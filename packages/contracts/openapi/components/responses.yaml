@@ -1,0 +1,36 @@
+Success:
+  description: Operación completada
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/Success' }
+Error:
+  description: Error de negocio o autorización
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/Error' }
+Session:
+  description: Sesion autenticada; refresh token en cookie HttpOnly.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/SessionSuccess' }
+Me:
+  description: Identidad y permisos vigentes de la sesion.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/MeSuccess' }
+Message:
+  description: Confirmacion de una operacion sin DTO adicional.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/MessageSuccess' }
+Health:
+  description: Estado de PostgreSQL y Redis
+  content:
+    application/json:
+      schema:
+        type: object
+        required: [status, timestamp, services]
+        properties:
+          status: { type: string, enum: [OK, DEGRADED] }
+          timestamp: { type: string, format: date-time }
+          services: { type: object }

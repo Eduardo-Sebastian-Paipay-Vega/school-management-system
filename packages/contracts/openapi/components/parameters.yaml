@@ -1,0 +1,4 @@
+Id: { name: id, in: path, required: true, schema: { type: string } }
+GuardianId: { name: guardianId, in: path, required: true, schema: { type: string, format: uuid } }
+StudentId: { name: studentId, in: path, required: true, schema: { type: string, format: uuid } }
+Category: { name: category, in: path, required: true, schema: { type: string } }

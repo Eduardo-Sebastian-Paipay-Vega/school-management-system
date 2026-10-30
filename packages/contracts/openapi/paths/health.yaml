@@ -1,0 +1,2 @@
+/health:
+  get: { operationId: health, security: [], responses: { '200': { $ref: '../components/responses.yaml#/Health' }, '503': { $ref: '../components/responses.yaml#/Health' } } }

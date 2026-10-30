@@ -1,0 +1,92 @@
+LoginRequest:
+  type: object
+  required: [codigoModular, identifier, password]
+  properties:
+    codigoModular: { type: string, maxLength: 10 }
+    identifier: { type: string, maxLength: 254 }
+    password: { type: string, format: password, minLength: 1 }
+RecoveryRequest:
+  type: object
+  required: [codigoModular, identifier]
+  properties:
+    codigoModular: { type: string, maxLength: 10 }
+    identifier: { type: string, maxLength: 254 }
+AccessLinkRequest:
+  type: object
+  required: [codigoModular, token, password]
+  properties:
+    codigoModular: { type: string, maxLength: 10 }
+    token: { type: string }
+    password: { type: string, format: password, minLength: 8 }
+Success:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      description: DTO especifico de la operacion. Las operaciones aun no migradas conservan esta forma generica temporalmente.
+    timestamp: { type: string, format: date-time }
+Error:
+  type: object
+  required: [success, error, timestamp]
+  properties:
+    success: { const: false }
+    error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          description: Codigo estable; catalogo transversal en ADR-005. Los codigos de dominio siguen abiertos hasta revision formal.
+          examples: [VALIDATION_FAILED, UNAUTHENTICATED, ACCESS_DENIED, TENANT_MISMATCH, RATE_LIMITED, AUTH_UNAVAILABLE]
+        message: { type: string }
+        details: {}
+    timestamp: { type: string, format: date-time }
+CoreUser:
+  type: object
+  required: [id, tenantId, username, fullName, email, roles, permissions]
+  properties:
+    id: { type: string, format: uuid }
+    tenantId: { type: string, format: uuid, description: 'Identificador derivado de la sesion validada, no del cliente.' }
+    username: { type: string }
+    fullName: { type: string }
+    email: { type: [string, 'null'], format: email }
+    roles: { type: array, items: { type: string } }
+    permissions: { type: array, items: { type: string } }
+    sessionId: { type: string, format: uuid, description: Presente en GET /auth/me. }
+SessionData:
+  type: object
+  required: [user, accessToken, expiresIn]
+  properties:
+    user: { $ref: './schemas.yaml#/CoreUser' }
+    accessToken: { type: string }
+    expiresIn: { type: integer, const: 900, description: Segundos de vigencia del access token. }
+SessionSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data: { $ref: './schemas.yaml#/SessionData' }
+    timestamp: { type: string, format: date-time }
+MeSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [user]
+      properties:
+        user: { $ref: './schemas.yaml#/CoreUser' }
+    timestamp: { type: string, format: date-time }
+MessageSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [message]
+      properties:
+        message: { type: string }
+    timestamp: { type: string, format: date-time }

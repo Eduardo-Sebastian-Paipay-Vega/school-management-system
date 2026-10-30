@@ -1,0 +1,14 @@
+/audit/logs:
+  get: { operationId: listAuditLogs, description: 'Permiso audit:read.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/audit/verify-chain:
+  get: { operationId: verifyAuditChain, description: 'Permiso audit:read.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/audit/export.pdf:
+  get:
+    operationId: exportAuditPdf
+    description: Permiso audit:export; hasta 2000 registros.
+    responses:
+      '200':
+        description: Archivo PDF
+        content:
+          application/pdf:
+            schema: { type: string, format: binary }

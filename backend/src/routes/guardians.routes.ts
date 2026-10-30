@@ -33,7 +33,7 @@ router.post('/activate', async (req, res) => {
   const parsed = z.object({ codigoModular: z.string().min(1).max(10), token: z.string().min(32),
     password: z.string().max(72).optional(),
     consentimiento: z.literal(true), versionTexto: z.literal(document.version) }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_ERROR', 'Debe definir la clave y aceptar el consentimiento.'); return; }
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Debe definir la clave y aceptar el consentimiento.'); return; }
   try {
     const tenantId = await resolveInstitution(parsed.data.codigoModular);
     if (!tenantId) { fail(res, 400, 'INVALID_LINK', 'Enlace inválido.'); return; }
@@ -124,7 +124,7 @@ router.post('/links', requirePermission('guardians:manage'), async (req: Authent
   const parsed = z.object({ guardianId: z.string().uuid(), studentId: z.string().uuid(),
     parentesco: z.enum(['PADRE','MADRE','TUTOR_LEGAL']),
     verificacion: z.string().min(5).max(500) }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_ERROR', 'Indique el vínculo y su verificación.'); return; }
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Indique el vínculo y su verificación.'); return; }
   try {
     const data = await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
       const guardian = await client.query('SELECT id FROM personas WHERE id=$1 AND documento_hash IS NOT NULL', [parsed.data.guardianId]);
@@ -153,7 +153,7 @@ router.post('/invitations', requirePermission('guardians:manage'), async (req: A
     fail(res, 503, 'CONSENT_NOT_CONFIGURED', 'Configure el consentimiento oficial antes de invitar.'); return;
   }
   const parsed = z.object({ guardianId: z.string().uuid(), studentId: z.string().uuid() }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_ERROR', 'Identificadores inválidos.'); return; }
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Identificadores inválidos.'); return; }
   try {
     const raw = randomToken();
     const prepared = await withTenant(req.user!.tenantId, req.user!.id, async (client) => {

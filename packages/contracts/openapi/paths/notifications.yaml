@@ -1,0 +1,11 @@
+/notifications:
+  get: { operationId: listNotifications, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  post: { operationId: sendNotification, description: 'Permiso notifications:send.', responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+/notifications/{id}/read:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  patch: { operationId: markNotificationRead, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/notifications/preferences:
+  get: { operationId: listNotificationPreferences, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/notifications/preferences/{category}:
+  parameters: [{ $ref: '../components/parameters.yaml#/Category' }]
+  put: { operationId: setNotificationPreference, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }

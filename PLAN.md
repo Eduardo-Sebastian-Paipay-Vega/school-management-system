@@ -211,6 +211,8 @@ E1–E3 habilitan la Fase 1 de accesos. E4 prepara el año siguiente. E5–E6 co
 | **S2. Contratos y seguridad transversal** | Dividir `packages/contracts/openapi/core.yaml` según ADR-005 y generar tipos compartidos; unificar códigos de error; fijar `AccessControlService`, `GradingScaleService` y `AuditService` como interfaces públicas solo al tener consumidor; revisar todas las consultas, exportaciones y eventos para contexto tenant. | Lint OpenAPI, tipos y builds verdes; ninguna ruta protegida acepta tenant del cliente; prueba automatizada de acceso cruzado en rutas existentes. |
 | **S3. Integración real y datos** | Entorno reproducible PostgreSQL 16 + Redis 7 + SMTP de pruebas; pruebas de login, refresh rotado, permisos, invitación, importación, apoderado y auditoría con dos tenants; respaldo y restauración; backfill de identidades en copia y retirada *contract* solo tras comprobar consumidores. | Suite integrada en CI, restauración cronometrada y documentada, datos cifrados verificables y cero lecturas de columnas legadas antes de *contract*. |
 
+El desglose, responsables, capacidad, secuencia de dos semanas y pruebas de salida de S2 están en [`docs/core/SPRINT_02_PLAN.md`](docs/core/SPRINT_02_PLAN.md). El plan de S2 mantiene las aprobaciones formales de S1 como dependencia para cambios incompatibles de contrato o claim.
+
 ### Fase 2 — Completar los 22 RF y sus dependencias (Sprints 4–5)
 
 | Sprint | Entregables | Puerta de salida |
@@ -254,3 +256,4 @@ Cada historia cierra con RF/CU (o ADR SaaS), contrato, migración compatible si 
 ### Seguimiento
 
 - **2026-10-30, Sprint 1 cerrado por el líder:** inventario RF/CU → evidencia y backlog en `docs/core/SPRINT_01_INVENTARIO_Y_DECISIONES.md`; revisión técnica y aceptación de ADR-001–005 como decisiones, con [acta de cierre](docs/core/SPRINT_01_ACTA_PROPUESTA.md). Backend 9/9, base 33/33 y lint de OpenAPI válido (113 advertencias) en el corte S1. Institución = tenant, invitación explícita y despliegue limitado al piloto. ADR-014, enmiendas RF/CU y SDD 22/22 continúan como trabajo posterior registrado; el cierre no los declara implementados.
+- **2026-10-30, Sprint 2 cerrado por el líder:** [resultados](docs/core/SPRINT_02_RESULTADOS.md) y [acta](docs/core/SPRINT_02_ACTA_CIERRE_FORMAL.md). CI de seis jobs técnicos verde, incluido aislamiento A/B con PostgreSQL 16 y Redis 7; OpenAPI modular, tipos generados y transición JWT. El líder aprobó el cierre sin revisión del equipo completo. DTO genéricos, validación de respuestas contra OpenAPI y contratos entre squads continúan como deuda de integración.

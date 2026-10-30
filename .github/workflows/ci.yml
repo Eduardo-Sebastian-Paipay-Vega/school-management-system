@@ -102,3 +102,69 @@ jobs:
           cache-dependency-path: packages/contracts/package-lock.json
       - run: npm ci
       - run: npm run lint
+      - run: npm run check:inventory
+      - run: npm run check:generated
+
+  core-integration:
+    name: Core (PostgreSQL + Redis, dos tenants)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: integration_only_password
+          POSTGRES_DB: school_management
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d school_management"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgres://postgres:integration_only_password@localhost:5432/school_management
+      INTEGRATION_DATABASE_URL: postgres://postgres:integration_only_password@localhost:5432/school_management
+      APP_DB_USER: sms_runtime
+      APP_DB_PASSWORD: integration_only_runtime_password_2026
+      DB_HOST: localhost
+      DB_PORT: '5432'
+      DB_NAME: school_management
+      DB_USER: sms_runtime
+      DB_PASSWORD: integration_only_runtime_password_2026
+      REDIS_HOST: localhost
+      REDIS_PORT: '6379'
+      JWT_SECRET: integration_only_access_secret_2026_very_long
+      JWT_REFRESH_SECRET: integration_only_refresh_secret_2026_very_long
+      ENCRYPTION_MASTER_KEY: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      DOCUMENT_HMAC_KEY: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            database/package-lock.json
+            backend/package-lock.json
+      - name: Instalar migrador
+        run: npm ci
+        working-directory: database
+      - name: Crear esquema versionado
+        run: npm run migrate
+        working-directory: database
+      - name: Crear rol de ejecución sin BYPASSRLS
+        run: npm run bootstrap:app-role
+        working-directory: database
+      - name: Instalar backend
+        run: npm ci
+        working-directory: backend
+      - name: Probar aislamiento y fallo cerrado
+        run: npm run test:integration
+        working-directory: backend

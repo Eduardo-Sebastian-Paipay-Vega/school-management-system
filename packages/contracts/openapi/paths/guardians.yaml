@@ -1,0 +1,16 @@
+/guardians/consent:
+  get: { operationId: getGuardianConsent, security: [], responses: { '200': { $ref: '../components/responses.yaml#/Success' }, '503': { $ref: '../components/responses.yaml#/Error' } } }
+/guardians/activate:
+  post: { operationId: activateGuardian, security: [], description: 'Exige versión vigente del texto y aceptación explícita.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/guardians/students:
+  get: { operationId: listLinkedStudents, description: 'Solo rol APODERADO con vínculo y consentimiento activos.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/guardians/links:
+  get: { operationId: listGuardianLinks, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  post: { operationId: createGuardianLink, responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+/guardians/invitations:
+  post: { operationId: inviteGuardian, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/guardians/links/{guardianId}/{studentId}:
+  parameters:
+    - { $ref: '../components/parameters.yaml#/GuardianId' }
+    - { $ref: '../components/parameters.yaml#/StudentId' }
+  delete: { operationId: revokeGuardianLink, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }

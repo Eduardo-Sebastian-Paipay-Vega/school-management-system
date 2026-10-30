@@ -1,0 +1,61 @@
+/auth/login:
+  post:
+    operationId: login
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas.yaml#/LoginRequest' }
+    responses:
+      '200': { $ref: '../components/responses.yaml#/Session' }
+      '401': { $ref: '../components/responses.yaml#/Error' }
+      '429': { $ref: '../components/responses.yaml#/Error' }
+/auth/refresh-token:
+  post:
+    operationId: refreshSession
+    security: []
+    description: Rota la cookie refresh HttpOnly de un solo uso.
+    responses:
+      '200': { $ref: '../components/responses.yaml#/Session' }
+      '401': { $ref: '../components/responses.yaml#/Error' }
+/auth/logout:
+  post: { operationId: logout, responses: { '200': { $ref: '../components/responses.yaml#/Message' } } }
+/auth/me:
+  get: { operationId: getSession, responses: { '200': { $ref: '../components/responses.yaml#/Me' } } }
+/auth/forgot-password:
+  post:
+    operationId: requestPasswordReset
+    security: []
+    description: Siempre devuelve la misma respuesta pública para cuentas existentes o ausentes.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas.yaml#/RecoveryRequest' }
+    responses:
+      '202': { $ref: '../components/responses.yaml#/Message' }
+/auth/reset-password:
+  post:
+    operationId: resetPassword
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas.yaml#/AccessLinkRequest' }
+    responses:
+      '200': { $ref: '../components/responses.yaml#/Message' }
+      '400': { $ref: '../components/responses.yaml#/Error' }
+/auth/activate:
+  post:
+    operationId: activateAccount
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas.yaml#/AccessLinkRequest' }
+    responses:
+      '200': { $ref: '../components/responses.yaml#/Message' }
+      '400': { $ref: '../components/responses.yaml#/Error' }

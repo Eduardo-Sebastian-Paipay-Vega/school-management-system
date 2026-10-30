@@ -1,0 +1,39 @@
+/users:
+  get: { operationId: listUsers, description: 'Permiso users:read.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  post: { operationId: createUser, description: 'Permiso users:manage y rol SUPERADMIN o DIRECTIVO.', responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+/users/me:
+  get: { operationId: getOwnUser, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  patch: { operationId: updateOwnProfile, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/users/me/change-password:
+  post: { operationId: changeOwnPassword, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/users/persons:
+  get: { operationId: searchPersonsForGuardianLink, description: 'Permiso guardians:manage.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/users/import/preview:
+  post: { operationId: previewUserImport, description: 'CSV/XLSX o filas JSON; máximo 1000 filas y sin contraseñas. Permiso users:import.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/users/import/commit:
+  post: { operationId: commitUserImport, description: 'La importación usa persona_id estable. Permiso users:import.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/users/roles:
+  get: { operationId: listRoles, description: 'Permiso roles:read.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/users/permissions:
+  get: { operationId: listPermissions, description: 'Permiso roles:read.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/users/roles/{id}/permissions:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  put: { operationId: updateRolePermissions, description: 'Permiso roles:manage; motivo obligatorio.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/users/{id}:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  patch: { operationId: updateUser, description: 'Permiso users:manage; el cambio de correo deja la cuenta pendiente.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/users/{id}/invite:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  post: { operationId: inviteUser, description: 'Envía enlace de activación a una cuenta pendiente. Permiso users:manage.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/users/{id}/deactivate:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  post: { operationId: deactivateUser, description: 'Permiso users:manage; motivo obligatorio y último administrador protegido.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/users/{id}/reactivate:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  post: { operationId: reactivateUser, description: 'Permiso users:manage; deja la cuenta pendiente de invitación.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/users/{id}/roles:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  put: { operationId: assignUserRoles, description: 'Permiso users:assign-roles; motivo obligatorio y sesiones revocadas.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+/users/{id}/document:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  post: { operationId: revealDocument, description: 'Permiso users:unmask; motivo obligatorio y auditoría.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }

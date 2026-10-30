@@ -1,0 +1,151 @@
+{
+  "/auth/login": [
+    "login"
+  ],
+  "/auth/refresh-token": [
+    "refreshSession"
+  ],
+  "/auth/logout": [
+    "logout"
+  ],
+  "/auth/me": [
+    "getSession"
+  ],
+  "/auth/forgot-password": [
+    "requestPasswordReset"
+  ],
+  "/auth/reset-password": [
+    "resetPassword"
+  ],
+  "/auth/activate": [
+    "activateAccount"
+  ],
+  "/users": [
+    "listUsers",
+    "createUser"
+  ],
+  "/users/me": [
+    "getOwnUser",
+    "updateOwnProfile"
+  ],
+  "/users/me/change-password": [
+    "changeOwnPassword"
+  ],
+  "/users/persons": [
+    "searchPersonsForGuardianLink"
+  ],
+  "/users/import/preview": [
+    "previewUserImport"
+  ],
+  "/users/import/commit": [
+    "commitUserImport"
+  ],
+  "/users/roles": [
+    "listRoles"
+  ],
+  "/users/permissions": [
+    "listPermissions"
+  ],
+  "/users/roles/{id}/permissions": [
+    "updateRolePermissions"
+  ],
+  "/users/{id}": [
+    "updateUser"
+  ],
+  "/users/{id}/invite": [
+    "inviteUser"
+  ],
+  "/users/{id}/deactivate": [
+    "deactivateUser"
+  ],
+  "/users/{id}/reactivate": [
+    "reactivateUser"
+  ],
+  "/users/{id}/roles": [
+    "assignUserRoles"
+  ],
+  "/users/{id}/document": [
+    "revealDocument"
+  ],
+  "/school/institution": [
+    "getInstitution",
+    "updateInstitution"
+  ],
+  "/school/sites": [
+    "listSites",
+    "createSite"
+  ],
+  "/school/years": [
+    "listYears",
+    "createYear"
+  ],
+  "/school/years/{id}/activate": [
+    "activateYear"
+  ],
+  "/school/years/{id}/periods": [
+    "listPeriods",
+    "createPeriod"
+  ],
+  "/school/periods/{id}/close": [
+    "closePeriod"
+  ],
+  "/school/years/{id}/non-school-days": [
+    "listNonSchoolDays",
+    "createNonSchoolDay"
+  ],
+  "/school/years/{id}/sections": [
+    "listSections",
+    "createSection"
+  ],
+  "/school/years/{id}/scales": [
+    "listScales",
+    "createScaleDraft"
+  ],
+  "/school/scales/{id}/approve": [
+    "approveScale"
+  ],
+  "/guardians/consent": [
+    "getGuardianConsent"
+  ],
+  "/guardians/activate": [
+    "activateGuardian"
+  ],
+  "/guardians/students": [
+    "listLinkedStudents"
+  ],
+  "/guardians/links": [
+    "listGuardianLinks",
+    "createGuardianLink"
+  ],
+  "/guardians/invitations": [
+    "inviteGuardian"
+  ],
+  "/guardians/links/{guardianId}/{studentId}": [
+    "revokeGuardianLink"
+  ],
+  "/notifications": [
+    "listNotifications",
+    "sendNotification"
+  ],
+  "/notifications/{id}/read": [
+    "markNotificationRead"
+  ],
+  "/notifications/preferences": [
+    "listNotificationPreferences"
+  ],
+  "/notifications/preferences/{category}": [
+    "setNotificationPreference"
+  ],
+  "/audit/logs": [
+    "listAuditLogs"
+  ],
+  "/audit/verify-chain": [
+    "verifyAuditChain"
+  ],
+  "/audit/export.pdf": [
+    "exportAuditPdf"
+  ],
+  "/health": [
+    "health"
+  ]
+}

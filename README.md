@@ -361,7 +361,7 @@ El proyecto cuenta con documentación formal de ingeniería de software con traz
 
 * 🏗️ **Arquitectura del esqueleto (empezar aquí para desarrollar):** [auditoría inicial](docs/architecture/00-auditoria-inicial.md), [mapa modular](docs/architecture/01-mapa-modular.md), [dependencias](docs/architecture/02-dependencias.md), [frontend](docs/architecture/03-frontend.md), [backend](docs/architecture/04-backend.md), [base de datos](docs/architecture/05-database.md), [verificación y pendientes](docs/architecture/06-verificacion-y-pendientes.md), [matriz RF → arquitectura](docs/requirements/matriz-rf-arquitectura.md) y [guía de despliegue](docs/deployment/guia-despliegue.md).
 
-* 🔐 **Core y seguridad:** [guía de operación e instalación](docs/core/OPERACION_CORE.md), [contrato OpenAPI](packages/contracts/openapi/core.yaml), [matriz RBAC](docs/seguridad/matriz_rbac.md) y [plan de implementación](PLAN.md).
+* 🔐 **Core y seguridad:** [guía de operación e instalación](docs/core/OPERACION_CORE.md), [contrato OpenAPI](packages/contracts/openapi/openapi.yaml), [matriz RBAC](docs/seguridad/matriz_rbac.md) y [plan de implementación](PLAN.md).
 
 * 📋 **Requisitos Funcionales (RF):** [Catálogo Maestro de 89 RFs (IEEE 830)](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales.md) y [SRS Técnico con Contratos JSON](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20Funcionales/requisitos_funcionales_tecnicos.md).
 * ⚙️ **Requisitos No Funcionales (RNF):** [Especificación de 20 RNFs Cuantificables (ISO/IEC 25010)](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20No%20Funcionales/requisitos_no_funcionales.md) y [Navegación por Squads](D%20-%20Base%201%20-%2001092026/Fase%202/Requisitos%20No%20Funcionales/README.md).

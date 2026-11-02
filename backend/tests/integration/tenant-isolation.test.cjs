@@ -419,18 +419,6 @@ test('rutas de usuarios y auditoría no muestran datos de otro tenant', async ()
   assert.equal(chain.body.data.valid, true);
 });
 
-test('intentos de acceso tienen límite por tenant sin enumerar cuentas', async () => {
-  for (let attempt = 1; attempt <= 6; attempt += 1) {
-    const result = await call('/auth/login', { method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ codigoModular: a.code,
-        identifier: 'cuenta-inexistente', password: PASSWORD }) });
-    assert.equal(result.status, attempt <= 5 ? 401 : 429);
-    assert.equal(result.body.error.code, attempt <= 5 ? 'UNAUTHENTICATED' : 'RATE_LIMITED');
-    assert.ok(!JSON.stringify(result.body).includes('cuenta-inexistente'));
-  }
-});
-
 test('sms_runtime aplica RLS, falla sin contexto y limpia el contexto del pool', async () => {
   const role = await runtime.pool.query(
     `SELECT r.rolbypassrls, r.rolsuper,
@@ -488,6 +476,32 @@ test('S4: reimportar la misma identidad no duplica persona ni cuenta', async () 
   assert.equal(count.rows[0].n, 1);
   const state = await admin.query('SELECT estado FROM usuarios WHERE id=$1', [first.body.data.registros[0].userId]);
   assert.equal(state.rows[0].estado, 'PENDIENTE_CAMBIO_CLAVE');
+});
+
+test('S4: reasignar roles con motivo revoca sesión y no cruza tenants', async () => {
+  // La prueba tiene su propio presupuesto de intentos; Redis es exclusivo de CI.
+  await redisClient.flushDb();
+  const signIn = () => call('/auth/login', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+      codigoModular: a.code, identifier: invitedUsername, password: 'NuevaClave2026' }) });
+  const old = await signIn();
+  assert.equal(old.status, 200, JSON.stringify(old.body));
+  const foreign = await call(`/users/${invitedUserId}/roles`, { method: 'PUT',
+    headers: bearer(accessB, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ roles: ['SECRETARIA'], motivo: 'Prueba de cambio de rol' }) });
+  assert.equal(foreign.status, 404, JSON.stringify(foreign.body));
+  const changed = await call(`/users/${invitedUserId}/roles`, { method: 'PUT',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ roles: ['SECRETARIA'], motivo: 'Prueba de cambio de rol' }) });
+  assert.equal(changed.status, 200, JSON.stringify(changed.body));
+  const stale = await call('/users/me', { headers: bearer(old.body.data.accessToken) });
+  assert.equal(stale.status, 401, JSON.stringify(stale.body));
+  const fresh = await signIn();
+  assert.equal(fresh.status, 200, JSON.stringify(fresh.body));
+  assert.deepEqual(fresh.body.data.user.roles, ['SECRETARIA']);
+  const audit = await admin.query(`SELECT count(*)::int AS n FROM logs_auditoria
+    WHERE tenant_id=$1 AND accion='CHANGE_ROLES' AND usuario_id=$2`, [a.tenantId, a.userId]);
+  assert.ok(audit.rows[0].n >= 1);
 });
 
 test('S4: directorio paginado, perfil propio y último administrador protegido', async () => {
@@ -634,6 +648,19 @@ test('S4: año nuevo conserva cuentas, configuración aislada y D-16 bloquea esc
   assert.equal(active.status, 200, JSON.stringify(active.body));
   const account = await admin.query('SELECT id FROM usuarios WHERE id=$1 AND tenant_id=$2', [a.userId, a.tenantId]);
   assert.equal(account.rowCount, 1, 'activar 2027 no recrea ni elimina cuentas');
+});
+
+test('intentos de acceso tienen límite por tenant sin enumerar cuentas', async () => {
+  await redisClient.flushDb();
+  for (let attempt = 1; attempt <= 6; attempt += 1) {
+    const result = await call('/auth/login', { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codigoModular: a.code,
+        identifier: 'cuenta-inexistente', password: PASSWORD }) });
+    assert.equal(result.status, attempt <= 5 ? 401 : 429);
+    assert.equal(result.body.error.code, attempt <= 5 ? 'UNAUTHENTICATED' : 'RATE_LIMITED');
+    assert.ok(!JSON.stringify(result.body).includes('cuenta-inexistente'));
+  }
 });
 
 test('logout revoca inmediatamente el access token', async () => {

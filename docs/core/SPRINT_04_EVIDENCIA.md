@@ -4,7 +4,7 @@
 
 | Historia | Evidencia en rama | Estado |
 |---|---|---|
-| S4-01 | `users.routes.ts`: directorio con total real, edición y protección de último administrador; `CoreModuleView.tsx`: paginación remota y formulario de edición. Suite HTTP: reimportación sin duplicados, edición y cruce A/B. | En verificación CI. |
+| S4-01 | `users.routes.ts`: directorio con total real, edición y protección de último administrador; `CoreModuleView.tsx`: paginación remota y formulario de edición. Suite HTTP: reimportación sin duplicados, edición, cambio de rol con revocación y cruce A/B. | En verificación CI. |
 | S4-02 | `GET/PATCH /users/me` y panel de perfil con teléfono/foto y errores. Suite HTTP: lectura, actualización y aislamiento. | En verificación CI. |
 | S4-03 | `PATCH /school/sites/{id}` con auditoría, UI de edición/estado y contrato OpenAPI; suite HTTP de institución, sedes, año 2027, periodos, secciones y conflictos. | En verificación CI. Los bloqueos de notas y aforo requieren prueba conjunta con Squads 3 y 2. |
 | S4-04 | Aprobación de escala `DUAL_VIGESIMAL` rechazada con `CNEB_D16_PENDING`; escala literal versionada y reemplazo comprobables. UI presenta D-16; edición de membrete y escudo. | En verificación CI. El PDF de Squad 5 y la decisión D-16 siguen pendientes. |
@@ -31,7 +31,7 @@
 | 67 | API de consulta/exportación presente; aceptación de búsquedas/exportaciones pendiente. | S5 |
 | 68 | Documento cifrado, HMAC, restauración y acceso enmascarado probados. | S3–S5 |
 | 72 | Baja/reactivación presentes; protección de último administrador en suite S4. | S4 |
-| 73 | Roles con motivo y revocación presentes; prueba de cambio efectivo pendiente. | S4 |
+| 73 | Roles con motivo y revocación presentes; prueba HTTP de cambio efectivo añadida. | S4 |
 | 75 | Flujo ficticio de CI probado; uso real bloqueado hasta texto institucional aprobado. | S3–S5 |
 | 76 | Avisos presentes; cola/reintentos y aislamiento de eventos quedan en S5/S7. | S5–S7 |
 

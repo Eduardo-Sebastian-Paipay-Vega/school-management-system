@@ -18,6 +18,8 @@ let accessA;
 let accessB;
 let refreshA;
 let smtp;
+let accessDocente;
+let refreshDocente;
 
 async function createInstitution(code) {
   const result = await admin.query(
@@ -140,7 +142,8 @@ test('alta, fallo SMTP, reintento y activación de uso único', async () => {
   const sent = await call(`/users/${userId}/invite`, { method: 'POST', headers: bearer(accessA) });
   assert.equal(sent.status, 200, JSON.stringify(sent.body));
   assert.equal(smtp.messages.length, 1);
-  const match = smtp.messages[0].match(/https?:\/\/[^\s]+/);
+  const decodedMail = smtp.messages[0].replace(/=\n/g, '').replace(/=3D/gi, '=');
+  const match = decodedMail.match(/https?:\/\/[^\s]+/);
   assert.ok(match, 'se capturó el enlace');
   const link = new URL(match[0]);
   const token = link.searchParams.get('token');
@@ -158,6 +161,36 @@ test('alta, fallo SMTP, reintento y activación de uso único', async () => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ codigoModular: a.code, identifier: username, password: PASSWORD }) });
   assert.equal(activeLogin.status, 200, JSON.stringify(activeLogin.body));
+  accessDocente = activeLogin.body.data.accessToken;
+  refreshDocente = activeLogin.headers.get('set-cookie');
+});
+
+test('RBAC denegado se registra en auditoría del tenant', async () => {
+  const denied = await call('/users', { headers: bearer(accessDocente) });
+  assert.equal(denied.status, 403, JSON.stringify(denied.body));
+  assert.equal(denied.body.error.code, 'ACCESS_DENIED');
+  const log = await admin.query(`SELECT tenant_id,accion FROM logs_auditoria
+    WHERE tenant_id=$1 AND usuario_id=(SELECT id FROM usuarios WHERE tenant_id=$1 AND username LIKE 'invite_%')
+      AND accion='ACCESS_DENIED' ORDER BY id DESC LIMIT 1`, [a.tenantId]);
+  assert.equal(log.rows[0]?.tenant_id, a.tenantId);
+});
+
+test('refresh rota token, detecta reuso y revoca la familia', async () => {
+  const original = refreshDocente.split(';')[0];
+  const rotated = await call('/auth/refresh-token', { method: 'POST',
+    headers: { Cookie: original } });
+  assert.equal(rotated.status, 200, JSON.stringify(rotated.body));
+  const nextCookie = rotated.headers.get('set-cookie').split(';')[0];
+  assert.notEqual(nextCookie, original);
+  const reuse = await call('/auth/refresh-token', { method: 'POST',
+    headers: { Cookie: original } });
+  assert.equal(reuse.status, 401, JSON.stringify(reuse.body));
+  const family = await call('/auth/refresh-token', { method: 'POST',
+    headers: { Cookie: nextCookie } });
+  assert.equal(family.status, 401, JSON.stringify(family.body));
+  const audit = await admin.query(`SELECT count(*)::int AS n FROM logs_auditoria
+    WHERE tenant_id=$1 AND accion='REFRESH_REUSE'`, [a.tenantId]);
+  assert.ok(audit.rows[0].n >= 1);
 });
 
 test('rutas reales rechazan ausencia de sesión y tenant discordante', async () => {

@@ -37,8 +37,8 @@ async function main() {
     const run = (...args) => spawnSync(process.execPath,
       ['dist/scripts/backfill-identities.js', ...args],
       { cwd: process.cwd(), env: { ...process.env, DATABASE_URL: url }, encoding: 'utf8' });
-    const preview = run();
-    assert.equal(preview.status, 0, preview.stderr);
+    const invalidPreview = run();
+    assert.notEqual(invalidPreview.status, 0, 'el conteo también debe detectar DNI inválido');
     const invalid = run('--apply');
     assert.notEqual(invalid.status, 0, 'el DNI inválido debe detener el backfill');
     for (const row of seeded) {
@@ -46,6 +46,10 @@ async function main() {
       assert.equal(rolledBack.rows[0].documento_hash, null, 'el lote completo debe revertirse');
     }
     await pool.query('UPDATE usuarios SET dni=$1 WHERE id=$2', ['87654321', seeded[1].userId]);
+    const preview = run();
+    assert.equal(preview.status, 0, preview.stderr);
+    assert.equal(preview.stdout.split('\n').filter((line) => /: 1 identidades por cifrar$/.test(line)).length,
+      2, 'ambos tenants deben figurar en el conteo');
     const applied = run('--apply');
     assert.equal(applied.status, 0, applied.stderr);
     const twice = run('--apply');

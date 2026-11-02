@@ -23,6 +23,7 @@ router.get('/logs', async (req: AuthenticatedRequest, res) => {
     limit: z.coerce.number().int().min(1).max(100).default(50),
     offset: z.coerce.number().int().min(0).default(0),
     modulo: z.string().max(50).optional(),
+    usuarioId: z.string().uuid().optional(),
     desde: z.coerce.date().optional(),
     hasta: z.coerce.date().optional(),
   }).safeParse(req.query);
@@ -30,22 +31,35 @@ router.get('/logs', async (req: AuthenticatedRequest, res) => {
     res.status(400).json({ success: false, error: { code: 'VALIDATION_FAILED', message: 'Filtros inválidos.' }, timestamp: new Date().toISOString() });
     return;
   }
-  const { limit, offset, modulo, desde, hasta } = parsed.data;
+  const { limit, offset, modulo, usuarioId, desde, hasta } = parsed.data;
   try {
     const data = await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
       const result = await client.query(
         `SELECT id, usuario_id, modulo, accion, tabla_afectada, registro_id,
-                ip_origen, user_agent, payload_anterior, payload_nuevo, timestamp_utc
+                ip_origen, user_agent, payload_anterior, payload_nuevo, timestamp_utc,
+                count(*) OVER()::int AS total
            FROM logs_auditoria
           WHERE tenant_id = $1 AND ($2::varchar IS NULL OR modulo = $2)
             AND ($3::timestamptz IS NULL OR timestamp_utc >= $3)
             AND ($4::timestamptz IS NULL OR timestamp_utc <= $4)
-          ORDER BY id DESC LIMIT $5 OFFSET $6`,
-        [req.user!.tenantId, modulo ?? null, desde ?? null, hasta ?? null, limit, offset]
+            AND ($5::uuid IS NULL OR usuario_id = $5)
+          ORDER BY id DESC LIMIT $6 OFFSET $7`,
+        [req.user!.tenantId, modulo ?? null, desde ?? null, hasta ?? null, usuarioId ?? null, limit, offset]
       );
-      return result.rows;
+      const total=result.rows.length ? Number(result.rows[0].total) : Number((await client.query(
+        `SELECT count(*)::int AS total FROM logs_auditoria WHERE tenant_id=$1
+          AND ($2::varchar IS NULL OR modulo=$2)
+          AND ($3::timestamptz IS NULL OR timestamp_utc >= $3)
+          AND ($4::timestamptz IS NULL OR timestamp_utc <= $4)
+          AND ($5::uuid IS NULL OR usuario_id=$5)`,
+        [req.user!.tenantId,modulo??null,desde??null,hasta??null,usuarioId??null])).rows[0].total);
+      await AuditService.record({tenantId:req.user!.tenantId,usuarioId:req.user!.id,
+        accion:'READ_AUDIT_LOGS',entidad:'logs_auditoria',
+        datosNuevos:{modulo,usuarioId,desde:desde?.toISOString(),hasta:hasta?.toISOString(),limit,offset,total},
+        ipOrigen:req.ip},client);
+      return {logs:result.rows.map(({total:ignored,...row})=>{void ignored;return row;}),count:total};
     });
-    res.json({ success: true, data: { logs: data, count: data.length }, timestamp: new Date().toISOString() });
+    res.json({ success: true, data, timestamp: new Date().toISOString() });
   } catch {
     res.status(500).json({ success: false, error: { code: 'AUDIT_UNAVAILABLE', message: 'No se pudo consultar la auditoría.' }, timestamp: new Date().toISOString() });
   }
@@ -68,14 +82,16 @@ router.get('/export.pdf', async (req: AuthenticatedRequest, res) => {
           AND ($2::timestamptz IS NULL OR timestamp_utc >= $2)
           AND ($3::timestamptz IS NULL OR timestamp_utc <= $3)
           AND ($4::varchar IS NULL OR modulo=$4)
-         ORDER BY id DESC LIMIT 2000`,
+         ORDER BY id DESC LIMIT 2001`,
         [req.user!.tenantId,parsed.data.desde??null,parsed.data.hasta??null,parsed.data.modulo??null]);
       await AuditService.record({tenantId:req.user!.tenantId,usuarioId:req.user!.id,
         accion:'EXPORT_AUDIT_PDF',entidad:'logs_auditoria',datosNuevos:{count:result.rows.length,
+          excedeLimite:result.rows.length>2000,
           desde:parsed.data.desde?.toISOString(),hasta:parsed.data.hasta?.toISOString(),modulo:parsed.data.modulo},
         ipOrigen:req.ip},client);
       return result.rows;
     });
+    if(logs.length>2000){res.status(409).json({success:false,error:{code:'AUDIT_EXPORT_LIMIT',message:'La exportación supera 2000 registros; acote el período.'},timestamp:new Date().toISOString()});return;}
     res.setHeader('Content-Type','application/pdf');
     res.setHeader('Content-Disposition','attachment; filename="auditoria-core.pdf"');
     const pdf=new PDFDocument({size:'A4',margin:42});

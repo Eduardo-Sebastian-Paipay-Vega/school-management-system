@@ -37,8 +37,10 @@ export class NotificationService {
        VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id,created_at`,
       [tenantId,userId,input.categoria,input.prioridad ?? 'NORMAL',input.titulo,input.mensaje,input.enlace ?? null]);
     await client.query(`INSERT INTO envios_correo(tenant_id,notificacion_id)
-      SELECT $1,$2 WHERE COALESCE((SELECT por_correo FROM preferencias_notificacion
-        WHERE tenant_id=$1 AND usuario_id=$3 AND categoria=$4),true)`,
+      SELECT $1,$2 FROM usuarios u JOIN personas p ON p.id=u.persona_id AND p.tenant_id=u.tenant_id
+      WHERE u.tenant_id=$1 AND u.id=$3 AND u.email_verificado_en IS NOT NULL AND p.email IS NOT NULL
+        AND COALESCE((SELECT por_correo FROM preferencias_notificacion
+          WHERE tenant_id=$1 AND usuario_id=$3 AND categoria=$4),true)`,
       [tenantId,result.rows[0].id,userId,input.categoria]);
     return result.rows[0];
   }
@@ -52,31 +54,39 @@ export class NotificationService {
     const tenants = await pool.query<{ tenant_id: string }>(
       'SELECT fn_tenants_correo_pendiente() AS tenant_id');
     for (const { tenant_id: tenantId } of tenants.rows) {
-      await withTenant(tenantId,'',async (client) => {
-        const jobs = await client.query<{ id: string; email: string | null; titulo: string; mensaje: string; intentos: number }>(
-          `SELECT e.id,p.email,n.titulo,n.mensaje,e.intentos FROM envios_correo e
+      const jobs = await withTenant(tenantId,'',async (client) => {
+        const claimed = await client.query<{ id: string; email: string | null; titulo: string; mensaje: string; intentos: number }>(
+          `SELECT e.id,CASE WHEN u.email_verificado_en IS NOT NULL
+             AND COALESCE(pref.por_correo,true) THEN p.email ELSE NULL END AS email,
+             n.titulo,n.mensaje,e.intentos FROM envios_correo e
            JOIN notificaciones n ON n.id=e.notificacion_id AND n.tenant_id=e.tenant_id
            JOIN usuarios u ON u.id=n.usuario_id AND u.tenant_id=n.tenant_id
            JOIN personas p ON p.id=u.persona_id AND p.tenant_id=u.tenant_id
+           LEFT JOIN preferencias_notificacion pref ON pref.tenant_id=e.tenant_id
+             AND pref.usuario_id=u.id AND pref.categoria=n.categoria
            WHERE e.tenant_id=$1 AND e.estado='PENDIENTE' AND e.proximo_intento_en<=now()
            ORDER BY e.created_at LIMIT 20 FOR UPDATE OF e SKIP LOCKED`,[tenantId]);
-        for (const job of jobs.rows) {
+        for(const job of claimed.rows)await client.query(`UPDATE envios_correo
+          SET intentos=intentos+1,proximo_intento_en=now()+interval '10 minutes'
+          WHERE id=$1 AND tenant_id=$2`,[job.id,tenantId]);
+        return claimed.rows;
+      });
+      for (const job of jobs) {
           if (!job.email) {
-            await client.query("UPDATE envios_correo SET estado='FALLIDO',ultimo_error='Sin correo' WHERE id=$1",[job.id]);
+            await withTenant(tenantId,'',client=>client.query("UPDATE envios_correo SET estado='FALLIDO',ultimo_error='Correo no verificado o preferencia desactivada' WHERE id=$1 AND tenant_id=$2",[job.id,tenantId]));
             continue;
           }
           try {
             await sendNotificationEmail(job.email,job.titulo,job.mensaje);
-            await client.query("UPDATE envios_correo SET estado='ENVIADO',enviado_en=now(),intentos=intentos+1,ultimo_error=NULL WHERE id=$1",[job.id]);
+            await withTenant(tenantId,'',client=>client.query("UPDATE envios_correo SET estado='ENVIADO',enviado_en=now(),ultimo_error=NULL WHERE id=$1 AND tenant_id=$2",[job.id,tenantId]));
           } catch (cause) {
             const attempts=job.intentos+1;
-            await client.query(`UPDATE envios_correo SET estado=$1,intentos=$2,ultimo_error=$3,
-              proximo_intento_en=now()+($4::int * interval '1 minute') WHERE id=$5`,
-              [attempts>=5?'FALLIDO':'PENDIENTE',attempts,
-                cause instanceof Error?cause.message.slice(0,500):'Error de correo',2**attempts,job.id]);
+            await withTenant(tenantId,'',client=>client.query(`UPDATE envios_correo SET estado=$1,ultimo_error=$2,
+              proximo_intento_en=now()+($3::int * interval '1 minute') WHERE id=$4 AND tenant_id=$5`,
+              [attempts>=5?'FALLIDO':'PENDIENTE',
+                cause instanceof Error?cause.message.slice(0,500):'Error de correo',2**attempts,job.id,tenantId]));
           }
-        }
-      });
+      }
     }
   }
 }

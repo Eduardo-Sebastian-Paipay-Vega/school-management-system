@@ -149,6 +149,7 @@ paths:
     post: { operationId: approveScale, description: 'Requiere fuenteAprobacion documentada por Dirección.', responses: { '200': { $ref: '#/components/responses/Success' } } }
   /guardians/consent:
     get: { operationId: getGuardianConsent, security: [], responses: { '200': { $ref: '#/components/responses/Success' }, '503': { $ref: '#/components/responses/Error' } } }
+    delete: { operationId: revokeGuardianConsent, description: 'Revoca el consentimiento vigente y todas las sesiones del apoderado.', responses: { '200': { $ref: '#/components/responses/Success' } } }
   /guardians/activate:
     post: { operationId: activateGuardian, security: [], description: 'Exige versión vigente del texto y aceptación explícita.', responses: { '200': { $ref: '#/components/responses/Success' } } }
   /guardians/students:

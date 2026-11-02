@@ -1,5 +1,9 @@
 # Operación del Core — Squad 1
 
+## Particiones mensuales de auditoría
+
+Ejecutar `npm run audit:partitions` desde `database/` cada mes con `DATABASE_URL` del propietario de migraciones. El comando crea el mes UTC actual y los 12 siguientes, de forma idempotente. Supervisar su resultado antes de que venza la última partición: una escritura auditada falla cerrada si falta la partición del mes; `sms_app` no puede crearla.
+
 ## Fases
 
 La cuenta pertenece a la persona y al plantel, no al año lectivo. En la Fase 1 se importan personas de la nómina, se crean solo las cuentas necesarias y se envía una invitación de un uso; cada usuario fija su clave. El archivo no lleva contraseñas. En 2027 se configura otro año con periodos y secciones, mientras Squad 2 crea la matrícula anual referida al `persona_id` existente. El Core no crea matrículas ni fija rangos numéricos CNEB sin la aprobación institucional D-16.

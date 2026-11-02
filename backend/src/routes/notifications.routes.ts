@@ -49,6 +49,9 @@ router.put('/preferences/:category',async(req:AuthenticatedRequest,res)=>{
   if(!parsed.success || !/^[A-Z_]{3,40}$/.test(req.params.category)){
     fail(res,400,'VALIDATION_FAILED','Preferencia inválida.');return;
   }
+  if(req.params.category==='SEGURIDAD' && !parsed.data.porCorreo){
+    fail(res,409,'SECURITY_PREFERENCE_REQUIRED','El correo de seguridad es obligatorio.');return;
+  }
   try{
     await withTenant(req.user!.tenantId,req.user!.id,async(client)=>{
       await client.query(`INSERT INTO preferencias_notificacion(tenant_id,usuario_id,categoria,por_correo)

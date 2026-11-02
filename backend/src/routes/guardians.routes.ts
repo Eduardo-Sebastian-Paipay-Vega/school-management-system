@@ -21,6 +21,16 @@ function consentDocument() {
   return version && version.length <= 20 && text && text.length >= 100 ? { version, text } : null;
 }
 
+// La ficha de matrícula verificadora todavía pertenece al contrato pendiente
+// con Squad 2. Un texto libre no prueba parentesco en datos reales.
+function guardianVerificationAvailable() {
+  return process.env.NODE_ENV === 'test' && process.env.GUARDIAN_TEST_LINK_VERIFICATION === '1';
+}
+function verificationUnavailable(res: import('express').Response) {
+  fail(res, 503, 'GUARDIAN_VERIFICATION_UNAVAILABLE',
+    'La verificación institucional del vínculo aún no está disponible.');
+}
+
 router.get('/consent', (_req, res) => {
   const document = consentDocument();
   if (!document) { fail(res, 503, 'CONSENT_NOT_CONFIGURED', 'El consentimiento oficial aún no está disponible.'); return; }
@@ -28,6 +38,7 @@ router.get('/consent', (_req, res) => {
 });
 
 router.post('/activate', async (req, res) => {
+  if (!guardianVerificationAvailable()) { verificationUnavailable(res); return; }
   const document = consentDocument();
   if (!document) { fail(res, 503, 'CONSENT_NOT_CONFIGURED', 'El consentimiento oficial aún no está disponible.'); return; }
   const parsed = z.object({ codigoModular: z.string().min(1).max(10), token: z.string().min(32),
@@ -92,7 +103,32 @@ router.post('/activate', async (req, res) => {
 
 router.use(authenticateJwt);
 
+router.delete('/consent', requireRoles(['APODERADO']), async (req: AuthenticatedRequest, res) => {
+  try {
+    const changed = await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
+      const person = await client.query<{ persona_id: string }>(
+        'SELECT persona_id FROM usuarios WHERE id=$1 AND tenant_id=$2', [req.user!.id,req.user!.tenantId]);
+      if (!person.rowCount) return false;
+      const revoked = await client.query(`UPDATE consentimientos_datos SET revocado_en=now()
+        WHERE tenant_id=$1 AND persona_id=$2 AND revocado_en IS NULL RETURNING id`,
+        [req.user!.tenantId,person.rows[0].persona_id]);
+      if (!revoked.rowCount) return false;
+      await client.query('UPDATE usuarios SET auth_version=auth_version+1 WHERE id=$1', [req.user!.id]);
+      await client.query(`UPDATE sesiones_usuario SET revocada_en=now()
+        WHERE tenant_id=$1 AND usuario_id=$2 AND revocada_en IS NULL`,
+        [req.user!.tenantId,req.user!.id]);
+      await AuditService.record({ tenantId:req.user!.tenantId,usuarioId:req.user!.id,
+        accion:'REVOKE_GUARDIAN_CONSENT',entidad:'consentimientos_datos',
+        entidadId:person.rows[0].persona_id,ipOrigen:req.ip },client);
+      return true;
+    });
+    if (!changed) { fail(res,404,'CONSENT_NOT_FOUND','No hay consentimiento vigente.'); return; }
+    ok(res,{message:'Consentimiento revocado. La sesión ha terminado.'});
+  } catch { fail(res,500,'CONSENT_REVOKE_FAILED','No se pudo revocar el consentimiento.'); }
+});
+
 router.get('/students', requireRoles(['APODERADO']), async (req: AuthenticatedRequest, res) => {
+  if (!guardianVerificationAvailable()) { verificationUnavailable(res); return; }
   const document = consentDocument();
   if (!document) { fail(res, 503, 'CONSENT_NOT_CONFIGURED', 'El consentimiento oficial no está disponible.'); return; }
   try {
@@ -125,6 +161,7 @@ router.get('/links', requirePermission('guardians:manage'), async (req: Authenti
 });
 
 router.post('/links', requirePermission('guardians:manage'), async (req: AuthenticatedRequest, res) => {
+  if (!guardianVerificationAvailable()) { verificationUnavailable(res); return; }
   const parsed = z.object({ guardianId: z.string().uuid(), studentId: z.string().uuid(),
     parentesco: z.enum(['PADRE','MADRE','TUTOR_LEGAL']),
     verificacion: z.string().min(5).max(500) }).safeParse(req.body);
@@ -153,6 +190,7 @@ router.post('/links', requirePermission('guardians:manage'), async (req: Authent
 });
 
 router.post('/invitations', requirePermission('guardians:manage'), async (req: AuthenticatedRequest, res) => {
+  if (!guardianVerificationAvailable()) { verificationUnavailable(res); return; }
   if (!consentDocument()) {
     fail(res, 503, 'CONSENT_NOT_CONFIGURED', 'Configure el consentimiento oficial antes de invitar.'); return;
   }

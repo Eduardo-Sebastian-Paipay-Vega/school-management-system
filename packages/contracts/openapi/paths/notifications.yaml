@@ -8,4 +8,4 @@
   get: { operationId: listNotificationPreferences, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
 /notifications/preferences/{category}:
   parameters: [{ $ref: '../components/parameters.yaml#/Category' }]
-  put: { operationId: setNotificationPreference, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  put: { operationId: setNotificationPreference, description: 'SEGURIDAD siempre conserva el correo.', responses: { '200': { $ref: '../components/responses.yaml#/Success' }, '409': { $ref: '../components/responses.yaml#/Error' } } }

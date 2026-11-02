@@ -17,13 +17,19 @@ export function attachRealtime(server: Server): void {
       const user=await AuthService.validateAccess(AuthService.accessClaims(protocols[1]),false);
       if(!user){socket.destroy();return;}
       wss.handleUpgrade(request,socket,head,(ws)=>{
-        const unsubscribe=NotificationService.subscribe(user.tenantId,user.id,(event)=>{
-          if(ws.readyState===ws.OPEN) ws.send(JSON.stringify(event));
+        const token=protocols[1];
+        const unsubscribe=NotificationService.subscribe(user.tenantId,user.id,async(event)=>{
+          if(ws.readyState!==ws.OPEN)return;
+          try{
+            const current=await AuthService.validateAccess(AuthService.accessClaims(token),false);
+            if(!current){ws.close(1008,'Sesión vencida');return;}
+            if(ws.readyState===ws.OPEN)ws.send(JSON.stringify(event));
+          }catch{ws.close(1011,'Autenticación no disponible');}
         });
         ws.on('close',unsubscribe);
         ws.on('error',unsubscribe);
         const recheck=setInterval(async()=>{
-          try{if(!await AuthService.validateAccess(AuthService.accessClaims(protocols[1]),false)) ws.close(1008,'Sesión vencida');}
+          try{if(!await AuthService.validateAccess(AuthService.accessClaims(token),false)) ws.close(1008,'Sesión vencida');}
           catch{ws.close(1011,'Autenticación no disponible');}
         },60_000);
         ws.on('close',()=>clearInterval(recheck));

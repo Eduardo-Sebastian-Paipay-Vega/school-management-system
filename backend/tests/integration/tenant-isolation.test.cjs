@@ -35,6 +35,9 @@ let accessDocente;
 let refreshDocente;
 let invitedUsername;
 let invitedUserId;
+let guardianAccess;
+let guardianPersonId;
+let studentPersonId;
 
 async function createInstitution(code) {
   const result = await admin.query(
@@ -92,6 +95,7 @@ before(async () => {
   process.env.PUBLIC_APP_URL = 'http://localhost:3000';
   process.env.SMTP_TEST_PLAINTEXT = '1';
   process.env.GUARDIAN_CONSENT_VERSION = 'ci-ficticio-1';
+  process.env.GUARDIAN_TEST_LINK_VERIFICATION = '1';
   process.env.GUARDIAN_CONSENT_TEXT = 'Texto ficticio exclusivo de CI para probar la aceptación explícita del vínculo familiar. ' +
     'No representa un consentimiento institucional ni habilita datos de personas reales.';
   const { createApp } = require('../../dist/app');
@@ -131,6 +135,51 @@ test('login de cada tenant emite una sesión propia', async () => {
       refreshA = result.headers.get('set-cookie');
     } else accessB = result.body.data.accessToken;
   }
+});
+
+test('S5: avisos A/B, correo verificado, preferencia obligatoria y reintento SMTP', async () => {
+  const json = { 'Content-Type': 'application/json' };
+  const reject = await call('/notifications/preferences/SEGURIDAD', { method:'PUT',
+    headers:bearer(accessA,json),body:JSON.stringify({porCorreo:false}) });
+  assert.equal(reject.status,409,JSON.stringify(reject.body));
+  assert.equal(reject.body.error.code,'SECURITY_PREFERENCE_REQUIRED');
+  const send=(token,userId,categoria,titulo)=>call('/notifications',{method:'POST',
+    headers:bearer(token,json),body:JSON.stringify({userId,categoria,titulo,mensaje:'Aviso ficticio de CI'})});
+  const unverified=await send(accessA,a.userId,'SEGURIDAD','Solo bandeja sin verificar');
+  assert.equal(unverified.status,201,JSON.stringify(unverified.body));
+  const noVerifiedEmail=await admin.query('SELECT id FROM envios_correo WHERE notificacion_id=$1',
+    [unverified.body.data.id]);
+  assert.equal(noVerifiedEmail.rowCount,0);
+  await admin.query('UPDATE usuarios SET email_verificado_en=now() WHERE id=$1',[a.userId]);
+  const security=await send(accessA,a.userId,'SEGURIDAD','Seguridad ficticia A');
+  assert.equal(security.status,201,JSON.stringify(security.body));
+  const cross=await send(accessB,a.userId,'SEGURIDAD','Cruce B');
+  assert.equal(cross.status,409,JSON.stringify(cross.body));
+  const inboxB=await call('/notifications',{headers:bearer(accessB)});
+  assert.equal(inboxB.status,200);
+  assert.ok(!JSON.stringify(inboxB.body.data).includes('Seguridad ficticia A'));
+  const pending=await admin.query(`SELECT id FROM envios_correo WHERE tenant_id=$1
+    AND notificacion_id=$2`,[a.tenantId,security.body.data.id]);
+  assert.equal(pending.rowCount,1);
+  const {NotificationService}=require('../../dist/services/notifications.service');
+  smtp.rejectOnce();
+  await NotificationService.processEmailQueue();
+  const failed=await admin.query('SELECT estado,intentos FROM envios_correo WHERE id=$1',[pending.rows[0].id]);
+  assert.equal(failed.rows[0].estado,'PENDIENTE');
+  assert.equal(failed.rows[0].intentos,1);
+  await admin.query("UPDATE envios_correo SET proximo_intento_en=now()-interval '1 second' WHERE id=$1",[pending.rows[0].id]);
+  await NotificationService.processEmailQueue();
+  const sent=await admin.query('SELECT estado,intentos FROM envios_correo WHERE id=$1',[pending.rows[0].id]);
+  assert.equal(sent.rows[0].estado,'ENVIADO');
+  assert.equal(sent.rows[0].intentos,2);
+  assert.ok(smtp.messages.some(message=>message.includes('Seguridad ficticia A')));
+  const optional=await call('/notifications/preferences/RECORDATORIO',{method:'PUT',
+    headers:bearer(accessA,json),body:JSON.stringify({porCorreo:false})});
+  assert.equal(optional.status,200,JSON.stringify(optional.body));
+  const noEmail=await send(accessA,a.userId,'RECORDATORIO','Solo bandeja A');
+  assert.equal(noEmail.status,201,JSON.stringify(noEmail.body));
+  const skipped=await admin.query('SELECT id FROM envios_correo WHERE notificacion_id=$1',[noEmail.body.data.id]);
+  assert.equal(skipped.rowCount,0);
 });
 
 test('alta, fallo SMTP, reintento y activación de uso único', async () => {
@@ -297,7 +346,17 @@ test('apoderado ficticio requiere vínculo, invitación y consentimiento en su t
       nombres: 'Escolar', apellidoPaterno: 'Ficticio' }) });
   assert.equal(student.status, 201, JSON.stringify(student.body));
   const guardianId = guardian.body.data.personId;
+  guardianPersonId = guardianId;
   const studentId = student.body.data.personId;
+  studentPersonId = studentId;
+  process.env.GUARDIAN_TEST_LINK_VERIFICATION = '0';
+  const unavailable = await call('/guardians/links', { method: 'POST',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ guardianId, studentId, parentesco: 'MADRE',
+      verificacion: 'Texto libre sin ficha' }) });
+  assert.equal(unavailable.status, 503, JSON.stringify(unavailable.body));
+  assert.equal(unavailable.body.error.code, 'GUARDIAN_VERIFICATION_UNAVAILABLE');
+  process.env.GUARDIAN_TEST_LINK_VERIFICATION = '1';
   const foreign = await call('/guardians/links', { method: 'POST',
     headers: bearer(accessB, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ guardianId, studentId, parentesco: 'MADRE',
@@ -342,11 +401,37 @@ test('apoderado ficticio requiere vínculo, invitación y consentimiento en su t
     body: JSON.stringify({ codigoModular: a.code,
       identifier: account.rows[0].username, password: PASSWORD }) });
   assert.equal(login.status, 200, JSON.stringify(login.body));
+  guardianAccess = login.body.data.accessToken;
   const students = await call('/guardians/students', {
     headers: bearer(login.body.data.accessToken) });
   assert.equal(students.status, 200, JSON.stringify(students.body));
   assertContract('/guardians/students', 'get', students);
   assert.ok(students.body.data.some((row) => row.id === studentId));
+});
+
+test('S5: revocar consentimiento y desvincular corta acceso del apoderado', async () => {
+  const revoked = await call('/guardians/consent', { method: 'DELETE',
+    headers: bearer(guardianAccess) });
+  assert.equal(revoked.status, 200, JSON.stringify(revoked.body));
+  assertContract('/guardians/consent', 'delete', revoked);
+  const stale = await call('/guardians/students', { headers: bearer(guardianAccess) });
+  assert.equal(stale.status, 401, JSON.stringify(stale.body));
+  const guardianUser = await admin.query('SELECT username FROM usuarios WHERE persona_id=$1', [guardianPersonId]);
+  const relogin = await call('/auth/login', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+      codigoModular: a.code, identifier: guardianUser.rows[0].username, password: PASSWORD }) });
+  assert.equal(relogin.status, 200, JSON.stringify(relogin.body));
+  const noConsent = await call('/guardians/students', { headers: bearer(relogin.body.data.accessToken) });
+  assert.equal(noConsent.status, 200, JSON.stringify(noConsent.body));
+  assert.deepEqual(noConsent.body.data, []);
+  const foreign = await call(`/guardians/links/${guardianPersonId}/${studentPersonId}`, {
+    method: 'DELETE', headers: bearer(accessB) });
+  assert.equal(foreign.status, 404, JSON.stringify(foreign.body));
+  const unlinked = await call(`/guardians/links/${guardianPersonId}/${studentPersonId}`, {
+    method: 'DELETE', headers: bearer(accessA) });
+  assert.equal(unlinked.status, 200, JSON.stringify(unlinked.body));
+  const invalidated = await call('/guardians/students', { headers: bearer(relogin.body.data.accessToken) });
+  assert.equal(invalidated.status, 401, JSON.stringify(invalidated.body));
 });
 
 test('rutas reales rechazan ausencia de sesión y tenant discordante', async () => {
@@ -413,6 +498,17 @@ test('rutas de usuarios y auditoría no muestran datos de otro tenant', async ()
   assert.equal(logs.status, 200, JSON.stringify(logs.body));
   assertContract('/audit/logs', 'get', logs);
   assert.ok(!JSON.stringify(logs.body.data).includes(b.userId));
+  const page = await call('/audit/logs?limit=1', { headers: bearer(accessA) });
+  assert.equal(page.status,200,JSON.stringify(page.body));
+  assert.equal(page.body.data.logs.length,1);
+  assert.ok(page.body.data.count>=page.body.data.logs.length);
+  const noForeignUser = await call(`/audit/logs?usuarioId=${b.userId}`,
+    { headers: bearer(accessA) });
+  assert.equal(noForeignUser.status,200,JSON.stringify(noForeignUser.body));
+  assert.equal(noForeignUser.body.data.count,0);
+  const auditRead=await admin.query(`SELECT count(*)::int AS n FROM logs_auditoria
+    WHERE tenant_id=$1 AND accion='READ_AUDIT_LOGS'`,[a.tenantId]);
+  assert.ok(auditRead.rows[0].n>=3);
   const chain = await call('/audit/verify-chain', { headers: bearer(accessA) });
   assert.equal(chain.status, 200, JSON.stringify(chain.body));
   assertContract('/audit/verify-chain', 'get', chain);
@@ -530,7 +626,18 @@ test('S4: directorio paginado, perfil propio y último administrador protegido',
   assert.equal(edited.status, 200, JSON.stringify(edited.body));
   const found = await call('/users?search=Invitada%20Editada', { headers: bearer(accessA) });
   assert.equal(found.body.data.count, 1);
-  assert.equal(found.body.data.users[0].telefono, '999222333');
+  assert.equal(found.body.data.users[0].telefono_enmascarado, '***2333');
+  assert.ok(!JSON.stringify(found.body.data).includes('999222333'));
+  const storedPhone = await admin.query(`SELECT p.telefono FROM usuarios u
+    JOIN personas p ON p.id=u.persona_id WHERE u.id=$1`, [invitedUserId]);
+  assert.equal(storedPhone.rows[0].telefono, '999222333');
+  const nameOnly = await call(`/users/${invitedUserId}`, { method: 'PATCH',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ nombres: 'Invitada Final' }) });
+  assert.equal(nameOnly.status, 200, JSON.stringify(nameOnly.body));
+  const unchangedPhone = await admin.query(`SELECT p.telefono FROM usuarios u
+    JOIN personas p ON p.id=u.persona_id WHERE u.id=$1`, [invitedUserId]);
+  assert.equal(unchangedPhone.rows[0].telefono, '999222333');
   const foreignEdit = await call(`/users/${invitedUserId}`, { method: 'PATCH',
     headers: bearer(accessB, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ nombres: 'Acceso ajeno' }) });

@@ -10,7 +10,7 @@ import { Button } from 'primereact/button';
 import { useCoreSession } from './SessionProvider';
 
 type DirectoryUser={id:string;username:string;estado:string;nombres:string;apellido_paterno:string;
-  apellido_materno:string|null;email:string|null;telefono:string|null;documento_ultimos4:string|null;roles:string[]};
+  apellido_materno:string|null;email:string|null;telefono_enmascarado:string|null;documento_ultimos4:string|null;roles:string[]};
 type Year={id:string;anio:number;fecha_inicio:string;fecha_fin:string;activo:boolean};
 type Institution={id:string;codigo_modular:string;nombre:string;direccion:string|null;telefono:string|null;
   membrete_texto:string|null;escudo_url:string|null};
@@ -64,7 +64,7 @@ function UsersPanel(){
   const [target,setTarget]=useState<DirectoryUser|null>(null);
   const [editTarget,setEditTarget]=useState<DirectoryUser|null>(null);
   const [editName,setEditName]=useState('');const [editLastName,setEditLastName]=useState('');
-  const [editPhone,setEditPhone]=useState('');
+  const [editPhone,setEditPhone]=useState('');const [editPhoneTouched,setEditPhoneTouched]=useState(false);
   const [selectedRoles,setSelectedRoles]=useState<string[]>([]);
   const [roleReason,setRoleReason]=useState('');
   async function createUser(){
@@ -92,7 +92,8 @@ function UsersPanel(){
     if(!editTarget)return;
     setAction('edit');setMessage('');
     try{await request(`/users/${editTarget.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({nombres:editName.trim(),apellidoPaterno:editLastName.trim(),telefono:editPhone})});
+      body:JSON.stringify({nombres:editName.trim(),apellidoPaterno:editLastName.trim(),
+        ...(editPhoneTouched?{telefono:editPhone}:{})})});
       setEditTarget(null);setMessage('Usuario actualizado.');await reload();}
     catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo actualizar el usuario.');}
     finally{setAction('');}
@@ -135,7 +136,7 @@ function UsersPanel(){
       <Column header="Acciones" body={(row:DirectoryUser)=><div className="flex gap-1">
         {user.permissions.includes('users:manage')&&<Button label="Editar" text size="small" onClick={()=>{
           setEditTarget(row);setEditName(row.nombres);setEditLastName(row.apellido_paterno);
-          setEditPhone(row.telefono??'');}}/>}
+          setEditPhone('');setEditPhoneTouched(false);}}/>}
         {user.permissions.includes('users:assign-roles')&&row.estado==='ACTIVO'&&
           <Button label="Roles" text size="small" onClick={()=>{
             setTarget(row);setSelectedRoles(row.roles);setRoleReason('');}}/>}
@@ -154,7 +155,11 @@ function UsersPanel(){
         <label htmlFor="edit-last-name" className="text-sm">Apellido paterno</label>
         <InputText id="edit-last-name" value={editLastName} onChange={event=>setEditLastName(event.target.value)} maxLength={100}/>
         <label htmlFor="edit-phone" className="text-sm">Teléfono</label>
-        <InputText id="edit-phone" value={editPhone} onChange={event=>setEditPhone(event.target.value)} maxLength={20}/>
+        <div><InputText id="edit-phone" value={editPhone} onChange={event=>{
+          setEditPhone(event.target.value);setEditPhoneTouched(true);}} maxLength={20}
+          placeholder="Dejar sin cambios"/>
+          {editTarget.telefono_enmascarado&&<p className="mt-1 text-xs text-gray-600">
+            Actual: {editTarget.telefono_enmascarado}</p>}</div>
       </div>
       <div className="mt-3 flex gap-2"><Button label="Guardar" disabled={!!action||!editName.trim()||!editLastName.trim()}
         onClick={()=>void saveUser()}/><Button label="Cancelar" outlined onClick={()=>setEditTarget(null)}/></div>
@@ -431,7 +436,7 @@ function NoticesPanel(){
   async function send(){
     setMessage('');try{await request('/notifications',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({userId:recipient,categoria:category,titulo:title,mensaje:body})});
-      setMessage('Aviso creado y puesto en cola de correo.');setTitle('');setBody('');}
+      setMessage('Aviso creado. El correo se enviará si el destinatario lo tiene verificado y habilitado.');setTitle('');setBody('');}
     catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo enviar.');}
   }
   const categories=['SEGURIDAD','RECORDATORIO','ASISTENCIA','NOTAS','TRAMITES','CITAS'];
@@ -442,9 +447,10 @@ function NoticesPanel(){
         <p className="text-xs text-gray-500">{n.categoria} · {new Date(n.created_at).toLocaleString('es-PE')}</p></div>
       {!n.leida_en&&<Button label="Marcar leída" text size="small" onClick={()=>void mark(n.id)}/>}</li>)}</ul>
     <section className="mt-5 rounded-xl border p-4"><h3 className="font-bold">Correo por categoría</h3>
-      <p className="text-xs text-gray-600">Los avisos permanecen en la bandeja aunque desactive el correo.</p>
+      <p className="text-xs text-gray-600">Los avisos permanecen en la bandeja aunque desactive el correo. El correo de seguridad es obligatorio.</p>
       <div className="mt-3 flex flex-wrap gap-4">{categories.map(c=><label key={c} className="flex gap-2 text-sm">
-        <input type="checkbox" checked={preferences?.find(p=>p.categoria===c)?.por_correo??true}
+        <input type="checkbox" checked={c==='SEGURIDAD'||(preferences?.find(p=>p.categoria===c)?.por_correo??true)}
+          disabled={c==='SEGURIDAD'}
           onChange={e=>void request(`/notifications/preferences/${c}`,{method:'PUT',
             headers:{'Content-Type':'application/json'},body:JSON.stringify({porCorreo:e.target.checked})})
             .then(()=>reloadPreferences()).catch(cause=>setMessage(String(cause)))}/>{c}</label>)}</div>

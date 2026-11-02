@@ -1,14 +1,15 @@
 /audit/logs:
-  get: { operationId: listAuditLogs, description: 'Permiso audit:read.', responses: { '200': { $ref: '../components/responses.yaml#/AuditLogs' } } }
+  get: { operationId: listAuditLogs, description: 'Permiso audit:read. Acepta modulo, usuarioId, desde, hasta, limit y offset; count es el total filtrado.', responses: { '200': { $ref: '../components/responses.yaml#/AuditLogs' } } }
 /audit/verify-chain:
   get: { operationId: verifyAuditChain, description: 'Permiso audit:read.', responses: { '200': { $ref: '../components/responses.yaml#/AuditChain' } } }
 /audit/export.pdf:
   get:
     operationId: exportAuditPdf
-    description: Permiso audit:export; hasta 2000 registros.
+    description: Permiso audit:export; responde 409 si el filtro supera 2000 registros.
     responses:
       '200':
         description: Archivo PDF
         content:
           application/pdf:
             schema: { type: string, format: binary }
+      '409': { $ref: '../components/responses.yaml#/Error' }

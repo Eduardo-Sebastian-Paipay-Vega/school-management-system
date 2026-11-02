@@ -108,7 +108,8 @@
     "approveScale"
   ],
   "/guardians/consent": [
-    "getGuardianConsent"
+    "getGuardianConsent",
+    "revokeGuardianConsent"
   ],
   "/guardians/activate": [
     "activateGuardian"

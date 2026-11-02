@@ -8,7 +8,7 @@ const refs = [...spec.matchAll(/^  (\/[^:]+):\r?\n    \$ref: '\.\/paths\/([^']+)
 const actualPaths = refs.map(match => match[1]);
 const expectedPaths = Object.keys(inventory);
 if (JSON.stringify(actualPaths) !== JSON.stringify(expectedPaths)) {
-  throw new Error('El inventario de rutas difiere de la línea base de 46 paths.');
+  throw new Error('El inventario de rutas difiere de la línea base versionada.');
 }
 const operations = [];
 for (const group of new Set(refs.map(match => match[2].split('.yaml')[0]))) {
@@ -18,6 +18,6 @@ for (const group of new Set(refs.map(match => match[2].split('.yaml')[0]))) {
 const expected = Object.values(inventory).flat();
 if (operations.length !== expected.length ||
     JSON.stringify([...operations].sort()) !== JSON.stringify([...expected].sort())) {
-  throw new Error('El inventario de operationId difiere de la línea base de 57 operaciones.');
+  throw new Error('El inventario de operationId difiere de la línea base versionada.');
 }
 console.log(`${actualPaths.length} paths y ${operations.length} operaciones preservados.`);

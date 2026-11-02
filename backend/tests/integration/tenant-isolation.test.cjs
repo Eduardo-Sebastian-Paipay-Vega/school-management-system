@@ -419,18 +419,6 @@ test('rutas de usuarios y auditoría no muestran datos de otro tenant', async ()
   assert.equal(chain.body.data.valid, true);
 });
 
-test('intentos de acceso tienen límite por tenant sin enumerar cuentas', async () => {
-  for (let attempt = 1; attempt <= 6; attempt += 1) {
-    const result = await call('/auth/login', { method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ codigoModular: a.code,
-        identifier: 'cuenta-inexistente', password: PASSWORD }) });
-    assert.equal(result.status, attempt <= 5 ? 401 : 429);
-    assert.equal(result.body.error.code, attempt <= 5 ? 'UNAUTHENTICATED' : 'RATE_LIMITED');
-    assert.ok(!JSON.stringify(result.body).includes('cuenta-inexistente'));
-  }
-});
-
 test('sms_runtime aplica RLS, falla sin contexto y limpia el contexto del pool', async () => {
   const role = await runtime.pool.query(
     `SELECT r.rolbypassrls, r.rolsuper,
@@ -464,6 +452,214 @@ test('sms_runtime aplica RLS, falla sin contexto y limpia el contexto del pool',
     }
   } finally {
     client.release();
+  }
+});
+
+test('S4: reimportar la misma identidad no duplica persona ni cuenta', async () => {
+  const suffix = Date.now().toString().slice(-8);
+  const row = { tipoDocumento: 'DNI', documento: suffix, nombres: 'Importada',
+    apellidoPaterno: 'Ficticia', email: `import-${suffix}@example.invalid`,
+    username: `import_${suffix}`, rol: 'DOCENTE' };
+  const commit = () => call('/users/import/commit', { method: 'POST',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ rows: [row] }) });
+  const first = await commit();
+  const second = await commit();
+  assert.equal(first.status, 200, JSON.stringify(first.body));
+  assert.equal(second.status, 200, JSON.stringify(second.body));
+  assert.equal(first.body.data.nuevos, 1);
+  assert.equal(second.body.data.sinCambios, 1);
+  assert.equal(first.body.data.registros[0].personId, second.body.data.registros[0].personId);
+  assert.equal(first.body.data.registros[0].userId, second.body.data.registros[0].userId);
+  const count = await admin.query(`SELECT count(*)::int AS n FROM personas
+    WHERE tenant_id=$1 AND documento_hash=$2`, [a.tenantId, documentHash(suffix)]);
+  assert.equal(count.rows[0].n, 1);
+  const state = await admin.query('SELECT estado FROM usuarios WHERE id=$1', [first.body.data.registros[0].userId]);
+  assert.equal(state.rows[0].estado, 'PENDIENTE_CAMBIO_CLAVE');
+});
+
+test('S4: reasignar roles con motivo revoca sesión y no cruza tenants', async () => {
+  // La prueba tiene su propio presupuesto de intentos; Redis es exclusivo de CI.
+  await redisClient.flushDb();
+  const signIn = () => call('/auth/login', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+      codigoModular: a.code, identifier: invitedUsername, password: 'NuevaClave2026' }) });
+  const old = await signIn();
+  assert.equal(old.status, 200, JSON.stringify(old.body));
+  const foreign = await call(`/users/${invitedUserId}/roles`, { method: 'PUT',
+    headers: bearer(accessB, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ roles: ['SECRETARIA'], motivo: 'Prueba de cambio de rol' }) });
+  assert.equal(foreign.status, 404, JSON.stringify(foreign.body));
+  const changed = await call(`/users/${invitedUserId}/roles`, { method: 'PUT',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ roles: ['SECRETARIA'], motivo: 'Prueba de cambio de rol' }) });
+  assert.equal(changed.status, 200, JSON.stringify(changed.body));
+  const stale = await call('/users/me', { headers: bearer(old.body.data.accessToken) });
+  assert.equal(stale.status, 401, JSON.stringify(stale.body));
+  const fresh = await signIn();
+  assert.equal(fresh.status, 200, JSON.stringify(fresh.body));
+  assert.deepEqual(fresh.body.data.user.roles, ['SECRETARIA']);
+  const audit = await admin.query(`SELECT count(*)::int AS n FROM logs_auditoria
+    WHERE tenant_id=$1 AND accion='CHANGE_ROLES' AND usuario_id=$2`, [a.tenantId, a.userId]);
+  assert.ok(audit.rows[0].n >= 1);
+});
+
+test('S4: directorio paginado, perfil propio y último administrador protegido', async () => {
+  const page = await call('/users?limit=1&offset=0', { headers: bearer(accessA) });
+  assert.equal(page.status, 200, JSON.stringify(page.body));
+  assert.equal(page.body.data.users.length, 1);
+  assert.ok(page.body.data.count >= 2, 'el total no debe ser el tamaño de la página');
+  assert.ok(!JSON.stringify(page.body.data).includes(`admin_${b.code}`));
+
+  const profile = await call('/users/me', { headers: bearer(accessA) });
+  assert.equal(profile.status, 200, JSON.stringify(profile.body));
+  assertContract('/users/me', 'get', profile);
+  assert.equal(profile.body.data.username, `admin_${a.code}`);
+  const updated = await call('/users/me', { method: 'PATCH',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ telefono: '999000111' }) });
+  assert.equal(updated.status, 200, JSON.stringify(updated.body));
+  const refreshed = await call('/users/me', { headers: bearer(accessA) });
+  assert.equal(refreshed.body.data.telefono, '999000111');
+  const other = await call('/users/me', { headers: bearer(accessB) });
+  assert.notEqual(other.body.data.telefono, '999000111');
+
+  const edited = await call(`/users/${invitedUserId}`, { method: 'PATCH',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ nombres: 'Invitada Editada', telefono: '999222333' }) });
+  assert.equal(edited.status, 200, JSON.stringify(edited.body));
+  const found = await call('/users?search=Invitada%20Editada', { headers: bearer(accessA) });
+  assert.equal(found.body.data.count, 1);
+  assert.equal(found.body.data.users[0].telefono, '999222333');
+  const foreignEdit = await call(`/users/${invitedUserId}`, { method: 'PATCH',
+    headers: bearer(accessB, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ nombres: 'Acceso ajeno' }) });
+  assert.equal(foreignEdit.status, 404, JSON.stringify(foreignEdit.body));
+
+  const self = await call(`/users/${a.userId}/deactivate`, { method: 'POST',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ motivo: 'Prueba de último administrador' }) });
+  assert.equal(self.status, 409, JSON.stringify(self.body));
+  const demote = await call(`/users/${a.userId}/roles`, { method: 'PUT',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ roles: ['DOCENTE'], motivo: 'Prueba de último administrador' }) });
+  assert.equal(demote.status, 409, JSON.stringify(demote.body));
+});
+
+test('S4: año nuevo conserva cuentas, configuración aislada y D-16 bloquea escala numérica', async () => {
+  const json = { 'Content-Type': 'application/json' };
+  const institution = await call('/school/institution', { method: 'PATCH',
+    headers: bearer(accessA, json), body: JSON.stringify({ membreteTexto: 'Plantel ficticio A',
+      escudoUrl: 'https://example.invalid/escudo-a.png' }) });
+  assert.equal(institution.status, 200, JSON.stringify(institution.body));
+  const ownInstitution = await call('/school/institution', { headers: bearer(accessA) });
+  const foreignInstitution = await call('/school/institution', { headers: bearer(accessB) });
+  assert.equal(ownInstitution.body.data.membrete_texto, 'Plantel ficticio A');
+  assert.notEqual(foreignInstitution.body.data.membrete_texto, 'Plantel ficticio A');
+
+  const site = await call('/school/sites', { method: 'POST', headers: bearer(accessA, json),
+    body: JSON.stringify({ nombre: 'Sede ficticia A' }) });
+  assert.equal(site.status, 201, JSON.stringify(site.body));
+  const siteId = site.body.data.id;
+  const changedSite = await call(`/school/sites/${siteId}`, { method: 'PATCH',
+    headers: bearer(accessA, json), body: JSON.stringify({ nombre: 'Sede A actualizada', activo: false }) });
+  assert.equal(changedSite.status, 200, JSON.stringify(changedSite.body));
+  assert.equal(changedSite.body.data.activo, false);
+  const beforeForeignAudit = await admin.query(`SELECT count(*)::int AS n FROM logs_auditoria
+    WHERE tenant_id=$1 AND accion='UPDATE_SITE'`, [b.tenantId]);
+  const foreignSite = await call(`/school/sites/${siteId}`, { method: 'PATCH',
+    headers: bearer(accessB, json), body: JSON.stringify({ activo: true }) });
+  assert.equal(foreignSite.status, 404, JSON.stringify(foreignSite.body));
+  assertContract('/school/sites/{id}', 'patch', foreignSite);
+  const afterForeignAudit = await admin.query(`SELECT count(*)::int AS n FROM logs_auditoria
+    WHERE tenant_id=$1 AND accion='UPDATE_SITE'`, [b.tenantId]);
+  assert.equal(afterForeignAudit.rows[0].n, beforeForeignAudit.rows[0].n);
+
+  const createYear = (token) => call('/school/years', { method: 'POST',
+    headers: bearer(token, json), body: JSON.stringify({ anio: 2027,
+      fechaInicio: '2027-03-01', fechaFin: '2027-12-15' }) });
+  const yearA = await createYear(accessA);
+  const yearB = await createYear(accessB);
+  assert.equal(yearA.status, 201, JSON.stringify(yearA.body));
+  assert.equal(yearB.status, 201, JSON.stringify(yearB.body));
+  const yearId = yearA.body.data.id;
+  assert.notEqual(yearId, yearB.body.data.id);
+
+  const period = await call(`/school/years/${yearId}/periods`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ tipo: 'BIMESTRE', numero: 1,
+      fechaInicio: '2027-03-01', fechaFin: '2027-05-01', fechaLimiteNotas: '2027-05-05T00:00:00.000Z' }) });
+  assert.equal(period.status, 201, JSON.stringify(period.body));
+  const duplicatePeriod = await call(`/school/years/${yearId}/periods`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ tipo: 'BIMESTRE', numero: 2,
+      fechaInicio: '2027-04-01', fechaFin: '2027-06-01', fechaLimiteNotas: '2027-06-05T00:00:00.000Z' }) });
+  assert.equal(duplicatePeriod.status, 409, JSON.stringify(duplicatePeriod.body));
+  const foreignPeriods = await call(`/school/years/${yearId}/periods`, { headers: bearer(accessB) });
+  assert.equal(foreignPeriods.status, 200);
+  assert.deepEqual(foreignPeriods.body.data, []);
+
+  const section = await call(`/school/years/${yearId}/sections`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ nivel: 'PRIMARIA', grado: 1,
+      seccion: 'A', aforoMaximo: 35 }) });
+  assert.equal(section.status, 201, JSON.stringify(section.body));
+  const duplicateSection = await call(`/school/years/${yearId}/sections`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ nivel: 'PRIMARIA', grado: 1,
+      seccion: 'A', aforoMaximo: 35 }) });
+  assert.equal(duplicateSection.status, 409, JSON.stringify(duplicateSection.body));
+  const foreignSections = await call(`/school/years/${yearId}/sections`, { headers: bearer(accessB) });
+  assert.equal(foreignSections.status, 200);
+  assert.deepEqual(foreignSections.body.data, []);
+
+  const numeric = await call(`/school/years/${yearId}/scales`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ nivel: 'PRIMARIA',
+      modalidad: 'DUAL_VIGESIMAL', rangos: [
+        { nivel: 'AD', min: 18, max: 20, descripcion: 'Solo fixture de CI' },
+        { nivel: 'A', min: 14, max: 17, descripcion: 'Solo fixture de CI' },
+        { nivel: 'B', min: 11, max: 13, descripcion: 'Solo fixture de CI' },
+        { nivel: 'C', min: 0, max: 10, descripcion: 'Solo fixture de CI' },
+      ] }) });
+  assert.equal(numeric.status, 201, JSON.stringify(numeric.body));
+  const blocked = await call(`/school/scales/${numeric.body.data.id}/approve`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ fuenteAprobacion: 'Referencia ficticia CI' }) });
+  assert.equal(blocked.status, 409, JSON.stringify(blocked.body));
+  assert.equal(blocked.body.error.code, 'CNEB_D16_PENDING');
+  const stillDraft = await admin.query('SELECT estado FROM escalas_calificacion WHERE id=$1', [numeric.body.data.id]);
+  assert.equal(stillDraft.rows[0].estado, 'BORRADOR');
+
+  const literalDraft = () => call(`/school/years/${yearId}/scales`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ nivel: 'SECUNDARIA', modalidad: 'LITERAL',
+      rangos: ['AD', 'A', 'B', 'C'].map((nivel) => ({ nivel, min: null, max: null,
+        descripcion: `Descripción ficticia ${nivel}` })) }) });
+  const approve = (id) => call(`/school/scales/${id}/approve`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ fuenteAprobacion: 'Acta ficticia CI 2027' }) });
+  const firstLiteral = await literalDraft();
+  assert.equal(firstLiteral.status, 201, JSON.stringify(firstLiteral.body));
+  const firstApproved = await approve(firstLiteral.body.data.id);
+  assert.equal(firstApproved.status, 200, JSON.stringify(firstApproved.body));
+  const secondLiteral = await literalDraft();
+  assert.equal(secondLiteral.status, 201, JSON.stringify(secondLiteral.body));
+  const secondApproved = await approve(secondLiteral.body.data.id);
+  assert.equal(secondApproved.status, 200, JSON.stringify(secondApproved.body));
+  const versions = await admin.query('SELECT id,estado FROM escalas_calificacion WHERE id=ANY($1::uuid[])',
+    [[firstLiteral.body.data.id, secondLiteral.body.data.id]]);
+  assert.equal(versions.rows.find((row) => row.id === firstLiteral.body.data.id).estado, 'REEMPLAZADA');
+  assert.equal(versions.rows.find((row) => row.id === secondLiteral.body.data.id).estado, 'VIGENTE');
+
+  const active = await call(`/school/years/${yearId}/activate`, { method: 'POST', headers: bearer(accessA) });
+  assert.equal(active.status, 200, JSON.stringify(active.body));
+  const account = await admin.query('SELECT id FROM usuarios WHERE id=$1 AND tenant_id=$2', [a.userId, a.tenantId]);
+  assert.equal(account.rowCount, 1, 'activar 2027 no recrea ni elimina cuentas');
+});
+
+test('intentos de acceso tienen límite por tenant sin enumerar cuentas', async () => {
+  await redisClient.flushDb();
+  for (let attempt = 1; attempt <= 6; attempt += 1) {
+    const result = await call('/auth/login', { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codigoModular: a.code,
+        identifier: 'cuenta-inexistente', password: PASSWORD }) });
+    assert.equal(result.status, attempt <= 5 ? 401 : 429);
+    assert.equal(result.body.error.code, attempt <= 5 ? 'UNAUTHENTICATED' : 'RATE_LIMITED');
+    assert.ok(!JSON.stringify(result.body).includes('cuenta-inexistente'));
   }
 });
 

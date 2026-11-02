@@ -116,6 +116,9 @@ paths:
   /school/sites:
     get: { operationId: listSites, responses: { '200': { $ref: '#/components/responses/Success' } } }
     post: { operationId: createSite, responses: { '201': { $ref: '#/components/responses/Success' } } }
+  /school/sites/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    patch: { operationId: updateSite, description: 'Solo SUPERADMIN del tenant; permite actualizar o desactivar una sede.', responses: { '200': { $ref: '#/components/responses/Success' }, '404': { $ref: '#/components/responses/Error' } } }
   /school/years:
     get: { operationId: listYears, responses: { '200': { $ref: '#/components/responses/Success' } } }
     post: { operationId: createYear, responses: { '201': { $ref: '#/components/responses/Success' } } }

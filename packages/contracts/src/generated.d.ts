@@ -420,6 +420,25 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/school/sites/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Solo SUPERADMIN del tenant; permite actualizar o desactivar una sede. */
+        patch: operations["updateSite"];
+        trace?: never;
+    };
     "/school/years": {
         parameters: {
             query?: never;
@@ -556,7 +575,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Requiere fuenteAprobacion documentada por Dirección. */
+        /** @description Requiere fuenteAprobacion documentada por Dirección. La modalidad DUAL_VIGESIMAL permanece bloqueada mientras D-16 esté pendiente. */
         post: operations["approveScale"];
         delete?: never;
         options?: never;
@@ -919,6 +938,7 @@ export interface components {
                     apellido_materno?: string | null;
                     /** Format: email */
                     email?: string | null;
+                    telefono: string | null;
                     documento_ultimos4?: string | null;
                     roles: string[];
                 }[];
@@ -936,6 +956,20 @@ export interface components {
                 personId: string;
                 /** Format: uuid */
                 userId?: string;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        OwnProfileSuccess: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["CoreUser"] & {
+                nombres: string;
+                apellido_paterno: string;
+                apellido_materno: string | null;
+                telefono: string | null;
+                /** Format: uri */
+                foto_url: string | null;
             };
             /** Format: date-time */
             timestamp: string;
@@ -1129,6 +1163,15 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["UserCreatedSuccess"];
+            };
+        };
+        /** @description Perfil propio con datos de contacto. */
+        OwnProfile: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["OwnProfileSuccess"];
             };
         };
         /** @description Validación del lote sin escritura. */
@@ -1345,7 +1388,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["OwnProfile"];
         };
     };
     updateOwnProfile: {
@@ -1580,6 +1623,21 @@ export interface operations {
             201: components["responses"]["Success"];
         };
     };
+    updateSite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["Success"];
+            404: components["responses"]["Error"];
+        };
+    };
     listYears: {
         parameters: {
             query?: never;
@@ -1756,6 +1814,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["Success"];
+            409: components["responses"]["Error"];
         };
     };
     getGuardianConsent: {

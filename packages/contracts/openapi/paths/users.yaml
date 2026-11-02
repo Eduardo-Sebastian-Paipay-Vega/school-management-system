@@ -2,7 +2,7 @@
   get: { operationId: listUsers, description: 'Permiso users:read.', responses: { '200': { $ref: '../components/responses.yaml#/UserDirectory' } } }
   post: { operationId: createUser, description: 'Permiso users:manage y rol SUPERADMIN o DIRECTIVO.', responses: { '201': { $ref: '../components/responses.yaml#/UserCreated' } } }
 /users/me:
-  get: { operationId: getOwnUser, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  get: { operationId: getOwnUser, responses: { '200': { $ref: '../components/responses.yaml#/OwnProfile' } } }
   patch: { operationId: updateOwnProfile, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
 /users/me/change-password:
   post: { operationId: changeOwnPassword, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }

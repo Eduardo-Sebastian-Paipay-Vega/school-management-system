@@ -499,6 +499,7 @@ test('S4: directorio paginado, perfil propio y último administrador protegido',
 
   const profile = await call('/users/me', { headers: bearer(accessA) });
   assert.equal(profile.status, 200, JSON.stringify(profile.body));
+  assertContract('/users/me', 'get', profile);
   assert.equal(profile.body.data.username, `admin_${a.code}`);
   const updated = await call('/users/me', { method: 'PATCH',
     headers: bearer(accessA, { 'Content-Type': 'application/json' }),

@@ -33,6 +33,11 @@ UserDirectory:
   content:
     application/json:
       schema: { $ref: './schemas.yaml#/UserDirectorySuccess' }
+OwnProfile:
+  description: Perfil propio con datos de contacto.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/OwnProfileSuccess' }
 AuditLogs:
   description: Bitácora filtrada del tenant autenticado.
   content:

@@ -938,6 +938,7 @@ export interface components {
                     apellido_materno?: string | null;
                     /** Format: email */
                     email?: string | null;
+                    telefono: string | null;
                     documento_ultimos4?: string | null;
                     roles: string[];
                 }[];
@@ -955,6 +956,20 @@ export interface components {
                 personId: string;
                 /** Format: uuid */
                 userId?: string;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        OwnProfileSuccess: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["CoreUser"] & {
+                nombres: string;
+                apellido_paterno: string;
+                apellido_materno: string | null;
+                telefono: string | null;
+                /** Format: uri */
+                foto_url: string | null;
             };
             /** Format: date-time */
             timestamp: string;
@@ -1148,6 +1163,15 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["UserCreatedSuccess"];
+            };
+        };
+        /** @description Perfil propio con datos de contacto. */
+        OwnProfile: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["OwnProfileSuccess"];
             };
         };
         /** @description Validación del lote sin escritura. */
@@ -1364,7 +1388,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["OwnProfile"];
         };
     };
     updateOwnProfile: {

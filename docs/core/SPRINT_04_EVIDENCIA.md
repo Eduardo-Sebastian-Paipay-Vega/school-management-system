@@ -1,14 +1,14 @@
 # Sprint 4 — Evidencia y estado
 
-**Base:** `dev` tras PR #3. **Rama:** `codex/core-sprint-4`. **PR:** [#4](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/pull/4), borrador sin solicitudes de revisión. **Estado:** en ejecución; este documento no constituye cierre ni aprobación del piloto.
+**Base:** `dev` tras PR #3. **Rama:** `codex/core-sprint-4`. **PR:** [#4](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/pull/4), borrador sin solicitudes de revisión. **Estado:** implementación Core S4 probada en [CI 41532128319](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/actions/runs/41532128319); pendientes aceptación de dependencias de Squads 2/3/5 e inspección visual autenticada. Este documento no constituye cierre ni aprobación del piloto.
 
 | Historia | Evidencia en rama | Estado |
 |---|---|---|
-| S4-01 | `users.routes.ts`: directorio con total real, edición y protección de último administrador; `CoreModuleView.tsx`: paginación remota y formulario de edición. Suite HTTP: reimportación sin duplicados, edición, cambio de rol con revocación y cruce A/B. | En verificación CI. |
-| S4-02 | `GET/PATCH /users/me` y panel de perfil con teléfono/foto y errores. Suite HTTP: lectura, actualización y aislamiento. | En verificación CI. |
-| S4-03 | `PATCH /school/sites/{id}` con auditoría, UI de edición/estado y contrato OpenAPI; suite HTTP de institución, sedes, año 2027, periodos, secciones y conflictos. | En verificación CI. Los bloqueos de notas y aforo requieren prueba conjunta con Squads 3 y 2. |
-| S4-04 | Aprobación de escala `DUAL_VIGESIMAL` rechazada con `CNEB_D16_PENDING`; escala literal versionada y reemplazo comprobables. UI presenta D-16; edición de membrete y escudo. | En verificación CI. El PDF de Squad 5 y la decisión D-16 siguen pendientes. |
-| S4-05 | Inventario de 22 RF del Core y puertas técnicas del [plan S4](SPRINT_04_PLAN.md). | Pendiente de cierre. |
+| S4-01 | `users.routes.ts`: directorio con total real, edición y protección de último administrador; `CoreModuleView.tsx`: paginación remota y formulario de edición. Suite HTTP: reimportación sin duplicados, edición, cambio de rol con revocación y cruce A/B. | CI verde. |
+| S4-02 | `GET/PATCH /users/me` y panel de perfil con teléfono/foto y errores. Suite HTTP: lectura, actualización y aislamiento. | CI verde; inspección visual autenticada pendiente. |
+| S4-03 | `PATCH /school/sites/{id}` con auditoría, UI de edición/estado y contrato OpenAPI; suite HTTP de institución, sedes, año 2027, periodos, secciones y conflictos. | CI verde en Core. Los bloqueos de notas y aforo requieren prueba conjunta con Squads 3 y 2. |
+| S4-04 | Aprobación de escala `DUAL_VIGESIMAL` rechazada con `CNEB_D16_PENDING`; escala literal versionada y reemplazo comprobables. UI presenta D-16; edición de membrete y escudo. | CI verde en Core. El PDF de Squad 5 y la decisión D-16 siguen pendientes. |
+| S4-05 | Inventario de 22 RF del Core y puertas técnicas del [plan S4](SPRINT_04_PLAN.md). | Trazabilidad completa; aceptación cruzada y cierre pendientes. |
 
 ## Trazabilidad de los 22 RF
 
@@ -35,4 +35,4 @@
 | 75 | Flujo ficticio de CI probado; uso real bloqueado hasta texto institucional aprobado. | S3–S5 |
 | 76 | Avisos presentes; cola/reintentos y aislamiento de eventos quedan en S5/S7. | S5–S7 |
 
-El auditor PrimeReact 10.9.9 pasó con cero errores y cero avisos. Lint y build del frontend pasaron localmente; la inspección visual de los recorridos autenticados queda pendiente de un entorno navegable con datos ficticios. El contrato tiene 47 rutas/58 operaciones y tipos generados reproducibles; Redocly conserva advertencias no bloqueantes de rutas ajenas a este cambio.
+La [CI S4](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/actions/runs/41532128319) pasó seis jobs: backend, frontend, contratos, migraciones, M8 y Core con PostgreSQL 16/Redis 7 y dos tenants ficticios. El auditor PrimeReact 10.9.9 pasó con cero errores y cero avisos; la inspección visual de los recorridos autenticados queda pendiente de un entorno navegable con datos ficticios. El contrato tiene 47 rutas/58 operaciones y tipos generados reproducibles; Redocly conserva advertencias no bloqueantes de rutas ajenas a este cambio.

@@ -183,6 +183,7 @@ test('S5: avisos A/B, correo verificado, preferencia obligatoria y reintento SMT
 });
 
 test('alta, fallo SMTP, reintento y activación de uso único', async () => {
+  const beforeMessages = smtp.messages.length;
   const suffix = Date.now().toString().slice(-8);
   const username = `invite_${suffix}`;
   invitedUsername = username;
@@ -196,7 +197,7 @@ test('alta, fallo SMTP, reintento y activación de uso único', async () => {
   const userId = created.body.data.userId;
   invitedUserId = userId;
   assert.ok(userId);
-  assert.equal(smtp.messages.length, 0, 'el alta no envía correo automáticamente');
+  assert.equal(smtp.messages.length, beforeMessages, 'el alta no envía correo automáticamente');
   const pendingLogin = await call('/auth/login', { method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ codigoModular: a.code, identifier: username, password: PASSWORD }) });
@@ -214,8 +215,8 @@ test('alta, fallo SMTP, reintento y activación de uso único', async () => {
   const sent = await call(`/users/${userId}/invite`, { method: 'POST', headers: bearer(accessA) });
   assert.equal(sent.status, 200, JSON.stringify(sent.body));
   assertContract('/users/{id}/invite', 'post', sent);
-  assert.equal(smtp.messages.length, 1);
-  const decodedMail = smtp.messages[0].replace(/=\n/g, '').replace(/=3D/gi, '=');
+  assert.equal(smtp.messages.length, beforeMessages + 1);
+  const decodedMail = smtp.messages.at(-1).replace(/=\n/g, '').replace(/=3D/gi, '=');
   const match = decodedMail.match(/https?:\/\/[^\s]+/);
   assert.ok(match, 'se capturó el enlace');
   const link = new URL(match[0]);

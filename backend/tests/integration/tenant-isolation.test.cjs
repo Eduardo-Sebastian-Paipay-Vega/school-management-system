@@ -467,6 +467,119 @@ test('sms_runtime aplica RLS, falla sin contexto y limpia el contexto del pool',
   }
 });
 
+test('S4: directorio paginado, perfil propio y último administrador protegido', async () => {
+  const page = await call('/users?limit=1&offset=0', { headers: bearer(accessA) });
+  assert.equal(page.status, 200, JSON.stringify(page.body));
+  assert.equal(page.body.data.users.length, 1);
+  assert.ok(page.body.data.count >= 2, 'el total no debe ser el tamaño de la página');
+  assert.ok(!JSON.stringify(page.body.data).includes(`admin_${b.code}`));
+
+  const profile = await call('/users/me', { headers: bearer(accessA) });
+  assert.equal(profile.status, 200, JSON.stringify(profile.body));
+  assert.equal(profile.body.data.username, `admin_${a.code}`);
+  const updated = await call('/users/me', { method: 'PATCH',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ telefono: '999000111' }) });
+  assert.equal(updated.status, 200, JSON.stringify(updated.body));
+  const refreshed = await call('/users/me', { headers: bearer(accessA) });
+  assert.equal(refreshed.body.data.telefono, '999000111');
+  const other = await call('/users/me', { headers: bearer(accessB) });
+  assert.notEqual(other.body.data.telefono, '999000111');
+
+  const edited = await call(`/users/${invitedUserId}`, { method: 'PATCH',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ nombres: 'Invitada Editada', telefono: '999222333' }) });
+  assert.equal(edited.status, 200, JSON.stringify(edited.body));
+  const found = await call('/users?search=Invitada%20Editada', { headers: bearer(accessA) });
+  assert.equal(found.body.data.count, 1);
+  assert.equal(found.body.data.users[0].telefono, '999222333');
+  const foreignEdit = await call(`/users/${invitedUserId}`, { method: 'PATCH',
+    headers: bearer(accessB, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ nombres: 'Acceso ajeno' }) });
+  assert.equal(foreignEdit.status, 404, JSON.stringify(foreignEdit.body));
+
+  const self = await call(`/users/${a.userId}/deactivate`, { method: 'POST',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ motivo: 'Prueba de último administrador' }) });
+  assert.equal(self.status, 409, JSON.stringify(self.body));
+  const demote = await call(`/users/${a.userId}/roles`, { method: 'PUT',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ roles: ['DOCENTE'], motivo: 'Prueba de último administrador' }) });
+  assert.equal(demote.status, 409, JSON.stringify(demote.body));
+});
+
+test('S4: año nuevo conserva cuentas, configuración aislada y D-16 bloquea escala numérica', async () => {
+  const json = { 'Content-Type': 'application/json' };
+  const institution = await call('/school/institution', { method: 'PATCH',
+    headers: bearer(accessA, json), body: JSON.stringify({ membreteTexto: 'Plantel ficticio A',
+      escudoUrl: 'https://example.invalid/escudo-a.png' }) });
+  assert.equal(institution.status, 200, JSON.stringify(institution.body));
+  const ownInstitution = await call('/school/institution', { headers: bearer(accessA) });
+  const foreignInstitution = await call('/school/institution', { headers: bearer(accessB) });
+  assert.equal(ownInstitution.body.data.membrete_texto, 'Plantel ficticio A');
+  assert.notEqual(foreignInstitution.body.data.membrete_texto, 'Plantel ficticio A');
+
+  const site = await call('/school/sites', { method: 'POST', headers: bearer(accessA, json),
+    body: JSON.stringify({ nombre: 'Sede ficticia A' }) });
+  assert.equal(site.status, 201, JSON.stringify(site.body));
+  const siteId = site.body.data.id;
+  const changedSite = await call(`/school/sites/${siteId}`, { method: 'PATCH',
+    headers: bearer(accessA, json), body: JSON.stringify({ nombre: 'Sede A actualizada', activo: false }) });
+  assert.equal(changedSite.status, 200, JSON.stringify(changedSite.body));
+  assert.equal(changedSite.body.data.activo, false);
+  const foreignSite = await call(`/school/sites/${siteId}`, { method: 'PATCH',
+    headers: bearer(accessB, json), body: JSON.stringify({ activo: true }) });
+  assert.equal(foreignSite.status, 404, JSON.stringify(foreignSite.body));
+  assertContract('/school/sites/{id}', 'patch', foreignSite);
+
+  const createYear = (token) => call('/school/years', { method: 'POST',
+    headers: bearer(token, json), body: JSON.stringify({ anio: 2027,
+      fechaInicio: '2027-03-01', fechaFin: '2027-12-15' }) });
+  const yearA = await createYear(accessA);
+  const yearB = await createYear(accessB);
+  assert.equal(yearA.status, 201, JSON.stringify(yearA.body));
+  assert.equal(yearB.status, 201, JSON.stringify(yearB.body));
+  const yearId = yearA.body.data.id;
+  assert.notEqual(yearId, yearB.body.data.id);
+
+  const period = await call(`/school/years/${yearId}/periods`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ tipo: 'BIMESTRE', numero: 1,
+      fechaInicio: '2027-03-01', fechaFin: '2027-05-01', fechaLimiteNotas: '2027-05-05T00:00:00.000Z' }) });
+  assert.equal(period.status, 201, JSON.stringify(period.body));
+  const foreignPeriods = await call(`/school/years/${yearId}/periods`, { headers: bearer(accessB) });
+  assert.equal(foreignPeriods.status, 200);
+  assert.deepEqual(foreignPeriods.body.data, []);
+
+  const section = await call(`/school/years/${yearId}/sections`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ nivel: 'PRIMARIA', grado: 1,
+      seccion: 'A', aforoMaximo: 35 }) });
+  assert.equal(section.status, 201, JSON.stringify(section.body));
+  const foreignSections = await call(`/school/years/${yearId}/sections`, { headers: bearer(accessB) });
+  assert.equal(foreignSections.status, 200);
+  assert.deepEqual(foreignSections.body.data, []);
+
+  const numeric = await call(`/school/years/${yearId}/scales`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ nivel: 'PRIMARIA',
+      modalidad: 'DUAL_VIGESIMAL', rangos: [
+        { nivel: 'AD', min: 18, max: 20, descripcion: 'Solo fixture de CI' },
+        { nivel: 'A', min: 14, max: 17, descripcion: 'Solo fixture de CI' },
+        { nivel: 'B', min: 11, max: 13, descripcion: 'Solo fixture de CI' },
+        { nivel: 'C', min: 0, max: 10, descripcion: 'Solo fixture de CI' },
+      ] }) });
+  assert.equal(numeric.status, 201, JSON.stringify(numeric.body));
+  const blocked = await call(`/school/scales/${numeric.body.data.id}/approve`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ fuenteAprobacion: 'Referencia ficticia CI' }) });
+  assert.equal(blocked.status, 409, JSON.stringify(blocked.body));
+  assert.equal(blocked.body.error.code, 'CNEB_D16_PENDING');
+  const stillDraft = await admin.query('SELECT estado FROM escalas_calificacion WHERE id=$1', [numeric.body.data.id]);
+  assert.equal(stillDraft.rows[0].estado, 'BORRADOR');
+
+  const active = await call(`/school/years/${yearId}/activate`, { method: 'POST', headers: bearer(accessA) });
+  assert.equal(active.status, 200, JSON.stringify(active.body));
+  const account = await admin.query('SELECT id FROM usuarios WHERE id=$1 AND tenant_id=$2', [a.userId, a.tenantId]);
+  assert.equal(account.rowCount, 1, 'activar 2027 no recrea ni elimina cuentas');
+});
+
 test('logout revoca inmediatamente el access token', async () => {
   const logout = await call('/auth/logout', { method: 'POST', headers: bearer(accessB) });
   assert.equal(logout.status, 200, JSON.stringify(logout.body));

@@ -56,6 +56,8 @@ paths:
     $ref: './paths/school.yaml#/~1school~1institution'
   /school/sites:
     $ref: './paths/school.yaml#/~1school~1sites'
+  /school/sites/{id}:
+    $ref: './paths/school.yaml#/~1school~1sites~1{id}'
   /school/years:
     $ref: './paths/school.yaml#/~1school~1years'
   /school/years/{id}/activate:

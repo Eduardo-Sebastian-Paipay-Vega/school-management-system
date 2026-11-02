@@ -4,6 +4,9 @@
 /school/sites:
   get: { operationId: listSites, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
   post: { operationId: createSite, responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+/school/sites/{id}:
+  parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
+  patch: { operationId: updateSite, description: 'Solo SUPERADMIN del tenant; permite actualizar o desactivar una sede.', responses: { '200': { $ref: '../components/responses.yaml#/Success' }, '404': { $ref: '../components/responses.yaml#/Error' } } }
 /school/years:
   get: { operationId: listYears, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
   post: { operationId: createYear, responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
@@ -31,4 +34,4 @@
   post: { operationId: createScaleDraft, description: 'Crea AD, A, B y C en borrador; D-16 rige cualquier rango numérico.', responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
 /school/scales/{id}/approve:
   parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
-  post: { operationId: approveScale, description: 'Requiere fuenteAprobacion documentada por Dirección.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  post: { operationId: approveScale, description: 'Requiere fuenteAprobacion documentada por Dirección. La modalidad DUAL_VIGESIMAL permanece bloqueada mientras D-16 esté pendiente.', responses: { '200': { $ref: '../components/responses.yaml#/Success' }, '409': { $ref: '../components/responses.yaml#/Error' } } }

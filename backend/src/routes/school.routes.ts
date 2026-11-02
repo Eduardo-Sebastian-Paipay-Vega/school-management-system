@@ -80,6 +80,24 @@ router.post('/sites', requireRoles(['SUPERADMIN']), async (req: AuthenticatedReq
   } catch { fail(res, 409, 'SITE_CONFLICT', 'La sede ya existe o es inválida.'); }
 });
 
+router.patch('/sites/:id', requireRoles(['SUPERADMIN']), async (req: AuthenticatedRequest, res) => {
+  const parsed = z.object({ nombre: z.string().min(2).max(120).optional(),
+    direccion: z.string().max(500).optional(), activo: z.boolean().optional() })
+    .refine((value) => Object.keys(value).length > 0).safeParse(req.body);
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Datos de sede inválidos.'); return; }
+  try {
+    const data = await mutate(req, async (client) =>
+      (await client.query(`UPDATE sedes SET nombre=coalesce($1,nombre),
+        direccion=coalesce($2,direccion),activo=coalesce($3,activo)
+        WHERE id=$4 AND tenant_id=$5 RETURNING id,nombre,direccion,activo`,
+      [parsed.data.nombre ?? null,parsed.data.direccion ?? null,parsed.data.activo ?? null,
+        req.params.id,req.user!.tenantId])).rows[0],
+    'UPDATE_SITE', 'sedes', { id: req.params.id, ...parsed.data });
+    if (!data) { fail(res, 404, 'SITE_NOT_FOUND', 'Sede no encontrada.'); return; }
+    ok(res, data);
+  } catch { fail(res, 409, 'SITE_CONFLICT', 'No se pudo actualizar la sede.'); }
+});
+
 router.get('/years', async (req: AuthenticatedRequest, res) => {
   try {
     const data = await withTenant(req.user!.tenantId, req.user!.id, async (client) =>
@@ -272,10 +290,11 @@ router.post('/scales/:id/approve', requireRoles(['SUPERADMIN','DIRECTIVO']), asy
   if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Indique la aprobación académica.'); return; }
   try {
     const data = await mutate(req, async (client) => {
-      const found = await client.query<{ id: string; anio_lectivo_id: string; nivel: string; estado: string }>(
-        'SELECT id,anio_lectivo_id,nivel,estado FROM escalas_calificacion WHERE id=$1 FOR UPDATE', [req.params.id]);
+      const found = await client.query<{ id: string; anio_lectivo_id: string; nivel: string; estado: string; modalidad: string }>(
+        'SELECT id,anio_lectivo_id,nivel,estado,modalidad FROM escalas_calificacion WHERE id=$1 FOR UPDATE', [req.params.id]);
       const scale = found.rows[0];
       if (!scale || scale.estado !== 'BORRADOR') return null;
+      if (scale.modalidad === 'DUAL_VIGESIMAL') throw new Error('CNEB_D16_PENDING');
       await client.query(`UPDATE escalas_calificacion SET estado='REEMPLAZADA'
         WHERE tenant_id=$1 AND anio_lectivo_id=$2 AND nivel=$3 AND estado='VIGENTE'`,
         [req.user!.tenantId,scale.anio_lectivo_id,scale.nivel]);
@@ -284,7 +303,12 @@ router.post('/scales/:id/approve', requireRoles(['SUPERADMIN','DIRECTIVO']), asy
     }, 'APPROVE_SCALE', 'escalas_calificacion', { id: req.params.id, fuenteAprobacion: parsed.data.fuenteAprobacion });
     if (!data) { fail(res, 404, 'SCALE_NOT_FOUND', 'Escala borrador no encontrada.'); return; }
     ok(res, data);
-  } catch { fail(res, 409, 'SCALE_INVALID', 'La escala no puede publicarse sin rangos válidos.'); }
+  } catch (cause) {
+    if (cause instanceof Error && cause.message === 'CNEB_D16_PENDING') {
+      fail(res, 409, 'CNEB_D16_PENDING', 'La publicación de rangos numéricos requiere resolver D-16.'); return;
+    }
+    fail(res, 409, 'SCALE_INVALID', 'La escala no puede publicarse sin rangos válidos.');
+  }
 });
 
 export default router;

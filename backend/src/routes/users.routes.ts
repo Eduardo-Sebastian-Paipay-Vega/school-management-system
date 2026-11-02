@@ -90,7 +90,17 @@ router.put('/roles/:id/permissions', requirePermission('roles:manage'), async (r
   }
 });
 
-router.get('/me', async (req: AuthenticatedRequest, res) => { ok(res, req.user); });
+router.get('/me', async (req: AuthenticatedRequest, res) => {
+  try {
+    const data = await withTenant(req.user!.tenantId, req.user!.id, async (client) =>
+      (await client.query(`SELECT p.nombres,p.apellido_paterno,p.apellido_materno,p.email,
+        p.telefono,p.foto_url,u.username FROM usuarios u
+        JOIN personas p ON p.id=u.persona_id AND p.tenant_id=u.tenant_id
+        WHERE u.id=$1 AND u.tenant_id=$2`, [req.user!.id,req.user!.tenantId])).rows[0]);
+    if (!data) { fail(res, 404, 'PROFILE_NOT_FOUND', 'Perfil no encontrado.'); return; }
+    ok(res, { ...req.user, ...data });
+  } catch { fail(res, 500, 'PROFILE_ERROR', 'No se pudo consultar el perfil.'); }
+});
 
 router.get('/persons', requirePermission('guardians:manage'), async (req: AuthenticatedRequest, res) => {
   const parsed=z.object({search:z.string().trim().min(2).max(100)}).safeParse(req.query);
@@ -173,7 +183,7 @@ router.get('/', requirePermission('users:read'),
       const hash = /^\d{8}$/.test(search) ? documentHash(search) : null;
       const data = await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
         const result = await client.query(`SELECT u.id,u.username,u.estado,p.id AS persona_id,
-          p.nombres,p.apellido_paterno,p.apellido_materno,p.email,p.documento_ultimos4,
+          p.nombres,p.apellido_paterno,p.apellido_materno,p.email,p.telefono,p.documento_ultimos4,
           COALESCE(array_agg(r.codigo::text) FILTER (WHERE ur.activo AND r.codigo IS NOT NULL),ARRAY[]::text[]) AS roles
           FROM usuarios u JOIN personas p ON p.id=u.persona_id AND p.tenant_id=u.tenant_id
           LEFT JOIN usuario_roles ur ON ur.usuario_id=u.id AND ur.activo
@@ -187,9 +197,19 @@ router.get('/', requirePermission('users:read'),
                 WHERE x.usuario_id=u.id AND x.activo AND y.codigo::text=$5))
           GROUP BY u.id,p.id ORDER BY p.apellido_paterno,p.nombres LIMIT $6 OFFSET $7`,
           [req.user!.tenantId,search,hash,estado ?? null,role ?? null,limit,offset]);
-        return result.rows;
+        const total = await client.query<{ count: number }>(`SELECT count(*)::int AS count
+          FROM usuarios u JOIN personas p ON p.id=u.persona_id AND p.tenant_id=u.tenant_id
+          WHERE u.tenant_id=$1 AND u.username<>'sistema'
+            AND ($2='' OR concat_ws(' ',p.nombres,p.apellido_paterno,p.apellido_materno) ILIKE '%'||$2||'%'
+                 OR u.username ILIKE '%'||$2||'%' OR p.email ILIKE '%'||$2||'%'
+                 OR ($3::char(64) IS NOT NULL AND p.documento_hash=$3))
+            AND ($4::varchar IS NULL OR u.estado::text=$4)
+            AND ($5::varchar IS NULL OR EXISTS(SELECT 1 FROM usuario_roles x JOIN roles y ON y.id=x.rol_id
+                WHERE x.usuario_id=u.id AND x.activo AND y.codigo::text=$5))`,
+          [req.user!.tenantId,search,hash,estado ?? null,role ?? null]);
+        return { users: result.rows, count: total.rows[0].count };
       });
-      ok(res, { users: data, count: data.length });
+      ok(res, data);
     } catch { fail(res, 500, 'USERS_ERROR', 'No se pudo consultar el directorio.'); }
   });
 

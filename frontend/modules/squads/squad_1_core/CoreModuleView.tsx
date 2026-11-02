@@ -10,7 +10,7 @@ import { Button } from 'primereact/button';
 import { useCoreSession } from './SessionProvider';
 
 type DirectoryUser={id:string;username:string;estado:string;nombres:string;apellido_paterno:string;
-  apellido_materno:string|null;email:string|null;documento_ultimos4:string|null;roles:string[]};
+  apellido_materno:string|null;email:string|null;telefono:string|null;documento_ultimos4:string|null;roles:string[]};
 type Year={id:string;anio:number;fecha_inicio:string;fecha_fin:string;activo:boolean};
 type Institution={id:string;codigo_modular:string;nombre:string;direccion:string|null;telefono:string|null;
   membrete_texto:string|null;escudo_url:string|null};
@@ -51,7 +51,9 @@ function State({busy,error,retry}:{busy:boolean;error:string;retry:()=>void}){
 function UsersPanel(){
   const {request,user}=useCoreSession();
   const [search,setSearch]=useState('');
-  const {data,busy,error,reload}=useLoad<{users:DirectoryUser[];count:number}>(`/users?search=${encodeURIComponent(search)}`,
+  const [appliedSearch,setAppliedSearch]=useState('');
+  const [first,setFirst]=useState(0);
+  const {data,busy,error,reload}=useLoad<{users:DirectoryUser[];count:number}>(`/users?search=${encodeURIComponent(appliedSearch)}&limit=10&offset=${first}`,
     !!user?.permissions.includes('users:read'));
   const {data:roles}=useLoad<Role[]>('/users/roles',!!user?.permissions.includes('roles:read'));
   const [action,setAction]=useState('');
@@ -60,6 +62,9 @@ function UsersPanel(){
   const [preview,setPreview]=useState<Preview|null>(null);
   const [newUser,setNewUser]=useState({nombres:'',apellidoPaterno:'',documento:'',email:'',rol:''});
   const [target,setTarget]=useState<DirectoryUser|null>(null);
+  const [editTarget,setEditTarget]=useState<DirectoryUser|null>(null);
+  const [editName,setEditName]=useState('');const [editLastName,setEditLastName]=useState('');
+  const [editPhone,setEditPhone]=useState('');
   const [selectedRoles,setSelectedRoles]=useState<string[]>([]);
   const [roleReason,setRoleReason]=useState('');
   async function createUser(){
@@ -81,6 +86,15 @@ function UsersPanel(){
       setTarget(null);setRoleReason('');setMessage('Roles actualizados; la cuenta deberá iniciar sesión de nuevo.');
       await reload();
     }catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudieron asignar los roles.');}
+    finally{setAction('');}
+  }
+  async function saveUser(){
+    if(!editTarget)return;
+    setAction('edit');setMessage('');
+    try{await request(`/users/${editTarget.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({nombres:editName.trim(),apellidoPaterno:editLastName.trim(),telefono:editPhone})});
+      setEditTarget(null);setMessage('Usuario actualizado.');await reload();}
+    catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo actualizar el usuario.');}
     finally{setAction('');}
   }
   async function post(path:string,body:object={}){
@@ -109,14 +123,19 @@ function UsersPanel(){
   return <div className="space-y-4">
     <div className="flex flex-wrap gap-2"><label htmlFor="search-users" className="sr-only">Buscar usuario</label>
       <InputText id="search-users" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Nombre, usuario o DNI"/>
+      <Button label="Buscar" icon="pi pi-search" outlined onClick={()=>{setFirst(0);setAppliedSearch(search.trim());}}/>
       <Button label="Actualizar" icon="pi pi-refresh" outlined onClick={()=>void reload()}/></div>
     <State busy={busy} error={error} retry={()=>void reload()}/>
-    <DataTable value={data?.users??[]} dataKey="id" loading={busy} paginator rows={10}
+    <DataTable value={data?.users??[]} dataKey="id" loading={busy} paginator rows={10} first={first}
+      lazy totalRecords={data?.count??0} onPage={event=>setFirst(event.first)}
       emptyMessage="No hay usuarios para mostrar." scrollable className="text-sm">
       <Column header="Persona" body={(row:DirectoryUser)=>`${row.nombres} ${row.apellido_paterno}`}/>
       <Column field="username" header="Usuario"/><Column field="estado" header="Estado"/>
       <Column header="Roles" body={(row:DirectoryUser)=>row.roles.join(', ')||'Sin rol'}/>
       <Column header="Acciones" body={(row:DirectoryUser)=><div className="flex gap-1">
+        {user.permissions.includes('users:manage')&&<Button label="Editar" text size="small" onClick={()=>{
+          setEditTarget(row);setEditName(row.nombres);setEditLastName(row.apellido_paterno);
+          setEditPhone(row.telefono??'');}}/>}
         {user.permissions.includes('users:assign-roles')&&row.estado==='ACTIVO'&&
           <Button label="Roles" text size="small" onClick={()=>{
             setTarget(row);setSelectedRoles(row.roles);setRoleReason('');}}/>}
@@ -127,6 +146,19 @@ function UsersPanel(){
             if(motivo)void post(`/users/${row.id}/${row.estado==='INACTIVO'?'reactivate':'deactivate'}`,{motivo});}}/>}
       </div>}/>
     </DataTable>
+    {editTarget&&<section className="rounded-xl border border-gray-200 p-4" aria-label="Editar usuario">
+      <h3 className="font-bold">Editar a {editTarget.username}</h3>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <label htmlFor="edit-name" className="text-sm">Nombres</label>
+        <InputText id="edit-name" value={editName} onChange={event=>setEditName(event.target.value)} maxLength={100}/>
+        <label htmlFor="edit-last-name" className="text-sm">Apellido paterno</label>
+        <InputText id="edit-last-name" value={editLastName} onChange={event=>setEditLastName(event.target.value)} maxLength={100}/>
+        <label htmlFor="edit-phone" className="text-sm">Teléfono</label>
+        <InputText id="edit-phone" value={editPhone} onChange={event=>setEditPhone(event.target.value)} maxLength={20}/>
+      </div>
+      <div className="mt-3 flex gap-2"><Button label="Guardar" disabled={!!action||!editName.trim()||!editLastName.trim()}
+        onClick={()=>void saveUser()}/><Button label="Cancelar" outlined onClick={()=>setEditTarget(null)}/></div>
+    </section>}
     {target&&<section className="rounded-xl border border-gray-200 p-4" aria-label="Asignar roles">
       <h3 className="font-bold">Roles de {target.nombres} {target.apellido_paterno}</h3>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">{roles?.map(role=><label key={role.codigo} className="flex gap-2 text-sm">
@@ -214,7 +246,8 @@ function YearDetails({id}:{id:string}){
     await submit(`/school/years/${id}/scales`,{nivel:scaleLevel,modalidad:scaleMode,rangos},scales.reload);
   }
   return <section className="space-y-5 rounded-xl border p-4"><h3 className="text-lg font-bold">Detalle del año lectivo</h3>
-    <div><h4 className="font-semibold">Periodos</h4><DataTable value={periods.data??[]} dataKey="id" emptyMessage="Sin periodos.">
+    <div><h4 className="font-semibold">Periodos</h4><State busy={periods.busy} error={periods.error} retry={()=>void periods.reload()}/>
+      <DataTable value={periods.data??[]} dataKey="id" emptyMessage="Sin periodos." loading={periods.busy}>
       <Column field="tipo" header="Tipo"/><Column field="numero" header="N.º"/><Column field="fecha_inicio" header="Inicio"/>
       <Column field="fecha_fin" header="Fin"/><Column header="Estado" body={(p:Period)=>p.cerrado?'Cerrado':'Abierto'}/>
       {user?.permissions.includes('school:manage')&&<Column header="Acción" body={(p:Period)=>!p.cerrado&&
@@ -228,7 +261,8 @@ function YearDetails({id}:{id:string}){
       <Button label="Crear periodo" disabled={!start||!end||!deadline} onClick={()=>void submit(`/school/years/${id}/periods`,
         {tipo:type,numero:Number(number),fechaInicio:start,fechaFin:end,fechaLimiteNotas:new Date(deadline).toISOString()},periods.reload)}/>
     </div>}</div>
-    <div><h4 className="font-semibold">Secciones</h4><DataTable value={sections.data??[]} dataKey="id" emptyMessage="Sin secciones.">
+    <div><h4 className="font-semibold">Secciones</h4><State busy={sections.busy} error={sections.error} retry={()=>void sections.reload()}/>
+      <DataTable value={sections.data??[]} dataKey="id" emptyMessage="Sin secciones." loading={sections.busy}>
       <Column field="nivel" header="Nivel"/><Column field="grado" header="Grado"/><Column field="seccion" header="Sección"/>
       <Column field="aforo_maximo" header="Aforo"/></DataTable>
       {user?.permissions.includes('school:manage')&&<div className="mt-3 flex flex-wrap items-end gap-2 text-sm">
@@ -240,7 +274,8 @@ function YearDetails({id}:{id:string}){
         <Button label="Crear sección" onClick={()=>void submit(`/school/years/${id}/sections`,
           {nivel:level,grado:Number(grade),seccion:section,aforoMaximo:Number(capacity)},sections.reload)}/>
       </div>}</div>
-    <div><h4 className="font-semibold">Días no lectivos</h4><DataTable value={days.data??[]} dataKey="id" emptyMessage="Sin días no lectivos.">
+    <div><h4 className="font-semibold">Días no lectivos</h4><State busy={days.busy} error={days.error} retry={()=>void days.reload()}/>
+      <DataTable value={days.data??[]} dataKey="id" emptyMessage="Sin días no lectivos." loading={days.busy}>
       <Column field="fecha" header="Fecha"/><Column field="tipo" header="Tipo"/><Column field="motivo" header="Motivo"/></DataTable>
       {user?.permissions.includes('school:manage')&&<div className="mt-3 flex flex-wrap items-end gap-2 text-sm">
         <label>Fecha<input type="date" value={day} onChange={e=>setDay(e.target.value)} className="block rounded border p-2"/></label>
@@ -250,13 +285,15 @@ function YearDetails({id}:{id:string}){
         <Button label="Agregar día" disabled={!day||reason.trim().length<2} onClick={()=>void submit(`/school/years/${id}/non-school-days`,
           {fecha:day,tipo:dayType,motivo:reason},days.reload)}/>
       </div>}</div>
-    <div><h4 className="font-semibold">Escalas CNEB</h4><DataTable value={scales.data??[]} dataKey="id" emptyMessage="Sin escalas.">
+    <div><h4 className="font-semibold">Escalas CNEB</h4><State busy={scales.busy} error={scales.error} retry={()=>void scales.reload()}/>
+      <DataTable value={scales.data??[]} dataKey="id" emptyMessage="Sin escalas." loading={scales.busy}>
       <Column field="nivel" header="Nivel"/><Column field="modalidad" header="Modalidad"/><Column field="estado" header="Estado"/>
       {user?.permissions.includes('school:manage')&&user.roles.some(role=>['SUPERADMIN','DIRECTIVO'].includes(role))&&
         <Column header="Aprobación" body={(scale:Scale)=>scale.estado==='BORRADOR'&&
-          <Button label="Aprobar" text size="small" disabled={approvalSource.trim().length<5}
-            onClick={()=>void submit(`/school/scales/${scale.id}/approve`,
-              {fuenteAprobacion:approvalSource.trim()},scales.reload)}/>}/>}</DataTable>
+          (scale.modalidad==='DUAL_VIGESIMAL'?<span>Pendiente D-16</span>:
+            <Button label="Aprobar" text size="small" disabled={approvalSource.trim().length<5}
+              onClick={()=>void submit(`/school/scales/${scale.id}/approve`,
+                {fuenteAprobacion:approvalSource.trim()},scales.reload)}/>)}/>}</DataTable>
       <p className="mt-2 text-xs text-gray-600">La publicación de rangos numéricos requiere la aprobación académica oficial D-16.</p>
       {user?.permissions.includes('school:manage')&&user.roles.some(role=>['SUPERADMIN','DIRECTIVO'].includes(role))&&
         <label className="mt-3 block text-sm">Fuente de aprobación
@@ -294,13 +331,15 @@ function YearDetails({id}:{id:string}){
 function SchoolPanel(){
   const {request,user}=useCoreSession();
   const {data,busy,error,reload}=useLoad<Year[]>('/school/years');
-  const {data:institution,reload:reloadInstitution}=useLoad<Institution>('/school/institution');
-  const {data:sites,reload:reloadSites}=useLoad<Site[]>('/school/sites');
+  const {data:institution,busy:institutionBusy,error:institutionError,reload:reloadInstitution}=useLoad<Institution>('/school/institution');
+  const {data:sites,busy:sitesBusy,error:sitesError,reload:reloadSites}=useLoad<Site[]>('/school/sites');
   const [schoolName,setSchoolName]=useState('');const [address,setAddress]=useState('');
-  const [phone,setPhone]=useState('');const [letterhead,setLetterhead]=useState('');
+  const [phone,setPhone]=useState('');const [letterhead,setLetterhead]=useState('');const [crest,setCrest]=useState('');
   const [siteName,setSiteName]=useState('');const [selectedYear,setSelectedYear]=useState('');
+  const [editingSite,setEditingSite]=useState<Site|null>(null);const [editingSiteName,setEditingSiteName]=useState('');
   useEffect(()=>{if(institution){setSchoolName(institution.nombre);setAddress(institution.direccion??'');
-    setPhone(institution.telefono??'');setLetterhead(institution.membrete_texto??'');}},[institution]);
+    setPhone(institution.telefono??'');setLetterhead(institution.membrete_texto??'');
+    setCrest(institution.escudo_url??'');}},[institution]);
   const [year,setYear]=useState(String(new Date().getFullYear()+1));
   const [start,setStart]=useState('');const [end,setEnd]=useState('');const [message,setMessage]=useState('');
   async function create(){
@@ -310,7 +349,8 @@ function SchoolPanel(){
   }
   async function updateInstitution(){
     setMessage('');try{await request('/school/institution',{method:'PATCH',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({nombre:schoolName,direccion:address,telefono:phone,membreteTexto:letterhead})});
+      body:JSON.stringify({nombre:schoolName,direccion:address,telefono:phone,membreteTexto:letterhead,
+        escudoUrl:crest||undefined})});
       setMessage('Datos institucionales actualizados.');await reloadInstitution();}
     catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo guardar.');}
   }
@@ -319,22 +359,42 @@ function SchoolPanel(){
       body:JSON.stringify({nombre:siteName})});setSiteName('');setMessage('Sede creada.');await reloadSites();}
     catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo crear la sede.');}
   }
+  async function updateSite(id:string,body:object){
+    setMessage('');try{await request(`/school/sites/${id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(body)});setEditingSite(null);setMessage('Sede actualizada.');await reloadSites();}
+    catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo actualizar la sede.');}
+  }
   async function activate(id:string){
     if(!window.confirm('¿Activar este año lectivo?'))return;
     try{await request(`/school/years/${id}/activate`,{method:'POST'});await reload();}
     catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo activar.');}
   }
   return <div className="space-y-4"><State busy={busy} error={error} retry={()=>void reload()}/>
+    <State busy={institutionBusy} error={institutionError} retry={()=>void reloadInstitution()}/>
     {institution&&<section className="rounded-xl border border-gray-200 p-4"><h3 className="font-bold">Institución · {institution.codigo_modular}</h3>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <label className="text-sm">Nombre<InputText value={schoolName} onChange={e=>setSchoolName(e.target.value)} className="block w-full rounded border p-2"/></label>
         <label className="text-sm">Dirección<InputText value={address} onChange={e=>setAddress(e.target.value)} className="block w-full rounded border p-2"/></label>
         <label className="text-sm">Teléfono<InputText value={phone} onChange={e=>setPhone(e.target.value)} className="block w-full rounded border p-2"/></label>
         <label className="text-sm">Membrete<InputText value={letterhead} onChange={e=>setLetterhead(e.target.value)} className="block w-full rounded border p-2"/></label>
+        <label className="text-sm">URL del escudo<InputText value={crest} onChange={e=>setCrest(e.target.value)} className="block w-full rounded border p-2"/></label>
       </div>{user?.permissions.includes('school:manage')&&<Button label="Guardar institución" className="mt-3"
         onClick={()=>void updateInstitution()}/>}</section>}
     <section className="rounded-xl border border-gray-200 p-4"><h3 className="font-bold">Sedes</h3>
-      <ul className="mt-2 text-sm">{sites?.map(s=><li key={s.id}>{s.nombre}{s.activo?'':' · inactiva'}</li>)}</ul>
+      <State busy={sitesBusy} error={sitesError} retry={()=>void reloadSites()}/>
+      <ul className="mt-2 space-y-2 text-sm">{sites?.map(s=><li key={s.id} className="flex flex-wrap items-center gap-2">
+        <span>{s.nombre}{s.activo?'':' · inactiva'}</span>
+        {user?.roles.includes('SUPERADMIN')&&<><Button label="Editar" text size="small" onClick={()=>{
+          setEditingSite(s);setEditingSiteName(s.nombre);}}/>
+          <Button label={s.activo?'Desactivar':'Reactivar'} text size="small"
+            onClick={()=>void updateSite(s.id,{activo:!s.activo})}/></>}
+      </li>)}</ul>
+      {editingSite&&<div className="mt-3 flex flex-wrap items-end gap-2"><label htmlFor="edit-site-name">Nombre de sede</label>
+        <InputText id="edit-site-name" value={editingSiteName} maxLength={120}
+          onChange={event=>setEditingSiteName(event.target.value)}/>
+        <Button label="Guardar" disabled={editingSiteName.trim().length<2}
+          onClick={()=>void updateSite(editingSite.id,{nombre:editingSiteName.trim()})}/>
+        <Button label="Cancelar" outlined onClick={()=>setEditingSite(null)}/></div>}
       {user?.roles.includes('SUPERADMIN')&&<div className="mt-3 flex gap-2"><InputText aria-label="Nueva sede" value={siteName}
         onChange={e=>setSiteName(e.target.value)} placeholder="Nueva sede" className="rounded border p-2"/>
         <Button label="Agregar" disabled={siteName.trim().length<2} onClick={()=>void addSite()}/></div>}</section>
@@ -508,16 +568,40 @@ function GuardiansPanel(){
 
 function ProfilePanel(){
   const {user,request,logout}=useCoreSession();
+  const profile=useLoad<{nombres:string;apellido_paterno:string;email:string|null;
+    username:string;telefono:string|null;foto_url:string|null}>('/users/me');
   const [current,setCurrent]=useState('');const [next,setNext]=useState('');
+  const [phone,setPhone]=useState('');const [photo,setPhoto]=useState('');
+  const [saving,setSaving]=useState(false);
   const [message,setMessage]=useState('');
+  useEffect(()=>{if(profile.data){setPhone(profile.data.telefono??'');setPhoto(profile.data.foto_url??'');}},
+    [profile.data]);
+  async function saveProfile(){
+    setSaving(true);setMessage('');
+    try{await request('/users/me',{method:'PATCH',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({telefono:phone,fotoUrl:photo||undefined})});
+      await profile.reload();setMessage('Perfil actualizado.');}
+    catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo actualizar el perfil.');}
+    finally{setSaving(false);}
+  }
   async function save(){
     setMessage('');try{await request('/users/me/change-password',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({actual:current,nueva:next})});await logout();}
     catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo cambiar la clave.');}
   }
   return <div className="max-w-xl space-y-3 text-sm">
+    <State busy={profile.busy} error={profile.error} retry={()=>void profile.reload()}/>
     <p><strong>Nombre:</strong> {user?.fullName}</p><p><strong>Usuario:</strong> {user?.username}</p>
     <p><strong>Correo:</strong> {user?.email||'No registrado'}</p>
+    <h3 className="pt-3 font-bold">Datos de contacto</h3>
+    <label htmlFor="profile-phone" className="block">Teléfono</label>
+    <InputText id="profile-phone" value={phone} maxLength={20} onChange={event=>setPhone(event.target.value)}
+      className="w-full"/>
+    <label htmlFor="profile-photo" className="block">URL de foto</label>
+    <InputText id="profile-photo" value={photo} maxLength={1000} onChange={event=>setPhoto(event.target.value)}
+      className="w-full"/>
+    <Button label={saving?'Guardando…':'Guardar perfil'} disabled={saving||profile.busy}
+      onClick={()=>void saveProfile()}/>
     <h3 className="pt-3 font-bold">Cambiar contraseña</h3>
     <label htmlFor="current-key" className="block">Clave actual</label>
     <input id="current-key" type="password" autoComplete="current-password" value={current}
@@ -527,7 +611,7 @@ function ProfilePanel(){
       onChange={e=>setNext(e.target.value)} className="w-full rounded border p-2"/>
     <p className="text-xs text-gray-600">Mínimo 8 caracteres, una letra y un número. Cerrará todas sus sesiones.</p>
     <Button label="Cambiar clave" disabled={!current||!next} onClick={()=>void save()}/>
-    {message&&<p role="alert" className="text-red-700">{message}</p>}
+    {message&&<p role="status">{message}</p>}
   </div>;
 }
 

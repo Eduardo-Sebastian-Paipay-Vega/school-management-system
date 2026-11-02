@@ -75,6 +75,9 @@
     "listSites",
     "createSite"
   ],
+  "/school/sites/{id}": [
+    "updateSite"
+  ],
   "/school/years": [
     "listYears",
     "createYear"

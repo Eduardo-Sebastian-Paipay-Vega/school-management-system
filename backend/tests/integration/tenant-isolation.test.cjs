@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
 const { startCapture } = require('./smtp-capture.cjs');
+const { documentHash } = require('../../dist/core/identity-crypto');
 
 // This file is run only by `npm run test:integration` with PostgreSQL 16 and
 // Redis 7. Never seed real school data: the fixtures below are fictitious.
@@ -20,6 +21,8 @@ let refreshA;
 let smtp;
 let accessDocente;
 let refreshDocente;
+let invitedUsername;
+let invitedUserId;
 
 async function createInstitution(code) {
   const result = await admin.query(
@@ -76,6 +79,9 @@ before(async () => {
   process.env.SMTP_FROM = 'core@example.invalid';
   process.env.PUBLIC_APP_URL = 'http://localhost:3000';
   process.env.SMTP_TEST_PLAINTEXT = '1';
+  process.env.GUARDIAN_CONSENT_VERSION = 'ci-ficticio-1';
+  process.env.GUARDIAN_CONSENT_TEXT = 'Texto ficticio exclusivo de CI para probar la aceptación explícita del vínculo familiar. ' +
+    'No representa un consentimiento institucional ni habilita datos de personas reales.';
   const { createApp } = require('../../dist/app');
   const database = require('../../dist/config/database');
   runtime = database;
@@ -117,6 +123,7 @@ test('login de cada tenant emite una sesión propia', async () => {
 test('alta, fallo SMTP, reintento y activación de uso único', async () => {
   const suffix = Date.now().toString().slice(-8);
   const username = `invite_${suffix}`;
+  invitedUsername = username;
   const created = await call('/users', { method: 'POST',
     headers: bearer(accessA, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ tipoDocumento: 'DNI', documento: suffix,
@@ -124,6 +131,7 @@ test('alta, fallo SMTP, reintento y activación de uso único', async () => {
       email: `${username}@example.invalid`, username, rol: 'DOCENTE' }) });
   assert.equal(created.status, 201, JSON.stringify(created.body));
   const userId = created.body.data.userId;
+  invitedUserId = userId;
   assert.ok(userId);
   assert.equal(smtp.messages.length, 0, 'el alta no envía correo automáticamente');
   const pendingLogin = await call('/auth/login', { method: 'POST',
@@ -191,6 +199,125 @@ test('refresh rota token, detecta reuso y revoca la familia', async () => {
   const audit = await admin.query(`SELECT count(*)::int AS n FROM logs_auditoria
     WHERE tenant_id=$1 AND accion='REFRESH_REUSE'`, [a.tenantId]);
   assert.ok(audit.rows[0].n >= 1);
+});
+
+test('recuperación no enumera, invalida fallo SMTP y consume enlace una vez', async () => {
+  const request = (identifier) => call('/auth/forgot-password', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ codigoModular: a.code, identifier }) });
+  const beforeMessages = smtp.messages.length;
+  const absent = await request('no-existe@example.invalid');
+  assert.equal(absent.status, 202);
+  assert.equal(smtp.messages.length, beforeMessages);
+  smtp.rejectOnce();
+  const failed = await request(invitedUsername);
+  assert.equal(failed.status, 202);
+  assert.deepEqual(failed.body.data, absent.body.data);
+  const stale = await admin.query(`SELECT count(*)::int AS n FROM enlaces_acceso
+    WHERE tenant_id=$1 AND usuario_id=$2 AND proposito='RECUPERACION' AND usado_en IS NULL`,
+  [a.tenantId, invitedUserId]);
+  assert.equal(stale.rows[0].n, 0);
+  const sent = await request(invitedUsername);
+  assert.equal(sent.status, 202);
+  assert.deepEqual(sent.body.data, absent.body.data);
+  assert.equal(smtp.messages.length, beforeMessages + 1);
+  const decodedMail = smtp.messages.at(-1).replace(/=\n/g, '').replace(/=3D/gi, '=');
+  const match = decodedMail.match(/https?:\/\/[^\s]+/);
+  assert.ok(match);
+  const token = new URL(match[0]).searchParams.get('token');
+  const otherTenant = await call('/auth/reset-password', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ codigoModular: b.code, token, password: 'NuevaClave2026' }) });
+  assert.equal(otherTenant.status, 400);
+  const reset = await call('/auth/reset-password', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ codigoModular: a.code, token, password: 'NuevaClave2026' }) });
+  assert.equal(reset.status, 200, JSON.stringify(reset.body));
+  const reuse = await call('/auth/reset-password', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ codigoModular: a.code, token, password: 'NuevaClave2026' }) });
+  assert.equal(reuse.status, 400);
+  assert.equal(reuse.body.error.code, 'INVALID_LINK');
+});
+
+test('importación revierte el lote ante conflicto de usuario', async () => {
+  const prefix = Date.now().toString().slice(-7);
+  const username = `batch_${prefix}`;
+  const rows = ['1', '2'].map((end) => ({ tipoDocumento: 'DNI',
+    documento: `${prefix}${end}`, nombres: 'Lote', apellidoPaterno: 'Ficticio',
+    email: `batch-${prefix}-${end}@example.invalid`, username, rol: 'DOCENTE' }));
+  const preview = await call('/users/import/preview', { method: 'POST',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ rows }) });
+  assert.equal(preview.status, 200, JSON.stringify(preview.body));
+  assert.equal(preview.body.data.summary.nuevos, 2);
+  const commit = await call('/users/import/commit', { method: 'POST',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ rows }) });
+  assert.equal(commit.status, 409, JSON.stringify(commit.body));
+  const left = await admin.query(`SELECT count(*)::int AS n FROM personas
+    WHERE tenant_id=$1 AND documento_hash=ANY($2::char(64)[])`,
+  [a.tenantId, rows.map((row) => documentHash(row.documento))]);
+  assert.equal(left.rows[0].n, 0, 'la primera fila no debe sobrevivir al conflicto de la segunda');
+});
+
+test('apoderado ficticio requiere vínculo, invitación y consentimiento en su tenant', async () => {
+  const suffix = Date.now().toString().slice(-8);
+  const guardian = await call('/users', { method: 'POST',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ tipoDocumento: 'DNI', documento: suffix,
+      nombres: 'Apoderada', apellidoPaterno: 'Ficticia',
+      email: `guardian-${suffix}@example.invalid` }) });
+  assert.equal(guardian.status, 201, JSON.stringify(guardian.body));
+  const student = await call('/users', { method: 'POST',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ tipoDocumento: 'SIN_DOCUMENTO', codigoSiagie: `CI-${suffix}`,
+      nombres: 'Escolar', apellidoPaterno: 'Ficticio' }) });
+  assert.equal(student.status, 201, JSON.stringify(student.body));
+  const guardianId = guardian.body.data.personId;
+  const studentId = student.body.data.personId;
+  const foreign = await call('/guardians/links', { method: 'POST',
+    headers: bearer(accessB, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ guardianId, studentId, parentesco: 'MADRE',
+      verificacion: 'Verificación ficticia CI' }) });
+  assert.equal(foreign.status, 409);
+  const link = await call('/guardians/links', { method: 'POST',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ guardianId, studentId, parentesco: 'MADRE',
+      verificacion: 'Verificación ficticia CI' }) });
+  assert.equal(link.status, 201, JSON.stringify(link.body));
+  const consent = await call('/guardians/consent');
+  assert.equal(consent.status, 200);
+  assert.equal(consent.body.data.version, 'ci-ficticio-1');
+  const invite = await call('/guardians/invitations', { method: 'POST',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ guardianId, studentId }) });
+  assert.equal(invite.status, 200, JSON.stringify(invite.body));
+  const decodedMail = smtp.messages.at(-1).replace(/=\n/g, '').replace(/=3D/gi, '=');
+  const match = decodedMail.match(/https?:\/\/[^\s]+/);
+  assert.ok(match);
+  const token = new URL(match[0]).searchParams.get('token');
+  const activation = await call('/guardians/activate', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ codigoModular: a.code, token, password: PASSWORD,
+      consentimiento: true, versionTexto: 'ci-ficticio-1' }) });
+  assert.equal(activation.status, 200, JSON.stringify(activation.body));
+  const repeat = await call('/guardians/activate', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ codigoModular: a.code, token, password: PASSWORD,
+      consentimiento: true, versionTexto: 'ci-ficticio-1' }) });
+  assert.equal(repeat.status, 400);
+  const account = await admin.query('SELECT username FROM usuarios WHERE tenant_id=$1 AND persona_id=$2',
+    [a.tenantId, guardianId]);
+  const login = await call('/auth/login', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ codigoModular: a.code,
+      identifier: account.rows[0].username, password: PASSWORD }) });
+  assert.equal(login.status, 200, JSON.stringify(login.body));
+  const students = await call('/guardians/students', {
+    headers: bearer(login.body.data.accessToken) });
+  assert.equal(students.status, 200, JSON.stringify(students.body));
+  assert.ok(students.body.data.some((row) => row.id === studentId));
 });
 
 test('rutas reales rechazan ausencia de sesión y tenant discordante', async () => {
@@ -314,4 +441,9 @@ test('Redis indisponible falla cerrado en petición protegida y refresh', async 
     headers: { Cookie: refreshA.split(';')[0] } });
   assert.equal(refresh.status, 503);
   assert.equal(refresh.body.error.code, 'AUTH_UNAVAILABLE');
+  const recovery = await call('/auth/forgot-password', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ codigoModular: a.code, identifier: invitedUsername }) });
+  assert.equal(recovery.status, 503);
+  assert.equal(recovery.body.error.code, 'AUTH_UNAVAILABLE');
 });

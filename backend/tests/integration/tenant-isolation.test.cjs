@@ -551,10 +551,15 @@ test('S4: año nuevo conserva cuentas, configuración aislada y D-16 bloquea esc
     headers: bearer(accessA, json), body: JSON.stringify({ nombre: 'Sede A actualizada', activo: false }) });
   assert.equal(changedSite.status, 200, JSON.stringify(changedSite.body));
   assert.equal(changedSite.body.data.activo, false);
+  const beforeForeignAudit = await admin.query(`SELECT count(*)::int AS n FROM logs_auditoria
+    WHERE tenant_id=$1 AND accion='UPDATE_SITE'`, [b.tenantId]);
   const foreignSite = await call(`/school/sites/${siteId}`, { method: 'PATCH',
     headers: bearer(accessB, json), body: JSON.stringify({ activo: true }) });
   assert.equal(foreignSite.status, 404, JSON.stringify(foreignSite.body));
   assertContract('/school/sites/{id}', 'patch', foreignSite);
+  const afterForeignAudit = await admin.query(`SELECT count(*)::int AS n FROM logs_auditoria
+    WHERE tenant_id=$1 AND accion='UPDATE_SITE'`, [b.tenantId]);
+  assert.equal(afterForeignAudit.rows[0].n, beforeForeignAudit.rows[0].n);
 
   const createYear = (token) => call('/school/years', { method: 'POST',
     headers: bearer(token, json), body: JSON.stringify({ anio: 2027,

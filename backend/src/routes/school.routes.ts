@@ -22,6 +22,7 @@ async function mutate<T>(req: AuthenticatedRequest, fn: (client: import('pg').Po
   action: string, entity: string, payload: unknown) {
   return withTenant(req.user!.tenantId, req.user!.id, async (client) => {
     const value = await fn(client);
+    if (value === null || value === undefined) return value;
     await AuditService.record({ tenantId: req.user!.tenantId, usuarioId: req.user!.id,
       accion: action, entidad: entity, datosNuevos: payload, ipOrigen: req.ip }, client);
     return value;

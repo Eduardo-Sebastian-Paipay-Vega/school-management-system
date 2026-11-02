@@ -4,6 +4,18 @@ const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
 const { startCapture } = require('./smtp-capture.cjs');
 const { documentHash } = require('../../dist/core/identity-crypto');
+const Ajv2020 = require('ajv/dist/2020');
+const addFormats = require('ajv-formats');
+const openapi = require('./.openapi-bundle.json');
+const ajv = new Ajv2020({ strict: false, allErrors: true });
+addFormats(ajv);
+
+function assertContract(path, method, response) {
+  const schema = openapi.paths[path][method].responses[String(response.status)]
+    .content['application/json'].schema;
+  const valid = ajv.compile(schema);
+  assert.ok(valid(response.body), JSON.stringify(valid.errors));
+}
 
 // This file is run only by `npm run test:integration` with PostgreSQL 16 and
 // Redis 7. Never seed real school data: the fixtures below are fictitious.
@@ -111,6 +123,7 @@ test('login de cada tenant emite una sesión propia', async () => {
       body: JSON.stringify({ codigoModular: fixture.code,
         identifier: `admin_${fixture.code}`, password: PASSWORD }) });
     assert.equal(result.status, 200, JSON.stringify(result.body));
+    assertContract('/auth/login', 'post', result);
     assert.equal(result.body.data.user.tenantId, fixture.tenantId);
     assert.ok(result.body.data.accessToken);
     if (assign === 'a') {
@@ -130,6 +143,7 @@ test('alta, fallo SMTP, reintento y activación de uso único', async () => {
       nombres: 'Invitada', apellidoPaterno: 'Ficticia',
       email: `${username}@example.invalid`, username, rol: 'DOCENTE' }) });
   assert.equal(created.status, 201, JSON.stringify(created.body));
+  assertContract('/users', 'post', created);
   const userId = created.body.data.userId;
   invitedUserId = userId;
   assert.ok(userId);
@@ -149,6 +163,7 @@ test('alta, fallo SMTP, reintento y activación de uso único', async () => {
 
   const sent = await call(`/users/${userId}/invite`, { method: 'POST', headers: bearer(accessA) });
   assert.equal(sent.status, 200, JSON.stringify(sent.body));
+  assertContract('/users/{id}/invite', 'post', sent);
   assert.equal(smtp.messages.length, 1);
   const decodedMail = smtp.messages[0].replace(/=\n/g, '').replace(/=3D/gi, '=');
   const match = decodedMail.match(/https?:\/\/[^\s]+/);
@@ -160,10 +175,12 @@ test('alta, fallo SMTP, reintento y activación de uso único', async () => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ codigoModular: a.code, token, password: PASSWORD }) });
   assert.equal(activation.status, 200, JSON.stringify(activation.body));
+  assertContract('/auth/activate', 'post', activation);
   const reused = await call('/auth/activate', { method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ codigoModular: a.code, token, password: PASSWORD }) });
   assert.equal(reused.status, 400);
+  assertContract('/auth/activate', 'post', reused);
   assert.equal(reused.body.error.code, 'INVALID_LINK');
   const activeLogin = await call('/auth/login', { method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -219,6 +236,7 @@ test('recuperación no enumera, invalida fallo SMTP y consume enlace una vez', a
   assert.equal(stale.rows[0].n, 0);
   const sent = await request(invitedUsername);
   assert.equal(sent.status, 202);
+  assertContract('/auth/forgot-password', 'post', sent);
   assert.deepEqual(sent.body.data, absent.body.data);
   assert.equal(smtp.messages.length, beforeMessages + 1);
   const decodedMail = smtp.messages.at(-1).replace(/=\n/g, '').replace(/=3D/gi, '=');
@@ -233,6 +251,7 @@ test('recuperación no enumera, invalida fallo SMTP y consume enlace una vez', a
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ codigoModular: a.code, token, password: 'NuevaClave2026' }) });
   assert.equal(reset.status, 200, JSON.stringify(reset.body));
+  assertContract('/auth/reset-password', 'post', reset);
   const reuse = await call('/auth/reset-password', { method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ codigoModular: a.code, token, password: 'NuevaClave2026' }) });
@@ -288,11 +307,13 @@ test('apoderado ficticio requiere vínculo, invitación y consentimiento en su t
   assert.equal(link.status, 201, JSON.stringify(link.body));
   const consent = await call('/guardians/consent');
   assert.equal(consent.status, 200);
+  assertContract('/guardians/consent', 'get', consent);
   assert.equal(consent.body.data.version, 'ci-ficticio-1');
   const invite = await call('/guardians/invitations', { method: 'POST',
     headers: bearer(accessA, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ guardianId, studentId }) });
   assert.equal(invite.status, 200, JSON.stringify(invite.body));
+  assertContract('/guardians/invitations', 'post', invite);
   const decodedMail = smtp.messages.at(-1).replace(/=\n/g, '').replace(/=3D/gi, '=');
   const match = decodedMail.match(/https?:\/\/[^\s]+/);
   assert.ok(match);
@@ -302,6 +323,7 @@ test('apoderado ficticio requiere vínculo, invitación y consentimiento en su t
     body: JSON.stringify({ codigoModular: a.code, token, password: PASSWORD,
       consentimiento: true, versionTexto: 'ci-ficticio-1' }) });
   assert.equal(activation.status, 200, JSON.stringify(activation.body));
+  assertContract('/guardians/activate', 'post', activation);
   const repeat = await call('/guardians/activate', { method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ codigoModular: a.code, token, password: PASSWORD,
@@ -378,10 +400,16 @@ test('errores HTTP transversales conservan código, estado y timestamp', async (
 test('rutas de usuarios y auditoría no muestran datos de otro tenant', async () => {
   const users = await call('/users', { headers: bearer(accessA) });
   assert.equal(users.status, 200, JSON.stringify(users.body));
+  assertContract('/users', 'get', users);
   assert.ok(!JSON.stringify(users.body.data).includes(`admin_${b.code}`));
   const logs = await call('/audit/logs', { headers: bearer(accessA) });
   assert.equal(logs.status, 200, JSON.stringify(logs.body));
+  assertContract('/audit/logs', 'get', logs);
   assert.ok(!JSON.stringify(logs.body.data).includes(b.userId));
+  const chain = await call('/audit/verify-chain', { headers: bearer(accessA) });
+  assert.equal(chain.status, 200, JSON.stringify(chain.body));
+  assertContract('/audit/verify-chain', 'get', chain);
+  assert.equal(chain.body.data.valid, true);
 });
 
 test('intentos de acceso tienen límite por tenant sin enumerar cuentas', async () => {

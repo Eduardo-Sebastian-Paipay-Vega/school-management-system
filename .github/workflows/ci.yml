@@ -165,6 +165,9 @@ jobs:
       - name: Instalar backend
         run: npm ci
         working-directory: backend
+      - name: Empaquetar contrato OpenAPI para validar respuestas HTTP
+        run: npm ci && npx redocly bundle openapi/openapi.yaml --dereferenced --output ../../backend/tests/integration/.openapi-bundle.json
+        working-directory: packages/contracts
       - name: Probar aislamiento y fallo cerrado
         run: npm run test:integration
         working-directory: backend

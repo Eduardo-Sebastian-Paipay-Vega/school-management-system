@@ -903,6 +903,82 @@ export interface components {
             /** Format: date-time */
             timestamp: string;
         };
+        UserDirectorySuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                users: {
+                    /** Format: uuid */
+                    id: string;
+                    username: string;
+                    estado: string;
+                    /** Format: uuid */
+                    persona_id: string;
+                    nombres: string;
+                    apellido_paterno: string;
+                    apellido_materno?: string | null;
+                    /** Format: email */
+                    email?: string | null;
+                    documento_ultimos4?: string | null;
+                    roles: string[];
+                }[];
+                count: number;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        UserCreatedSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                line: number;
+                /** Format: uuid */
+                personId: string;
+                /** Format: uuid */
+                userId?: string;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        GuardianConsentSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                version: string;
+                text: string;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        AuditLogsSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                logs: {
+                    id: string;
+                    /** Format: uuid */
+                    usuario_id?: string | null;
+                    modulo: string;
+                    accion: string;
+                    /** Format: date-time */
+                    timestamp_utc: string;
+                }[];
+                count: number;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        AuditChainSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                valid: boolean;
+                totalRecords: number;
+                errorIndex?: number;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
     };
     responses: {
         /** @description Operación completada */
@@ -963,6 +1039,51 @@ export interface components {
                     timestamp: string;
                     services: Record<string, never>;
                 };
+            };
+        };
+        /** @description Directorio visible en el tenant autenticado. */
+        UserDirectory: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["UserDirectorySuccess"];
+            };
+        };
+        /** @description Persona y cuenta opcional creadas sin enviar invitación. */
+        UserCreated: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["UserCreatedSuccess"];
+            };
+        };
+        /** @description Texto y versión de consentimiento configurados. */
+        GuardianConsent: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["GuardianConsentSuccess"];
+            };
+        };
+        /** @description Bitácora filtrada del tenant autenticado. */
+        AuditLogs: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["AuditLogsSuccess"];
+            };
+        };
+        /** @description Integridad de la cadena de auditoría del tenant. */
+        AuditChain: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["AuditChainSuccess"];
             };
         };
     };
@@ -1092,7 +1213,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["UserDirectory"];
         };
     };
     createUser: {
@@ -1104,7 +1225,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            201: components["responses"]["Success"];
+            201: components["responses"]["UserCreated"];
         };
     };
     getOwnUser: {
@@ -1242,7 +1363,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Message"];
         };
     };
     deactivateUser: {
@@ -1536,7 +1657,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["GuardianConsent"];
             503: components["responses"]["Error"];
         };
     };
@@ -1549,7 +1670,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Message"];
         };
     };
     listLinkedStudents: {
@@ -1597,7 +1718,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Message"];
         };
     };
     revokeGuardianLink: {
@@ -1688,7 +1809,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["AuditLogs"];
         };
     };
     verifyAuditChain: {
@@ -1700,7 +1821,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["AuditChain"];
         };
     };
     exportAuditPdf: {

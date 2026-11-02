@@ -35,6 +35,8 @@ Las rutas bajo `/api/v1` usan `{success,data|error,timestamp}`, salvo `/health` 
 
 El contrato vigente se publica en `packages/contracts/openapi/openapi.yaml`, con rutas en `paths/` y componentes en `components/`; `core.yaml` permanece como instantánea histórica para comprobar la migración de 46 rutas y 57 operaciones. Los tipos de `school-contracts` se generan desde el contrato vigente. Los campos de entrada se validan en los controladores con Zod.
 
+La suite HTTP integrada valida las respuestas de Sprint 3 contra un bundle OpenAPI 3.1 desreferenciado. En una instalación local nueva, ejecutar `npm ci` en `packages/contracts/` y `npx redocly bundle openapi/openapi.yaml --dereferenced --output ../../backend/tests/integration/.openapi-bundle.json` antes de `npm run test:integration` en `backend/`; el archivo generado está ignorado por Git. El CI ejecuta esos pasos automáticamente.
+
 | Grupo | Rutas principales |
 | --- | --- |
 | Acceso | `POST /auth/login`, `/auth/refresh-token`, `/auth/logout`, `/auth/forgot-password`, `/auth/reset-password`, `/auth/activate`; `GET /auth/me` |

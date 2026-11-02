@@ -6,3 +6,8 @@ WHERE categoria='SEGURIDAD' AND por_correo IS DISTINCT FROM true;
 ALTER TABLE preferencias_notificacion
   ADD CONSTRAINT ck_preferencia_seguridad_correo
   CHECK (categoria<>'SEGURIDAD' OR por_correo IS TRUE);
+
+CREATE INDEX IF NOT EXISTS idx_notificaciones_retencion
+  ON notificaciones(created_at,id);
+CREATE INDEX IF NOT EXISTS idx_avisos_inasistencia_notificacion
+  ON avisos_inasistencia(notificacion_id) WHERE notificacion_id IS NOT NULL;

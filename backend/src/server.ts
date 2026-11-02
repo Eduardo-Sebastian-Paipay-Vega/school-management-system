@@ -29,6 +29,8 @@ const startServer = async () => {
   setInterval(() => {
     NotificationService.processEmailQueue().catch((error) =>
       console.error('Error al procesar la cola de correo:', error));
+    NotificationService.processDailyDigest().catch((error) =>
+      console.error('Error al procesar el resumen diario:', error));
   }, 60_000).unref();
 };
 

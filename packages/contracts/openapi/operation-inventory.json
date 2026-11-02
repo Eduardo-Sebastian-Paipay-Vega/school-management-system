@@ -131,6 +131,9 @@
     "listNotifications",
     "sendNotification"
   ],
+  "/notifications/unread-count": [
+    "countUnreadNotifications"
+  ],
   "/notifications/{id}/read": [
     "markNotificationRead"
   ],

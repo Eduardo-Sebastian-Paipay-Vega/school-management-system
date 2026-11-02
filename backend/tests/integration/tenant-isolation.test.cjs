@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
 const { startCapture } = require('./smtp-capture.cjs');
+const WebSocket = require('ws');
 const { documentHash } = require('../../dist/core/identity-crypto');
 const Ajv2020 = require('ajv/dist/2020');
 const addFormats = require('ajv-formats');
@@ -95,6 +96,7 @@ before(async () => {
   process.env.PUBLIC_APP_URL = 'http://localhost:3000';
   process.env.SMTP_TEST_PLAINTEXT = '1';
   process.env.GUARDIAN_CONSENT_VERSION = 'ci-ficticio-1';
+  process.env.CORS_ORIGIN = 'http://localhost:3000';
   process.env.GUARDIAN_TEST_LINK_VERIFICATION = '1';
   process.env.GUARDIAN_CONSENT_TEXT = 'Texto ficticio exclusivo de CI para probar la aceptación explícita del vínculo familiar. ' +
     'No representa un consentimiento institucional ni habilita datos de personas reales.';
@@ -104,16 +106,19 @@ before(async () => {
   redisClient = require('../../dist/config/redis').redisClient;
   await database.assertRuntimeRole();
   await redisClient.connect();
+  await require('../../dist/services/notifications.service').NotificationService.startPubsub();
   const suffix = Date.now().toString().slice(-6);
   a = await createInstitution(`1${suffix}`);
   b = await createInstitution(`2${suffix}`);
   const app = createApp();
   await new Promise((resolve) => { server = app.listen(0, resolve); });
+  require('../../dist/services/realtime.service').attachRealtime(server);
   base = `http://127.0.0.1:${server.address().port}`;
 });
 
 after(async () => {
   if (server) await new Promise((resolve) => server.close(resolve));
+  await require('../../dist/services/notifications.service').NotificationService.stopPubsub();
   if (redisClient?.isOpen) await redisClient.quit();
   if (runtime) await runtime.pool.end();
   await admin.end();
@@ -143,8 +148,9 @@ test('S5: avisos A/B, correo verificado, preferencia obligatoria y reintento SMT
     headers:bearer(accessA,json),body:JSON.stringify({porCorreo:false}) });
   assert.equal(reject.status,409,JSON.stringify(reject.body));
   assert.equal(reject.body.error.code,'SECURITY_PREFERENCE_REQUIRED');
-  const send=(token,userId,categoria,titulo)=>call('/notifications',{method:'POST',
-    headers:bearer(token,json),body:JSON.stringify({userId,categoria,titulo,mensaje:'Aviso ficticio de CI'})});
+  const send=(token,userId,categoria,titulo,prioridad)=>call('/notifications',{method:'POST',
+    headers:bearer(token,json),body:JSON.stringify({userId,categoria,titulo,
+      mensaje:'Aviso ficticio de CI',prioridad})});
   const unverified=await send(accessA,a.userId,'SEGURIDAD','Solo bandeja sin verificar');
   assert.equal(unverified.status,201,JSON.stringify(unverified.body));
   const noVerifiedEmail=await admin.query('SELECT id FROM envios_correo WHERE notificacion_id=$1',
@@ -153,6 +159,15 @@ test('S5: avisos A/B, correo verificado, preferencia obligatoria y reintento SMT
   await admin.query('UPDATE usuarios SET email_verificado_en=now() WHERE id=$1',[a.userId]);
   const security=await send(accessA,a.userId,'SEGURIDAD','Seguridad ficticia A');
   assert.equal(security.status,201,JSON.stringify(security.body));
+  const unread=await call('/notifications/unread-count',{headers:bearer(accessA)});
+  assert.equal(unread.status,200,JSON.stringify(unread.body));
+  assert.equal(unread.body.data.count,2);
+  assertContract('/notifications/unread-count','get',unread);
+  const marked=await call(`/notifications/${security.body.data.id}/read`,{
+    method:'PATCH',headers:bearer(accessA)});
+  assert.equal(marked.status,200,JSON.stringify(marked.body));
+  const afterRead=await call('/notifications/unread-count',{headers:bearer(accessA)});
+  assert.equal(afterRead.body.data.count,1);
   const cross=await send(accessB,a.userId,'SEGURIDAD','Cruce B');
   assert.equal(cross.status,409,JSON.stringify(cross.body));
   const inboxB=await call('/notifications',{headers:bearer(accessB)});
@@ -180,6 +195,75 @@ test('S5: avisos A/B, correo verificado, preferencia obligatoria y reintento SMT
   assert.equal(noEmail.status,201,JSON.stringify(noEmail.body));
   const skipped=await admin.query('SELECT id FROM envios_correo WHERE notificacion_id=$1',[noEmail.body.data.id]);
   assert.equal(skipped.rowCount,0);
+  const low1=await send(accessA,a.userId,'NOTAS','Resumen bajo uno','BAJA');
+  const low2=await send(accessA,a.userId,'NOTAS','Resumen bajo dos','BAJA');
+  assert.equal(low1.status,201,JSON.stringify(low1.body));
+  assert.equal(low2.status,201,JSON.stringify(low2.body));
+  const beforeDigest=smtp.messages.length;
+  await NotificationService.processEmailQueue();
+  assert.equal(smtp.messages.length,beforeDigest,'prioridad BAJA no envía correos individuales');
+  await admin.query(`UPDATE notificaciones SET created_at=now()-interval '2 days'
+    WHERE id=ANY($1::uuid[])`,[[low1.body.data.id,low2.body.data.id]]);
+  await NotificationService.processDailyDigest();
+  assert.equal(smtp.messages.length,beforeDigest+1);
+  assert.ok(smtp.messages.at(-1).includes('Resumen bajo uno'));
+  assert.ok(smtp.messages.at(-1).includes('Resumen bajo dos'));
+  const digestSent=await admin.query(`SELECT estado FROM envios_correo
+    WHERE notificacion_id=ANY($1::uuid[])`,[[low1.body.data.id,low2.body.data.id]]);
+  assert.equal(digestSent.rowCount,2);
+  assert.ok(digestSent.rows.every(row=>row.estado==='ENVIADO'));
+});
+
+test('S5: WebSocket entrega solo al tenant y cierra la sesión revocada', async () => {
+  const openSocket=async(token)=>{
+    const ws=new WebSocket(base.replace('http','ws')+'/api/v1/notifications/ws',
+      ['bearer',token],{origin:'http://localhost:3000'});
+    const events=[];
+    ws.on('message',raw=>events.push(JSON.parse(raw.toString())));
+    await new Promise((resolve,reject)=>{ws.once('open',resolve);ws.once('error',reject);});
+    return {ws,events};
+  };
+  const aSocket=await openSocket(accessA);
+  const bSocket=await openSocket(accessB);
+  try{
+    const event=new Promise((resolve,reject)=>{
+      const timeout=setTimeout(()=>reject(new Error('WebSocket A no recibió el aviso')),2000);
+      aSocket.ws.on('message',raw=>{
+        const parsed=JSON.parse(raw.toString());
+        if(parsed.type==='notification'){clearTimeout(timeout);resolve(parsed);}
+      });
+    });
+    const notice=await call('/notifications',{method:'POST',
+      headers:bearer(accessA,{'Content-Type':'application/json'}),
+      body:JSON.stringify({userId:a.userId,categoria:'ASISTENCIA',
+        titulo:'Evento WebSocket ficticio A',mensaje:'Solo A'})});
+    assert.equal(notice.status,201,JSON.stringify(notice.body));
+    assert.equal((await event).id,notice.body.data.id);
+    await new Promise(resolve=>setTimeout(resolve,50));
+    assert.ok(!bSocket.events.some(item=>item.type==='notification'));
+
+    const login=await call('/auth/login',{method:'POST',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        codigoModular:a.code,identifier:`admin_${a.code}`,password:PASSWORD})});
+    assert.equal(login.status,200,JSON.stringify(login.body));
+    const stale=await openSocket(login.body.data.accessToken);
+    try{
+      const closed=new Promise((resolve,reject)=>{
+        const timeout=setTimeout(()=>reject(new Error('WebSocket revocado permaneció abierto')),2000);
+        stale.ws.once('close',code=>{clearTimeout(timeout);resolve(code);});
+      });
+      const logout=await call('/auth/logout',{method:'POST',
+        headers:bearer(login.body.data.accessToken)});
+      assert.equal(logout.status,200,JSON.stringify(logout.body));
+      const trigger=await call('/notifications',{method:'POST',
+        headers:bearer(accessA,{'Content-Type':'application/json'}),
+        body:JSON.stringify({userId:a.userId,categoria:'ASISTENCIA',
+          titulo:'Evento tras revocación',mensaje:'Solo sesión vigente'})});
+      assert.equal(trigger.status,201,JSON.stringify(trigger.body));
+      assert.equal(await closed,1008);
+      assert.ok(!stale.events.some(item=>item.type==='notification'));
+    }finally{stale.ws.terminate();}
+  }finally{aSocket.ws.terminate();bSocket.ws.terminate();}
 });
 
 test('alta, fallo SMTP, reintento y activación de uso único', async () => {

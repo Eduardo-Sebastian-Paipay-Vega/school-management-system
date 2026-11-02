@@ -4,6 +4,10 @@
 
 Ejecutar `npm run audit:partitions` desde `database/` cada mes con `DATABASE_URL` del propietario de migraciones. El comando crea el mes UTC actual y los 12 siguientes, de forma idempotente. Supervisar su resultado antes de que venza la última partición: una escritura auditada falla cerrada si falta la partición del mes; `sms_app` no puede crearla.
 
+## Conservación de notificaciones
+
+Ejecutar `npm run notifications:retain` diariamente desde `database/` con `DATABASE_URL` del propietario de migraciones. El comando elimina avisos de más de 180 días en lotes de 1000, junto con sus intentos de correo; las referencias de avisos de inasistencia se conservan con `notificacion_id` nulo. No borra la bitácora de auditoría. El despliegue debe programar y supervisar esta tarea.
+
 ## Fases
 
 La cuenta pertenece a la persona y al plantel, no al año lectivo. En la Fase 1 se importan personas de la nómina, se crean solo las cuentas necesarias y se envía una invitación de un uso; cada usuario fija su clave. El archivo no lleva contraseñas. En 2027 se configura otro año con periodos y secciones, mientras Squad 2 crea la matrícula anual referida al `persona_id` existente. El Core no crea matrículas ni fija rangos numéricos CNEB sin la aprobación institucional D-16.

@@ -6,8 +6,8 @@
 |---|---|---|
 | S5-00 Privacidad | `/users` entrega `telefono_enmascarado`; edición UI envía teléfono solo si fue tocado. Suite HTTP prueba ausencia de número completo y PATCH parcial. | Implementada; suite integrada pendiente de CI. |
 | S5-01 Familias | Sin ficha institucional de Squad 2, altas y consulta real fallan con 503; mecanismo ficticio solo en `NODE_ENV=test`. `DELETE /guardians/consent` y desvinculación revocan sesiones; suite A/B lo comprueba. | Implementada con bloqueo real; aceptación institucional pendiente. |
-| S5-02 Avisos | SEGURIDAD obligatorio en API y BD; correo solo a cuenta verificada, preferencia respetada al crear y al enviar. Cola reclama trabajo en transacción corta y reintenta; WebSocket revalida antes de emitir. Suite HTTP/SMTP A/B cubre preferencia, verificación y reintento. | Implementada; suite integrada y WS cliente pendiente de CI. |
-| S5-03 Auditoría | `/audit/logs` devuelve total filtrado, filtro usuario y registra lecturas. PDF responde 409 al superar 2000 filas. `database audit:partitions` prepara 13 meses UTC con propietario de migraciones. | Implementada; prueba operacional de particiones pendiente. |
+| S5-02 Avisos | SEGURIDAD obligatorio en API y BD; correo solo a cuenta verificada, preferencia respetada al crear y al enviar. Cola reclama trabajo en transacción corta y reintenta; BAJA se agrupa al día siguiente (hora Lima). Contador de no leídas se actualiza por WebSocket y se prueba su cierre tras revocar la sesión. | Implementada; nueva suite integrada pendiente de CI. |
+| S5-03 Auditoría | `/audit/logs` devuelve total filtrado, filtro usuario y registra lecturas. PDF responde 409 al superar 2000 filas. `database audit:partitions` prepara 13 meses UTC con propietario de migraciones. `notifications:retain` elimina avisos mayores de 180 días en lotes. | Implementada; tareas operativas pendientes de CI. |
 | S5-04 RF-66 | Contrato de transacción compartida definido abajo. Squad 3 conserva su `grade_audit_history` separado y Squad 2 aún no expone mutación auditable en Core. | Dependencia entre squads; no se declara cierre RF-66. |
 
 ## Contrato de integración RF-66
@@ -18,9 +18,9 @@ La mutación de asistencia o calificación y `fn_registrar_auditoria` deben usar
 
 - `database npm test`: 33/33.
 - `backend npm run lint`, `npm run build`, `npm test`: 0 errores; 10/10 pruebas unitarias.
-- `packages/contracts npm run generate`, `check:inventory`, `check:generated`: 47 rutas y 59 operaciones; generación reproducible. OpenAPI mantiene avisos de calidad preexistentes.
-- PrimeReact Guardian: auditor 0 errores y 0 avisos. `frontend npm run lint`: 0 errores, 66 avisos preexistentes. `frontend npm run build`: compiló tras la última edición de texto.
-- `git diff --check`: sin errores de whitespace. Inspección visual autenticada aún no ejecutada por falta de backend local con datos ficticios; los estados se verifican en build, no visualmente.
+- `packages/contracts npm run generate`, `check:inventory`, `check:generated`: 48 rutas y 60 operaciones, tipos reproducibles. OpenAPI mantiene avisos de calidad preexistentes.
+- PrimeReact Guardian: auditor 0 errores y 0 avisos. `frontend npm run lint`: 0 errores y 66 avisos preexistentes; `npm run build` compiló con el contador nuevo.
+- [CI 41537384800](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/actions/runs/41537384800): seis jobs verdes antes de añadir contador, resumen diario y retención. Inspección visual autenticada aún no ejecutada por falta de backend local con datos ficticios; los estados se verifican en build, no visualmente.
 
 ## Dependencias para aceptación del piloto
 

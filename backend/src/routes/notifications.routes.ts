@@ -24,6 +24,16 @@ router.get('/',async(req:AuthenticatedRequest,res)=>{
   }catch{fail(res,500,'NOTIFICATIONS_ERROR','No se pudo cargar la bandeja.');}
 });
 
+router.get('/unread-count',async(req:AuthenticatedRequest,res)=>{
+  try{
+    const data=await withTenant(req.user!.tenantId,req.user!.id,async(client)=>
+      (await client.query<{count:number}>(`SELECT count(*)::int AS count FROM notificaciones
+        WHERE tenant_id=$1 AND usuario_id=$2 AND leida_en IS NULL`,
+        [req.user!.tenantId,req.user!.id])).rows[0]);
+    ok(res,data);
+  }catch{fail(res,500,'NOTIFICATIONS_ERROR','No se pudo cargar el contador.');}
+});
+
 router.patch('/:id/read',async(req:AuthenticatedRequest,res)=>{
   try{
     const data=await withTenant(req.user!.tenantId,req.user!.id,async(client)=>

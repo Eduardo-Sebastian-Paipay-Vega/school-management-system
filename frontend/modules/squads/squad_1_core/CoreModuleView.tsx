@@ -423,12 +423,13 @@ function SchoolPanel(){
 
 function NoticesPanel(){
   const {request,subscribeNotifications,user}=useCoreSession();const {data,busy,error,reload}=useLoad<Notice[]>('/notifications');
+  const {data:unread,reload:reloadUnread}=useLoad<{count:number}>('/notifications/unread-count');
   const {data:preferences,reload:reloadPreferences}=useLoad<{categoria:string;por_correo:boolean}[]>('/notifications/preferences');
   const [search,setSearch]=useState('');const [recipients,setRecipients]=useState<DirectoryUser[]>([]);
   const [recipient,setRecipient]=useState('');const [category,setCategory]=useState('RECORDATORIO');
   const [title,setTitle]=useState('');const [body,setBody]=useState('');const [message,setMessage]=useState('');
-  useEffect(()=>subscribeNotifications(()=>{void reload();}),[subscribeNotifications,reload]);
-  async function mark(id:string){await request(`/notifications/${id}/read`,{method:'PATCH'});await reload();}
+  useEffect(()=>subscribeNotifications(()=>{void reload();void reloadUnread();}),[subscribeNotifications,reload,reloadUnread]);
+  async function mark(id:string){await request(`/notifications/${id}/read`,{method:'PATCH'});await reload();await reloadUnread();}
   async function findRecipients(){
     try{const result=await request<{users:DirectoryUser[]}>(`/users?search=${encodeURIComponent(search)}`);
       setRecipients(result.users);}catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo buscar.');}
@@ -440,7 +441,10 @@ function NoticesPanel(){
     catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo enviar.');}
   }
   const categories=['SEGURIDAD','RECORDATORIO','ASISTENCIA','NOTAS','TRAMITES','CITAS'];
-  return <div><State busy={busy} error={error} retry={()=>void reload()}/>
+  return <div><h2 className="mb-2 flex items-center gap-2 font-bold" aria-live="polite">
+    <i className="pi pi-bell" aria-hidden="true"/> Avisos
+    <span className="rounded-full bg-primary px-2 py-0.5 text-xs text-white" aria-label={`${unread?.count??0} avisos no leídos`}>
+      {unread?.count??0}</span></h2><State busy={busy} error={error} retry={()=>{void reload();void reloadUnread();}}/>
     {data?.length===0&&<p className="p-4 text-sm text-gray-600">No hay avisos.</p>}
     <ul className="divide-y">{data?.map(n=><li key={n.id} className="flex flex-wrap items-start justify-between gap-3 py-4">
       <div><h3 className="font-bold">{n.titulo}</h3><p className="text-sm text-gray-700">{n.mensaje}</p>

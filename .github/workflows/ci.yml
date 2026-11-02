@@ -171,6 +171,9 @@ jobs:
       - name: Probar aislamiento y fallo cerrado
         run: npm run test:integration
         working-directory: backend
+      - name: Verificar tareas operativas de auditoría y retención
+        run: npm run audit:partitions && npm run notifications:retain
+        working-directory: database
       - name: Respaldar y restaurar en otra base aislada
         shell: bash
         run: |

@@ -156,6 +156,7 @@ test('alta, fallo SMTP, reintento y activación de uso único', async () => {
   smtp.rejectOnce();
   const failed = await call(`/users/${userId}/invite`, { method: 'POST', headers: bearer(accessA) });
   assert.equal(failed.status, 503, JSON.stringify(failed.body));
+  assertContract('/users/{id}/invite', 'post', failed);
   const stale = await admin.query(`SELECT count(*)::int AS n FROM enlaces_acceso
     WHERE tenant_id=$1 AND usuario_id=$2 AND proposito='ACTIVACION' AND usado_en IS NULL`,
   [a.tenantId, userId]);
@@ -269,11 +270,13 @@ test('importación revierte el lote ante conflicto de usuario', async () => {
     headers: bearer(accessA, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ rows }) });
   assert.equal(preview.status, 200, JSON.stringify(preview.body));
+  assertContract('/users/import/preview', 'post', preview);
   assert.equal(preview.body.data.summary.nuevos, 2);
   const commit = await call('/users/import/commit', { method: 'POST',
     headers: bearer(accessA, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ rows }) });
   assert.equal(commit.status, 409, JSON.stringify(commit.body));
+  assertContract('/users/import/commit', 'post', commit);
   const left = await admin.query(`SELECT count(*)::int AS n FROM personas
     WHERE tenant_id=$1 AND documento_hash=ANY($2::char(64)[])`,
   [a.tenantId, rows.map((row) => documentHash(row.documento))]);
@@ -300,11 +303,13 @@ test('apoderado ficticio requiere vínculo, invitación y consentimiento en su t
     body: JSON.stringify({ guardianId, studentId, parentesco: 'MADRE',
       verificacion: 'Verificación ficticia CI' }) });
   assert.equal(foreign.status, 409);
+  assertContract('/guardians/links', 'post', foreign);
   const link = await call('/guardians/links', { method: 'POST',
     headers: bearer(accessA, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ guardianId, studentId, parentesco: 'MADRE',
       verificacion: 'Verificación ficticia CI' }) });
   assert.equal(link.status, 201, JSON.stringify(link.body));
+  assertContract('/guardians/links', 'post', link);
   const consent = await call('/guardians/consent');
   assert.equal(consent.status, 200);
   assertContract('/guardians/consent', 'get', consent);
@@ -329,6 +334,7 @@ test('apoderado ficticio requiere vínculo, invitación y consentimiento en su t
     body: JSON.stringify({ codigoModular: a.code, token, password: PASSWORD,
       consentimiento: true, versionTexto: 'ci-ficticio-1' }) });
   assert.equal(repeat.status, 400);
+  assertContract('/guardians/activate', 'post', repeat);
   const account = await admin.query('SELECT username FROM usuarios WHERE tenant_id=$1 AND persona_id=$2',
     [a.tenantId, guardianId]);
   const login = await call('/auth/login', { method: 'POST',
@@ -339,6 +345,7 @@ test('apoderado ficticio requiere vínculo, invitación y consentimiento en su t
   const students = await call('/guardians/students', {
     headers: bearer(login.body.data.accessToken) });
   assert.equal(students.status, 200, JSON.stringify(students.body));
+  assertContract('/guardians/students', 'get', students);
   assert.ok(students.body.data.some((row) => row.id === studentId));
 });
 
@@ -458,6 +465,15 @@ test('sms_runtime aplica RLS, falla sin contexto y limpia el contexto del pool',
   } finally {
     client.release();
   }
+});
+
+test('logout revoca inmediatamente el access token', async () => {
+  const logout = await call('/auth/logout', { method: 'POST', headers: bearer(accessB) });
+  assert.equal(logout.status, 200, JSON.stringify(logout.body));
+  assertContract('/auth/logout', 'post', logout);
+  const revoked = await call('/school/institution', { headers: bearer(accessB) });
+  assert.equal(revoked.status, 401);
+  assert.equal(revoked.body.error.code, 'UNAUTHENTICATED');
 });
 
 test('Redis indisponible falla cerrado en petición protegida y refresh', async () => {

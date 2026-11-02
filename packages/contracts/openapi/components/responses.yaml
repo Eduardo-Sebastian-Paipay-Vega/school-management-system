@@ -48,6 +48,26 @@ GuardianConsent:
   content:
     application/json:
       schema: { $ref: './schemas.yaml#/GuardianConsentSuccess' }
+ImportPreview:
+  description: Validación del lote sin escritura.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/ImportPreviewSuccess' }
+ImportCommit:
+  description: Resultado transaccional de la importación.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/ImportCommitSuccess' }
+GuardianLinkCreated:
+  description: Vínculo familiar verificado y pendiente de aceptación.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/GuardianLinkCreatedSuccess' }
+GuardianStudents:
+  description: Estudiantes visibles tras vínculo y consentimiento vigentes.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/GuardianStudentsSuccess' }
 Health:
   description: Estado de PostgreSQL y Redis
   content:

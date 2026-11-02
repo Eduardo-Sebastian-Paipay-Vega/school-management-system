@@ -940,12 +940,84 @@ export interface components {
             /** Format: date-time */
             timestamp: string;
         };
+        ImportRejectedRow: {
+            line: number;
+            reason: string;
+        };
+        ImportSummary: {
+            nuevos: number;
+            actualizados: number;
+            sinCambios: number;
+            rechazados: number;
+        };
+        ImportPreviewSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                valid: {
+                    line: number;
+                    row: Record<string, never>;
+                    /** Format: uuid */
+                    personId?: string;
+                    /** @enum {string} */
+                    status: "NUEVO" | "ACTUALIZADO" | "SIN_CAMBIOS";
+                }[];
+                rejected: components["schemas"]["ImportRejectedRow"][];
+                summary: components["schemas"]["ImportSummary"];
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        ImportCommitSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                nuevos: number;
+                actualizados: number;
+                sinCambios: number;
+                rechazados: components["schemas"]["ImportRejectedRow"][];
+                registros: {
+                    line: number;
+                    /** Format: uuid */
+                    personId: string;
+                    /** Format: uuid */
+                    userId?: string;
+                }[];
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
         GuardianConsentSuccess: {
             /** @constant */
             success: true;
             data: {
                 version: string;
                 text: string;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        GuardianStudentsSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** Format: uuid */
+                id: string;
+                nombres: string;
+                apellido_paterno: string;
+                apellido_materno?: string | null;
+                /** @enum {string} */
+                parentesco: "PADRE" | "MADRE" | "TUTOR_LEGAL";
+            }[];
+            /** Format: date-time */
+            timestamp: string;
+        };
+        GuardianLinkCreatedSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** Format: uuid */
+                id: string;
             };
             /** Format: date-time */
             timestamp: string;
@@ -1059,6 +1131,24 @@ export interface components {
                 "application/json": components["schemas"]["UserCreatedSuccess"];
             };
         };
+        /** @description Validación del lote sin escritura. */
+        ImportPreview: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ImportPreviewSuccess"];
+            };
+        };
+        /** @description Resultado transaccional de la importación. */
+        ImportCommit: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ImportCommitSuccess"];
+            };
+        };
         /** @description Texto y versión de consentimiento configurados. */
         GuardianConsent: {
             headers: {
@@ -1066,6 +1156,24 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["GuardianConsentSuccess"];
+            };
+        };
+        /** @description Estudiantes visibles tras vínculo y consentimiento vigentes. */
+        GuardianStudents: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["GuardianStudentsSuccess"];
+            };
+        };
+        /** @description Vínculo familiar verificado y pendiente de aceptación. */
+        GuardianLinkCreated: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["GuardianLinkCreatedSuccess"];
             };
         };
         /** @description Bitácora filtrada del tenant autenticado. */
@@ -1285,7 +1393,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["ImportPreview"];
         };
     };
     commitUserImport: {
@@ -1297,7 +1405,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["ImportCommit"];
+            409: components["responses"]["Error"];
         };
     };
     listRoles: {
@@ -1364,6 +1473,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["Message"];
+            503: components["responses"]["Error"];
         };
     };
     deactivateUser: {
@@ -1671,6 +1781,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["Message"];
+            400: components["responses"]["Error"];
         };
     };
     listLinkedStudents: {
@@ -1682,7 +1793,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["GuardianStudents"];
         };
     };
     listGuardianLinks: {
@@ -1706,7 +1817,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            201: components["responses"]["Success"];
+            201: components["responses"]["GuardianLinkCreated"];
+            409: components["responses"]["Error"];
         };
     };
     inviteGuardian: {

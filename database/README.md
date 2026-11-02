@@ -80,6 +80,6 @@ SELECT * FROM fn_verificar_cadena_auditoria();
 
 ## Pendiente
 
-- La migración *contract* de identidad: cifrar los DNI existentes en `personas` y eliminar de `usuarios` las columnas de identidad, cuando el login del Squad 1 lea `personas`.
+- La migración *contract* de identidad: retirar columnas legadas de `usuarios` solo después del ensayo de restauración y backfill, inventario de consumidores y ventana de compatibilidad. El procedimiento está en [`docs/core/OPERACION_CORE.md`](../docs/core/OPERACION_CORE.md).
 - Job mensual que ejecute `fn_crear_particion_auditoria()`. La migración deja creados los próximos 12 meses.
 - Cambiar `docker-compose.yml` para que el *init* solo cree roles (ADR-004). Mientras tanto funciona igual: la línea base se puede ejecutar de nuevo sin errores.

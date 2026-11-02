@@ -168,3 +168,25 @@ jobs:
       - name: Probar aislamiento y fallo cerrado
         run: npm run test:integration
         working-directory: backend
+      - name: Respaldar y restaurar en otra base aislada
+        shell: bash
+        run: |
+          set -euo pipefail
+          container_id=$(docker ps --filter 'ancestor=postgres:16' --format '{{.ID}}' | head -n 1)
+          test -n "$container_id"
+          started=$(date +%s)
+          docker exec "$container_id" pg_dump -U postgres -d school_management -Fc -f /tmp/core-s3.dump
+          docker exec "$container_id" createdb -U postgres school_management_restore
+          docker exec "$container_id" pg_restore -U postgres -d school_management_restore --exit-on-error /tmp/core-s3.dump
+          echo "Respaldo y restauración: $(($(date +%s) - started)) s"
+      - name: Verificar copia, RLS, auditoría y descifrado
+        run: node tests/integration/verify-restored.cjs
+        working-directory: backend
+        env:
+          RESTORED_DATABASE_URL: postgres://postgres:integration_only_password@localhost:5432/school_management_restore
+          DB_NAME: school_management_restore
+      - name: Verificar backfill en la copia restaurada
+        run: node tests/integration/verify-backfill.cjs
+        working-directory: backend
+        env:
+          RESTORED_DATABASE_URL: postgres://postgres:integration_only_password@localhost:5432/school_management_restore

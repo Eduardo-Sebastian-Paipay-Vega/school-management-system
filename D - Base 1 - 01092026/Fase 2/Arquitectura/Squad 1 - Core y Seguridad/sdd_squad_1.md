@@ -14,22 +14,23 @@
 | **Líder Técnico** | Brandon Fernando Montero Gutiérrez (`@brandonmontero27-g`) |
 | **Rama de Desarrollo** | `feature/squad-1/auth-core` |
 | **Módulos Asignados** | Módulo 1 (Acceso y JWT), Módulo 2 (Usuarios), Módulo 3 (Configuración Escolar), Módulo 12 (Auditoría) |
-| **Requisitos Trazables** | `RF-01` al `RF-14` y `RF-65` al `RF-68` (**18 Requisitos Funcionales**) |
-| **Casos de Uso** | `CU-SEG-01`..`04`, `CU-USR-01`..`05`, `CU-INS-01`..`05`, `CU-AUD-01`..`04` (**18 Casos de Uso**) |
-| **Versión del SDD** | v1.0.0 (Línea Base Fase 2) |
-| **Estado** | Aprobado para Implementación |
+| **Requisitos Trazables** | `RF-01`..`14`, `RF-65`..`68`, `RF-72`, `RF-73`, `RF-75`, `RF-76` (**22 requisitos**) |
+| **Casos de Uso** | `CU-SEG-01`..`04`, `CU-USR-01`..`09`, `CU-INS-01`..`05`, `CU-AUD-01`..`04` (**22 casos**) |
+| **Versión del SDD** | v1.1.0 (actualización Sprint 3) |
+| **Estado** | En revisión; pendiente validación funcional y técnica |
 
 ---
 
 ## 1. Introducción y Alcance del Módulo
 
 ### 1.1. Propósito del Documento
-El presente Documento de Diseño de Software (SDD) formaliza las decisiones de arquitectura técnica, el diseño de modelos relacionales en PostgreSQL, los contratos de endpoints RESTful y la estructura de componentes en Next.js correspondientes al núcleo de seguridad, administración multi-tenant y auditoría inmutable del Sistema de Gestión Escolar.
+El presente SDD traza el núcleo de seguridad, administración de la institución y auditoría. **Las secciones 2 a 5 conservan ejemplos de la línea base de Fase 2 y no constituyen contratos ni DDL ejecutables.** Para implementación prevalecen `database/migrations/`, `packages/contracts/openapi/openapi.yaml`, `backend/src/`, `frontend/modules/squads/squad_1_core/` y los ADR aceptados. La matriz de la sección 7 refleja las rutas actuales y sus límites.
 
 ### 1.2. Alcance Funcional
 * **Autenticación Robusta:** Emisión y rotación de tokens JWT duales (Access Token de 15 minutos en memoria y Refresh Token de 7 días en cookie segura `HttpOnly`).
 * **Control de Acceso RBAC Granular:** Autorización por roles jerárquicos (`SUPERADMIN`, `DIRECTIVO`, `DOCENTE`, `ESTUDIANTE`, `PORTERIA`).
-* **Gestión Multi-Tenant:** Aislamiento lógico de planteles y sedes por `tenant_id` en todas las consultas.
+* **Gestión Multi-Tenant:** La institución es el tenant (`tenant_id UUID`); las sedes son unidades internas. El aislamiento entre instituciones se aplica con `withTenant()` y RLS. El piloto real se limita a Guamán Poma de Ayala.
+* **Directorio y protección de datos:** Alta pendiente, invitación explícita, roles, baja lógica, apoderados sujetos a consentimiento y notificaciones. El consentimiento institucional RF-75 sigue pendiente.
 * **Configuración del Año Académico:** Parametrización de bimestres, calendarios y escalas CNEB.
 * **Pista de Auditoría Inmutable:** Registro indeleble de accesos y modificaciones sensibles conforme a la Ley N.° 29733 (Protección de Datos Personales).
 
@@ -331,9 +332,7 @@ frontend/modules/squads/squad_1_core/
 ## 6. Seguridad, Resiliencia y Atributos de Calidad (NFR)
 
 * **Algoritmo Criptográfico de Contraseñas:** `bcrypt` con factor de coste 12.
-* **Tiempos de Respuesta de API:**
-  * Login / Logout: < 250 ms.
-  * Búsqueda en directorio con índices trigrama: < 120 ms.
+* **Rendimiento:** Los tiempos de login, logout y búsqueda aún requieren medición contra los RNF; las cifras de la línea base no se consideran aceptación cumplida.
 * **Protección de Datos Personales (Ley N.° 29733):**
   * DNIs y datos de menores de edad siempre enmascarados en reportes públicos.
   * Cifrado en reposo (AES-256) de campos sensibles.
@@ -342,21 +341,29 @@ frontend/modules/squads/squad_1_core/
 
 ## 7. Matriz de Trazabilidad Bidireccional
 
-| Requisito | Caso de Uso | Tabla PostgreSQL | Endpoint API | Componente Next.js |
+Todas las rutas REST tienen el prefijo `/api/v1`. Las vistas se concentran hoy en `CoreModuleView.tsx`, `SessionProvider.tsx` y `AccessLinkForm.tsx`; los nombres de subcomponentes de la sección 5 son diseño futuro. El estado por RF se mantiene en `docs/requirements/matriz-rf-arquitectura.md`.
+
+| Requisito | Caso de uso | Persistencia | API vigente o integración | UI / consumidor |
 |---|---|---|---|---|
-| `RF-01` | `CU-SEG-01` | `usuarios`, `instituciones` | `POST /auth/login` | `LoginScreen` |
-| `RF-02` | `CU-SEG-02` | `Redis Blacklist` | `POST /auth/logout` | `useIdleTimeout` |
-| `RF-03` | `CU-SEG-03` | `usuarios` | `POST /auth/reset-password` | `ResetPasswordForm` |
-| `RF-04` | `CU-SEG-04` | `roles`, `usuario_roles` | `GET /roles`, `PUT /users/:id/roles` | `RbacRoleChip` |
-| `RF-05` | `CU-USR-01` | `usuarios` | `POST /users` | `UserCreateDialog` |
-| `RF-08` | `CU-USR-04` | `usuarios` (gin_trgm) | `GET /users?query=` | `UserDirectoryList` |
-| `RF-10` | `CU-INS-01` | `anios_lectivos` | `POST /academic-years` | `AcademicYearConfig` |
-| `RF-11` | `CU-INS-02` | `periodos_academicos` | `POST /periods` | `PeriodTimeline` |
-| `RF-65` | `CU-AUD-01` | `audit_logs` | `POST /audit/logs` | `auditMiddleware` (backend) |
-| `RF-66` | `CU-AUD-02` | `audit_logs` | Trigger PostgreSQL | `AuditRow` |
-| `RF-67` | `CU-AUD-03` | `audit_logs` | `GET /audit/logs` | `AuditViewer` |
-| `RF-68` | `CU-AUD-04` | `audit_logs`, `usuarios` | Políticas de privacidad | `PrivacyPolicyDialog` |
-| `RF-72` | `CU-USR-06` | `usuarios` (baja lógica) | `PATCH /users/:id`, `POST /users/:id/deactivate` | `UserEditDialog` |
-| `RF-73` | `CU-USR-07` | `usuario_roles`, `logs_auditoria` | `PUT /users/:id/roles` | `RoleManagerPanel` |
-| `RF-75` | `CU-USR-08` | `apoderados_estudiantes`, `invitaciones_apoderado`, `consentimientos_datos` | `POST /guardians/invitations`, `POST /public/guardians/activate` | `GuardianInviteDialog` |
-| `RF-76` | `CU-USR-09` | `notificaciones`, `preferencias_notificacion`, `envios_correo` | `GET /notifications`, WS `notification:new` | `NotificationBell` |
+| `RF-01` | `CU-SEG-01` | `instituciones`, `usuarios`, `sesiones_usuario` | `POST /auth/login`, `GET /auth/me` | `SessionProvider.tsx` |
+| `RF-02` | `CU-SEG-02` | `sesiones_usuario`; Redis revocación | `POST /auth/logout`, `POST /auth/refresh-token` | `SessionProvider.tsx` |
+| `RF-03` | `CU-SEG-03` | `enlaces_acceso`, `usuarios` | `POST /auth/forgot-password`, `POST /auth/reset-password` | `AccessLinkForm.tsx` |
+| `RF-04` | `CU-SEG-04` | `roles`, `usuario_roles`, `rol_permisos_core` | `GET /users/roles`, `PUT /users/roles/{id}/permissions` | `CoreModuleView.tsx` |
+| `RF-05` | `CU-USR-01` | `personas`, `usuarios`, `enlaces_acceso` | `POST /users`, `POST /users/{id}/invite`, `POST /auth/activate` | `CoreModuleView.tsx`, `AccessLinkForm.tsx` |
+| `RF-06` | `CU-USR-02` | `personas`, `usuarios` | `POST /users/import/preview`, `POST /users/import/commit` | `CoreModuleView.tsx` |
+| `RF-07` | `CU-USR-03` | `instituciones`, `sedes` | `GET/POST /school/sites`; provisión SaaS futura | `CoreModuleView.tsx` |
+| `RF-08` | `CU-USR-04` | `personas`, `usuarios` | `GET /users` | `CoreModuleView.tsx` |
+| `RF-09` | `CU-USR-05` | `personas`, `usuarios`, `sesiones_usuario` | `GET/PATCH /users/me`, `POST /users/me/change-password` | `CoreModuleView.tsx` |
+| `RF-10` | `CU-INS-01` | `anios_lectivos`, `dias_no_lectivos` | `GET/POST /school/years` | `CoreModuleView.tsx` |
+| `RF-11` | `CU-INS-02` | `periodos_academicos` | `GET/POST /school/years/{id}/periods` | `CoreModuleView.tsx` |
+| `RF-12` | `CU-INS-03` | `grados_secciones` | `GET/POST /school/years/{id}/sections` | `CoreModuleView.tsx`, Squads 2/3 |
+| `RF-13` | `CU-INS-04` | `escalas_calificacion`, `rangos_escala` | `GET/POST /school/years/{id}/scales`, `POST /school/scales/{id}/approve` | `CoreModuleView.tsx`, Squad 3; rangos bloqueados por D-16 |
+| `RF-14` | `CU-INS-05` | `configuracion_institucional` | `GET/PATCH /school/institution` | `CoreModuleView.tsx`, Squad 5 |
+| `RF-65` | `CU-AUD-01` | `logs_auditoria` | `AuditService.record()`; `GET /audit/verify-chain` | Servicio backend |
+| `RF-66` | `CU-AUD-02` | `logs_auditoria`, `squad3.grade_audit_history` | Integración con notas/asistencia pendiente | Squads 2/3 |
+| `RF-67` | `CU-AUD-03` | `logs_auditoria` | `GET /audit/logs`, `GET /audit/export.pdf` | `CoreModuleView.tsx` |
+| `RF-68` | `CU-AUD-04` | `personas` (cifrado e índice ciego) | `POST /users/{id}/document` | `CoreModuleView.tsx` |
+| `RF-72` | `CU-USR-06` | `usuarios`, `personas` | `PATCH /users/{id}`, `POST /users/{id}/deactivate` | `CoreModuleView.tsx` |
+| `RF-73` | `CU-USR-07` | `usuario_roles`, `logs_auditoria` | `PUT /users/{id}/roles` | `CoreModuleView.tsx` |
+| `RF-75` | `CU-USR-08` | `apoderados_estudiantes`, `invitaciones_apoderado`, `consentimientos_datos` | `POST /guardians/invitations`, `POST /guardians/activate` | `CoreModuleView.tsx`; consentimiento real pendiente |
+| `RF-76` | `CU-USR-09` | `notificaciones`, `preferencias_notificacion`, `envios_correo` | `GET /notifications`; WebSocket por formalizar | `CoreModuleView.tsx` |

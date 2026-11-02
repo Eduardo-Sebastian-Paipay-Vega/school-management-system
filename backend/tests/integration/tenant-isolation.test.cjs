@@ -2,6 +2,7 @@ const { before, after, test } = require('node:test');
 const assert = require('node:assert/strict');
 const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
+const { startCapture } = require('./smtp-capture.cjs');
 
 // This file is run only by `npm run test:integration` with PostgreSQL 16 and
 // Redis 7. Never seed real school data: the fixtures below are fictitious.
@@ -16,6 +17,7 @@ let b;
 let accessA;
 let accessB;
 let refreshA;
+let smtp;
 
 async function createInstitution(code) {
   const result = await admin.query(
@@ -64,6 +66,14 @@ function bearer(token, extra = {}) {
 
 before(async () => {
   assert.ok(process.env.INTEGRATION_DATABASE_URL, 'Falta INTEGRATION_DATABASE_URL');
+  smtp = await startCapture();
+  process.env.SMTP_HOST = '127.0.0.1';
+  process.env.SMTP_PORT = String(smtp.port);
+  process.env.SMTP_USER = 'capture';
+  process.env.SMTP_PASSWORD = 'capture-only';
+  process.env.SMTP_FROM = 'core@example.invalid';
+  process.env.PUBLIC_APP_URL = 'http://localhost:3000';
+  process.env.SMTP_TEST_PLAINTEXT = '1';
   const { createApp } = require('../../dist/app');
   const database = require('../../dist/config/database');
   runtime = database;
@@ -83,6 +93,7 @@ after(async () => {
   if (redisClient?.isOpen) await redisClient.quit();
   if (runtime) await runtime.pool.end();
   await admin.end();
+  if (smtp) await smtp.close();
 });
 
 test('login de cada tenant emite una sesión propia', async () => {
@@ -99,6 +110,54 @@ test('login de cada tenant emite una sesión propia', async () => {
       refreshA = result.headers.get('set-cookie');
     } else accessB = result.body.data.accessToken;
   }
+});
+
+test('alta, fallo SMTP, reintento y activación de uso único', async () => {
+  const suffix = Date.now().toString().slice(-8);
+  const username = `invite_${suffix}`;
+  const created = await call('/users', { method: 'POST',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ tipoDocumento: 'DNI', documento: suffix,
+      nombres: 'Invitada', apellidoPaterno: 'Ficticia',
+      email: `${username}@example.invalid`, username, rol: 'DOCENTE' }) });
+  assert.equal(created.status, 201, JSON.stringify(created.body));
+  const userId = created.body.data.userId;
+  assert.ok(userId);
+  assert.equal(smtp.messages.length, 0, 'el alta no envía correo automáticamente');
+  const pendingLogin = await call('/auth/login', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ codigoModular: a.code, identifier: username, password: PASSWORD }) });
+  assert.equal(pendingLogin.status, 401);
+
+  smtp.rejectOnce();
+  const failed = await call(`/users/${userId}/invite`, { method: 'POST', headers: bearer(accessA) });
+  assert.equal(failed.status, 503, JSON.stringify(failed.body));
+  const stale = await admin.query(`SELECT count(*)::int AS n FROM enlaces_acceso
+    WHERE tenant_id=$1 AND usuario_id=$2 AND proposito='ACTIVACION' AND usado_en IS NULL`,
+  [a.tenantId, userId]);
+  assert.equal(stale.rows[0].n, 0, 'el enlace no entregado queda invalidado');
+
+  const sent = await call(`/users/${userId}/invite`, { method: 'POST', headers: bearer(accessA) });
+  assert.equal(sent.status, 200, JSON.stringify(sent.body));
+  assert.equal(smtp.messages.length, 1);
+  const match = smtp.messages[0].match(/https?:\/\/[^\s]+/);
+  assert.ok(match, 'se capturó el enlace');
+  const link = new URL(match[0]);
+  const token = link.searchParams.get('token');
+  assert.ok(token);
+  const activation = await call('/auth/activate', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ codigoModular: a.code, token, password: PASSWORD }) });
+  assert.equal(activation.status, 200, JSON.stringify(activation.body));
+  const reused = await call('/auth/activate', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ codigoModular: a.code, token, password: PASSWORD }) });
+  assert.equal(reused.status, 400);
+  assert.equal(reused.body.error.code, 'INVALID_LINK');
+  const activeLogin = await call('/auth/login', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ codigoModular: a.code, identifier: username, password: PASSWORD }) });
+  assert.equal(activeLogin.status, 200, JSON.stringify(activeLogin.body));
 });
 
 test('rutas reales rechazan ausencia de sesión y tenant discordante', async () => {

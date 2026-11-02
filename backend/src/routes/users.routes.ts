@@ -227,7 +227,12 @@ router.post('/:id/invite', requirePermission('users:manage'), requireRoles(['SUP
     });
     if (!found) { fail(res, 404, 'USER_NOT_FOUND', 'Cuenta pendiente sin correo no encontrada.'); return; }
     const token = await AuthService.createAccessLink(req.user!.tenantId, req.params.id, req.user!.id, 'ACTIVACION');
-    await sendAccessLink(found.email, found.codigo_modular, token, 'ACTIVACION');
+    try {
+      await sendAccessLink(found.email, found.codigo_modular, token, 'ACTIVACION');
+    } catch (cause) {
+      await AuthService.invalidateAccessLink(req.user!.tenantId, req.params.id, req.user!.id, 'ACTIVACION', token);
+      throw cause;
+    }
     ok(res, { message: 'Invitación enviada.' });
   } catch { fail(res, 503, 'INVITE_FAILED', 'No se pudo enviar la invitación.'); }
 });

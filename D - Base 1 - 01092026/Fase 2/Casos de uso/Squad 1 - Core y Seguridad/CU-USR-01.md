@@ -12,14 +12,14 @@
 
 ## 1. Resumen y Alcance
 
-Permite registrar un nuevo miembro del personal (docente, administrativo, directivo o practicante) asignándole credenciales institucionales y rol.
+Permite registrar un miembro del personal en su institución y asignarle un rol. La invitación para activar la cuenta se envía mediante una acción explícita posterior al alta.
 
 ---
 
 ## 2. Actores Involucrados
 
 * **Actor Primario:** Administrador / Responsable de Recursos Humanos
-* **Actores Secundarios / Sistemas:** Servicio RENIEC (Validación DNI referencial), Base de Datos
+* **Actores Secundarios / Sistemas:** Base de Datos, servicio de correo transaccional. La validación de formato del DNI es local; no existe conexión directa con RENIEC.
 
 ---
 
@@ -35,7 +35,7 @@ Permite registrar un nuevo miembro del personal (docente, administrativo, direct
   No se crean usuarios duplicados; la transacción se revierte si el DNI o email ya existen.
 
 * **Garantía de Éxito (Postcondición Exitosa):**  
-  Usuario creado en tabla users con perfil asociado, credenciales provisionales generadas y notificación enviada.
+  Persona y cuenta pendientes registradas en `personas` y `usuarios`, con rol asociado y auditoría. La invitación se envía solo por acción explícita; la activación requiere que el titular defina su contraseña.
 
 ---
 
@@ -45,22 +45,24 @@ Permite registrar un nuevo miembro del personal (docente, administrativo, direct
 2. Ingresa DNI, nombres, apellidos, correo institucional, teléfono y tipo de contrato.
 3. Asigna el rol principal (Docente, Administrativo, Portería, Practicante).
 4. Presiona 'Crear Usuario'.
-5. El sistema valida la unicidad del DNI y correo electrónico.
-6. Genera una contraseña segura provisional y registra al usuario en PostgreSQL.
-7. Envía las credenciales al correo del usuario y registra el evento en auditoría.
+5. El sistema valida identidad y correo dentro de la institución sin divulgar datos de otra.
+6. Registra o vincula la persona y crea la cuenta pendiente, sin contraseña provisional conocida; registra el alta en auditoría.
+7. Posteriormente, el administrador acciona «Enviar invitación» y el sistema envía un enlace de un solo uso; el titular define su contraseña y activa la cuenta dentro del plazo de 72 horas.
 
 ---
 
 ## 6. Flujos Alternativos y Excepciones
 
-* **4a. DNI o correo duplicado: El sistema muestra mensaje de error indicando el usuario existente con enlace a su ficha.**
+* **4a. DNI o correo duplicado:** El sistema impide duplicar la cuenta sin revelar información de otro tenant.
+* **7a. Fallo de correo:** La cuenta queda pendiente, se informa el fallo y el administrador puede reintentar la invitación sin duplicar el alta.
+* **7b. Enlace vencido o usado:** No se activa la cuenta; el administrador puede emitir una nueva invitación.
 
 ---
 
 ## 7. Reglas de Negocio Asociadas
 
 * **RN-USR-01: El DNI debe ser exactamente de 8 dígitos numéricos válidos.**
-* **RN-USR-02: Todo usuario nuevo debe ser forzado a cambiar su contraseña provisional en su primer acceso.**
+* **RN-USR-02: La cuenta no puede autenticarse hasta que su titular defina la contraseña mediante una invitación vigente de un solo uso.**
 
 ---
 

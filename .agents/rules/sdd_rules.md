@@ -21,7 +21,7 @@
 ## 2. Reglas del Modelo de Datos (PostgreSQL)
 
 1. **Aislamiento Multi-Tenant:**
-   * Toda tabla transaccional o maestra DEBE incluir la columna `tenant_id VARCHAR(50) NOT NULL` con su correspondiente índice B-tree `idx_[tabla]_tenant`.
+   * Toda tabla transaccional o maestra perteneciente a una institución DEBE incluir `tenant_id UUID NOT NULL`, referenciado a `instituciones(id)`, con su correspondiente índice B-tree `idx_[tabla]_tenant`. La institución es el tenant; una sede pertenece a ese tenant (ADR-002 y ADR-014).
 2. **Claves Primarias:**
    * Usar UUID v4 (`UUID PRIMARY KEY DEFAULT gen_random_uuid()`) para evitar colisiones en sincronización offline.
 3. **Pistas de Auditoría:**

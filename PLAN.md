@@ -1,8 +1,8 @@
 # Plan de implementación integral — Core del Squad 1
 
-**Fecha:** 2026-10-23 · **Hoja de ruta por sprints actualizada:** 2026-10-30
+**Fecha:** 2026-10-23 · **Hoja de ruta por sprints actualizada:** 2026-11-02
 **Alcance:** los 22 RF del Squad 1: RF-01–14, RF-65–68, RF-72, RF-73, RF-75 y RF-76; sus RNF de seguridad, privacidad, calidad y accesibilidad.  
-**Estado:** implementación del Core desarrollada y validada con compilación, lint y pruebas locales. La aceptación integrada con PostgreSQL, Redis y SMTP, la aprobación D-16 y el texto oficial de consentimiento siguen pendientes. Las secciones de contexto comprobado describen el estado previo a los cambios; consultar `docs/core/OPERACION_CORE.md` para el arranque actual. La "Fase 1 (2026) / Fase 2 (2027)" describe la puesta en marcha escolar, no las fases documentales del repositorio.
+**Estado:** Sprints 1–2 integrados en `dev`; Sprint 3 implementado y probado en [CI](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/actions/runs/41490863165), pendiente de integración de PR #3. PostgreSQL 16, Redis 7 y SMTP de captura cubren los flujos principales; el *contract* se prueba tras restauración/backfill sobre una copia y queda como migración opt-in para el piloto. La aprobación D-16 y el texto oficial de consentimiento siguen pendientes. Las secciones de contexto comprobado describen el estado previo a los cambios; consultar `docs/core/OPERACION_CORE.md` y `docs/core/SPRINT_03_EVIDENCIA.md` para el estado actual. La "Fase 1 (2026) / Fase 2 (2027)" describe la puesta en marcha escolar, no las fases documentales del repositorio.
 
 ## Resumen
 

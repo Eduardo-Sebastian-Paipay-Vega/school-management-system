@@ -56,6 +56,7 @@ Notas: el esquema `squad3` de M8 guarda `tenant_id` como `VARCHAR(50)` con el UU
 | Historial | Tabla de control de `node-pg-migrate`. Una migración aplicada **no se edita ni se borra** |
 | Transacción | Una por migración; excepciones (`CREATE INDEX CONCURRENTLY`, `ALTER TYPE … ADD VALUE`) van solas y lo declaran en el encabezado |
 | Cambios incompatibles | *Expand / contract* en dos despliegues (p. ej. traslado de identidad de `usuarios` a `personas`) |
+| Contract de identidad | Migración opt-in en `database/migrations/contract/`; `npm run migrate` no la aplica. Tras respaldo y backfill verificados, `npm run migrate:contract` la registra en el mismo historial. CI la prueba solo sobre copia restaurada. |
 | Reversión | Solo hacia adelante en entornos compartidos: una reversión es una migración nueva, respaldada por el volcado previo |
 | Aprobación | Las que tocan tablas del núcleo requieren aprobación del Squad 1 |
 

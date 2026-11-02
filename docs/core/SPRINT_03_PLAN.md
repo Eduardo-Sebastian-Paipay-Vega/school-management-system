@@ -1,6 +1,6 @@
 # Sprint 3 — Integración real y migración segura de datos del Core
 
-**Ventana orientativa:** 2–13 de noviembre de 2026 (10 días hábiles, Lima). **Estado:** en ejecución; evidencia por historia en [SPRINT_03_EVIDENCIA.md](SPRINT_03_EVIDENCIA.md). **Rama:** `codex/core-sprint-3`, desde `dev`. **Aprobación de cierre:** líder del proyecto; este plan no presupone aprobación de S3.
+**Ventana orientativa:** 2–13 de noviembre de 2026 (10 días hábiles, Lima). **Estado:** implementación técnica completa en rama; evidencia por historia en [SPRINT_03_EVIDENCIA.md](SPRINT_03_EVIDENCIA.md). **Rama:** `codex/core-sprint-3`, desde `dev`. **Aprobación de cierre:** líder del proyecto; este plan no presupone aprobación de S3 ni ejecución sobre el piloto real.
 
 ## Objetivo y frontera
 

@@ -3,6 +3,9 @@
 -- No modificar migraciones históricas ni usar CASCADE: una dependencia nueva
 -- debe bloquear la retirada y obligar a actualizar su consumidor primero.
 
+LOCK TABLE usuarios IN ACCESS EXCLUSIVE MODE;
+LOCK TABLE personas IN SHARE MODE;
+
 DO $$
 BEGIN
   IF EXISTS (

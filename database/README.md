@@ -32,7 +32,7 @@ Aplicar las migraciones pendientes a una base existente, por ejemplo la de `dock
 DATABASE_URL="postgres://postgres:<clave>@localhost:5432/school_management" npm run migrate
 ```
 
-La retirada de columnas legadas **no** se aplica con `npm run migrate`. Tras verificar respaldo, restauración, backfill y compatibilidad en el entorno autorizado, ejecutar la migración opt-in contra la base indicada por `DATABASE_URL`:
+La retirada de columnas legadas **no** se aplica con `npm run migrate`. Tras verificar respaldo, restauración y backfill, ejecutar primero `npm run verify:identity-contract` en `backend/` con `DATABASE_URL`, `ENCRYPTION_MASTER_KEY` y `DOCUMENT_HMAC_KEY`. Ese preflight comprueba que cada DNI legado se descifre y coincida con su HMAC. Después de verificar compatibilidad en el entorno autorizado, ejecutar la migración opt-in contra la base indicada por `DATABASE_URL`:
 
 ```bash
 CORE_IDENTITY_CONTRACT_ACK=backup-restore-backfill-verified DATABASE_URL="postgres://..." npm run migrate:contract

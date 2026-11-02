@@ -74,6 +74,15 @@ async function main() {
       assert.equal(clear, index === 0 ? '12345678' : '87654321');
       assert.equal(person.rows[0].documento_hash.trim(), documentHash(clear));
     }
+    await pool.query('UPDATE personas SET documento_hash=$1 WHERE id=$2',
+      [documentHash('99999999'), seeded[0].personId]);
+    const preflight = spawnSync(process.execPath,
+      ['dist/scripts/verify-identity-contract.js'],
+      { cwd: process.cwd(), env: { ...process.env, DATABASE_URL: url }, encoding: 'utf8' });
+    assert.notEqual(preflight.status, 0, 'el preflight debe detectar un índice ciego discordante');
+    assert.match(preflight.stderr, /Identidad cifrada discordante/);
+    await pool.query('UPDATE personas SET documento_hash=$1 WHERE id=$2',
+      [documentHash('12345678'), seeded[0].personId]);
     process.stdout.write('Backfill verificado en copia: rollback por DNI inválido, cifrado e idempotencia.\n');
   } finally { await pool.end(); }
 }

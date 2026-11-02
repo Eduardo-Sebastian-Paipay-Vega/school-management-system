@@ -193,6 +193,11 @@ jobs:
         working-directory: backend
         env:
           RESTORED_DATABASE_URL: postgres://postgres:integration_only_password@localhost:5432/school_management_restore
+      - name: Verificar identidad cifrada antes del contract
+        run: node dist/scripts/verify-identity-contract.js
+        working-directory: backend
+        env:
+          DATABASE_URL: postgres://postgres:integration_only_password@localhost:5432/school_management_restore
       - name: Aplicar contract solo en la copia verificada
         run: npm run migrate:contract
         working-directory: database

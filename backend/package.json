@@ -8,6 +8,7 @@
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "backfill:identities": "npm run build && node dist/scripts/backfill-identities.js",
+    "verify:identity-contract": "npm run build && node dist/scripts/verify-identity-contract.js",
     "bootstrap:admin": "npm run build && node dist/scripts/bootstrap-admin.js",
     "lint": "eslint src",
     "test": "npm run build && node --test tests/*.test.cjs",

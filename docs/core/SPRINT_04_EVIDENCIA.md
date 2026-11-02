@@ -1,6 +1,6 @@
 # Sprint 4 — Evidencia y estado
 
-**Base:** `dev` tras PR #3. **Rama:** `codex/core-sprint-4`. **PR:** [#4](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/pull/4), borrador sin solicitudes de revisión. **Estado:** implementación Core S4 probada en [CI 41532128319](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/actions/runs/41532128319); pendientes aceptación de dependencias de Squads 2/3/5 e inspección visual autenticada. Este documento no constituye cierre ni aprobación del piloto.
+**Base:** `dev` tras PR #3. **Rama:** `codex/core-sprint-4`. **PR:** [#4](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/pull/4), listo para revisión del líder, sin solicitudes al equipo. **Estado:** implementación Core S4 probada en [CI 41532751983](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/actions/runs/41532751983); pendientes aceptación de dependencias de Squads 2/3/5 e inspección visual autenticada. Este documento no constituye cierre ni aprobación del piloto.
 
 | Historia | Evidencia en rama | Estado |
 |---|---|---|
@@ -35,4 +35,4 @@
 | 75 | Flujo ficticio de CI probado; uso real bloqueado hasta texto institucional aprobado. | S3–S5 |
 | 76 | Avisos presentes; cola/reintentos y aislamiento de eventos quedan en S5/S7. | S5–S7 |
 
-La [CI S4](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/actions/runs/41532128319) pasó seis jobs: backend, frontend, contratos, migraciones, M8 y Core con PostgreSQL 16/Redis 7 y dos tenants ficticios. El auditor PrimeReact 10.9.9 pasó con cero errores y cero avisos; la inspección visual de los recorridos autenticados queda pendiente de un entorno navegable con datos ficticios. El contrato tiene 47 rutas/58 operaciones y tipos generados reproducibles; Redocly conserva advertencias no bloqueantes de rutas ajenas a este cambio.
+La [CI S4](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/actions/runs/41532751983) pasó seis jobs: backend, frontend, contratos, migraciones, M8 y Core con PostgreSQL 16/Redis 7 y dos tenants ficticios. El auditor PrimeReact 10.9.9 pasó con cero errores y cero avisos; la inspección visual de los recorridos autenticados queda pendiente de un entorno navegable con datos ficticios. El contrato tiene 47 rutas/58 operaciones y tipos generados reproducibles; Redocly conserva advertencias no bloqueantes de rutas ajenas a este cambio.

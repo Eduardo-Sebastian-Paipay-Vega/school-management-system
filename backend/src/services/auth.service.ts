@@ -211,13 +211,20 @@ export class AuthService {
     purpose: 'ACTIVACION' | 'RECUPERACION') {
     const raw = randomToken();
     await withTenant(tenantId, creatorId, async (client) => {
-      await client.query(`UPDATE enlaces_acceso SET usado_en=now()
-        WHERE tenant_id=$1 AND usuario_id=$2 AND proposito=$3 AND usado_en IS NULL`, [tenantId, userId, purpose]);
       await client.query(`INSERT INTO enlaces_acceso(tenant_id,usuario_id,proposito,token_hash,expira_en)
         VALUES($1,$2,$3,$4,now()+($5::int * interval '1 minute'))`,
       [tenantId, userId, purpose, tokenHash(raw), purpose === 'ACTIVACION' ? 4320 : 30]);
     });
     return raw;
+  }
+
+  static async invalidateAccessLink(tenantId: string, userId: string, actorId: string,
+    purpose: 'ACTIVACION' | 'RECUPERACION', raw: string): Promise<void> {
+    await withTenant(tenantId, actorId, async (client) => {
+      await client.query(`UPDATE enlaces_acceso SET usado_en=now()
+        WHERE tenant_id=$1 AND usuario_id=$2 AND proposito=$3 AND token_hash=$4 AND usado_en IS NULL`,
+      [tenantId, userId, purpose, tokenHash(raw)]);
+    });
   }
 
   static async consumeAccessLink(codigoModular: string, token: string, password: string,
@@ -241,6 +248,9 @@ export class AuthService {
         estado='ACTIVO',auth_version=auth_version+1,email_verificado_en=coalesce(email_verificado_en,now())
         WHERE id=$2`, [password, link.usuario_id]);
       await client.query('UPDATE enlaces_acceso SET usado_en=now() WHERE id=$1', [link.id]);
+      await client.query(`UPDATE enlaces_acceso SET usado_en=now()
+        WHERE tenant_id=$1 AND usuario_id=$2 AND proposito=$3 AND id<>$4 AND usado_en IS NULL`,
+      [tenantId, link.usuario_id, purpose, link.id]);
       await client.query('UPDATE sesiones_usuario SET revocada_en=now() WHERE usuario_id=$1 AND revocada_en IS NULL', [link.usuario_id]);
       await AuditService.record({ tenantId, usuarioId: link.usuario_id, accion: purpose,
         entidad: 'usuarios', entidadId: link.usuario_id, ipOrigen: ip }, client);

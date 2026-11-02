@@ -71,6 +71,10 @@ router.post('/activate', async (req, res) => {
         WHERE tenant_id=$1 AND apoderado_id=$2 AND estudiante_id=$3 AND activo`,
         [tenantId,invite.apoderado_id,invite.estudiante_id]);
       await client.query('UPDATE invitaciones_apoderado SET usada_en=now() WHERE id=$1', [invite.id]);
+      await client.query(`UPDATE invitaciones_apoderado SET usada_en=now()
+        WHERE tenant_id=$1 AND apoderado_id=$2 AND estudiante_id=$3
+          AND id<>$4 AND usada_en IS NULL`,
+      [tenantId, invite.apoderado_id, invite.estudiante_id, invite.id]);
       await AuditService.record({ tenantId, usuarioId: userId, accion: 'GUARDIAN_CONSENT',
         entidad: 'consentimientos_datos', entidadId: invite.apoderado_id,
         datosNuevos: { version: parsed.data.versionTexto }, ipOrigen: req.ip }, client);
@@ -170,9 +174,6 @@ router.post('/invitations', requirePermission('guardians:manage'), async (req: A
           VALUES($1,$2,$3,crypt(gen_random_uuid()::text,gen_salt('bf',12)),'PENDIENTE_CAMBIO_CLAVE') RETURNING id`,
           [req.user!.tenantId,parsed.data.guardianId,`g_${crypto.randomBytes(8).toString('hex')}`]);
       }
-      await client.query(`UPDATE invitaciones_apoderado SET usada_en=now()
-        WHERE tenant_id=$1 AND apoderado_id=$2 AND estudiante_id=$3 AND usada_en IS NULL`,
-        [req.user!.tenantId,parsed.data.guardianId,parsed.data.studentId]);
       await client.query(`INSERT INTO invitaciones_apoderado
         (tenant_id,apoderado_id,estudiante_id,token_hash,expira_en,creada_por)
         VALUES($1,$2,$3,$4,now()+interval '72 hours',$5)`,
@@ -183,7 +184,16 @@ router.post('/invitations', requirePermission('guardians:manage'), async (req: A
       return found.rows[0];
     });
     if (!prepared) { fail(res, 404, 'GUARDIAN_LINK_NOT_FOUND', 'Vínculo verificado con correo no encontrado.'); return; }
-    await sendGuardianLink(prepared.email, prepared.codigo_modular, raw);
+    try {
+      await sendGuardianLink(prepared.email, prepared.codigo_modular, raw);
+    } catch (cause) {
+      await withTenant(req.user!.tenantId, req.user!.id, (client) =>
+        client.query(`UPDATE invitaciones_apoderado SET usada_en=now()
+          WHERE tenant_id=$1 AND apoderado_id=$2 AND estudiante_id=$3
+            AND token_hash=$4 AND usada_en IS NULL`,
+        [req.user!.tenantId, parsed.data.guardianId, parsed.data.studentId, tokenHash(raw)]));
+      throw cause;
+    }
     ok(res, { message: 'Invitación enviada.' });
   } catch { fail(res, 503, 'GUARDIAN_INVITE_FAILED', 'No se pudo enviar la invitación.'); }
 });

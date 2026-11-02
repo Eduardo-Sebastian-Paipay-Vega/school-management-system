@@ -23,6 +23,51 @@ Message:
   content:
     application/json:
       schema: { $ref: './schemas.yaml#/MessageSuccess' }
+UserCreated:
+  description: Persona y cuenta opcional creadas sin enviar invitación.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/UserCreatedSuccess' }
+UserDirectory:
+  description: Directorio visible en el tenant autenticado.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/UserDirectorySuccess' }
+AuditLogs:
+  description: Bitácora filtrada del tenant autenticado.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/AuditLogsSuccess' }
+AuditChain:
+  description: Integridad de la cadena de auditoría del tenant.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/AuditChainSuccess' }
+GuardianConsent:
+  description: Texto y versión de consentimiento configurados.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/GuardianConsentSuccess' }
+ImportPreview:
+  description: Validación del lote sin escritura.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/ImportPreviewSuccess' }
+ImportCommit:
+  description: Resultado transaccional de la importación.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/ImportCommitSuccess' }
+GuardianLinkCreated:
+  description: Vínculo familiar verificado y pendiente de aceptación.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/GuardianLinkCreatedSuccess' }
+GuardianStudents:
+  description: Estudiantes visibles tras vínculo y consentimiento vigentes.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/GuardianStudentsSuccess' }
 Health:
   description: Estado de PostgreSQL y Redis
   content:

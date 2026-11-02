@@ -1,7 +1,7 @@
 /audit/logs:
-  get: { operationId: listAuditLogs, description: 'Permiso audit:read.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  get: { operationId: listAuditLogs, description: 'Permiso audit:read.', responses: { '200': { $ref: '../components/responses.yaml#/AuditLogs' } } }
 /audit/verify-chain:
-  get: { operationId: verifyAuditChain, description: 'Permiso audit:read.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  get: { operationId: verifyAuditChain, description: 'Permiso audit:read.', responses: { '200': { $ref: '../components/responses.yaml#/AuditChain' } } }
 /audit/export.pdf:
   get:
     operationId: exportAuditPdf

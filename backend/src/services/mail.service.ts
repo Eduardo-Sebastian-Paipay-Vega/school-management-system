@@ -8,8 +8,13 @@ function transporter() {
     throw new Error('SMTP no está configurado.');
   }
   const port = Number(process.env.SMTP_PORT ?? '587');
+  // A local capture server in integration tests has no TLS certificate. Never
+  // permit this switch outside the test process or for a remote SMTP host.
+  const localCapture = process.env.NODE_ENV === 'test' &&
+    process.env.SMTP_TEST_PLAINTEXT === '1' &&
+    (host === '127.0.0.1' || host === 'localhost' || host === '::1');
   return nodemailer.createTransport({ host, port, secure: port === 465,
-    requireTLS: port !== 465, auth: { user, pass } });
+    requireTLS: port !== 465 && !localCapture, auth: { user, pass } });
 }
 
 export async function sendAccessLink(email: string, code: string, token: string,

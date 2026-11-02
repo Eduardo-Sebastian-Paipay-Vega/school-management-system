@@ -1,14 +1,14 @@
 /guardians/consent:
-  get: { operationId: getGuardianConsent, security: [], responses: { '200': { $ref: '../components/responses.yaml#/Success' }, '503': { $ref: '../components/responses.yaml#/Error' } } }
+  get: { operationId: getGuardianConsent, security: [], responses: { '200': { $ref: '../components/responses.yaml#/GuardianConsent' }, '503': { $ref: '../components/responses.yaml#/Error' } } }
 /guardians/activate:
-  post: { operationId: activateGuardian, security: [], description: 'Exige versión vigente del texto y aceptación explícita.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  post: { operationId: activateGuardian, security: [], description: 'Exige versión vigente del texto y aceptación explícita.', responses: { '200': { $ref: '../components/responses.yaml#/Message' }, '400': { $ref: '../components/responses.yaml#/Error' } } }
 /guardians/students:
-  get: { operationId: listLinkedStudents, description: 'Solo rol APODERADO con vínculo y consentimiento activos.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  get: { operationId: listLinkedStudents, description: 'Solo rol APODERADO con vínculo y consentimiento activos.', responses: { '200': { $ref: '../components/responses.yaml#/GuardianStudents' } } }
 /guardians/links:
   get: { operationId: listGuardianLinks, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
-  post: { operationId: createGuardianLink, responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+  post: { operationId: createGuardianLink, responses: { '201': { $ref: '../components/responses.yaml#/GuardianLinkCreated' }, '409': { $ref: '../components/responses.yaml#/Error' } } }
 /guardians/invitations:
-  post: { operationId: inviteGuardian, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  post: { operationId: inviteGuardian, responses: { '200': { $ref: '../components/responses.yaml#/Message' } } }
 /guardians/links/{guardianId}/{studentId}:
   parameters:
     - { $ref: '../components/parameters.yaml#/GuardianId' }

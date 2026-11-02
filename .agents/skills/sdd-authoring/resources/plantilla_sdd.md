@@ -108,7 +108,7 @@ erDiagram
 -- DDL para el Squad X
 CREATE TABLE IF NOT EXISTS esquema_squad.nombre_tabla (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    tenant_id VARCHAR(50) NOT NULL,
+    tenant_id UUID NOT NULL REFERENCES instituciones(id) ON DELETE RESTRICT,
     codigo_institucional VARCHAR(30) UNIQUE NOT NULL,
     nombre VARCHAR(150) NOT NULL,
     metadata JSONB DEFAULT '{}'::jsonb,

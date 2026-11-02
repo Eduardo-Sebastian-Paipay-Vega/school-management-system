@@ -14,11 +14,30 @@ La cuenta pertenece a la persona y al plantel, no al año lectivo. En la Fase 1 
 6. Para usuarios legados, respaldar la base y ejecutar `npm run backfill:identities` en `backend/` para revisar el conteo. Repetir con `-- --apply` después de verificar claves y respaldo. Cifra documentos en `personas` e indexa HMAC. Las columnas antiguas de `usuarios` permanecen hasta comprobar todos los consumidores y el backfill en producción.
 7. Iniciar backend (`npm run build && npm start`, puerto 3001) y frontend (`npm run build && npm start`, puerto 3000). Definir `NEXT_PUBLIC_CORE_API_URL` antes del build del frontend. La cookie refresh usa `SameSite=Strict`: en producción frontend y API deben compartir sitio registrable o proxy de origen. Enumerar los orígenes exactos en `CORS_ORIGIN`.
 
+## Respaldo, restauración y backfill (Sprint 3)
+
+El CI usa exclusivamente dos instituciones ficticias. Ejecuta `pg_dump -Fc` después de las pruebas HTTP, restaura el archivo en `school_management_restore` y compara conteos de `instituciones`, `personas`, `usuarios` y `logs_auditoria`. En la copia verifica que el rol de aplicación no lea filas sin contexto, que RLS aísle instituciones, que la cadena de auditoría sea íntegra y que los documentos cifrados se puedan descifrar con la clave externa de prueba. Luego siembra identidades legadas ficticias, ensaya error por DNI inválido con rollback global, corrige el fixture y ejecuta dos veces el backfill para comprobar idempotencia. Por último prueba que el *contract* rechaza identidades pendientes, lo aplica sobre la copia y repite la suite HTTP después de retirar las columnas. El CI no publica el volcado.
+
+Para ensayar una restauración fuera de CI, en una infraestructura autorizada y con acceso restringido:
+
+```bash
+export PGDATABASE=school_management
+pg_dump -Fc -f /ruta/segura/core.dump
+createdb school_management_restore
+pg_restore --exit-on-error -d school_management_restore /ruta/segura/core.dump
+```
+
+Registrar fecha, versión PostgreSQL, tamaño y duración del volcado y restauración, conteos antes/después, resultado de RLS, cadena y descifrado. Custodiar `ENCRYPTION_MASTER_KEY` y `DOCUMENT_HMAC_KEY` fuera del volcado; sin ellas no se recupera la identidad cifrada. Proteger el archivo como dato personal y borrarlo conforme a la retención aprobada. No restaurar encima de la base activa. Si la restauración falla, detener la migración y conservar la base original; si falla el backfill, revertir la transacción completa y corregir el dato de origen antes de reintentar.
+
+La migración *contract* exige además inventario de consumidores, ventana de compatibilidad y autorización de ejecución en el entorno compartido. Detener escrituras durante el preflight y la migración. Antes de aplicarla, ejecutar `npm run verify:identity-contract` en `backend/` con `DATABASE_URL`, `ENCRYPTION_MASTER_KEY` y `DOCUMENT_HMAC_KEY`; el preflight compara cada DNI legado con el documento descifrado, HMAC y últimos cuatro dígitos, sin imprimir el documento. El comando opt-in se ejecuta desde `database/` con `DATABASE_URL` de la base objetivo y `CORE_IDENTITY_CONTRACT_ACK=backup-restore-backfill-verified npm run migrate:contract`; `npm run migrate` no la incluye. Probar antes el mismo comando en una copia recién restaurada. El SQL bloquea escrituras concurrentes en `usuarios` y `personas` hasta completar la transacción. Si detecta un DNI no cifrado o una dependencia de columna, toda la migración se revierte y se conserva la base original. Si aparece una incidencia después de aplicarla, detener escrituras, restaurar el volcado previo en otra base, verificar RLS, auditoría y claves, y conmutar el servicio a esa copia durante la ventana acordada. Cualquier compensación posterior en la base compartida requiere una migración nueva; no editar ni revertir la migración histórica.
+
 ## API
 
 Las rutas bajo `/api/v1` usan `{success,data|error,timestamp}`, salvo `/health` y el PDF. El tenant procede del JWT validado y la conexión ejecuta `SET LOCAL app.tenant_id` y `app.user_id` para RLS.
 
 El contrato vigente se publica en `packages/contracts/openapi/openapi.yaml`, con rutas en `paths/` y componentes en `components/`; `core.yaml` permanece como instantánea histórica para comprobar la migración de 46 rutas y 57 operaciones. Los tipos de `school-contracts` se generan desde el contrato vigente. Los campos de entrada se validan en los controladores con Zod.
+
+La suite HTTP integrada valida las respuestas de Sprint 3 contra un bundle OpenAPI 3.1 desreferenciado. En una instalación local nueva, ejecutar `npm ci` en `packages/contracts/` y `npx redocly bundle openapi/openapi.yaml --dereferenced --output ../../backend/tests/integration/.openapi-bundle.json` antes de `npm run test:integration` en `backend/`; el archivo generado está ignorado por Git. El CI ejecuta esos pasos automáticamente.
 
 | Grupo | Rutas principales |
 | --- | --- |
@@ -38,4 +57,4 @@ Un vínculo familiar creado por Secretaría queda pendiente de aceptación. `GET
 
 ## Verificación y pendientes institucionales
 
-`database/npm test` comprueba migraciones, RLS y cadena; `backend/npm test` cubre cifrado e importación CSV. Ejecutar lint, build y auditor PrimeReact en frontend. Para la aceptación real se necesita un entorno integrado PostgreSQL + Redis + SMTP con dos planteles y cuentas de cada rol. La institución debe aprobar D-16 y el texto legal de consentimiento antes de habilitar escalas numéricas o consentimiento de apoderados con datos reales.
+`database/npm test` comprueba migraciones, RLS y cadena; `backend/npm test` cubre cifrado e importación CSV/XLSX. El CI del Core usa PostgreSQL 16, Redis 7 y SMTP de captura local con dos instituciones ficticias, además del ensayo de restauración y backfill. Ejecutar lint, build y auditor PrimeReact en frontend cuando cambie la interfaz. La institución debe aprobar D-16 y el texto legal de consentimiento antes de habilitar escalas numéricas o consentimiento de apoderados con datos reales.

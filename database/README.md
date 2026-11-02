@@ -10,6 +10,7 @@ Las reglas están en [ADR-004](../D%20-%20Base%201%20-%2001092026/Fase%202/Arqui
 database/
 ├── init/          # 01_esquema_consolidado.sql: línea base histórica, NO se edita
 ├── migrations/    # migraciones SQL, en orden por marca de tiempo
+│   └── contract/   # retirada de identidad legada, opt-in tras respaldo/backfill
 └── tests/         # pruebas de restricciones, RLS y auditoría (PGlite)
 ```
 
@@ -30,6 +31,14 @@ Aplicar las migraciones pendientes a una base existente, por ejemplo la de `dock
 ```bash
 DATABASE_URL="postgres://postgres:<clave>@localhost:5432/school_management" npm run migrate
 ```
+
+La retirada de columnas legadas **no** se aplica con `npm run migrate`. Tras verificar respaldo, restauración y backfill, ejecutar primero `npm run verify:identity-contract` en `backend/` con `DATABASE_URL`, `ENCRYPTION_MASTER_KEY` y `DOCUMENT_HMAC_KEY`. Ese preflight comprueba que cada DNI legado se descifre y coincida con su HMAC. Después de verificar compatibilidad en el entorno autorizado, ejecutar la migración opt-in contra la base indicada por `DATABASE_URL`:
+
+```bash
+CORE_IDENTITY_CONTRACT_ACK=backup-restore-backfill-verified DATABASE_URL="postgres://..." npm run migrate:contract
+```
+
+El mismo historial `pgmigrations` registra el paso. La migración falla si algún DNI legado carece de documento cifrado y no usa `CASCADE`; una dependencia desconocida detiene la operación. En CI se prueba exclusivamente en `school_management_restore`, nunca en la base original ni en datos reales. Véase [el gate de Sprint 3](../docs/core/SPRINT_03_CONTRACT_GATE.md).
 
 Crear una migración nueva (genera el archivo con la marca de tiempo):
 
@@ -80,6 +89,6 @@ SELECT * FROM fn_verificar_cadena_auditoria();
 
 ## Pendiente
 
-- La migración *contract* de identidad: cifrar los DNI existentes en `personas` y eliminar de `usuarios` las columnas de identidad, cuando el login del Squad 1 lea `personas`.
+- Aplicar la migración *contract* opt-in al piloto solo después del ensayo de restauración y backfill con sus datos, inventario de consumidores y ventana de compatibilidad. El procedimiento está en [`docs/core/OPERACION_CORE.md`](../docs/core/OPERACION_CORE.md).
 - Job mensual que ejecute `fn_crear_particion_auditoria()`. La migración deja creados los próximos 12 meses.
 - Cambiar `docker-compose.yml` para que el *init* solo cree roles (ADR-004). Mientras tanto funciona igual: la línea base se puede ejecutar de nuevo sin errores.

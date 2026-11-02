@@ -47,6 +47,7 @@ out/
 # Build outputs
 /dist/
 **/dist/
+backend/tests/integration/.openapi-bundle.json
 
 # Environment and secrets
 .env

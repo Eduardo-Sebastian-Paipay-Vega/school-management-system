@@ -12,27 +12,27 @@
 
 ## 1. Resumen y Alcance
 
-Permite registrar y configurar las sedes y niveles del plantel 'Guamán Poma de Ayala' garantizando aislamiento lógico de datos (Multi-Tenant por tenant_id).
+Permite registrar y configurar sedes y niveles dentro de la institución piloto. La institución es el tenant; las sedes son unidades internas. PostgreSQL RLS aísla instituciones y los permisos controlan el acceso por sede.
 
 ---
 
 ## 2. Actores Involucrados
 
-* **Actor Primario:** Superadmin del Sistema
+* **Actor Primario:** Administrador local autorizado de la institución
 * **Actores Secundarios / Sistemas:** Base de Datos PostgreSQL
 
 ---
 
 ## 3. Precondiciones
 
-* El usuario posee credenciales de Superadmin global.
+* El usuario posee credenciales y permisos de gestión de sedes en su institución.
 
 ---
 
 ## 4. Garantías del Sistema
 
 * **Garantía Mínima (En caso de fallo):**  
-  No se permite mezclar información entre diferentes sedes o niveles educativos sin autorización explícita.
+  No se permite acceder a otra institución; el acceso entre sedes de la misma institución exige la autorización correspondiente.
 
 * **Garantía de Éxito (Postcondición Exitosa):**  
   Sede registrada con sus parámetros de infraestructura y claves foráneas asignadas.
@@ -41,11 +41,11 @@ Permite registrar y configurar las sedes y niveles del plantel 'Guamán Poma de 
 
 ## 5. Flujo Principal de Eventos (Camino Feliz)
 
-1. El superadmin ingresa a 'Configuración > Sedes e Institución'.
+1. El administrador autorizado ingresa a 'Configuración > Sedes e Institución'.
 2. Registra nombre de sede, código modular, nivel (Inicial, Primaria, Secundaria), dirección física y datos de contacto.
-3. Define el tenant_id único y los administradores locales asignados.
+3. El sistema asigna a la sede el `tenant_id UUID` de la institución existente; el administrador configura responsables locales autorizados.
 4. Presiona 'Guardar Sede'.
-5. El sistema persiste la configuración y habilita los esquemas correspondientes.
+5. El sistema persiste la sede en `sedes`; no crea un tenant ni un esquema nuevo.
 
 ---
 
@@ -57,7 +57,7 @@ Permite registrar y configurar las sedes y niveles del plantel 'Guamán Poma de 
 
 ## 7. Reglas de Negocio Asociadas
 
-* **RN-INS-01: Cada registro académico y transaccional debe incluir obligatoriamente el tenant_id de la sede correspondiente.**
+* **RN-INS-01: Cada registro académico y transaccional perteneciente a una institución debe incluir el `tenant_id UUID` de esa institución. Las referencias a sede son independientes y quedan sujetas a autorización.**
 
 ---
 

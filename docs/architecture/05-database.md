@@ -56,6 +56,7 @@ Notas: el esquema `squad3` de M8 guarda `tenant_id` como `VARCHAR(50)` con el UU
 | Historial | Tabla de control de `node-pg-migrate`. Una migración aplicada **no se edita ni se borra** |
 | Transacción | Una por migración; excepciones (`CREATE INDEX CONCURRENTLY`, `ALTER TYPE … ADD VALUE`) van solas y lo declaran en el encabezado |
 | Cambios incompatibles | *Expand / contract* en dos despliegues (p. ej. traslado de identidad de `usuarios` a `personas`) |
+| Contract de identidad | Migración opt-in en `database/migrations/contract/`; `npm run migrate` no la aplica. Tras respaldo y backfill verificados, `npm run migrate:contract` la registra en el mismo historial. CI la prueba solo sobre copia restaurada. |
 | Reversión | Solo hacia adelante en entornos compartidos: una reversión es una migración nueva, respaldada por el volcado previo |
 | Aprobación | Las que tocan tablas del núcleo requieren aprobación del Squad 1 |
 
@@ -80,9 +81,9 @@ Comprobar estado: `npx node-pg-migrate up --dry-run --migrations-dir migrations 
 
 | Tema | Estado |
 |---|---|
-| Mecanismo | Propuesto: `pg_dump -Fc` antes de cada migración en entornos compartidos y uno diario. Sin implementar |
+| Mecanismo | `pg_dump -Fc` ensayado en CI con datos ficticios; respaldo diario y retención del entorno compartido pendientes de infraestructura (D-19) |
 | Responsable | Líder del proyecto hasta que se defina el hosting (D-19) |
-| Prueba de restauración | **No realizada.** Es requisito previo a la migración *contract* de identidad (`PLAN.md`) |
+| Prueba de restauración | Ensayada en CI sobre `school_management_restore`: conteos, RLS, cadena de auditoría, descifrado y backfill atómico/idempotente. Falta ensayo operativo con volumen y claves del entorno autorizado antes del *contract* real. Véase `docs/core/OPERACION_CORE.md`. |
 | Particiones de auditoría | Las migraciones crean 12 meses; falta el job mensual de `fn_crear_particion_auditoria()` |
 | Redis | Datos efímeros (contadores, `jti` revocados); `appendonly yes` en local. Perderlo invalida sesiones, no datos |
 
@@ -92,4 +93,4 @@ Comprobar estado: `npx node-pg-migrate up --dry-run --migrations-dir migrations 
 2. La contraseña de PostgreSQL de desarrollo está escrita en `docker-compose.yml`; moverla a un `.env` local no versionado.
 3. Revisar y corregir con migraciones nuevas las tablas de la línea base de S2–S5 antes de usarlas.
 4. Unificar `tenant_id` de M8 a `UUID` (ADR-002 §3) con *dry-run* y reversión.
-5. Definir respaldo, probar una restauración y documentar el procedimiento.
+5. Definir frecuencia, retención y custodia de respaldos del entorno compartido; medir RTO/RPO con volumen representativo y claves externas antes del *contract* real.

@@ -91,16 +91,25 @@ export class AuthController {
     if (!parsed.success) { error(res, 400, 'VALIDATION_FAILED', 'Solicitud inválida.'); return; }
     if (!redisClient.isReady) { error(res, 503, 'AUTH_UNAVAILABLE', 'Servicio temporalmente no disponible.'); return; }
     const key = `forgot:${tokenHash(`${ipOf(req)}:${parsed.data.identifier.toLowerCase()}`)}`;
-    const count = await redisClient.incr(key);
-    if (count === 1) await redisClient.expire(key, 900);
-    if (count > 5) { error(res, 429, 'RATE_LIMITED', 'Espere antes de volver a intentar.'); return; }
+    try {
+      const count = await redisClient.incr(key);
+      if (count === 1) await redisClient.expire(key, 900);
+      if (count > 5) { error(res, 429, 'RATE_LIMITED', 'Espere antes de volver a intentar.'); return; }
+    } catch {
+      error(res, 503, 'AUTH_UNAVAILABLE', 'Servicio temporalmente no disponible.'); return;
+    }
     try {
       const user = await AuthService.requestRecovery(parsed.data.codigoModular, parsed.data.identifier);
       if (user) {
         const tenant = await (await import('../config/database')).resolveInstitution(parsed.data.codigoModular);
         if (tenant) {
           const token = await AuthService.createAccessLink(tenant, user.id, user.id, 'RECUPERACION');
-          await sendAccessLink(user.email, parsed.data.codigoModular, token, 'RECUPERACION');
+          try {
+            await sendAccessLink(user.email, parsed.data.codigoModular, token, 'RECUPERACION');
+          } catch (cause) {
+            await AuthService.invalidateAccessLink(tenant, user.id, user.id, 'RECUPERACION', token);
+            throw cause;
+          }
         }
       }
     } catch (cause) {

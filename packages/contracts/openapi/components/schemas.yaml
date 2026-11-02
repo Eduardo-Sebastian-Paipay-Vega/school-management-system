@@ -90,3 +90,177 @@ MessageSuccess:
       properties:
         message: { type: string }
     timestamp: { type: string, format: date-time }
+UserCreatedSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [line, personId]
+      properties:
+        line: { type: integer, minimum: 2 }
+        personId: { type: string, format: uuid }
+        userId: { type: string, format: uuid }
+    timestamp: { type: string, format: date-time }
+UserDirectorySuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [users, count]
+      properties:
+        users:
+          type: array
+          items:
+            type: object
+            required: [id, username, estado, persona_id, nombres, apellido_paterno, roles]
+            properties:
+              id: { type: string, format: uuid }
+              username: { type: string }
+              estado: { type: string }
+              persona_id: { type: string, format: uuid }
+              nombres: { type: string }
+              apellido_paterno: { type: string }
+              apellido_materno: { type: [string, 'null'] }
+              email: { type: [string, 'null'], format: email }
+              documento_ultimos4: { type: [string, 'null'] }
+              roles: { type: array, items: { type: string } }
+        count: { type: integer, minimum: 0 }
+    timestamp: { type: string, format: date-time }
+ImportSummary:
+  type: object
+  required: [nuevos, actualizados, sinCambios, rechazados]
+  properties:
+    nuevos: { type: integer, minimum: 0 }
+    actualizados: { type: integer, minimum: 0 }
+    sinCambios: { type: integer, minimum: 0 }
+    rechazados: { type: integer, minimum: 0 }
+ImportRejectedRow:
+  type: object
+  required: [line, reason]
+  properties:
+    line: { type: integer, minimum: 2 }
+    reason: { type: string }
+ImportPreviewSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [valid, rejected, summary]
+      properties:
+        valid:
+          type: array
+          items:
+            type: object
+            required: [line, row, status]
+            properties:
+              line: { type: integer, minimum: 2 }
+              row: { type: object }
+              personId: { type: string, format: uuid }
+              status: { type: string, enum: [NUEVO, ACTUALIZADO, SIN_CAMBIOS] }
+        rejected: { type: array, items: { $ref: './schemas.yaml#/ImportRejectedRow' } }
+        summary: { $ref: './schemas.yaml#/ImportSummary' }
+    timestamp: { type: string, format: date-time }
+ImportCommitSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [nuevos, actualizados, sinCambios, rechazados, registros]
+      properties:
+        nuevos: { type: integer, minimum: 0 }
+        actualizados: { type: integer, minimum: 0 }
+        sinCambios: { type: integer, minimum: 0 }
+        rechazados: { type: array, items: { $ref: './schemas.yaml#/ImportRejectedRow' } }
+        registros:
+          type: array
+          items:
+            type: object
+            required: [line, personId]
+            properties:
+              line: { type: integer, minimum: 2 }
+              personId: { type: string, format: uuid }
+              userId: { type: string, format: uuid }
+    timestamp: { type: string, format: date-time }
+GuardianLinkCreatedSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [id]
+      properties:
+        id: { type: string, format: uuid }
+    timestamp: { type: string, format: date-time }
+GuardianStudentsSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: array
+      items:
+        type: object
+        required: [id, nombres, apellido_paterno, parentesco]
+        properties:
+          id: { type: string, format: uuid }
+          nombres: { type: string }
+          apellido_paterno: { type: string }
+          apellido_materno: { type: [string, 'null'] }
+          parentesco: { type: string, enum: [PADRE, MADRE, TUTOR_LEGAL] }
+    timestamp: { type: string, format: date-time }
+AuditLogsSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [logs, count]
+      properties:
+        logs:
+          type: array
+          items:
+            type: object
+            required: [id, modulo, accion, timestamp_utc]
+            properties:
+              id: { type: string, pattern: '^[0-9]+$' }
+              usuario_id: { type: [string, 'null'], format: uuid }
+              modulo: { type: string }
+              accion: { type: string }
+              timestamp_utc: { type: string, format: date-time }
+        count: { type: integer, minimum: 0 }
+    timestamp: { type: string, format: date-time }
+AuditChainSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [valid, totalRecords]
+      properties:
+        valid: { type: boolean }
+        totalRecords: { type: integer, minimum: 0 }
+        errorIndex: { type: integer, minimum: 0 }
+    timestamp: { type: string, format: date-time }
+GuardianConsentSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [version, text]
+      properties:
+        version: { type: string, maxLength: 20 }
+        text: { type: string, minLength: 100 }
+    timestamp: { type: string, format: date-time }

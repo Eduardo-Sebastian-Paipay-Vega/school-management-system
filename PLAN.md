@@ -1,8 +1,8 @@
 # Plan de implementación integral — Core del Squad 1
 
-**Fecha:** 2026-10-23 · **Hoja de ruta por sprints actualizada:** 2026-10-30
+**Fecha:** 2026-10-23 · **Hoja de ruta por sprints actualizada:** 2026-11-02
 **Alcance:** los 22 RF del Squad 1: RF-01–14, RF-65–68, RF-72, RF-73, RF-75 y RF-76; sus RNF de seguridad, privacidad, calidad y accesibilidad.  
-**Estado:** implementación del Core desarrollada y validada con compilación, lint y pruebas locales. La aceptación integrada con PostgreSQL, Redis y SMTP, la aprobación D-16 y el texto oficial de consentimiento siguen pendientes. Las secciones de contexto comprobado describen el estado previo a los cambios; consultar `docs/core/OPERACION_CORE.md` para el arranque actual. La "Fase 1 (2026) / Fase 2 (2027)" describe la puesta en marcha escolar, no las fases documentales del repositorio.
+**Estado:** Sprints 1–2 integrados en `dev`; Sprint 3 implementado y probado en [CI](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/actions/runs/41490863165), pendiente de integración de PR #3. PostgreSQL 16, Redis 7 y SMTP de captura cubren los flujos principales; el *contract* se prueba tras restauración/backfill sobre una copia y queda como migración opt-in para el piloto. La aprobación D-16 y el texto oficial de consentimiento siguen pendientes. Las secciones de contexto comprobado describen el estado previo a los cambios; consultar `docs/core/OPERACION_CORE.md` y `docs/core/SPRINT_03_EVIDENCIA.md` para el estado actual. La "Fase 1 (2026) / Fase 2 (2027)" describe la puesta en marcha escolar, no las fases documentales del repositorio.
 
 ## Resumen
 
@@ -211,7 +211,7 @@ E1–E3 habilitan la Fase 1 de accesos. E4 prepara el año siguiente. E5–E6 co
 | **S2. Contratos y seguridad transversal** | Dividir `packages/contracts/openapi/core.yaml` según ADR-005 y generar tipos compartidos; unificar códigos de error; fijar `AccessControlService`, `GradingScaleService` y `AuditService` como interfaces públicas solo al tener consumidor; revisar todas las consultas, exportaciones y eventos para contexto tenant. | Lint OpenAPI, tipos y builds verdes; ninguna ruta protegida acepta tenant del cliente; prueba automatizada de acceso cruzado en rutas existentes. |
 | **S3. Integración real y datos** | Entorno reproducible PostgreSQL 16 + Redis 7 + SMTP de pruebas; pruebas de login, refresh rotado, permisos, invitación, importación, apoderado y auditoría con dos tenants; respaldo y restauración; backfill de identidades en copia y retirada *contract* solo tras comprobar consumidores. | Suite integrada en CI, restauración cronometrada y documentada, datos cifrados verificables y cero lecturas de columnas legadas antes de *contract*. |
 
-El desglose, responsables, capacidad, secuencia de dos semanas y pruebas de salida de S2 están en [`docs/core/SPRINT_02_PLAN.md`](docs/core/SPRINT_02_PLAN.md). El plan de S2 mantiene las aprobaciones formales de S1 como dependencia para cambios incompatibles de contrato o claim.
+El desglose y la evidencia de S2 están en [`docs/core/SPRINT_02_PLAN.md`](docs/core/SPRINT_02_PLAN.md) y [`docs/core/SPRINT_02_RESULTADOS.md`](docs/core/SPRINT_02_RESULTADOS.md). El Sprint 3 se ejecuta según [`docs/core/SPRINT_03_PLAN.md`](docs/core/SPRINT_03_PLAN.md), con PostgreSQL, Redis y SMTP de captura, restauración ensayada y gates previos a la migración *contract*.
 
 ### Fase 2 — Completar los 22 RF y sus dependencias (Sprints 4–5)
 

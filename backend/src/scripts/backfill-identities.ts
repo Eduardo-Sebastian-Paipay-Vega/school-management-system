@@ -7,11 +7,20 @@ async function main(){
   const client=new Client({connectionString:process.env.DATABASE_URL});
   await client.connect();
   try{
+    const legacy=await client.query<{present:boolean}>(`SELECT EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema='public' AND table_name='usuarios' AND column_name='dni'
+    ) AS present`);
+    if(!legacy.rows[0].present){
+      process.stdout.write('Identidad legada ya retirada; no hay backfill pendiente.\n');
+      return;
+    }
     const tenants=await client.query<{id:string;codigo_modular:string}>(
       'SELECT id,codigo_modular FROM instituciones ORDER BY codigo_modular');
-    for(const tenant of tenants.rows){
-      await client.query('BEGIN');
-      try{
+    const counts: Array<{code:string;count:number}>=[];
+    await client.query('BEGIN');
+    try{
+      for(const tenant of tenants.rows){
         const system=await client.query<{id:string}>(
           "SELECT id FROM usuarios WHERE tenant_id=$1 AND username='sistema'",[tenant.id]);
         if(!system.rowCount)throw new Error(`Falta usuario sistema en ${tenant.codigo_modular}`);
@@ -31,10 +40,12 @@ async function main(){
         if(apply&&pending.rowCount)await client.query(
           `SELECT fn_registrar_auditoria('core','BACKFILL_DOCUMENTS','127.0.0.1'::inet,
             'personas',NULL,NULL,$1::jsonb)`,[JSON.stringify({count:pending.rowCount})]);
-        await client.query(apply?'COMMIT':'ROLLBACK');
-        process.stdout.write(`${tenant.codigo_modular}: ${pending.rowCount} identidades ${apply?'cifradas':'por cifrar'}\n`);
-      }catch(cause){await client.query('ROLLBACK');throw cause;}
-    }
+        counts.push({code:tenant.codigo_modular,count:pending.rowCount ?? 0});
+      }
+      await client.query(apply?'COMMIT':'ROLLBACK');
+      for(const row of counts)process.stdout.write(
+        `${row.code}: ${row.count} identidades ${apply?'cifradas':'por cifrar'}\n`);
+    }catch(cause){await client.query('ROLLBACK');throw cause;}
   }finally{await client.end();}
 }
 main().catch((cause)=>{console.error(cause);process.exitCode=1;});

@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const { spawnSync } = require('node:child_process');
+const path = require('node:path');
 const { Pool } = require('pg');
 const { decryptDocument, documentHash } = require('../../dist/core/identity-crypto');
 
@@ -39,6 +40,14 @@ async function main() {
       { cwd: process.cwd(), env: { ...process.env, DATABASE_URL: url }, encoding: 'utf8' });
     const invalidPreview = run();
     assert.notEqual(invalidPreview.status, 0, 'el conteo también debe detectar DNI inválido');
+    const contractScript = path.resolve(__dirname, '../../../database/scripts/apply-identity-contract.mjs');
+    const blockedContract = spawnSync(process.execPath, [contractScript], {
+      cwd: path.resolve(__dirname, '../../../database'),
+      env: { ...process.env, DATABASE_URL: url,
+        CORE_IDENTITY_CONTRACT_ACK: 'backup-restore-backfill-verified' }, encoding: 'utf8',
+    });
+    assert.notEqual(blockedContract.status, 0, 'contract debe rechazar identidades pendientes');
+    assert.match(blockedContract.stderr, /IDENTITY_BACKFILL_INCOMPLETE/);
     const invalid = run('--apply');
     assert.notEqual(invalid.status, 0, 'el DNI inválido debe detener el backfill');
     for (const row of seeded) {

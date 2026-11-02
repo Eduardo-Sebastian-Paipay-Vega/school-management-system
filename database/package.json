@@ -6,6 +6,7 @@
   "description": "Migraciones versionadas y pruebas de la base de datos (ADR-004).",
   "scripts": {
     "migrate": "node-pg-migrate up --migrations-dir migrations --migration-file-language sql --no-check-order",
+    "migrate:contract": "node scripts/apply-identity-contract.mjs",
     "migrate:create": "node-pg-migrate create --migrations-dir migrations --migration-file-language sql",
     "bootstrap:app-role": "node scripts/bootstrap-app-role.mjs",
     "test": "node --test \"tests/**/*.test.mjs\""

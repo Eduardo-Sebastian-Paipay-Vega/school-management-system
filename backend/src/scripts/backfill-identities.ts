@@ -7,6 +7,14 @@ async function main(){
   const client=new Client({connectionString:process.env.DATABASE_URL});
   await client.connect();
   try{
+    const legacy=await client.query<{present:boolean}>(`SELECT EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema='public' AND table_name='usuarios' AND column_name='dni'
+    ) AS present`);
+    if(!legacy.rows[0].present){
+      process.stdout.write('Identidad legada ya retirada; no hay backfill pendiente.\n');
+      return;
+    }
     const tenants=await client.query<{id:string;codigo_modular:string}>(
       'SELECT id,codigo_modular FROM instituciones ORDER BY codigo_modular');
     const counts: Array<{code:string;count:number}>=[];

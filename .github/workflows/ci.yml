@@ -193,3 +193,21 @@ jobs:
         working-directory: backend
         env:
           RESTORED_DATABASE_URL: postgres://postgres:integration_only_password@localhost:5432/school_management_restore
+      - name: Aplicar contract solo en la copia verificada
+        run: npm run migrate:contract
+        working-directory: database
+        env:
+          DATABASE_URL: postgres://postgres:integration_only_password@localhost:5432/school_management_restore
+          CORE_IDENTITY_CONTRACT_ACK: backup-restore-backfill-verified
+      - name: Verificar retirada y cifrado en la copia
+        run: node tests/integration/verify-contract.cjs
+        working-directory: backend
+        env:
+          RESTORED_DATABASE_URL: postgres://postgres:integration_only_password@localhost:5432/school_management_restore
+      - name: Repetir suite HTTP tras contract en la copia
+        run: npm run test:integration
+        working-directory: backend
+        env:
+          DATABASE_URL: postgres://postgres:integration_only_password@localhost:5432/school_management_restore
+          INTEGRATION_DATABASE_URL: postgres://postgres:integration_only_password@localhost:5432/school_management_restore
+          DB_NAME: school_management_restore

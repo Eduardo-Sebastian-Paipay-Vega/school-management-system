@@ -609,7 +609,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Exige versión vigente del texto y aceptación explícita; la verificación real de ficha sigue bloqueada. */
+        /** @description Exige versión vigente del texto, aceptación explícita y fuente de ficha verificada no revocada. */
         post: operations["activateGuardian"];
         delete?: never;
         options?: never;
@@ -643,7 +643,7 @@ export interface paths {
         };
         get: operations["listGuardianLinks"];
         put?: never;
-        /** @description La ficha verificadora real requiere contrato de Squad 2; pruebas ficticias solo en CI. */
+        /** @description Solo vincula cuando fichas_apoderados_verificados contiene DNI hash, estudiante y parentesco activos cargados por Squad 2. */
         post: operations["createGuardianLink"];
         delete?: never;
         options?: never;
@@ -779,7 +779,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Permiso audit:read. Acepta modulo, usuarioId, desde, hasta, limit y offset; count es el total filtrado. */
+        /** @description Permiso audit:read. Acepta modulo, usuarioId, dni, ip, desde, hasta, limit y offset; count es el total filtrado. El DNI se convierte a hash antes de consultar. */
         get: operations["listAuditLogs"];
         put?: never;
         post?: never;
@@ -813,7 +813,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Permiso audit:export; responde 409 si el filtro supera 2000 registros. */
+        /** @description Permiso audit:export; comparte filtros modulo, usuarioId, dni, ip, desde y hasta; responde 409 si supera 2000 registros. */
         get: operations["exportAuditPdf"];
         put?: never;
         post?: never;
@@ -1913,7 +1913,6 @@ export interface operations {
         responses: {
             201: components["responses"]["GuardianLinkCreated"];
             409: components["responses"]["Error"];
-            503: components["responses"]["Error"];
         };
     };
     inviteGuardian: {

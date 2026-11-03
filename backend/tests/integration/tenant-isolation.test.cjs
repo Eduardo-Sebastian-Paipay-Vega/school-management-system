@@ -99,7 +99,6 @@ before(async () => {
   process.env.SMTP_TEST_PLAINTEXT = '1';
   process.env.GUARDIAN_CONSENT_VERSION = 'ci-ficticio-1';
   process.env.CORS_ORIGIN = 'http://localhost:3000';
-  process.env.GUARDIAN_TEST_LINK_VERIFICATION = '1';
   process.env.GUARDIAN_CONSENT_TEXT = 'Texto ficticio exclusivo de CI para probar la aceptación explícita del vínculo familiar. ' +
     'No representa un consentimiento institucional ni habilita datos de personas reales.';
   const { createApp } = require('../../dist/app');
@@ -438,14 +437,19 @@ test('apoderado ficticio requiere vínculo, invitación y consentimiento en su t
   guardianPersonId = guardianId;
   const studentId = student.body.data.personId;
   studentPersonId = studentId;
-  process.env.GUARDIAN_TEST_LINK_VERIFICATION = '0';
   const unavailable = await call('/guardians/links', { method: 'POST',
     headers: bearer(accessA, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ guardianId, studentId, parentesco: 'MADRE',
       verificacion: 'Texto libre sin ficha' }) });
-  assert.equal(unavailable.status, 503, JSON.stringify(unavailable.body));
-  assert.equal(unavailable.body.error.code, 'GUARDIAN_VERIFICATION_UNAVAILABLE');
-  process.env.GUARDIAN_TEST_LINK_VERIFICATION = '1';
+  assert.equal(unavailable.status, 409, JSON.stringify(unavailable.body));
+  assert.equal(unavailable.body.error.code, 'FICHA_LINK_NOT_VERIFIED');
+  const ficha = await admin.query(`INSERT INTO fichas_apoderados_verificados
+    (tenant_id,fuente_ficha_id,estudiante_id,apoderado_documento_hash,parentesco,verificado_en)
+    VALUES($1,gen_random_uuid(),$2,$3,'MADRE',now()) RETURNING id`,
+    [a.tenantId,studentId,documentHash(suffix)]);
+  await assert.rejects(runtime.withTenant(a.tenantId,a.userId,client=>client.query(
+    `UPDATE fichas_apoderados_verificados SET revocado_en=now() WHERE id=$1`,
+    [ficha.rows[0].id])),/permission denied/i);
   const foreign = await call('/guardians/links', { method: 'POST',
     headers: bearer(accessB, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ guardianId, studentId, parentesco: 'MADRE',
@@ -496,6 +500,14 @@ test('apoderado ficticio requiere vínculo, invitación y consentimiento en su t
   assert.equal(students.status, 200, JSON.stringify(students.body));
   assertContract('/guardians/students', 'get', students);
   assert.ok(students.body.data.some((row) => row.id === studentId));
+  await admin.query('UPDATE fichas_apoderados_verificados SET revocado_en=now() WHERE id=$1',
+    [ficha.rows[0].id]);
+  const sourceRevoked = await call('/guardians/students', {
+    headers: bearer(login.body.data.accessToken) });
+  assert.equal(sourceRevoked.status,200,JSON.stringify(sourceRevoked.body));
+  assert.deepEqual(sourceRevoked.body.data,[]);
+  await admin.query('UPDATE fichas_apoderados_verificados SET revocado_en=NULL WHERE id=$1',
+    [ficha.rows[0].id]);
 });
 
 test('S5: revocar consentimiento y desvincular corta acceso del apoderado', async () => {
@@ -595,13 +607,83 @@ test('rutas de usuarios y auditoría no muestran datos de otro tenant', async ()
     { headers: bearer(accessA) });
   assert.equal(noForeignUser.status,200,JSON.stringify(noForeignUser.body));
   assert.equal(noForeignUser.body.data.count,0);
+  const invitedDni=invitedUsername.split('_')[1];
+  const byDni=await call(`/audit/logs?dni=${invitedDni}`,
+    {headers:bearer(accessA)});
+  assert.equal(byDni.status,200,JSON.stringify(byDni.body));
+  assert.ok(byDni.body.data.count>=1);
+  assert.ok(byDni.body.data.logs.every(row=>row.usuario_id===invitedUserId));
+  const foreignDni=await call(`/audit/logs?dni=${invitedDni}`,
+    {headers:bearer(accessB)});
+  assert.equal(foreignDni.status,200,JSON.stringify(foreignDni.body));
+  assert.equal(foreignDni.body.data.count,0);
+  const sourceIp=await admin.query(`SELECT ip_origen::text AS ip FROM logs_auditoria
+    WHERE tenant_id=$1 AND usuario_id=$2 ORDER BY id DESC LIMIT 1`,
+    [a.tenantId,invitedUserId]);
+  const byIp=await call(`/audit/logs?ip=${encodeURIComponent(sourceIp.rows[0].ip)}`,
+    {headers:bearer(accessA)});
+  assert.equal(byIp.status,200,JSON.stringify(byIp.body));
+  assert.ok(byIp.body.data.count>=1);
+  const auditPayload=await admin.query(`SELECT payload_nuevo::text AS payload FROM logs_auditoria
+    WHERE tenant_id=$1 AND accion='READ_AUDIT_LOGS'
+      AND payload_nuevo ? 'dniUltimos4' ORDER BY id DESC LIMIT 1`,
+    [a.tenantId]);
+  assert.ok(!auditPayload.rows[0].payload.includes(invitedDni));
   const auditRead=await admin.query(`SELECT count(*)::int AS n FROM logs_auditoria
     WHERE tenant_id=$1 AND accion='READ_AUDIT_LOGS'`,[a.tenantId]);
-  assert.ok(auditRead.rows[0].n>=3);
+  assert.ok(auditRead.rows[0].n>=5);
   const chain = await call('/audit/verify-chain', { headers: bearer(accessA) });
   assert.equal(chain.status, 200, JSON.stringify(chain.body));
   assertContract('/audit/verify-chain', 'get', chain);
   assert.equal(chain.body.data.valid, true);
+});
+
+test('S5: historial M8 y cadena Core comparten transacción y tenant', async () => {
+  const bookId=require('node:crypto').randomUUID();
+  const firstState={id:bookId,tenantId:a.tenantId,revision:1,grades:{}};
+  const historyId=await runtime.withTenant(a.tenantId,a.userId,async(client)=>{
+    await client.query(`INSERT INTO squad3.gradebooks
+      (id,tenant_id,revision,state,created_by) VALUES($1,$2,1,$3,$4)`,
+      [bookId,a.tenantId,JSON.stringify(firstState),a.userId]);
+    const history=await client.query(`INSERT INTO squad3.grade_audit_history
+      (tenant_id,book_id,action,after_state,created_by)
+      VALUES($1,$2,'provision',$3,$4) RETURNING id`,
+      [a.tenantId,bookId,JSON.stringify(firstState),a.userId]);
+    return history.rows[0].id;
+  });
+  const linked=await admin.query(`SELECT usuario_id,registro_id FROM logs_auditoria
+    WHERE tenant_id=$1 AND modulo='grades' AND accion='GRADE_HISTORY' AND registro_id=$2`,
+    [a.tenantId,historyId]);
+  assert.equal(linked.rowCount,1);
+  assert.equal(linked.rows[0].usuario_id,a.userId);
+  await assert.rejects(runtime.withTenant(a.tenantId,a.userId,client=>client.query(
+    `INSERT INTO squad3.grade_audit_history
+      (tenant_id,book_id,action,after_state,created_by)
+      VALUES($1,$2,'provision',$3,$4)`,
+    [a.tenantId,bookId,JSON.stringify(firstState),b.userId])),
+  /autor del historial no coincide/i);
+  const secondState={...firstState,revision:2,grades:{ficticia:'A'}};
+  await assert.rejects(runtime.withTenant(a.tenantId,a.userId,async(client)=>{
+    await client.query(`UPDATE squad3.gradebooks SET state=$1,revision=2
+      WHERE tenant_id=$2 AND id=$3`,[JSON.stringify(secondState),a.tenantId,bookId]);
+    await client.query(`INSERT INTO squad3.grade_audit_history
+      (tenant_id,book_id,action,before_state,after_state,created_by)
+      VALUES($1,$2,'batch',$3,$4,$5)`,
+      [a.tenantId,bookId,JSON.stringify(firstState),JSON.stringify(secondState),a.userId]);
+    throw new Error('rollback ficticio');
+  }),/rollback ficticio/);
+  const rolledBack=await admin.query(`SELECT revision FROM squad3.gradebooks WHERE id=$1`,[bookId]);
+  assert.equal(rolledBack.rows[0].revision,1);
+  const history=await admin.query(`SELECT count(*)::int AS n FROM squad3.grade_audit_history
+    WHERE tenant_id=$1 AND book_id=$2`,[a.tenantId,bookId]);
+  assert.equal(history.rows[0].n,1);
+  const audit=await admin.query(`SELECT count(*)::int AS n FROM logs_auditoria
+    WHERE tenant_id=$1 AND modulo='grades' AND accion='GRADE_HISTORY'
+      AND payload_nuevo->>'bookId'=$2`,[a.tenantId,bookId]);
+  assert.equal(audit.rows[0].n,1);
+  const chain=await call('/audit/verify-chain',{headers:bearer(accessA)});
+  assert.equal(chain.status,200,JSON.stringify(chain.body));
+  assert.equal(chain.body.data.valid,true);
 });
 
 test('sms_runtime aplica RLS, falla sin contexto y limpia el contexto del pool', async () => {

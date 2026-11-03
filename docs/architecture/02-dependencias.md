@@ -64,6 +64,6 @@ flowchart LR
 
 ## 4. Riesgos de acoplamiento
 
-- **Ciclo potencial S2 ↔ S1:** S1 necesita estudiantes para vincular apoderados (RF-75) y S2 necesita personas de S1. Se evita porque ambos referencian `personas` (de S1); S1 no consulta `matriculas`.
+- **Ciclo potencial S2 ↔ S1:** S1 necesita estudiantes para vincular apoderados (RF-75) y S2 necesita personas de S1. Ambos referencian `personas`; S1 consulta la fuente de filiación `fichas_apoderados_verificados` cargada por S2, sin consultar `matriculas`.
 - **Analítica sobre tablas de otros squads:** S4 solo lee vistas agregadas; si necesita una columna nueva, la pide al dueño de la tabla.
 - **Errores divergentes (P-05):** un consumidor que filtre por `code` se rompe al unificar el catálogo. La unificación debe hacerse antes de que otros squads consuman el Core.

@@ -63,6 +63,8 @@ Si Administración TI cambia el correo de una cuenta no administradora, esta que
 
 Un vínculo familiar creado por Secretaría queda pendiente de aceptación. `GET /guardians/students` solo devuelve estudiantes tras consumir la invitación y aceptar la versión vigente del texto oficial. Revocar y volver a vincular obliga a confirmar otra vez; una nueva versión oficial obliga a recabar de nuevo el consentimiento.
 
+Antes de vincular, Squad 2 debe publicar la ficha de filiación en `fichas_apoderados_verificados` conforme al [contrato RF-15 → RF-75](CONTRATO_FICHA_RF15_RF75.md). Secretaría no puede sustituir esa fuente con texto libre. La ausencia o revocación de la ficha bloquea invitación, activación y consulta. El texto/versionado oficial de consentimiento se configura al preparar el despliegue del piloto; sin él el API responde 503.
+
 ## Verificación y pendientes institucionales
 
 `database/npm test` comprueba migraciones, RLS y cadena; `backend/npm test` cubre cifrado e importación CSV/XLSX. El CI del Core usa PostgreSQL 16, Redis 7 y SMTP de captura local con dos instituciones ficticias, además del ensayo de restauración y backfill. Ejecutar lint, build y auditor PrimeReact en frontend cuando cambie la interfaz. La institución debe aprobar D-16 y el texto legal de consentimiento antes de habilitar escalas numéricas o consentimiento de apoderados con datos reales.

@@ -481,15 +481,48 @@ function NoticesPanel(){
 function AuditPanel(){
   const {download,user}=useCoreSession();
   const [exportError,setExportError]=useState('');
-  const {data,busy,error,reload}=useLoad<{logs:AuditLog[];count:number}>('/audit/logs?limit=50');
+  const [dni,setDni]=useState('');const [ip,setIp]=useState('');const [moduleFilter,setModuleFilter]=useState('');
+  const [from,setFrom]=useState('');const [to,setTo]=useState('');
+  const [applied,setApplied]=useState({dni:'',ip:'',modulo:'',desde:'',hasta:''});
+  const [first,setFirst]=useState(0);
+  const params=new URLSearchParams();
+  for(const [key,value] of Object.entries(applied))if(value)params.set(key,value);
+  const filterQuery=params.toString();
+  params.set('limit','20');params.set('offset',String(first));
+  const {data,busy,error,reload}=useLoad<{logs:AuditLog[];count:number}>(`/audit/logs?${params.toString()}`);
+  const invalidDni=!!dni&&!/^\d{8}$/.test(dni);
+  const invalidDates=!!from&&!!to&&from>to;
+  function apply(){setFirst(0);setApplied({dni:dni.trim(),ip:ip.trim(),modulo:moduleFilter.trim(),
+    desde:from?`${from}T00:00:00-05:00`:'',hasta:to?`${to}T23:59:59-05:00`:''});}
+  function clear(){setDni('');setIp('');setModuleFilter('');setFrom('');setTo('');setFirst(0);
+    setApplied({dni:'',ip:'',modulo:'',desde:'',hasta:''});}
   return <div><State busy={busy} error={error} retry={()=>void reload()}/>
+    <section className="mb-4 grid gap-3 rounded-xl border p-4 sm:grid-cols-2 lg:grid-cols-5">
+      <label className="text-sm">DNI del responsable<InputText value={dni} onChange={e=>setDni(e.target.value)}
+        inputMode="numeric" maxLength={8} className="mt-1 w-full"/></label>
+      <label className="text-sm">Dirección IP<InputText value={ip} onChange={e=>setIp(e.target.value)}
+        maxLength={45} className="mt-1 w-full"/></label>
+      <label className="text-sm">Módulo<InputText value={moduleFilter} onChange={e=>setModuleFilter(e.target.value)}
+        maxLength={50} className="mt-1 w-full"/></label>
+      <label className="text-sm">Desde<input type="date" value={from} onChange={e=>setFrom(e.target.value)}
+        className="mt-1 w-full rounded border p-2"/></label>
+      <label className="text-sm">Hasta<input type="date" value={to} onChange={e=>setTo(e.target.value)}
+        className="mt-1 w-full rounded border p-2"/></label>
+      <div className="flex flex-wrap gap-2 sm:col-span-2 lg:col-span-5">
+        <Button label="Buscar" icon="pi pi-search" disabled={invalidDni||invalidDates} onClick={apply}/>
+        <Button label="Limpiar" outlined onClick={clear}/>
+      </div>
+    </section>
+    <p className="mb-2 text-sm" role="status">{data?.count??0} registros encontrados</p>
     {user?.permissions.includes('audit:export')&&<Button label="Exportar PDF" icon="pi pi-file-pdf" outlined
-      onClick={()=>void download('/audit/export.pdf','auditoria-core.pdf').catch(cause=>setExportError(String(cause)))}/>}
+      onClick={()=>void download(`/audit/export.pdf${filterQuery?`?${filterQuery}`:''}`,'auditoria-core.pdf')
+        .catch(cause=>setExportError(String(cause)))}/>}
     {exportError&&<p role="alert" className="text-sm text-red-700">{exportError}</p>}
-    <DataTable value={data?.logs??[]} dataKey="id" loading={busy} paginator rows={10}
+    <DataTable value={data?.logs??[]} dataKey="id" loading={busy} paginator lazy first={first} rows={20}
+      totalRecords={data?.count??0} onPage={event=>setFirst(event.first)}
       emptyMessage="No hay eventos de auditoría." scrollable>
       <Column field="id" header="ID"/><Column field="accion" header="Acción"/>
-      <Column field="modulo" header="Módulo"/>
+      <Column field="modulo" header="Módulo"/><Column field="usuario_id" header="Usuario"/>
       <Column header="Fecha" body={(row:AuditLog)=>new Date(row.timestamp_utc).toLocaleString('es-PE')}/>
     </DataTable></div>;
 }
@@ -531,7 +564,7 @@ function GuardiansPanel(){
   const {data:links,busy,error,reload}=useLoad<GuardianLink[]>('/guardians/links');
   const [query,setQuery]=useState('');const [persons,setPersons]=useState<Person[]>([]);
   const [guardian,setGuardian]=useState('');const [student,setStudent]=useState('');
-  const [relationship,setRelationship]=useState('PADRE');const [verification,setVerification]=useState('');
+  const [relationship,setRelationship]=useState('PADRE');
   const [message,setMessage]=useState('');
   async function search(){
     setMessage('');try{const found=await request<Person[]>(`/users/persons?search=${encodeURIComponent(query)}`);
@@ -555,7 +588,8 @@ function GuardiansPanel(){
             if(window.confirm('¿Revocar este vínculo familiar?'))void action(`/guardians/links/${r.apoderado_id}/${r.estudiante_id}`,'DELETE');}}/></>}
       </div>}/>
     </DataTable>
-    <section className="rounded-xl border p-4"><h3 className="font-bold">Verificar y vincular</h3>
+    <section className="rounded-xl border p-4"><h3 className="font-bold">Vincular desde la ficha verificada</h3>
+      <p className="mt-1 text-sm text-gray-600">El parentesco debe constar en la ficha del estudiante cargada por Matrícula.</p>
       <div className="mt-3 flex flex-wrap gap-2"><label htmlFor="person-search" className="sr-only">Buscar persona</label>
         <InputText id="person-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar persona por nombre"/>
         <Button label="Buscar" outlined disabled={query.trim().length<2} onClick={()=>void search()}/></div>
@@ -568,11 +602,9 @@ function GuardiansPanel(){
         </select></label>
         <label className="text-sm">Parentesco<select value={relationship} onChange={e=>setRelationship(e.target.value)} className="block w-full rounded border p-2">
           <option value="PADRE">Padre</option><option value="MADRE">Madre</option><option value="TUTOR_LEGAL">Tutor legal</option></select></label>
-        <label className="text-sm">Evidencia de verificación<InputText value={verification} onChange={e=>setVerification(e.target.value)}
-          className="block w-full" placeholder="Ficha o acta verificada"/></label>
       </div>
-      <Button label="Crear vínculo" className="mt-3" disabled={!guardian||!student||guardian===student||verification.trim().length<5}
-        onClick={()=>void action('/guardians/links','POST',{guardianId:guardian,studentId:student,parentesco:relationship,verificacion:verification})}/>
+      <Button label="Crear vínculo" className="mt-3" disabled={!guardian||!student||guardian===student}
+        onClick={()=>void action('/guardians/links','POST',{guardianId:guardian,studentId:student,parentesco:relationship})}/>
     </section>{message&&<p role="status">{message}</p>}</div>;
 }
 

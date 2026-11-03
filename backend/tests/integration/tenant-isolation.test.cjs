@@ -4,6 +4,8 @@ const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
 const { startCapture } = require('./smtp-capture.cjs');
 const WebSocket = require('ws');
+const { execFileSync } = require('node:child_process');
+const { resolve } = require('node:path');
 const { documentHash } = require('../../dist/core/identity-crypto');
 const Ajv2020 = require('ajv/dist/2020');
 const addFormats = require('ajv-formats');
@@ -878,4 +880,26 @@ test('Redis indisponible falla cerrado en petición protegida y refresh', async 
     body: JSON.stringify({ codigoModular: a.code, identifier: invitedUsername }) });
   assert.equal(recovery.status, 503);
   assert.equal(recovery.body.error.code, 'AUTH_UNAVAILABLE');
+});
+
+test('S5: retención elimina avisos mayores de 180 días y conserva los recientes', async () => {
+  const old=await admin.query(`INSERT INTO notificaciones
+    (tenant_id,usuario_id,created_by,categoria,titulo,mensaje,created_at)
+    VALUES($1,$2,$2,'RECORDATORIO','Aviso vencido ficticio','Prueba',now()-interval '181 days')
+    RETURNING id`,[a.tenantId,a.userId]);
+  const recent=await admin.query(`INSERT INTO notificaciones
+    (tenant_id,usuario_id,created_by,categoria,titulo,mensaje,created_at)
+    VALUES($1,$2,$2,'RECORDATORIO','Aviso reciente ficticio','Prueba',now()-interval '179 days')
+    RETURNING id`,[a.tenantId,a.userId]);
+  await admin.query('INSERT INTO envios_correo(tenant_id,notificacion_id) VALUES($1,$2)',
+    [a.tenantId,old.rows[0].id]);
+  const script=resolve(__dirname,'../../../database/scripts/retain-notifications.mjs');
+  execFileSync(process.execPath,[script],{env:{...process.env,
+    DATABASE_URL:process.env.INTEGRATION_DATABASE_URL},stdio:'pipe'});
+  const rows=await admin.query('SELECT id FROM notificaciones WHERE id=ANY($1::uuid[])',
+    [[old.rows[0].id,recent.rows[0].id]]);
+  assert.deepEqual(rows.rows.map(row=>row.id),[recent.rows[0].id]);
+  const queue=await admin.query('SELECT id FROM envios_correo WHERE notificacion_id=$1',
+    [old.rows[0].id]);
+  assert.equal(queue.rowCount,0);
 });

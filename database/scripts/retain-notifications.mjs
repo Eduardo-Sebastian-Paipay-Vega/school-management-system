@@ -14,6 +14,7 @@ try {
     const ids=old.rows.map(row=>row.id);
     await client.query(`UPDATE avisos_inasistencia SET notificacion_id=NULL
       WHERE notificacion_id=ANY($1::uuid[])`,[ids]);
+    await client.query(`DELETE FROM envios_correo WHERE notificacion_id=ANY($1::uuid[])`,[ids]);
     const removed=await client.query(`DELETE FROM notificaciones WHERE id=ANY($1::uuid[])`,[ids]);
     total+=removed.rowCount??0;
     await client.query('COMMIT');

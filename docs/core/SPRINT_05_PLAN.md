@@ -1,6 +1,6 @@
 # Sprint 5 — Familias, avisos, privacidad y auditoría
 
-**Base:** merge de PR #4 en `dev` (`f10e0ddd`). **Rama:** `codex/core-sprint-5`. **Estado:** en ejecución. El piloto real sigue limitado a Guamán Poma de Ayala; CI usa dos tenants ficticios.
+**Base:** merge de PR #4 en `dev` (`f10e0ddd`). **Rama:** `codex/core-sprint-5`. **Estado:** cierre técnico acreditado en [el acta](SPRINT_05_ACTA_CIERRE_FORMAL.md). El piloto real sigue limitado a Guamán Poma de Ayala; CI usa dos tenants ficticios.
 
 ## Objetivo y fuentes de verdad
 

@@ -891,8 +891,8 @@ test('S5: retención elimina avisos mayores de 180 días y conserva los reciente
     (tenant_id,usuario_id,created_by,categoria,titulo,mensaje,created_at)
     VALUES($1,$2,$2,'RECORDATORIO','Aviso reciente ficticio','Prueba',now()-interval '179 days')
     RETURNING id`,[a.tenantId,a.userId]);
-  await admin.query('INSERT INTO envios_correo(tenant_id,notificacion_id) VALUES($1,$2)',
-    [a.tenantId,old.rows[0].id]);
+  await admin.query(`INSERT INTO envios_correo(tenant_id,notificacion_id,created_by)
+    VALUES($1,$2,$3)`,[a.tenantId,old.rows[0].id,a.userId]);
   const script=resolve(__dirname,'../../../database/scripts/retain-notifications.mjs');
   execFileSync(process.execPath,[script],{env:{...process.env,
     DATABASE_URL:process.env.INTEGRATION_DATABASE_URL},stdio:'pipe'});

@@ -10,7 +10,7 @@ import { Button } from 'primereact/button';
 import { useCoreSession } from './SessionProvider';
 
 type DirectoryUser={id:string;username:string;estado:string;nombres:string;apellido_paterno:string;
-  apellido_materno:string|null;email:string|null;telefono:string|null;documento_ultimos4:string|null;roles:string[]};
+  apellido_materno:string|null;email:string|null;telefono_enmascarado:string|null;documento_ultimos4:string|null;roles:string[]};
 type Year={id:string;anio:number;fecha_inicio:string;fecha_fin:string;activo:boolean};
 type Institution={id:string;codigo_modular:string;nombre:string;direccion:string|null;telefono:string|null;
   membrete_texto:string|null;escudo_url:string|null};
@@ -64,7 +64,7 @@ function UsersPanel(){
   const [target,setTarget]=useState<DirectoryUser|null>(null);
   const [editTarget,setEditTarget]=useState<DirectoryUser|null>(null);
   const [editName,setEditName]=useState('');const [editLastName,setEditLastName]=useState('');
-  const [editPhone,setEditPhone]=useState('');
+  const [editPhone,setEditPhone]=useState('');const [editPhoneTouched,setEditPhoneTouched]=useState(false);
   const [selectedRoles,setSelectedRoles]=useState<string[]>([]);
   const [roleReason,setRoleReason]=useState('');
   async function createUser(){
@@ -92,7 +92,8 @@ function UsersPanel(){
     if(!editTarget)return;
     setAction('edit');setMessage('');
     try{await request(`/users/${editTarget.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({nombres:editName.trim(),apellidoPaterno:editLastName.trim(),telefono:editPhone})});
+      body:JSON.stringify({nombres:editName.trim(),apellidoPaterno:editLastName.trim(),
+        ...(editPhoneTouched?{telefono:editPhone}:{})})});
       setEditTarget(null);setMessage('Usuario actualizado.');await reload();}
     catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo actualizar el usuario.');}
     finally{setAction('');}
@@ -135,7 +136,7 @@ function UsersPanel(){
       <Column header="Acciones" body={(row:DirectoryUser)=><div className="flex gap-1">
         {user.permissions.includes('users:manage')&&<Button label="Editar" text size="small" onClick={()=>{
           setEditTarget(row);setEditName(row.nombres);setEditLastName(row.apellido_paterno);
-          setEditPhone(row.telefono??'');}}/>}
+          setEditPhone('');setEditPhoneTouched(false);}}/>}
         {user.permissions.includes('users:assign-roles')&&row.estado==='ACTIVO'&&
           <Button label="Roles" text size="small" onClick={()=>{
             setTarget(row);setSelectedRoles(row.roles);setRoleReason('');}}/>}
@@ -154,7 +155,11 @@ function UsersPanel(){
         <label htmlFor="edit-last-name" className="text-sm">Apellido paterno</label>
         <InputText id="edit-last-name" value={editLastName} onChange={event=>setEditLastName(event.target.value)} maxLength={100}/>
         <label htmlFor="edit-phone" className="text-sm">Teléfono</label>
-        <InputText id="edit-phone" value={editPhone} onChange={event=>setEditPhone(event.target.value)} maxLength={20}/>
+        <div><InputText id="edit-phone" value={editPhone} onChange={event=>{
+          setEditPhone(event.target.value);setEditPhoneTouched(true);}} maxLength={20}
+          placeholder="Dejar sin cambios"/>
+          {editTarget.telefono_enmascarado&&<p className="mt-1 text-xs text-gray-600">
+            Actual: {editTarget.telefono_enmascarado}</p>}</div>
       </div>
       <div className="mt-3 flex gap-2"><Button label="Guardar" disabled={!!action||!editName.trim()||!editLastName.trim()}
         onClick={()=>void saveUser()}/><Button label="Cancelar" outlined onClick={()=>setEditTarget(null)}/></div>
@@ -418,12 +423,13 @@ function SchoolPanel(){
 
 function NoticesPanel(){
   const {request,subscribeNotifications,user}=useCoreSession();const {data,busy,error,reload}=useLoad<Notice[]>('/notifications');
+  const {data:unread,reload:reloadUnread}=useLoad<{count:number}>('/notifications/unread-count');
   const {data:preferences,reload:reloadPreferences}=useLoad<{categoria:string;por_correo:boolean}[]>('/notifications/preferences');
   const [search,setSearch]=useState('');const [recipients,setRecipients]=useState<DirectoryUser[]>([]);
   const [recipient,setRecipient]=useState('');const [category,setCategory]=useState('RECORDATORIO');
   const [title,setTitle]=useState('');const [body,setBody]=useState('');const [message,setMessage]=useState('');
-  useEffect(()=>subscribeNotifications(()=>{void reload();}),[subscribeNotifications,reload]);
-  async function mark(id:string){await request(`/notifications/${id}/read`,{method:'PATCH'});await reload();}
+  useEffect(()=>subscribeNotifications(()=>{void reload();void reloadUnread();}),[subscribeNotifications,reload,reloadUnread]);
+  async function mark(id:string){await request(`/notifications/${id}/read`,{method:'PATCH'});await reload();await reloadUnread();}
   async function findRecipients(){
     try{const result=await request<{users:DirectoryUser[]}>(`/users?search=${encodeURIComponent(search)}`);
       setRecipients(result.users);}catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo buscar.');}
@@ -431,20 +437,24 @@ function NoticesPanel(){
   async function send(){
     setMessage('');try{await request('/notifications',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({userId:recipient,categoria:category,titulo:title,mensaje:body})});
-      setMessage('Aviso creado y puesto en cola de correo.');setTitle('');setBody('');}
+      setMessage('Aviso creado. El correo se enviará si el destinatario lo tiene verificado y habilitado.');setTitle('');setBody('');}
     catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo enviar.');}
   }
   const categories=['SEGURIDAD','RECORDATORIO','ASISTENCIA','NOTAS','TRAMITES','CITAS'];
-  return <div><State busy={busy} error={error} retry={()=>void reload()}/>
+  return <div><h2 className="mb-2 flex items-center gap-2 font-bold" aria-live="polite">
+    <i className="pi pi-bell" aria-hidden="true"/> Avisos
+    <span className="rounded-full bg-primary px-2 py-0.5 text-xs text-white" aria-label={`${unread?.count??0} avisos no leídos`}>
+      {unread?.count??0}</span></h2><State busy={busy} error={error} retry={()=>{void reload();void reloadUnread();}}/>
     {data?.length===0&&<p className="p-4 text-sm text-gray-600">No hay avisos.</p>}
     <ul className="divide-y">{data?.map(n=><li key={n.id} className="flex flex-wrap items-start justify-between gap-3 py-4">
       <div><h3 className="font-bold">{n.titulo}</h3><p className="text-sm text-gray-700">{n.mensaje}</p>
         <p className="text-xs text-gray-500">{n.categoria} · {new Date(n.created_at).toLocaleString('es-PE')}</p></div>
       {!n.leida_en&&<Button label="Marcar leída" text size="small" onClick={()=>void mark(n.id)}/>}</li>)}</ul>
     <section className="mt-5 rounded-xl border p-4"><h3 className="font-bold">Correo por categoría</h3>
-      <p className="text-xs text-gray-600">Los avisos permanecen en la bandeja aunque desactive el correo.</p>
+      <p className="text-xs text-gray-600">Los avisos permanecen en la bandeja aunque desactive el correo. El correo de seguridad es obligatorio.</p>
       <div className="mt-3 flex flex-wrap gap-4">{categories.map(c=><label key={c} className="flex gap-2 text-sm">
-        <input type="checkbox" checked={preferences?.find(p=>p.categoria===c)?.por_correo??true}
+        <input type="checkbox" checked={c==='SEGURIDAD'||(preferences?.find(p=>p.categoria===c)?.por_correo??true)}
+          disabled={c==='SEGURIDAD'}
           onChange={e=>void request(`/notifications/preferences/${c}`,{method:'PUT',
             headers:{'Content-Type':'application/json'},body:JSON.stringify({porCorreo:e.target.checked})})
             .then(()=>reloadPreferences()).catch(cause=>setMessage(String(cause)))}/>{c}</label>)}</div>
@@ -471,15 +481,48 @@ function NoticesPanel(){
 function AuditPanel(){
   const {download,user}=useCoreSession();
   const [exportError,setExportError]=useState('');
-  const {data,busy,error,reload}=useLoad<{logs:AuditLog[];count:number}>('/audit/logs?limit=50');
+  const [dni,setDni]=useState('');const [ip,setIp]=useState('');const [moduleFilter,setModuleFilter]=useState('');
+  const [from,setFrom]=useState('');const [to,setTo]=useState('');
+  const [applied,setApplied]=useState({dni:'',ip:'',modulo:'',desde:'',hasta:''});
+  const [first,setFirst]=useState(0);
+  const params=new URLSearchParams();
+  for(const [key,value] of Object.entries(applied))if(value)params.set(key,value);
+  const filterQuery=params.toString();
+  params.set('limit','20');params.set('offset',String(first));
+  const {data,busy,error,reload}=useLoad<{logs:AuditLog[];count:number}>(`/audit/logs?${params.toString()}`);
+  const invalidDni=!!dni&&!/^\d{8}$/.test(dni);
+  const invalidDates=!!from&&!!to&&from>to;
+  function apply(){setFirst(0);setApplied({dni:dni.trim(),ip:ip.trim(),modulo:moduleFilter.trim(),
+    desde:from?`${from}T00:00:00-05:00`:'',hasta:to?`${to}T23:59:59-05:00`:''});}
+  function clear(){setDni('');setIp('');setModuleFilter('');setFrom('');setTo('');setFirst(0);
+    setApplied({dni:'',ip:'',modulo:'',desde:'',hasta:''});}
   return <div><State busy={busy} error={error} retry={()=>void reload()}/>
+    <section className="mb-4 grid gap-3 rounded-xl border p-4 sm:grid-cols-2 lg:grid-cols-5">
+      <label className="text-sm">DNI del responsable<InputText value={dni} onChange={e=>setDni(e.target.value)}
+        inputMode="numeric" maxLength={8} className="mt-1 w-full"/></label>
+      <label className="text-sm">Dirección IP<InputText value={ip} onChange={e=>setIp(e.target.value)}
+        maxLength={45} className="mt-1 w-full"/></label>
+      <label className="text-sm">Módulo<InputText value={moduleFilter} onChange={e=>setModuleFilter(e.target.value)}
+        maxLength={50} className="mt-1 w-full"/></label>
+      <label className="text-sm">Desde<input type="date" value={from} onChange={e=>setFrom(e.target.value)}
+        className="mt-1 w-full rounded border p-2"/></label>
+      <label className="text-sm">Hasta<input type="date" value={to} onChange={e=>setTo(e.target.value)}
+        className="mt-1 w-full rounded border p-2"/></label>
+      <div className="flex flex-wrap gap-2 sm:col-span-2 lg:col-span-5">
+        <Button label="Buscar" icon="pi pi-search" disabled={invalidDni||invalidDates} onClick={apply}/>
+        <Button label="Limpiar" outlined onClick={clear}/>
+      </div>
+    </section>
+    <p className="mb-2 text-sm" role="status">{data?.count??0} registros encontrados</p>
     {user?.permissions.includes('audit:export')&&<Button label="Exportar PDF" icon="pi pi-file-pdf" outlined
-      onClick={()=>void download('/audit/export.pdf','auditoria-core.pdf').catch(cause=>setExportError(String(cause)))}/>}
+      onClick={()=>void download(`/audit/export.pdf${filterQuery?`?${filterQuery}`:''}`,'auditoria-core.pdf')
+        .catch(cause=>setExportError(String(cause)))}/>}
     {exportError&&<p role="alert" className="text-sm text-red-700">{exportError}</p>}
-    <DataTable value={data?.logs??[]} dataKey="id" loading={busy} paginator rows={10}
+    <DataTable value={data?.logs??[]} dataKey="id" loading={busy} paginator lazy first={first} rows={20}
+      totalRecords={data?.count??0} onPage={event=>setFirst(event.first)}
       emptyMessage="No hay eventos de auditoría." scrollable>
       <Column field="id" header="ID"/><Column field="accion" header="Acción"/>
-      <Column field="modulo" header="Módulo"/>
+      <Column field="modulo" header="Módulo"/><Column field="usuario_id" header="Usuario"/>
       <Column header="Fecha" body={(row:AuditLog)=>new Date(row.timestamp_utc).toLocaleString('es-PE')}/>
     </DataTable></div>;
 }
@@ -521,7 +564,7 @@ function GuardiansPanel(){
   const {data:links,busy,error,reload}=useLoad<GuardianLink[]>('/guardians/links');
   const [query,setQuery]=useState('');const [persons,setPersons]=useState<Person[]>([]);
   const [guardian,setGuardian]=useState('');const [student,setStudent]=useState('');
-  const [relationship,setRelationship]=useState('PADRE');const [verification,setVerification]=useState('');
+  const [relationship,setRelationship]=useState('PADRE');
   const [message,setMessage]=useState('');
   async function search(){
     setMessage('');try{const found=await request<Person[]>(`/users/persons?search=${encodeURIComponent(query)}`);
@@ -545,7 +588,8 @@ function GuardiansPanel(){
             if(window.confirm('¿Revocar este vínculo familiar?'))void action(`/guardians/links/${r.apoderado_id}/${r.estudiante_id}`,'DELETE');}}/></>}
       </div>}/>
     </DataTable>
-    <section className="rounded-xl border p-4"><h3 className="font-bold">Verificar y vincular</h3>
+    <section className="rounded-xl border p-4"><h3 className="font-bold">Vincular desde la ficha verificada</h3>
+      <p className="mt-1 text-sm text-gray-600">El parentesco debe constar en la ficha del estudiante cargada por Matrícula.</p>
       <div className="mt-3 flex flex-wrap gap-2"><label htmlFor="person-search" className="sr-only">Buscar persona</label>
         <InputText id="person-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar persona por nombre"/>
         <Button label="Buscar" outlined disabled={query.trim().length<2} onClick={()=>void search()}/></div>
@@ -558,11 +602,9 @@ function GuardiansPanel(){
         </select></label>
         <label className="text-sm">Parentesco<select value={relationship} onChange={e=>setRelationship(e.target.value)} className="block w-full rounded border p-2">
           <option value="PADRE">Padre</option><option value="MADRE">Madre</option><option value="TUTOR_LEGAL">Tutor legal</option></select></label>
-        <label className="text-sm">Evidencia de verificación<InputText value={verification} onChange={e=>setVerification(e.target.value)}
-          className="block w-full" placeholder="Ficha o acta verificada"/></label>
       </div>
-      <Button label="Crear vínculo" className="mt-3" disabled={!guardian||!student||guardian===student||verification.trim().length<5}
-        onClick={()=>void action('/guardians/links','POST',{guardianId:guardian,studentId:student,parentesco:relationship,verificacion:verification})}/>
+      <Button label="Crear vínculo" className="mt-3" disabled={!guardian||!student||guardian===student}
+        onClick={()=>void action('/guardians/links','POST',{guardianId:guardian,studentId:student,parentesco:relationship})}/>
     </section>{message&&<p role="status">{message}</p>}</div>;
 }
 

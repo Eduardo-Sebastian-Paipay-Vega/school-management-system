@@ -593,7 +593,8 @@ export interface paths {
         get: operations["getGuardianConsent"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** @description Revoca el consentimiento vigente y todas las sesiones del apoderado. */
+        delete: operations["revokeGuardianConsent"];
         options?: never;
         head?: never;
         patch?: never;
@@ -608,7 +609,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Exige versión vigente del texto y aceptación explícita. */
+        /** @description Exige versión vigente del texto, aceptación explícita y fuente de ficha verificada no revocada. */
         post: operations["activateGuardian"];
         delete?: never;
         options?: never;
@@ -623,7 +624,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Solo rol APODERADO con vínculo y consentimiento activos. */
+        /** @description Solo rol APODERADO con vínculo y consentimiento activos; requiere ficha verificadora institucional. */
         get: operations["listLinkedStudents"];
         put?: never;
         post?: never;
@@ -642,6 +643,7 @@ export interface paths {
         };
         get: operations["listGuardianLinks"];
         put?: never;
+        /** @description Solo vincula cuando fichas_apoderados_verificados contiene DNI hash, estudiante y parentesco activos cargados por Squad 2. */
         post: operations["createGuardianLink"];
         delete?: never;
         options?: never;
@@ -701,6 +703,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["countUnreadNotifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/notifications/{id}/read": {
         parameters: {
             query?: never;
@@ -745,6 +763,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        /** @description SEGURIDAD siempre conserva el correo. */
         put: operations["setNotificationPreference"];
         post?: never;
         delete?: never;
@@ -760,7 +779,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Permiso audit:read. */
+        /** @description Permiso audit:read. Acepta modulo, usuarioId, dni, ip, desde, hasta, limit y offset; count es el total filtrado. El DNI se convierte a hash antes de consultar. */
         get: operations["listAuditLogs"];
         put?: never;
         post?: never;
@@ -794,7 +813,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Permiso audit:export; hasta 2000 registros. */
+        /** @description Permiso audit:export; comparte filtros modulo, usuarioId, dni, ip, desde y hasta; responde 409 si supera 2000 registros. */
         get: operations["exportAuditPdf"];
         put?: never;
         post?: never;
@@ -938,7 +957,8 @@ export interface components {
                     apellido_materno?: string | null;
                     /** Format: email */
                     email?: string | null;
-                    telefono: string | null;
+                    /** @description Nunca contiene el teléfono completo. */
+                    telefono_enmascarado: string | null;
                     documento_ultimos4?: string | null;
                     roles: string[];
                 }[];
@@ -1830,6 +1850,19 @@ export interface operations {
             503: components["responses"]["Error"];
         };
     };
+    revokeGuardianConsent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["Message"];
+            404: components["responses"]["Error"];
+        };
+    };
     activateGuardian: {
         parameters: {
             query?: never;
@@ -1841,6 +1874,7 @@ export interface operations {
         responses: {
             200: components["responses"]["Message"];
             400: components["responses"]["Error"];
+            503: components["responses"]["Error"];
         };
     };
     listLinkedStudents: {
@@ -1853,6 +1887,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["GuardianStudents"];
+            503: components["responses"]["Error"];
         };
     };
     listGuardianLinks: {
@@ -1890,6 +1925,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["Message"];
+            503: components["responses"]["Error"];
         };
     };
     revokeGuardianLink: {
@@ -1931,6 +1967,18 @@ export interface operations {
             201: components["responses"]["Success"];
         };
     };
+    countUnreadNotifications: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["Success"];
+        };
+    };
     markNotificationRead: {
         parameters: {
             query?: never;
@@ -1969,6 +2017,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["Success"];
+            409: components["responses"]["Error"];
         };
     };
     listAuditLogs: {
@@ -2013,6 +2062,7 @@ export interface operations {
                     "application/pdf": string;
                 };
             };
+            409: components["responses"]["Error"];
         };
     };
     health: {

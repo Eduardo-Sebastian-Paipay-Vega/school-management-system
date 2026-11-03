@@ -3,6 +3,9 @@ const assert = require('node:assert/strict');
 const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
 const { startCapture } = require('./smtp-capture.cjs');
+const WebSocket = require('ws');
+const { execFileSync } = require('node:child_process');
+const { resolve } = require('node:path');
 const { documentHash } = require('../../dist/core/identity-crypto');
 const Ajv2020 = require('ajv/dist/2020');
 const addFormats = require('ajv-formats');
@@ -35,6 +38,9 @@ let accessDocente;
 let refreshDocente;
 let invitedUsername;
 let invitedUserId;
+let guardianAccess;
+let guardianPersonId;
+let studentPersonId;
 
 async function createInstitution(code) {
   const result = await admin.query(
@@ -92,6 +98,7 @@ before(async () => {
   process.env.PUBLIC_APP_URL = 'http://localhost:3000';
   process.env.SMTP_TEST_PLAINTEXT = '1';
   process.env.GUARDIAN_CONSENT_VERSION = 'ci-ficticio-1';
+  process.env.CORS_ORIGIN = 'http://localhost:3000';
   process.env.GUARDIAN_CONSENT_TEXT = 'Texto ficticio exclusivo de CI para probar la aceptación explícita del vínculo familiar. ' +
     'No representa un consentimiento institucional ni habilita datos de personas reales.';
   const { createApp } = require('../../dist/app');
@@ -100,16 +107,19 @@ before(async () => {
   redisClient = require('../../dist/config/redis').redisClient;
   await database.assertRuntimeRole();
   await redisClient.connect();
+  await require('../../dist/services/notifications.service').NotificationService.startPubsub();
   const suffix = Date.now().toString().slice(-6);
   a = await createInstitution(`1${suffix}`);
   b = await createInstitution(`2${suffix}`);
   const app = createApp();
   await new Promise((resolve) => { server = app.listen(0, resolve); });
+  require('../../dist/services/realtime.service').attachRealtime(server);
   base = `http://127.0.0.1:${server.address().port}`;
 });
 
 after(async () => {
   if (server) await new Promise((resolve) => server.close(resolve));
+  await require('../../dist/services/notifications.service').NotificationService.stopPubsub();
   if (redisClient?.isOpen) await redisClient.quit();
   if (runtime) await runtime.pool.end();
   await admin.end();
@@ -133,7 +143,134 @@ test('login de cada tenant emite una sesión propia', async () => {
   }
 });
 
+test('S5: avisos A/B, correo verificado, preferencia obligatoria y reintento SMTP', async () => {
+  const json = { 'Content-Type': 'application/json' };
+  const reject = await call('/notifications/preferences/SEGURIDAD', { method:'PUT',
+    headers:bearer(accessA,json),body:JSON.stringify({porCorreo:false}) });
+  assert.equal(reject.status,409,JSON.stringify(reject.body));
+  assert.equal(reject.body.error.code,'SECURITY_PREFERENCE_REQUIRED');
+  const send=(token,userId,categoria,titulo,prioridad)=>call('/notifications',{method:'POST',
+    headers:bearer(token,json),body:JSON.stringify({userId,categoria,titulo,
+      mensaje:'Aviso ficticio de CI',prioridad})});
+  const unverified=await send(accessA,a.userId,'SEGURIDAD','Solo bandeja sin verificar');
+  assert.equal(unverified.status,201,JSON.stringify(unverified.body));
+  const noVerifiedEmail=await admin.query('SELECT id FROM envios_correo WHERE notificacion_id=$1',
+    [unverified.body.data.id]);
+  assert.equal(noVerifiedEmail.rowCount,0);
+  await admin.query('UPDATE usuarios SET email_verificado_en=now() WHERE id=$1',[a.userId]);
+  const security=await send(accessA,a.userId,'SEGURIDAD','Seguridad ficticia A');
+  assert.equal(security.status,201,JSON.stringify(security.body));
+  const unread=await call('/notifications/unread-count',{headers:bearer(accessA)});
+  assert.equal(unread.status,200,JSON.stringify(unread.body));
+  assert.equal(unread.body.data.count,2);
+  assertContract('/notifications/unread-count','get',unread);
+  const marked=await call(`/notifications/${security.body.data.id}/read`,{
+    method:'PATCH',headers:bearer(accessA)});
+  assert.equal(marked.status,200,JSON.stringify(marked.body));
+  const afterRead=await call('/notifications/unread-count',{headers:bearer(accessA)});
+  assert.equal(afterRead.body.data.count,1);
+  const cross=await send(accessB,a.userId,'SEGURIDAD','Cruce B');
+  assert.equal(cross.status,409,JSON.stringify(cross.body));
+  const inboxB=await call('/notifications',{headers:bearer(accessB)});
+  assert.equal(inboxB.status,200);
+  assert.ok(!JSON.stringify(inboxB.body.data).includes('Seguridad ficticia A'));
+  const pending=await admin.query(`SELECT id FROM envios_correo WHERE tenant_id=$1
+    AND notificacion_id=$2`,[a.tenantId,security.body.data.id]);
+  assert.equal(pending.rowCount,1);
+  await admin.query(`UPDATE envios_correo SET proximo_intento_en=now()+interval '1 day'
+    WHERE id<>$1 AND estado='PENDIENTE' AND proximo_intento_en<=now()`,[pending.rows[0].id]);
+  const {NotificationService}=require('../../dist/services/notifications.service');
+  smtp.rejectOnce();
+  await NotificationService.processEmailQueue();
+  const failed=await admin.query('SELECT estado,intentos FROM envios_correo WHERE id=$1',[pending.rows[0].id]);
+  assert.equal(failed.rows[0].estado,'PENDIENTE');
+  assert.equal(failed.rows[0].intentos,1);
+  await admin.query("UPDATE envios_correo SET proximo_intento_en=now()-interval '1 second' WHERE id=$1",[pending.rows[0].id]);
+  await NotificationService.processEmailQueue();
+  const sent=await admin.query('SELECT estado,intentos FROM envios_correo WHERE id=$1',[pending.rows[0].id]);
+  assert.equal(sent.rows[0].estado,'ENVIADO');
+  assert.equal(sent.rows[0].intentos,2);
+  assert.ok(smtp.messages.some(message=>message.includes('Seguridad ficticia A')));
+  const optional=await call('/notifications/preferences/RECORDATORIO',{method:'PUT',
+    headers:bearer(accessA,json),body:JSON.stringify({porCorreo:false})});
+  assert.equal(optional.status,200,JSON.stringify(optional.body));
+  const noEmail=await send(accessA,a.userId,'RECORDATORIO','Solo bandeja A');
+  assert.equal(noEmail.status,201,JSON.stringify(noEmail.body));
+  const skipped=await admin.query('SELECT id FROM envios_correo WHERE notificacion_id=$1',[noEmail.body.data.id]);
+  assert.equal(skipped.rowCount,0);
+  const low1=await send(accessA,a.userId,'NOTAS','Resumen bajo uno','BAJA');
+  const low2=await send(accessA,a.userId,'NOTAS','Resumen bajo dos','BAJA');
+  assert.equal(low1.status,201,JSON.stringify(low1.body));
+  assert.equal(low2.status,201,JSON.stringify(low2.body));
+  const beforeDigest=smtp.messages.length;
+  await NotificationService.processEmailQueue();
+  assert.equal(smtp.messages.length,beforeDigest,'prioridad BAJA no envía correos individuales');
+  await admin.query(`UPDATE notificaciones SET created_at=now()-interval '2 days'
+    WHERE id=ANY($1::uuid[])`,[[low1.body.data.id,low2.body.data.id]]);
+  await NotificationService.processDailyDigest();
+  assert.equal(smtp.messages.length,beforeDigest+1);
+  assert.ok(smtp.messages.at(-1).includes('Resumen bajo uno'));
+  assert.ok(smtp.messages.at(-1).includes('Resumen bajo dos'));
+  const digestSent=await admin.query(`SELECT estado FROM envios_correo
+    WHERE notificacion_id=ANY($1::uuid[])`,[[low1.body.data.id,low2.body.data.id]]);
+  assert.equal(digestSent.rowCount,2);
+  assert.ok(digestSent.rows.every(row=>row.estado==='ENVIADO'));
+});
+
+test('S5: WebSocket entrega solo al tenant y cierra la sesión revocada', async () => {
+  const openSocket=async(token)=>{
+    const ws=new WebSocket(base.replace('http','ws')+'/api/v1/notifications/ws',
+      ['bearer',token],{origin:'http://localhost:3000'});
+    const events=[];
+    ws.on('message',raw=>events.push(JSON.parse(raw.toString())));
+    await new Promise((resolve,reject)=>{ws.once('open',resolve);ws.once('error',reject);});
+    return {ws,events};
+  };
+  const aSocket=await openSocket(accessA);
+  const bSocket=await openSocket(accessB);
+  try{
+    const event=new Promise((resolve,reject)=>{
+      const timeout=setTimeout(()=>reject(new Error('WebSocket A no recibió el aviso')),2000);
+      aSocket.ws.on('message',raw=>{
+        const parsed=JSON.parse(raw.toString());
+        if(parsed.type==='notification'){clearTimeout(timeout);resolve(parsed);}
+      });
+    });
+    const notice=await call('/notifications',{method:'POST',
+      headers:bearer(accessA,{'Content-Type':'application/json'}),
+      body:JSON.stringify({userId:a.userId,categoria:'ASISTENCIA',
+        titulo:'Evento WebSocket ficticio A',mensaje:'Solo A'})});
+    assert.equal(notice.status,201,JSON.stringify(notice.body));
+    assert.equal((await event).id,notice.body.data.id);
+    await new Promise(resolve=>setTimeout(resolve,50));
+    assert.ok(!bSocket.events.some(item=>item.type==='notification'));
+
+    const login=await call('/auth/login',{method:'POST',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        codigoModular:a.code,identifier:`admin_${a.code}`,password:PASSWORD})});
+    assert.equal(login.status,200,JSON.stringify(login.body));
+    const stale=await openSocket(login.body.data.accessToken);
+    try{
+      const closed=new Promise((resolve,reject)=>{
+        const timeout=setTimeout(()=>reject(new Error('WebSocket revocado permaneció abierto')),2000);
+        stale.ws.once('close',code=>{clearTimeout(timeout);resolve(code);});
+      });
+      const logout=await call('/auth/logout',{method:'POST',
+        headers:bearer(login.body.data.accessToken)});
+      assert.equal(logout.status,200,JSON.stringify(logout.body));
+      const trigger=await call('/notifications',{method:'POST',
+        headers:bearer(accessA,{'Content-Type':'application/json'}),
+        body:JSON.stringify({userId:a.userId,categoria:'ASISTENCIA',
+          titulo:'Evento tras revocación',mensaje:'Solo sesión vigente'})});
+      assert.equal(trigger.status,201,JSON.stringify(trigger.body));
+      assert.equal(await closed,1008);
+      assert.ok(!stale.events.some(item=>item.type==='notification'));
+    }finally{stale.ws.terminate();}
+  }finally{aSocket.ws.terminate();bSocket.ws.terminate();}
+});
+
 test('alta, fallo SMTP, reintento y activación de uso único', async () => {
+  const beforeMessages = smtp.messages.length;
   const suffix = Date.now().toString().slice(-8);
   const username = `invite_${suffix}`;
   invitedUsername = username;
@@ -147,7 +284,7 @@ test('alta, fallo SMTP, reintento y activación de uso único', async () => {
   const userId = created.body.data.userId;
   invitedUserId = userId;
   assert.ok(userId);
-  assert.equal(smtp.messages.length, 0, 'el alta no envía correo automáticamente');
+  assert.equal(smtp.messages.length, beforeMessages, 'el alta no envía correo automáticamente');
   const pendingLogin = await call('/auth/login', { method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ codigoModular: a.code, identifier: username, password: PASSWORD }) });
@@ -165,8 +302,8 @@ test('alta, fallo SMTP, reintento y activación de uso único', async () => {
   const sent = await call(`/users/${userId}/invite`, { method: 'POST', headers: bearer(accessA) });
   assert.equal(sent.status, 200, JSON.stringify(sent.body));
   assertContract('/users/{id}/invite', 'post', sent);
-  assert.equal(smtp.messages.length, 1);
-  const decodedMail = smtp.messages[0].replace(/=\n/g, '').replace(/=3D/gi, '=');
+  assert.equal(smtp.messages.length, beforeMessages + 1);
+  const decodedMail = smtp.messages.at(-1).replace(/=\n/g, '').replace(/=3D/gi, '=');
   const match = decodedMail.match(/https?:\/\/[^\s]+/);
   assert.ok(match, 'se capturó el enlace');
   const link = new URL(match[0]);
@@ -297,7 +434,22 @@ test('apoderado ficticio requiere vínculo, invitación y consentimiento en su t
       nombres: 'Escolar', apellidoPaterno: 'Ficticio' }) });
   assert.equal(student.status, 201, JSON.stringify(student.body));
   const guardianId = guardian.body.data.personId;
+  guardianPersonId = guardianId;
   const studentId = student.body.data.personId;
+  studentPersonId = studentId;
+  const unavailable = await call('/guardians/links', { method: 'POST',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ guardianId, studentId, parentesco: 'MADRE',
+      verificacion: 'Texto libre sin ficha' }) });
+  assert.equal(unavailable.status, 409, JSON.stringify(unavailable.body));
+  assert.equal(unavailable.body.error.code, 'FICHA_LINK_NOT_VERIFIED');
+  const ficha = await admin.query(`INSERT INTO fichas_apoderados_verificados
+    (tenant_id,fuente_ficha_id,estudiante_id,apoderado_documento_hash,parentesco,verificado_en)
+    VALUES($1,gen_random_uuid(),$2,$3,'MADRE',now()) RETURNING id`,
+    [a.tenantId,studentId,documentHash(suffix)]);
+  await assert.rejects(runtime.withTenant(a.tenantId,a.userId,client=>client.query(
+    `UPDATE fichas_apoderados_verificados SET revocado_en=now() WHERE id=$1`,
+    [ficha.rows[0].id])),/permission denied/i);
   const foreign = await call('/guardians/links', { method: 'POST',
     headers: bearer(accessB, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ guardianId, studentId, parentesco: 'MADRE',
@@ -342,11 +494,45 @@ test('apoderado ficticio requiere vínculo, invitación y consentimiento en su t
     body: JSON.stringify({ codigoModular: a.code,
       identifier: account.rows[0].username, password: PASSWORD }) });
   assert.equal(login.status, 200, JSON.stringify(login.body));
+  guardianAccess = login.body.data.accessToken;
   const students = await call('/guardians/students', {
     headers: bearer(login.body.data.accessToken) });
   assert.equal(students.status, 200, JSON.stringify(students.body));
   assertContract('/guardians/students', 'get', students);
   assert.ok(students.body.data.some((row) => row.id === studentId));
+  await admin.query('UPDATE fichas_apoderados_verificados SET revocado_en=now() WHERE id=$1',
+    [ficha.rows[0].id]);
+  const sourceRevoked = await call('/guardians/students', {
+    headers: bearer(login.body.data.accessToken) });
+  assert.equal(sourceRevoked.status,200,JSON.stringify(sourceRevoked.body));
+  assert.deepEqual(sourceRevoked.body.data,[]);
+  await admin.query('UPDATE fichas_apoderados_verificados SET revocado_en=NULL WHERE id=$1',
+    [ficha.rows[0].id]);
+});
+
+test('S5: revocar consentimiento y desvincular corta acceso del apoderado', async () => {
+  const revoked = await call('/guardians/consent', { method: 'DELETE',
+    headers: bearer(guardianAccess) });
+  assert.equal(revoked.status, 200, JSON.stringify(revoked.body));
+  assertContract('/guardians/consent', 'delete', revoked);
+  const stale = await call('/guardians/students', { headers: bearer(guardianAccess) });
+  assert.equal(stale.status, 401, JSON.stringify(stale.body));
+  const guardianUser = await admin.query('SELECT username FROM usuarios WHERE persona_id=$1', [guardianPersonId]);
+  const relogin = await call('/auth/login', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+      codigoModular: a.code, identifier: guardianUser.rows[0].username, password: PASSWORD }) });
+  assert.equal(relogin.status, 200, JSON.stringify(relogin.body));
+  const noConsent = await call('/guardians/students', { headers: bearer(relogin.body.data.accessToken) });
+  assert.equal(noConsent.status, 200, JSON.stringify(noConsent.body));
+  assert.deepEqual(noConsent.body.data, []);
+  const foreign = await call(`/guardians/links/${guardianPersonId}/${studentPersonId}`, {
+    method: 'DELETE', headers: bearer(accessB) });
+  assert.equal(foreign.status, 404, JSON.stringify(foreign.body));
+  const unlinked = await call(`/guardians/links/${guardianPersonId}/${studentPersonId}`, {
+    method: 'DELETE', headers: bearer(accessA) });
+  assert.equal(unlinked.status, 200, JSON.stringify(unlinked.body));
+  const invalidated = await call('/guardians/students', { headers: bearer(relogin.body.data.accessToken) });
+  assert.equal(invalidated.status, 401, JSON.stringify(invalidated.body));
 });
 
 test('rutas reales rechazan ausencia de sesión y tenant discordante', async () => {
@@ -413,10 +599,91 @@ test('rutas de usuarios y auditoría no muestran datos de otro tenant', async ()
   assert.equal(logs.status, 200, JSON.stringify(logs.body));
   assertContract('/audit/logs', 'get', logs);
   assert.ok(!JSON.stringify(logs.body.data).includes(b.userId));
+  const page = await call('/audit/logs?limit=1', { headers: bearer(accessA) });
+  assert.equal(page.status,200,JSON.stringify(page.body));
+  assert.equal(page.body.data.logs.length,1);
+  assert.ok(page.body.data.count>=page.body.data.logs.length);
+  const noForeignUser = await call(`/audit/logs?usuarioId=${b.userId}`,
+    { headers: bearer(accessA) });
+  assert.equal(noForeignUser.status,200,JSON.stringify(noForeignUser.body));
+  assert.equal(noForeignUser.body.data.count,0);
+  const invitedDni=invitedUsername.split('_')[1];
+  const byDni=await call(`/audit/logs?dni=${invitedDni}`,
+    {headers:bearer(accessA)});
+  assert.equal(byDni.status,200,JSON.stringify(byDni.body));
+  assert.ok(byDni.body.data.count>=1);
+  assert.ok(byDni.body.data.logs.every(row=>row.usuario_id===invitedUserId));
+  const foreignDni=await call(`/audit/logs?dni=${invitedDni}`,
+    {headers:bearer(accessB)});
+  assert.equal(foreignDni.status,200,JSON.stringify(foreignDni.body));
+  assert.equal(foreignDni.body.data.count,0);
+  const sourceIp=await admin.query(`SELECT host(ip_origen) AS ip FROM logs_auditoria
+    WHERE tenant_id=$1 AND usuario_id=$2 ORDER BY id DESC LIMIT 1`,
+    [a.tenantId,invitedUserId]);
+  const byIp=await call(`/audit/logs?ip=${encodeURIComponent(sourceIp.rows[0].ip)}`,
+    {headers:bearer(accessA)});
+  assert.equal(byIp.status,200,JSON.stringify(byIp.body));
+  assert.ok(byIp.body.data.count>=1);
+  const auditPayload=await admin.query(`SELECT payload_nuevo::text AS payload FROM logs_auditoria
+    WHERE tenant_id=$1 AND accion='READ_AUDIT_LOGS'
+      AND payload_nuevo ? 'dniUltimos4' ORDER BY id DESC LIMIT 1`,
+    [a.tenantId]);
+  assert.ok(!auditPayload.rows[0].payload.includes(invitedDni));
+  const auditRead=await admin.query(`SELECT count(*)::int AS n FROM logs_auditoria
+    WHERE tenant_id=$1 AND accion='READ_AUDIT_LOGS'`,[a.tenantId]);
+  assert.ok(auditRead.rows[0].n>=5);
   const chain = await call('/audit/verify-chain', { headers: bearer(accessA) });
   assert.equal(chain.status, 200, JSON.stringify(chain.body));
   assertContract('/audit/verify-chain', 'get', chain);
   assert.equal(chain.body.data.valid, true);
+});
+
+test('S5: historial M8 y cadena Core comparten transacción y tenant', async () => {
+  const bookId=require('node:crypto').randomUUID();
+  const firstState={id:bookId,tenantId:a.tenantId,revision:1,grades:{}};
+  const historyId=await runtime.withTenant(a.tenantId,a.userId,async(client)=>{
+    await client.query(`INSERT INTO squad3.gradebooks
+      (id,tenant_id,revision,state,created_by) VALUES($1,$2,1,$3,$4)`,
+      [bookId,a.tenantId,JSON.stringify(firstState),a.userId]);
+    const history=await client.query(`INSERT INTO squad3.grade_audit_history
+      (tenant_id,book_id,action,after_state,created_by)
+      VALUES($1,$2,'provision',$3,$4) RETURNING id`,
+      [a.tenantId,bookId,JSON.stringify(firstState),a.userId]);
+    return history.rows[0].id;
+  });
+  const linked=await admin.query(`SELECT usuario_id,registro_id FROM logs_auditoria
+    WHERE tenant_id=$1 AND modulo='grades' AND accion='GRADE_HISTORY' AND registro_id=$2`,
+    [a.tenantId,historyId]);
+  assert.equal(linked.rowCount,1);
+  assert.equal(linked.rows[0].usuario_id,a.userId);
+  await assert.rejects(runtime.withTenant(a.tenantId,a.userId,client=>client.query(
+    `INSERT INTO squad3.grade_audit_history
+      (tenant_id,book_id,action,after_state,created_by)
+      VALUES($1,$2,'provision',$3,$4)`,
+    [a.tenantId,bookId,JSON.stringify(firstState),b.userId])),
+  /autor del historial no coincide/i);
+  const secondState={...firstState,revision:2,grades:{ficticia:'A'}};
+  await assert.rejects(runtime.withTenant(a.tenantId,a.userId,async(client)=>{
+    await client.query(`UPDATE squad3.gradebooks SET state=$1,revision=2
+      WHERE tenant_id=$2 AND id=$3`,[JSON.stringify(secondState),a.tenantId,bookId]);
+    await client.query(`INSERT INTO squad3.grade_audit_history
+      (tenant_id,book_id,action,before_state,after_state,created_by)
+      VALUES($1,$2,'batch',$3,$4,$5)`,
+      [a.tenantId,bookId,JSON.stringify(firstState),JSON.stringify(secondState),a.userId]);
+    throw new Error('rollback ficticio');
+  }),/rollback ficticio/);
+  const rolledBack=await admin.query(`SELECT revision FROM squad3.gradebooks WHERE id=$1`,[bookId]);
+  assert.equal(rolledBack.rows[0].revision,1);
+  const history=await admin.query(`SELECT count(*)::int AS n FROM squad3.grade_audit_history
+    WHERE tenant_id=$1 AND book_id=$2`,[a.tenantId,bookId]);
+  assert.equal(history.rows[0].n,1);
+  const audit=await admin.query(`SELECT count(*)::int AS n FROM logs_auditoria
+    WHERE tenant_id=$1 AND modulo='grades' AND accion='GRADE_HISTORY'
+      AND payload_nuevo->>'bookId'=$2`,[a.tenantId,bookId]);
+  assert.equal(audit.rows[0].n,1);
+  const chain=await call('/audit/verify-chain',{headers:bearer(accessA)});
+  assert.equal(chain.status,200,JSON.stringify(chain.body));
+  assert.equal(chain.body.data.valid,true);
 });
 
 test('sms_runtime aplica RLS, falla sin contexto y limpia el contexto del pool', async () => {
@@ -530,7 +797,18 @@ test('S4: directorio paginado, perfil propio y último administrador protegido',
   assert.equal(edited.status, 200, JSON.stringify(edited.body));
   const found = await call('/users?search=Invitada%20Editada', { headers: bearer(accessA) });
   assert.equal(found.body.data.count, 1);
-  assert.equal(found.body.data.users[0].telefono, '999222333');
+  assert.equal(found.body.data.users[0].telefono_enmascarado, '***2333');
+  assert.ok(!JSON.stringify(found.body.data).includes('999222333'));
+  const storedPhone = await admin.query(`SELECT p.telefono FROM usuarios u
+    JOIN personas p ON p.id=u.persona_id WHERE u.id=$1`, [invitedUserId]);
+  assert.equal(storedPhone.rows[0].telefono, '999222333');
+  const nameOnly = await call(`/users/${invitedUserId}`, { method: 'PATCH',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ nombres: 'Invitada Final' }) });
+  assert.equal(nameOnly.status, 200, JSON.stringify(nameOnly.body));
+  const unchangedPhone = await admin.query(`SELECT p.telefono FROM usuarios u
+    JOIN personas p ON p.id=u.persona_id WHERE u.id=$1`, [invitedUserId]);
+  assert.equal(unchangedPhone.rows[0].telefono, '999222333');
   const foreignEdit = await call(`/users/${invitedUserId}`, { method: 'PATCH',
     headers: bearer(accessB, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ nombres: 'Acceso ajeno' }) });
@@ -686,4 +964,26 @@ test('Redis indisponible falla cerrado en petición protegida y refresh', async 
     body: JSON.stringify({ codigoModular: a.code, identifier: invitedUsername }) });
   assert.equal(recovery.status, 503);
   assert.equal(recovery.body.error.code, 'AUTH_UNAVAILABLE');
+});
+
+test('S5: retención elimina avisos mayores de 180 días y conserva los recientes', async () => {
+  const old=await admin.query(`INSERT INTO notificaciones
+    (tenant_id,usuario_id,created_by,categoria,titulo,mensaje,created_at)
+    VALUES($1,$2,$2,'RECORDATORIO','Aviso vencido ficticio','Prueba',now()-interval '181 days')
+    RETURNING id`,[a.tenantId,a.userId]);
+  const recent=await admin.query(`INSERT INTO notificaciones
+    (tenant_id,usuario_id,created_by,categoria,titulo,mensaje,created_at)
+    VALUES($1,$2,$2,'RECORDATORIO','Aviso reciente ficticio','Prueba',now()-interval '179 days')
+    RETURNING id`,[a.tenantId,a.userId]);
+  await admin.query(`INSERT INTO envios_correo(tenant_id,notificacion_id,created_by)
+    VALUES($1,$2,$3)`,[a.tenantId,old.rows[0].id,a.userId]);
+  const script=resolve(__dirname,'../../../database/scripts/retain-notifications.mjs');
+  execFileSync(process.execPath,[script],{env:{...process.env,
+    DATABASE_URL:process.env.INTEGRATION_DATABASE_URL},stdio:'pipe'});
+  const rows=await admin.query('SELECT id FROM notificaciones WHERE id=ANY($1::uuid[])',
+    [[old.rows[0].id,recent.rows[0].id]]);
+  assert.deepEqual(rows.rows.map(row=>row.id),[recent.rows[0].id]);
+  const queue=await admin.query('SELECT id FROM envios_correo WHERE notificacion_id=$1',
+    [old.rows[0].id]);
+  assert.equal(queue.rowCount,0);
 });

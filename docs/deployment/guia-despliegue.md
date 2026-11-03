@@ -38,6 +38,8 @@ El backend necesita un proceso persistente: usa WebSocket (`/api/v1/notification
 | `SMTP_*` | **Secreto** / infraestructura | Necesario para invitaciones y recuperación |
 | `GUARDIAN_CONSENT_VERSION`, `GUARDIAN_CONSENT_TEXT` | Configuración aprobada | Vacíos hasta la aprobación institucional; sin ellos la activación de apoderados responde 503 |
 
+La carga de apoderados reales requiere además filas de filiación verificadas por Squad 2 en `fichas_apoderados_verificados` ([contrato RF-15 → RF-75](../core/CONTRATO_FICHA_RF15_RF75.md)). El despliegue no debe habilitar el acceso familiar con datos reales antes de cargar esa fuente y el texto oficial.
+
 ### Frontend (`frontend/.env.local`, plantilla `frontend/.env.example`)
 
 | Variable | Tipo | Notas |

@@ -88,6 +88,8 @@ paths:
     $ref: './paths/guardians.yaml#/~1guardians~1links~1{guardianId}~1{studentId}'
   /notifications:
     $ref: './paths/notifications.yaml#/~1notifications'
+  /notifications/unread-count:
+    $ref: './paths/notifications.yaml#/~1notifications~1unread-count'
   /notifications/{id}/read:
     $ref: './paths/notifications.yaml#/~1notifications~1{id}~1read'
   /notifications/preferences:

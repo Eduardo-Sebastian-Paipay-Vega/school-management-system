@@ -108,7 +108,8 @@
     "approveScale"
   ],
   "/guardians/consent": [
-    "getGuardianConsent"
+    "getGuardianConsent",
+    "revokeGuardianConsent"
   ],
   "/guardians/activate": [
     "activateGuardian"
@@ -129,6 +130,9 @@
   "/notifications": [
     "listNotifications",
     "sendNotification"
+  ],
+  "/notifications/unread-count": [
+    "countUnreadNotifications"
   ],
   "/notifications/{id}/read": [
     "markNotificationRead"

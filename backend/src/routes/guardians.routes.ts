@@ -44,8 +44,13 @@ router.post('/activate', async (req, res) => {
         [tenantId,tokenHash(parsed.data.token)]);
       const invite = found.rows[0];
       if (!invite) return false;
-      const link = await client.query(`SELECT 1 FROM apoderados_estudiantes WHERE tenant_id=$1
-        AND apoderado_id=$2 AND estudiante_id=$3 AND activo FOR UPDATE`,
+      const link = await client.query(`SELECT 1 FROM apoderados_estudiantes l
+        JOIN personas g ON g.id=l.apoderado_id AND g.tenant_id=l.tenant_id
+        WHERE l.tenant_id=$1 AND l.apoderado_id=$2 AND l.estudiante_id=$3 AND l.activo
+          AND EXISTS(SELECT 1 FROM fichas_apoderados_verificados f
+            WHERE f.tenant_id=l.tenant_id AND f.estudiante_id=l.estudiante_id
+              AND f.apoderado_documento_hash=g.documento_hash
+              AND f.parentesco=l.parentesco AND f.revocado_en IS NULL) FOR UPDATE OF l`,
         [tenantId,invite.apoderado_id,invite.estudiante_id]);
       if (!link.rowCount) return false;
       const account = await client.query<{ id: string; estado: string }>('SELECT id,estado FROM usuarios WHERE persona_id=$1 FOR UPDATE', [invite.apoderado_id]);
@@ -92,6 +97,30 @@ router.post('/activate', async (req, res) => {
 
 router.use(authenticateJwt);
 
+router.delete('/consent', requireRoles(['APODERADO']), async (req: AuthenticatedRequest, res) => {
+  try {
+    const changed = await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
+      const person = await client.query<{ persona_id: string }>(
+        'SELECT persona_id FROM usuarios WHERE id=$1 AND tenant_id=$2', [req.user!.id,req.user!.tenantId]);
+      if (!person.rowCount) return false;
+      const revoked = await client.query(`UPDATE consentimientos_datos SET revocado_en=now()
+        WHERE tenant_id=$1 AND persona_id=$2 AND revocado_en IS NULL RETURNING id`,
+        [req.user!.tenantId,person.rows[0].persona_id]);
+      if (!revoked.rowCount) return false;
+      await client.query('UPDATE usuarios SET auth_version=auth_version+1 WHERE id=$1', [req.user!.id]);
+      await client.query(`UPDATE sesiones_usuario SET revocada_en=now()
+        WHERE tenant_id=$1 AND usuario_id=$2 AND revocada_en IS NULL`,
+        [req.user!.tenantId,req.user!.id]);
+      await AuditService.record({ tenantId:req.user!.tenantId,usuarioId:req.user!.id,
+        accion:'REVOKE_GUARDIAN_CONSENT',entidad:'consentimientos_datos',
+        entidadId:person.rows[0].persona_id,ipOrigen:req.ip },client);
+      return true;
+    });
+    if (!changed) { fail(res,404,'CONSENT_NOT_FOUND','No hay consentimiento vigente.'); return; }
+    ok(res,{message:'Consentimiento revocado. La sesión ha terminado.'});
+  } catch { fail(res,500,'CONSENT_REVOKE_FAILED','No se pudo revocar el consentimiento.'); }
+});
+
 router.get('/students', requireRoles(['APODERADO']), async (req: AuthenticatedRequest, res) => {
   const document = consentDocument();
   if (!document) { fail(res, 503, 'CONSENT_NOT_CONFIGURED', 'El consentimiento oficial no está disponible.'); return; }
@@ -101,6 +130,10 @@ router.get('/students', requireRoles(['APODERADO']), async (req: AuthenticatedRe
           l.parentesco FROM usuarios u JOIN apoderados_estudiantes l ON l.apoderado_id=u.persona_id
           JOIN personas s ON s.id=l.estudiante_id AND s.tenant_id=l.tenant_id
           WHERE u.id=$1 AND l.tenant_id=$2 AND l.activo AND l.confirmado_en IS NOT NULL
+          AND EXISTS(SELECT 1 FROM fichas_apoderados_verificados f
+            JOIN personas g ON g.tenant_id=f.tenant_id AND g.documento_hash=f.apoderado_documento_hash
+            WHERE f.tenant_id=l.tenant_id AND f.estudiante_id=l.estudiante_id
+              AND g.id=l.apoderado_id AND f.parentesco=l.parentesco AND f.revocado_en IS NULL)
           AND EXISTS(SELECT 1 FROM consentimientos_datos c WHERE c.persona_id=u.persona_id
             AND c.tenant_id=$2 AND c.version_texto=$3 AND c.revocado_en IS NULL)`,
         [req.user!.id,req.user!.tenantId,document.version]);
@@ -126,14 +159,19 @@ router.get('/links', requirePermission('guardians:manage'), async (req: Authenti
 
 router.post('/links', requirePermission('guardians:manage'), async (req: AuthenticatedRequest, res) => {
   const parsed = z.object({ guardianId: z.string().uuid(), studentId: z.string().uuid(),
-    parentesco: z.enum(['PADRE','MADRE','TUTOR_LEGAL']),
-    verificacion: z.string().min(5).max(500) }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Indique el vínculo y su verificación.'); return; }
+    parentesco: z.enum(['PADRE','MADRE','TUTOR_LEGAL']) }).safeParse(req.body);
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Indique el vínculo.'); return; }
   try {
     const data = await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
       const guardian = await client.query('SELECT id FROM personas WHERE id=$1 AND documento_hash IS NOT NULL', [parsed.data.guardianId]);
       const student = await client.query('SELECT id FROM personas WHERE id=$1', [parsed.data.studentId]);
       if (!guardian.rowCount || !student.rowCount) throw new Error('PERSON_NOT_FOUND');
+      const verified = await client.query(`SELECT f.id FROM fichas_apoderados_verificados f
+        JOIN personas g ON g.tenant_id=f.tenant_id AND g.documento_hash=f.apoderado_documento_hash
+        WHERE f.tenant_id=$1 AND f.estudiante_id=$2 AND g.id=$3
+          AND f.parentesco=$4 AND f.revocado_en IS NULL`,
+        [req.user!.tenantId,parsed.data.studentId,parsed.data.guardianId,parsed.data.parentesco]);
+      if (!verified.rowCount) throw new Error('FICHA_LINK_NOT_VERIFIED');
       const result = await client.query(`INSERT INTO apoderados_estudiantes
         (tenant_id,apoderado_id,estudiante_id,parentesco,vinculado_por)
         VALUES($1,$2,$3,$4,$5)
@@ -144,12 +182,17 @@ router.post('/links', requirePermission('guardians:manage'), async (req: Authent
           parsed.data.parentesco,req.user!.id]);
       await AuditService.record({ tenantId: req.user!.tenantId, usuarioId: req.user!.id,
         accion: 'VERIFY_GUARDIAN_LINK', entidad: 'apoderados_estudiantes',
-        entidadId: result.rows[0].id, datosNuevos: { verificacion: parsed.data.verificacion,
+        entidadId: result.rows[0].id, datosNuevos: { fichaVerificadaId:verified.rows[0].id,
           parentesco: parsed.data.parentesco }, ipOrigen: req.ip }, client);
       return result.rows[0];
     });
     ok(res, data, 201);
-  } catch { fail(res, 409, 'GUARDIAN_LINK_FAILED', 'No se pudo verificar el vínculo.'); }
+  } catch(cause) {
+    if(cause instanceof Error && cause.message==='FICHA_LINK_NOT_VERIFIED'){
+      fail(res,409,'FICHA_LINK_NOT_VERIFIED','El vínculo no consta en la ficha verificada.');return;
+    }
+    fail(res, 409, 'GUARDIAN_LINK_FAILED', 'No se pudo verificar el vínculo.');
+  }
 });
 
 router.post('/invitations', requirePermission('guardians:manage'), async (req: AuthenticatedRequest, res) => {
@@ -165,6 +208,10 @@ router.post('/invitations', requirePermission('guardians:manage'), async (req: A
         `SELECT p.email,i.codigo_modular FROM apoderados_estudiantes l
           JOIN personas p ON p.id=l.apoderado_id JOIN instituciones i ON i.id=l.tenant_id
           WHERE l.tenant_id=$1 AND l.apoderado_id=$2 AND l.estudiante_id=$3 AND l.activo
+            AND EXISTS(SELECT 1 FROM fichas_apoderados_verificados f
+              WHERE f.tenant_id=l.tenant_id AND f.estudiante_id=l.estudiante_id
+                AND f.apoderado_documento_hash=p.documento_hash
+                AND f.parentesco=l.parentesco AND f.revocado_en IS NULL)
             AND p.email IS NOT NULL`, [req.user!.tenantId,parsed.data.guardianId,parsed.data.studentId]);
       if (!found.rowCount) return null;
       let account = await client.query<{ id: string }>('SELECT id FROM usuarios WHERE persona_id=$1', [parsed.data.guardianId]);

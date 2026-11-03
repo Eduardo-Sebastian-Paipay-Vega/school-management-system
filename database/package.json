@@ -9,6 +9,8 @@
     "migrate:contract": "node scripts/apply-identity-contract.mjs",
     "migrate:create": "node-pg-migrate create --migrations-dir migrations --migration-file-language sql",
     "bootstrap:app-role": "node scripts/bootstrap-app-role.mjs",
+    "audit:partitions": "node scripts/ensure-audit-partitions.mjs",
+    "notifications:retain": "node scripts/retain-notifications.mjs",
     "test": "node --test \"tests/**/*.test.mjs\""
   },
   "devDependencies": {

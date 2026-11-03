@@ -37,6 +37,7 @@ Las decisiones que siguen **propuestas** (ADR-002 a ADR-004) se aplican en el c√
 | `instituciones`, `sedes`, `configuracion_institucional`, `anios_lectivos`, `periodos_academicos`, `dias_no_lectivos`, `escalas_calificacion`, `rangos_escala` | S1 | S1 | Todos |
 | `personas`, `usuarios`, `usuario_roles`, `roles`, `permisos_core`, `rol_permisos_core`, `sesiones_usuario`, `enlaces_acceso` | S1 | S1 | S2 (v√≠a servicio) |
 | `apoderados_estudiantes`, `invitaciones_apoderado`, `consentimientos_datos`, `notificaciones`, `preferencias_notificacion`, `envios_correo` | S1 | S1 (otros squads crean avisos con `NotificationService.create`) | S1 |
+| `fichas_apoderados_verificados` | S2 (fuente RF-15) | S2 carga/revoca tras verificar la ficha; S1 solo consulta | S1 |
 | `logs_auditoria` | S1 | Solo `fn_registrar_auditoria()` | S1 |
 | `grados_secciones` | S1 (RF-12) | S1 | S2, S3, S4 |
 | `matriculas`, `cursos`, `competencias`, `plan_estudios`, `carga_lectiva`, `importaciones_nomina`, `asistencias_*`, `carnes_escolares`, `avisos_inasistencia` | S2 | S2 | S3, S4, S5 |

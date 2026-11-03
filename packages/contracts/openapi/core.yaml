@@ -149,6 +149,7 @@ paths:
     post: { operationId: approveScale, description: 'Requiere fuenteAprobacion documentada por Dirección.', responses: { '200': { $ref: '#/components/responses/Success' } } }
   /guardians/consent:
     get: { operationId: getGuardianConsent, security: [], responses: { '200': { $ref: '#/components/responses/Success' }, '503': { $ref: '#/components/responses/Error' } } }
+    delete: { operationId: revokeGuardianConsent, description: 'Revoca el consentimiento vigente y todas las sesiones del apoderado.', responses: { '200': { $ref: '#/components/responses/Success' } } }
   /guardians/activate:
     post: { operationId: activateGuardian, security: [], description: 'Exige versión vigente del texto y aceptación explícita.', responses: { '200': { $ref: '#/components/responses/Success' } } }
   /guardians/students:
@@ -166,6 +167,8 @@ paths:
   /notifications:
     get: { operationId: listNotifications, responses: { '200': { $ref: '#/components/responses/Success' } } }
     post: { operationId: sendNotification, description: 'Permiso notifications:send.', responses: { '201': { $ref: '#/components/responses/Success' } } }
+  /notifications/unread-count:
+    get: { operationId: countUnreadNotifications, responses: { '200': { $ref: '#/components/responses/Success' } } }
   /notifications/{id}/read:
     parameters: [{ $ref: '#/components/parameters/Id' }]
     patch: { operationId: markNotificationRead, responses: { '200': { $ref: '#/components/responses/Success' } } }

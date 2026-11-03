@@ -116,7 +116,7 @@ UserDirectorySuccess:
           type: array
           items:
             type: object
-            required: [id, username, estado, persona_id, nombres, apellido_paterno, telefono, roles]
+            required: [id, username, estado, persona_id, nombres, apellido_paterno, telefono_enmascarado, roles]
             properties:
               id: { type: string, format: uuid }
               username: { type: string }
@@ -126,7 +126,7 @@ UserDirectorySuccess:
               apellido_paterno: { type: string }
               apellido_materno: { type: [string, 'null'] }
               email: { type: [string, 'null'], format: email }
-              telefono: { type: [string, 'null'] }
+              telefono_enmascarado: { type: [string, 'null'], description: 'Nunca contiene el teléfono completo.' }
               documento_ultimos4: { type: [string, 'null'] }
               roles: { type: array, items: { type: string } }
         count: { type: integer, minimum: 0 }

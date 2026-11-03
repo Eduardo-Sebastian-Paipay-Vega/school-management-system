@@ -183,7 +183,9 @@ router.get('/', requirePermission('users:read'),
       const hash = /^\d{8}$/.test(search) ? documentHash(search) : null;
       const data = await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
         const result = await client.query(`SELECT u.id,u.username,u.estado,p.id AS persona_id,
-          p.nombres,p.apellido_paterno,p.apellido_materno,p.email,p.telefono,p.documento_ultimos4,
+          p.nombres,p.apellido_paterno,p.apellido_materno,p.email,p.documento_ultimos4,
+          CASE WHEN p.telefono IS NULL THEN NULL WHEN length(p.telefono)>=4
+            THEN '***'||right(p.telefono,4) ELSE '***' END AS telefono_enmascarado,
           COALESCE(array_agg(r.codigo::text) FILTER (WHERE ur.activo AND r.codigo IS NOT NULL),ARRAY[]::text[]) AS roles
           FROM usuarios u JOIN personas p ON p.id=u.persona_id AND p.tenant_id=u.tenant_id
           LEFT JOIN usuario_roles ur ON ur.usuario_id=u.id AND ur.activo

@@ -1,5 +1,13 @@
 # Operación del Core — Squad 1
 
+## Particiones mensuales de auditoría
+
+Ejecutar `npm run audit:partitions` desde `database/` cada mes con `DATABASE_URL` del propietario de migraciones. El comando crea el mes UTC actual y los 12 siguientes, de forma idempotente. Supervisar su resultado antes de que venza la última partición: una escritura auditada falla cerrada si falta la partición del mes; `sms_app` no puede crearla.
+
+## Conservación de notificaciones
+
+Ejecutar `npm run notifications:retain` diariamente desde `database/` con `DATABASE_URL` del propietario de migraciones. El comando elimina avisos de más de 180 días en lotes de 1000, junto con sus intentos de correo; las referencias de avisos de inasistencia se conservan con `notificacion_id` nulo. No borra la bitácora de auditoría. El despliegue debe programar y supervisar esta tarea.
+
 ## Fases
 
 La cuenta pertenece a la persona y al plantel, no al año lectivo. En la Fase 1 se importan personas de la nómina, se crean solo las cuentas necesarias y se envía una invitación de un uso; cada usuario fija su clave. El archivo no lleva contraseñas. En 2027 se configura otro año con periodos y secciones, mientras Squad 2 crea la matrícula anual referida al `persona_id` existente. El Core no crea matrículas ni fija rangos numéricos CNEB sin la aprobación institucional D-16.
@@ -54,6 +62,8 @@ Access JWT dura 15 minutos; refresh rota por sesión. La inactividad de 30 minut
 Si Administración TI cambia el correo de una cuenta no administradora, esta queda pendiente, se revocan sus sesiones y se debe enviar una nueva invitación. La importación aplica la misma regla. El correo de una cuenta `SUPERADMIN` no se cambia por estas rutas. El vínculo de contraseña anterior no habilita recuperación por un correo aún no verificado.
 
 Un vínculo familiar creado por Secretaría queda pendiente de aceptación. `GET /guardians/students` solo devuelve estudiantes tras consumir la invitación y aceptar la versión vigente del texto oficial. Revocar y volver a vincular obliga a confirmar otra vez; una nueva versión oficial obliga a recabar de nuevo el consentimiento.
+
+Antes de vincular, Squad 2 debe publicar la ficha de filiación en `fichas_apoderados_verificados` conforme al [contrato RF-15 → RF-75](CONTRATO_FICHA_RF15_RF75.md). Secretaría no puede sustituir esa fuente con texto libre. La ausencia o revocación de la ficha bloquea invitación, activación y consulta. El texto/versionado oficial de consentimiento se configura al preparar el despliegue del piloto; sin él el API responde 503.
 
 ## Verificación y pendientes institucionales
 

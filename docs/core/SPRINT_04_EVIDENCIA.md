@@ -1,6 +1,6 @@
 # Sprint 4 — Evidencia y estado
 
-**Base:** `dev` tras PR #3. **Rama:** `codex/core-sprint-4`. **PR:** [#4](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/pull/4), listo para revisión del líder, sin solicitudes al equipo. **Estado:** implementación Core S4 probada en [CI 41532751983](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/actions/runs/41532751983); pendientes aceptación de dependencias de Squads 2/3/5 e inspección visual autenticada. Este documento no constituye cierre ni aprobación del piloto.
+**Base:** `dev` tras PR #3. **Rama:** `codex/core-sprint-4`. **PR:** [#4](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/pull/4), aprobado por el líder y fusionado en `dev` como `f10e0ddd` tras CI verde (seis jobs). **Estado:** integración técnica de S4 realizada; pendientes aceptación de dependencias de Squads 2/3/5 e inspección visual autenticada. Este documento no constituye aprobación del piloto.
 
 | Historia | Evidencia en rama | Estado |
 |---|---|---|

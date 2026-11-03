@@ -178,6 +178,8 @@ test('S5: avisos A/B, correo verificado, preferencia obligatoria y reintento SMT
   const pending=await admin.query(`SELECT id FROM envios_correo WHERE tenant_id=$1
     AND notificacion_id=$2`,[a.tenantId,security.body.data.id]);
   assert.equal(pending.rowCount,1);
+  await admin.query(`UPDATE envios_correo SET proximo_intento_en=now()+interval '1 day'
+    WHERE id<>$1 AND estado='PENDIENTE' AND proximo_intento_en<=now()`,[pending.rows[0].id]);
   const {NotificationService}=require('../../dist/services/notifications.service');
   smtp.rejectOnce();
   await NotificationService.processEmailQueue();

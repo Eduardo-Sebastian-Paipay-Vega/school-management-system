@@ -617,7 +617,7 @@ test('rutas de usuarios y auditoría no muestran datos de otro tenant', async ()
     {headers:bearer(accessB)});
   assert.equal(foreignDni.status,200,JSON.stringify(foreignDni.body));
   assert.equal(foreignDni.body.data.count,0);
-  const sourceIp=await admin.query(`SELECT ip_origen::text AS ip FROM logs_auditoria
+  const sourceIp=await admin.query(`SELECT host(ip_origen) AS ip FROM logs_auditoria
     WHERE tenant_id=$1 AND usuario_id=$2 ORDER BY id DESC LIMIT 1`,
     [a.tenantId,invitedUserId]);
   const byIp=await call(`/audit/logs?ip=${encodeURIComponent(sourceIp.rows[0].ip)}`,

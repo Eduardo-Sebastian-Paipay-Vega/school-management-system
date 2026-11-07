@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { API_BASE_URL as API, parseEnvelope as parse, publicGet, publicPost } from '@/modules/shared/api';
+import { API_BASE_URL as API, apiFetch, parseEnvelope as parse, publicGet, publicPost } from '@/modules/shared/api';
 import type { CoreSessionData, CoreUser } from '@/modules/shared/api';
 
 export type { CoreUser } from '@/modules/shared/api';
@@ -25,7 +25,7 @@ export function SessionProvider({children}:{children:React.ReactNode}){
   const router=useRouter();
   const pathname=usePathname();
   const renew=useCallback(async()=>{
-    const response=await fetch(`${API}/api/v1/auth/refresh-token`,{method:'POST',credentials:'include'});
+    const response=await apiFetch(`${API}/api/v1/auth/refresh-token`,{method:'POST',credentials:'include'});
     const data=await parse<SessionResult>(response);
     token.current=data.accessToken;
     setUser(data.user);
@@ -41,14 +41,14 @@ export function SessionProvider({children}:{children:React.ReactNode}){
     if(!loading && !user && pathname.startsWith('/intranet')) router.replace('/login');
   },[loading,user,pathname,router]);
   const login=useCallback(async(codigoModular:string,identifier:string,password:string)=>{
-    const response=await fetch(`${API}/api/v1/auth/login`,{method:'POST',credentials:'include',
+    const response=await apiFetch(`${API}/api/v1/auth/login`,{method:'POST',credentials:'include',
       headers:{'Content-Type':'application/json'},body:JSON.stringify({codigoModular,identifier,password})});
     const data=await parse<SessionResult>(response);
     token.current=data.accessToken;
     setUser(data.user);
   },[]);
   const logout=useCallback(async()=>{
-    try{if(token.current)await fetch(`${API}/api/v1/auth/logout`,{method:'POST',credentials:'include',
+    try{if(token.current)await apiFetch(`${API}/api/v1/auth/logout`,{method:'POST',credentials:'include',
       headers:{Authorization:`Bearer ${token.current}`}});}finally{
       token.current=null;setUser(null);router.replace('/login');
     }
@@ -56,7 +56,7 @@ export function SessionProvider({children}:{children:React.ReactNode}){
   const request=useCallback(async<T,>(path:string,init:RequestInit={}):Promise<T>=>{
     let access=token.current;
     if(!access) access=await renew();
-    const send=(value:string)=>fetch(`${API}/api/v1${path}`,{...init,credentials:'include',
+    const send=(value:string)=>apiFetch(`${API}/api/v1${path}`,{...init,credentials:'include',
       headers:{...init.headers,Authorization:`Bearer ${value}`}});
     let response=await send(access);
     if(response.status===401){access=await renew();response=await send(access);}
@@ -64,7 +64,7 @@ export function SessionProvider({children}:{children:React.ReactNode}){
   },[renew]);
   const download=useCallback(async(path:string,filename:string)=>{
     let access=token.current||await renew();
-    const send=(value:string)=>fetch(`${API}/api/v1${path}`,{credentials:'include',headers:{Authorization:`Bearer ${value}`}});
+    const send=(value:string)=>apiFetch(`${API}/api/v1${path}`,{credentials:'include',headers:{Authorization:`Bearer ${value}`}});
     let response=await send(access);
     if(response.status===401){access=await renew();response=await send(access);}
     if(!response.ok)throw new Error('No se pudo descargar el archivo.');

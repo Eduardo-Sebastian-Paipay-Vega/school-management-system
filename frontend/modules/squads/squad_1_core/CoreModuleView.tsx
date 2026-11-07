@@ -371,7 +371,8 @@ function SchoolPanel(){
   }
   async function activate(id:string){
     if(!window.confirm('¿Activar este año lectivo?'))return;
-    try{await request(`/school/years/${id}/activate`,{method:'POST'});await reload();}
+    setMessage('');try{await request(`/school/years/${id}/activate`,{method:'POST'});
+      setMessage('Año lectivo activado.');await reload();}
     catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo activar.');}
   }
   return <div className="space-y-4"><State busy={busy} error={error} retry={()=>void reload()}/>
@@ -457,7 +458,7 @@ function NoticesPanel(){
           disabled={c==='SEGURIDAD'}
           onChange={e=>void request(`/notifications/preferences/${c}`,{method:'PUT',
             headers:{'Content-Type':'application/json'},body:JSON.stringify({porCorreo:e.target.checked})})
-            .then(()=>reloadPreferences()).catch(cause=>setMessage(String(cause)))}/>{c}</label>)}</div>
+            .then(()=>reloadPreferences()).catch(cause=>setMessage(cause instanceof Error?cause.message:'No se pudo guardar la preferencia.'))}/>{c}</label>)}</div>
     </section>
     {user?.permissions.includes('notifications:send')&&<section className="mt-5 rounded-xl border p-4">
       <h3 className="font-bold">Enviar aviso</h3>
@@ -516,7 +517,7 @@ function AuditPanel(){
     <p className="mb-2 text-sm" role="status">{data?.count??0} registros encontrados</p>
     {user?.permissions.includes('audit:export')&&<Button label="Exportar PDF" icon="pi pi-file-pdf" outlined
       onClick={()=>void download(`/audit/export.pdf${filterQuery?`?${filterQuery}`:''}`,'auditoria-core.pdf')
-        .catch(cause=>setExportError(String(cause)))}/>}
+        .catch(cause=>setExportError(cause instanceof Error?cause.message:'No se pudo descargar el archivo.'))}/>}
     {exportError&&<p role="alert" className="text-sm text-red-700">{exportError}</p>}
     <DataTable value={data?.logs??[]} dataKey="id" loading={busy} paginator lazy first={first} rows={20}
       totalRecords={data?.count??0} onPage={event=>setFirst(event.first)}
@@ -662,7 +663,7 @@ export default function CoreModuleView(){
   return <div className="space-y-5"><Link href="/intranet" className="text-sm font-semibold text-brand">← Volver a la intranet</Link>
     <div><p className="text-xs font-bold uppercase text-brand">Squad 1 · Core y seguridad</p>
       <h1 className="text-2xl font-black text-brand-dark">Gestión institucional</h1></div>
-    <TabView>
+    <TabView scrollable>
       {user?.permissions.includes('users:read')&&<TabPanel header="Usuarios"><UsersPanel/></TabPanel>}
       {user?.permissions.includes('school:read')&&<TabPanel header="Año lectivo"><SchoolPanel/></TabPanel>}
       <TabPanel header="Avisos"><NoticesPanel/></TabPanel>

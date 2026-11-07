@@ -641,6 +641,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Permiso guardians:manage. Por defecto lista solo vínculos activos; estado=todos agrega el historial de revocados. */
         get: operations["listGuardianLinks"];
         put?: never;
         /** @description Solo vincula cuando fichas_apoderados_verificados contiene DNI hash, estudiante y parentesco activos cargados por Squad 2. */
@@ -680,6 +681,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
+        /** @description Responde 404 LINK_NOT_FOUND si no hay vínculo activo de ese par en el tenant. */
         delete: operations["revokeGuardianLink"];
         options?: never;
         head?: never;
@@ -1142,13 +1144,13 @@ export interface components {
             id: string;
             anio: number;
             /**
-             * Format: date-time
-             * @description Columna DATE serializada como instante ISO.
+             * Format: date
+             * @description Columna DATE como día de calendario YYYY-MM-DD.
              */
             fecha_inicio: string;
             /**
-             * Format: date-time
-             * @description Columna DATE serializada como instante ISO.
+             * Format: date
+             * @description Columna DATE como día de calendario YYYY-MM-DD.
              */
             fecha_fin: string;
             activo: boolean;
@@ -1191,13 +1193,13 @@ export interface components {
             tipo: "BIMESTRE" | "TRIMESTRE";
             numero: number;
             /**
-             * Format: date-time
-             * @description Columna DATE serializada como instante ISO.
+             * Format: date
+             * @description Columna DATE como día de calendario YYYY-MM-DD.
              */
             fecha_inicio: string;
             /**
-             * Format: date-time
-             * @description Columna DATE serializada como instante ISO.
+             * Format: date
+             * @description Columna DATE como día de calendario YYYY-MM-DD.
              */
             fecha_fin: string;
             /** Format: date-time */
@@ -1238,8 +1240,8 @@ export interface components {
             /** Format: uuid */
             id: string;
             /**
-             * Format: date-time
-             * @description Columna DATE serializada como instante ISO.
+             * Format: date
+             * @description Columna DATE como día de calendario YYYY-MM-DD.
              */
             fecha: string;
             /** @enum {string} */
@@ -1260,8 +1262,8 @@ export interface components {
                 /** Format: uuid */
                 id: string;
                 /**
-                 * Format: date-time
-                 * @description Columna DATE serializada como instante ISO.
+                 * Format: date
+                 * @description Columna DATE como día de calendario YYYY-MM-DD.
                  */
                 fecha: string;
             };
@@ -1477,7 +1479,8 @@ export interface components {
             success: true;
             data: {
                 categoria: string;
-                porCorreo: boolean;
+                /** @description Mismo nombre que en GET /notifications/preferences; el cuerpo del PUT usa porCorreo. */
+                por_correo: boolean;
             };
             /** Format: date-time */
             timestamp: string;
@@ -1826,7 +1829,7 @@ export interface components {
                 "application/json": components["schemas"]["GuardianStudentsSuccess"];
             };
         };
-        /** @description Últimos 100 vínculos familiares del tenant, activos o revocados. */
+        /** @description Últimos 100 vínculos familiares del tenant; solo activos salvo estado=todos, que incluye los revocados. */
         GuardianLinks: {
             headers: {
                 [name: string]: unknown;
@@ -2551,7 +2554,10 @@ export interface operations {
     };
     listGuardianLinks: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description activos (por defecto) o todos, que incluye los vínculos revocados (activo=false). */
+                estado?: "activos" | "todos";
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2559,6 +2565,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["GuardianLinks"];
+            400: components["responses"]["Error"];
         };
     };
     createGuardianLink: {
@@ -2600,6 +2607,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["Message"];
+            404: components["responses"]["Error"];
         };
     };
     listNotifications: {

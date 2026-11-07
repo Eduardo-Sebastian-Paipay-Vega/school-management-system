@@ -69,7 +69,7 @@ GuardianStudents:
     application/json:
       schema: { $ref: './schemas.yaml#/GuardianStudentsSuccess' }
 GuardianLinks:
-  description: Últimos 100 vínculos familiares del tenant, activos o revocados.
+  description: Últimos 100 vínculos familiares del tenant; solo activos salvo estado=todos, que incluye los revocados.
   content:
     application/json:
       schema: { $ref: './schemas.yaml#/GuardianLinkListSuccess' }

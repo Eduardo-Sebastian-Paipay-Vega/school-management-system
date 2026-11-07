@@ -1,0 +1,14 @@
+/*
+ * Orden de capas en cascada. Debe cargarse antes que cualquier otra hoja de estilos
+ * (ver app/layout.tsx): el orden de capas lo fija su primera aparición.
+ *
+ * - tailwind-base: preflight de Tailwind y estilos base de elementos.
+ * - primereact: tema unsch-lara.css y estilos que PrimeReact 10 inyecta en tiempo de
+ *   ejecución; ambos se declaran dentro de @layer primereact.
+ * - tailwind-utilities: componentes y utilidades de Tailwind, que pueden ajustar el tema.
+ *
+ * Sin este orden, el preflight sin capa (button { background: transparent; padding: 0 },
+ * * { border-width: 0 }) gana a cualquier regla en capa y anula el tema PrimeReact
+ * (defecto S6-08). Las reglas sin capa de globals.css siguen ganando a todas las capas.
+ */
+@layer tailwind-base, primereact, tailwind-utilities;

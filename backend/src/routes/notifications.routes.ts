@@ -71,7 +71,7 @@ router.put('/preferences/:category',async(req:AuthenticatedRequest,res)=>{
         accion:'NOTIFICATION_PREFERENCE',entidad:'preferencias_notificacion',
         datosNuevos:{categoria:req.params.category,porCorreo:parsed.data.porCorreo},ipOrigen:req.ip},client);
     });
-    ok(res,{categoria:req.params.category,porCorreo:parsed.data.porCorreo});
+    ok(res,{categoria:req.params.category,por_correo:parsed.data.porCorreo});
   }catch{fail(res,500,'NOTIFICATIONS_ERROR','No se pudo guardar la preferencia.');}
 });
 

@@ -26,12 +26,14 @@ async function rowsFromRequest(body: unknown) {
 }
 
 router.get('/roles', requirePermission('roles:read'), async (req: AuthenticatedRequest, res) => {
-  const data = await withTenant(req.user!.tenantId, req.user!.id, async (client) =>
-    (await client.query(`SELECT r.id,r.codigo,r.nombre,r.descripcion,
-      COALESCE(array_agg(rp.permiso_codigo) FILTER (WHERE rp.permiso_codigo IS NOT NULL),ARRAY[]::varchar[]) AS permisos
-      FROM roles r LEFT JOIN rol_permisos_core rp ON rp.rol_id=r.id AND rp.tenant_id=$1
-      GROUP BY r.id ORDER BY r.nombre`, [req.user!.tenantId])).rows);
-  ok(res, data);
+  try {
+    const data = await withTenant(req.user!.tenantId, req.user!.id, async (client) =>
+      (await client.query(`SELECT r.id,r.codigo,r.nombre,r.descripcion,
+        COALESCE(array_agg(rp.permiso_codigo) FILTER (WHERE rp.permiso_codigo IS NOT NULL),ARRAY[]::varchar[]) AS permisos
+        FROM roles r LEFT JOIN rol_permisos_core rp ON rp.rol_id=r.id AND rp.tenant_id=$1
+        GROUP BY r.id ORDER BY r.nombre`, [req.user!.tenantId])).rows);
+    ok(res, data);
+  } catch { fail(res, 500, 'ROLES_ERROR', 'No se pudieron consultar los roles.'); }
 });
 
 router.get('/permissions', requirePermission('roles:read'), async (req: AuthenticatedRequest, res) => {

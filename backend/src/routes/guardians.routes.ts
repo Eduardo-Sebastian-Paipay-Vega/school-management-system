@@ -144,6 +144,10 @@ router.get('/students', requireRoles(['APODERADO']), async (req: AuthenticatedRe
 });
 
 router.get('/links', requirePermission('guardians:manage'), async (req: AuthenticatedRequest, res) => {
+  // Por defecto solo vínculos activos (RF-75 no pide historial); ?estado=todos incluye los revocados.
+  const parsed=z.object({estado:z.enum(['activos','todos']).default('activos')}).safeParse(req.query);
+  if(!parsed.success){fail(res,400,'VALIDATION_FAILED','Filtro de estado inválido.');return;}
+  const includeRevoked=parsed.data.estado==='todos';
   try {
     const data=await withTenant(req.user!.tenantId,req.user!.id,async(client)=>
       (await client.query(`SELECT l.id,l.apoderado_id,l.estudiante_id,l.parentesco,l.activo,l.confirmado_en,
@@ -152,7 +156,8 @@ router.get('/links', requirePermission('guardians:manage'), async (req: Authenti
         FROM apoderados_estudiantes l
         JOIN personas g ON g.id=l.apoderado_id AND g.tenant_id=l.tenant_id
         JOIN personas s ON s.id=l.estudiante_id AND s.tenant_id=l.tenant_id
-        WHERE l.tenant_id=$1 ORDER BY l.created_at DESC LIMIT 100`,[req.user!.tenantId])).rows);
+        WHERE l.tenant_id=$1 AND (l.activo OR $2::boolean)
+        ORDER BY l.created_at DESC LIMIT 100`,[req.user!.tenantId,includeRevoked])).rows);
     ok(res,data);
   } catch { fail(res,500,'GUARDIAN_ERROR','No se pudieron consultar los vínculos.'); }
 });

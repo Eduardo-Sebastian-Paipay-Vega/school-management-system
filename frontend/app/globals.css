@@ -1,6 +1,20 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Capas declaradas en app/css-layers.css (orden: tailwind-base, primereact, tailwind-utilities). */
+@layer tailwind-base {
+  @tailwind base;
+}
+
+@layer tailwind-utilities {
+  /* El tema Lara declara un color de placeholder global (::-webkit-input-placeholder) que,
+     al quedar el preflight en una capa inferior, alcanzaría también a los controles nativos
+     del portal. Se conserva el color del preflight fuera de PrimeReact; :where() mantiene
+     especificidad mínima para que las utilidades placeholder:* sigan ganando. */
+  :where(input:not(.p-inputtext), textarea:not(.p-inputtextarea))::placeholder {
+    color: var(--secondary-colors-gray-400);
+  }
+
+  @tailwind components;
+  @tailwind utilities;
+}
 
 :root {
   color-scheme: light;
@@ -59,18 +73,22 @@ body {
   background-color: #FFFFFF;
 }
 
-button,
-input {
-  font: inherit;
-}
+/* Estilos base de elementos: en la capa base para que el tema PrimeReact y las utilidades
+   de Tailwind los puedan ajustar, igual que el preflight. */
+@layer tailwind-base {
+  button,
+  input {
+    font: inherit;
+  }
 
-button {
-  cursor: pointer;
-}
+  button {
+    cursor: pointer;
+  }
 
-a {
-  text-decoration: none;
-  color: inherit;
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
 }
 
 a:focus-visible,

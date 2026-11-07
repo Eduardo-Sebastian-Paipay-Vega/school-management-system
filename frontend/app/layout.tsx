@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import './css-layers.css';
 import 'primeicons/primeicons.css';
 import '@/modules/shared/prime/theme/unsch-lara.css';
 import './globals.css';

@@ -1,7 +1,12 @@
-import { Pool, PoolClient } from 'pg';
+import { Pool, PoolClient, types } from 'pg';
 import dotenv from 'dotenv';
 
 dotenv.config();
+
+// DATE (OID 1082) es un día de calendario sin hora ni zona: se conserva como 'YYYY-MM-DD'.
+// Sin este parser, pg lo convierte a Date a medianoche local y JSON lo emite como instante
+// UTC, lo que desplaza el día cuando el proceso no corre en UTC. Afecta a todo el proceso.
+types.setTypeParser(types.builtins.DATE, (value: string) => value);
 
 const dbUser = process.env.DB_USER;
 const dbPassword = process.env.DB_PASSWORD;

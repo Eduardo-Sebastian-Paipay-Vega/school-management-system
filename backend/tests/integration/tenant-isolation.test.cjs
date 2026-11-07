@@ -1046,6 +1046,119 @@ test('S6-07: /health avisa si falta la partición de auditoría del mes siguient
   assert.equal(restored.body.services.auditPartitions, 'OK');
 });
 
+test('S7: columnas DATE salen como YYYY-MM-DD y se comparan como día de calendario', async () => {
+  const json = { 'Content-Type': 'application/json' };
+  const created = await call('/school/years', { method: 'POST', headers: bearer(accessA, json),
+    body: JSON.stringify({ anio: 2028, fechaInicio: '2028-03-01', fechaFin: '2028-12-15' }) });
+  assert.equal(created.status, 201, JSON.stringify(created.body));
+  const yearId = created.body.data.id;
+  const years = await call('/school/years', { headers: bearer(accessA) });
+  assert.equal(years.status, 200, JSON.stringify(years.body));
+  assertContract('/school/years', 'get', years);
+  const year = years.body.data.find((row) => row.id === yearId);
+  assert.equal(year.fecha_inicio, '2028-03-01');
+  assert.equal(year.fecha_fin, '2028-12-15');
+
+  const period = await call(`/school/years/${yearId}/periods`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ tipo: 'BIMESTRE', numero: 1,
+      fechaInicio: '2028-03-01', fechaFin: '2028-05-10', fechaLimiteNotas: '2028-05-15T05:00:00.000Z' }) });
+  assert.equal(period.status, 201, JSON.stringify(period.body));
+  const periods = await call(`/school/years/${yearId}/periods`, { headers: bearer(accessA) });
+  assert.equal(periods.status, 200, JSON.stringify(periods.body));
+  assertContract('/school/years/{id}/periods', 'get', periods);
+  assert.equal(periods.body.data[0].fecha_inicio, '2028-03-01');
+  assert.equal(periods.body.data[0].fecha_fin, '2028-05-10');
+  assert.equal(periods.body.data[0].fecha_limite_notas, '2028-05-15T05:00:00.000Z', 'TIMESTAMPTZ sigue siendo instante');
+  // Con DATE como Date, comparar el texto de la petición contra el año daba siempre false
+  // y estas validaciones de rango no rechazaban nada.
+  const outOfYearPeriod = await call(`/school/years/${yearId}/periods`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ tipo: 'BIMESTRE', numero: 4,
+      fechaInicio: '2028-11-01', fechaFin: '2028-12-31', fechaLimiteNotas: '2029-01-05T05:00:00.000Z' }) });
+  assert.equal(outOfYearPeriod.status, 409, JSON.stringify(outOfYearPeriod.body));
+
+  const day = await call(`/school/years/${yearId}/non-school-days`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ fecha: '2028-07-28', tipo: 'FERIADO',
+      motivo: 'Feriado ficticio CI' }) });
+  assert.equal(day.status, 201, JSON.stringify(day.body));
+  assertContract('/school/years/{id}/non-school-days', 'post', day);
+  assert.equal(day.body.data.fecha, '2028-07-28');
+  const days = await call(`/school/years/${yearId}/non-school-days`, { headers: bearer(accessA) });
+  assert.equal(days.status, 200, JSON.stringify(days.body));
+  assertContract('/school/years/{id}/non-school-days', 'get', days);
+  assert.deepEqual(days.body.data.map((row) => row.fecha), ['2028-07-28']);
+  const outOfYearDay = await call(`/school/years/${yearId}/non-school-days`, { method: 'POST',
+    headers: bearer(accessA, json), body: JSON.stringify({ fecha: '2029-01-02', tipo: 'FERIADO',
+      motivo: 'Fuera del año ficticio' }) });
+  assert.equal(outOfYearDay.status, 409, JSON.stringify(outOfYearDay.body));
+  assert.equal(outOfYearDay.body.error.code, 'DAY_CONFLICT');
+});
+
+test('S7: GET /users/roles responde 500 en vez de quedar colgada si falla la consulta', async () => {
+  const original = runtime.withTenant;
+  runtime.withTenant = (tenantId, userId, fn) => original(tenantId, userId, (client) => fn({
+    query: (sql, ...rest) => /FROM roles r LEFT JOIN rol_permisos_core/.test(String(sql))
+      ? Promise.reject(new Error('fallo simulado de CI')) : client.query(sql, ...rest),
+  }));
+  let failed;
+  try {
+    failed = await call('/users/roles', { headers: bearer(accessA), signal: AbortSignal.timeout(5000) });
+  } finally {
+    runtime.withTenant = original;
+  }
+  assert.equal(failed.status, 500, JSON.stringify(failed.body));
+  assert.equal(failed.body.success, false);
+  assert.equal(failed.body.error.code, 'ROLES_ERROR');
+  assert.ok(!JSON.stringify(failed.body).includes('fallo simulado'), 'no expone el detalle técnico');
+  assert.ok(failed.body.timestamp);
+  const roles = await call('/users/roles', { headers: bearer(accessA) });
+  assert.equal(roles.status, 200, JSON.stringify(roles.body));
+  assertContract('/users/roles', 'get', roles);
+});
+
+test('S7: PUT y GET de preferencias de aviso devuelven la misma forma', async () => {
+  const saved = await call('/notifications/preferences/AVISOS', { method: 'PUT',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }), body: JSON.stringify({ porCorreo: false }) });
+  assert.equal(saved.status, 200, JSON.stringify(saved.body));
+  assertContract('/notifications/preferences/{category}', 'put', saved);
+  assert.deepEqual(saved.body.data, { categoria: 'AVISOS', por_correo: false });
+  const listed = await call('/notifications/preferences', { headers: bearer(accessA) });
+  assert.equal(listed.status, 200, JSON.stringify(listed.body));
+  assertContract('/notifications/preferences', 'get', listed);
+  const row = listed.body.data.find((item) => item.categoria === 'AVISOS');
+  assert.deepEqual(Object.keys(row).sort(), Object.keys(saved.body.data).sort());
+  assert.deepEqual(row, saved.body.data);
+});
+
+test('S7: vínculos familiares listan solo activos salvo estado=todos y DELETE repetido es 404', async () => {
+  // El vínculo de la prueba S5 ya está revocado.
+  const repeated = await call(`/guardians/links/${guardianPersonId}/${studentPersonId}`, {
+    method: 'DELETE', headers: bearer(accessA) });
+  assert.equal(repeated.status, 404, JSON.stringify(repeated.body));
+  assert.equal(repeated.body.error.code, 'LINK_NOT_FOUND');
+  assertContract('/guardians/links/{guardianId}/{studentId}', 'delete', repeated);
+
+  const active = await call('/guardians/links', { headers: bearer(accessA) });
+  assert.equal(active.status, 200, JSON.stringify(active.body));
+  assertContract('/guardians/links', 'get', active);
+  assert.ok(active.body.data.every((row) => row.activo === true));
+  assert.ok(!active.body.data.some((row) => row.apoderado_id === guardianPersonId));
+  const history = await call('/guardians/links?estado=todos', { headers: bearer(accessA) });
+  assert.equal(history.status, 200, JSON.stringify(history.body));
+  assertContract('/guardians/links', 'get', history);
+  const revoked = history.body.data.find((row) => row.apoderado_id === guardianPersonId);
+  assert.equal(revoked?.activo, false);
+  const invalid = await call('/guardians/links?estado=revocados', { headers: bearer(accessA) });
+  assert.equal(invalid.status, 400, JSON.stringify(invalid.body));
+  assertContract('/guardians/links', 'get', invalid);
+
+  const relinked = await call('/guardians/links', { method: 'POST',
+    headers: bearer(accessA, { 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ guardianId: guardianPersonId, studentId: studentPersonId, parentesco: 'MADRE' }) });
+  assert.equal(relinked.status, 201, JSON.stringify(relinked.body));
+  const again = await call('/guardians/links', { headers: bearer(accessA) });
+  assert.equal(again.body.data.find((row) => row.apoderado_id === guardianPersonId)?.activo, true);
+});
+
 test('Redis indisponible falla cerrado en petición protegida y refresh', async () => {
   await redisClient.quit();
   const protectedRoute = await call('/school/institution', { headers: bearer(accessA) });

@@ -275,8 +275,8 @@ GuardianConsentSuccess:
         text: { type: string, minLength: 100 }
     timestamp: { type: string, format: date-time }
 # --- S6-03: DTOs concretos de school, notifications, guardians y users ---
-# Las columnas DATE de PostgreSQL se serializan hoy como instante ISO (el driver
-# pg las convierte a Date sin parser de tipo); por eso se modelan como date-time.
+# Las columnas DATE de PostgreSQL se serializan como 'YYYY-MM-DD' (format: date):
+# backend/src/config/database.ts registra un parser que conserva el texto de pg.
 Institution:
   type: object
   required: [id, codigo_modular, nombre, nivel_educativo, direccion, telefono, escudo_url, membrete_texto, zona_horaria, minutos_inactividad_sesion]
@@ -338,8 +338,8 @@ AcademicYear:
   properties:
     id: { type: string, format: uuid }
     anio: { type: integer }
-    fecha_inicio: { type: string, format: date-time, description: 'Columna DATE serializada como instante ISO.' }
-    fecha_fin: { type: string, format: date-time, description: 'Columna DATE serializada como instante ISO.' }
+    fecha_inicio: { type: string, format: date, description: 'Columna DATE como día de calendario YYYY-MM-DD.' }
+    fecha_fin: { type: string, format: date, description: 'Columna DATE como día de calendario YYYY-MM-DD.' }
     activo: { type: boolean }
 AcademicYearListSuccess:
   type: object
@@ -380,8 +380,8 @@ AcademicPeriod:
     id: { type: string, format: uuid }
     tipo: { type: string, enum: [BIMESTRE, TRIMESTRE] }
     numero: { type: integer, minimum: 1, maximum: 4 }
-    fecha_inicio: { type: string, format: date-time, description: 'Columna DATE serializada como instante ISO.' }
-    fecha_fin: { type: string, format: date-time, description: 'Columna DATE serializada como instante ISO.' }
+    fecha_inicio: { type: string, format: date, description: 'Columna DATE como día de calendario YYYY-MM-DD.' }
+    fecha_fin: { type: string, format: date, description: 'Columna DATE como día de calendario YYYY-MM-DD.' }
     fecha_limite_notas: { type: string, format: date-time }
     cerrado: { type: boolean }
 AcademicPeriodListSuccess:
@@ -420,7 +420,7 @@ NonSchoolDay:
   required: [id, fecha, tipo, motivo]
   properties:
     id: { type: string, format: uuid }
-    fecha: { type: string, format: date-time, description: 'Columna DATE serializada como instante ISO.' }
+    fecha: { type: string, format: date, description: 'Columna DATE como día de calendario YYYY-MM-DD.' }
     tipo: { type: string, enum: [FERIADO, VACACIONES, SUSPENSION, INSTITUCIONAL] }
     motivo: { type: string }
 NonSchoolDayListSuccess:
@@ -440,7 +440,7 @@ NonSchoolDayCreatedSuccess:
       required: [id, fecha]
       properties:
         id: { type: string, format: uuid }
-        fecha: { type: string, format: date-time, description: 'Columna DATE serializada como instante ISO.' }
+        fecha: { type: string, format: date, description: 'Columna DATE como día de calendario YYYY-MM-DD.' }
     timestamp: { type: string, format: date-time }
 Section:
   type: object
@@ -598,10 +598,10 @@ NotificationPreferenceSuccess:
     success: { const: true }
     data:
       type: object
-      required: [categoria, porCorreo]
+      required: [categoria, por_correo]
       properties:
         categoria: { type: string, pattern: '^[A-Z_]{3,40}$' }
-        porCorreo: { type: boolean }
+        por_correo: { type: boolean, description: 'Mismo nombre que en GET /notifications/preferences; el cuerpo del PUT usa porCorreo.' }
     timestamp: { type: string, format: date-time }
 GuardianLinkListSuccess:
   type: object

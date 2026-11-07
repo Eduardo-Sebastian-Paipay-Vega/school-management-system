@@ -376,3 +376,191 @@ describe('Migración bloqueada por datos que no puede resolver sola', () => {
     await assert.rejects(aplicar(db, NUCLEO), /secciones sin año lectivo/);
   });
 });
+
+// ---------------------------------------------------------------------------------------
+// Sprint 6 (docs/core/PLAN_IMPLEMENTACION_S6_S9.md): S6-01, S6-04 y S6-06.
+// ---------------------------------------------------------------------------------------
+
+// Tablas de public a las que sms_app puede acceder sin RLS con política. Solo se admiten
+// catálogos globales de lectura; instituciones tiene su propia política (id = tenant).
+const CATALOGOS_GLOBALES = ['banco_conclusiones_cneb', 'permisos_core', 'roles'];
+const SQL_TABLAS_EXPUESTAS = `
+  SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+  WHERE n.nspname = 'public' AND c.relkind IN ('r', 'p') AND NOT c.relispartition
+    AND (has_table_privilege('sms_app', c.oid, 'SELECT') OR has_table_privilege('sms_app', c.oid, 'INSERT')
+         OR has_table_privilege('sms_app', c.oid, 'UPDATE') OR has_table_privilege('sms_app', c.oid, 'DELETE'))
+    AND NOT (c.relrowsecurity AND EXISTS (SELECT 1 FROM pg_policies p
+                                          WHERE p.schemaname = 'public' AND p.tablename = c.relname))
+  ORDER BY 1`;
+
+describe('S6-01: guarda de cobertura RLS para sms_app', () => {
+  it('detecta el hueco H1 en el esquema previo al Sprint 6', async () => {
+    const previa = await nuevaBase();
+    await aplicar(previa, archivos.filter((f) => f < '20261107'));
+    const expuestas = (await previa.query(SQL_TABLAS_EXPUESTAS)).rows.map((r) => r.relname)
+      .filter((t) => !CATALOGOS_GLOBALES.includes(t));
+    assert.deepEqual(expuestas, ['asistencias_alumnos', 'asistencias_practicantes', 'avisos_inasistencia',
+      'calificaciones', 'carnes_escolares', 'conclusiones_descriptivas', 'evaluaciones',
+      'expedientes_adjuntos', 'expedientes_movimientos', 'metricas_impacto_ssu', 'noticias_galeria']);
+    const escribible = await uno(previa,
+      `SELECT has_table_privilege('sms_app', 'permisos_core', 'INSERT') AS insert`);
+    assert.equal(escribible.insert, true);
+  });
+
+  describe('con todas las migraciones', () => {
+    let db;
+    before(async () => {
+      db = await nuevaBase();
+      await aplicar(db, archivos);
+    });
+
+    it('sms_app solo alcanza sin RLS a catálogos globales', async () => {
+      const r = (await db.query(SQL_TABLAS_EXPUESTAS)).rows.map((x) => x.relname);
+      assert.deepEqual(r, CATALOGOS_GLOBALES);
+    });
+
+    it('los catálogos globales son de solo lectura para sms_app', async () => {
+      const r = await db.query(`
+        SELECT t FROM unnest($1::text[]) AS t
+        WHERE has_table_privilege('sms_app', t, 'INSERT') OR has_table_privilege('sms_app', t, 'UPDATE')
+           OR has_table_privilege('sms_app', t, 'DELETE') OR has_table_privilege('sms_app', t, 'TRUNCATE')`,
+      [CATALOGOS_GLOBALES]);
+      assert.deepEqual(r.rows, []);
+    });
+
+    it('sms_app no lee tablas heredadas sin tenant', async () => {
+      await db.exec('BEGIN');
+      try {
+        await db.exec('SET LOCAL ROLE sms_app');
+        await assert.rejects(db.query('SELECT count(*) FROM calificaciones'), /permission denied/);
+      } finally {
+        await db.exec('ROLLBACK');
+      }
+    });
+  });
+});
+
+describe('S6-04 y S6-06: asistencia auditada y aforo de sección', () => {
+  let db, T1, T2, S1, S2, SEC1, SEC2, MAT1, MAT2, ASIS1, ASIS2;
+  const comoApp = (tenant, usuario, fn) => enContexto(db, { tenant, usuario, comoApp: true }, fn);
+  const persona = (tenant, nombre) => uno(db,
+    `INSERT INTO personas (tenant_id, tipo_documento, nombres, apellido_paterno)
+     VALUES ($1, 'SIN_DOCUMENTO', $2, 'Prueba') RETURNING id`, [tenant, nombre]).then((r) => r.id);
+  const anio = (tenant) => uno(db,
+    `INSERT INTO anios_lectivos (tenant_id, anio, fecha_inicio, fecha_fin, activo)
+     VALUES ($1, 2026, '2026-03-01', '2026-12-20', true) RETURNING id`, [tenant]).then((r) => r.id);
+  const seccion = (tenant, anioId, letra, aforo) => uno(db,
+    `INSERT INTO grados_secciones (tenant_id, anio_lectivo_id, nivel, grado, seccion, aforo_maximo)
+     VALUES ($1, $2, 'PRIMARIA', 4, $3, $4) RETURNING id`, [tenant, anioId, letra, aforo]).then((r) => r.id);
+  const matricular = (tenant, anioId, est, sec) => uno(db,
+    `INSERT INTO matriculas (tenant_id, anio_lectivo_id, estudiante_id, seccion_id)
+     VALUES ($1, $2, $3, $4) RETURNING id`, [tenant, anioId, est, sec]).then((r) => r.id);
+  const corregir = (id, estado, justificada, motivo, ip = '10.0.0.7') => uno(db,
+    // Forma obligatoria: `(fn(...)).*` ejecutaría la función una vez por columna.
+    `SELECT * FROM fn_corregir_asistencia($1, $2, $3, $4, $5::inet)`, [id, estado, justificada, motivo, ip]);
+  const MOTIVO = 'Constancia médica presentada por el apoderado';
+  let A1;
+
+  before(async () => {
+    db = await nuevaBase();
+    await aplicar(db, archivos);
+    T1 = await nuevaInstitucion(db, '0000061');
+    T2 = await nuevaInstitucion(db, '0000062');
+    S1 = await sistemaDe(db, T1);
+    S2 = await sistemaDe(db, T2);
+    await enContexto(db, { tenant: T1, usuario: S1 }, async () => {
+      A1 = await anio(T1);
+      SEC1 = await seccion(T1, A1, 'A', 2);
+      MAT1 = await matricular(T1, A1, await persona(T1, 'Rosa'), SEC1);
+    });
+    await enContexto(db, { tenant: T2, usuario: S2 }, async () => {
+      const A2 = await anio(T2);
+      SEC2 = await seccion(T2, A2, 'A', 30);
+      MAT2 = await matricular(T2, A2, await persona(T2, 'Juan'), SEC2);
+    });
+    // Registro ordinario por sms_app: el tenant se toma del contexto (DEFAULT app_tenant_id()).
+    ASIS1 = (await comoApp(T1, S1, () => uno(db,
+      `INSERT INTO asistencias_alumnos (matricula_id, fecha, hora_registro, estado, origen)
+       VALUES ($1, '2026-04-06', '08:10', 'FALTA_INJUSTIFICADA', 'AULA_DOCENTE') RETURNING id, tenant_id`, [MAT1])));
+    ASIS2 = (await comoApp(T2, S2, () => uno(db,
+      `INSERT INTO asistencias_alumnos (matricula_id, fecha, hora_registro, estado, origen)
+       VALUES ($1, '2026-04-06', '08:05', 'PRESENTE', 'KIOSCO_PORTERIA') RETURNING id`, [MAT2]))).id;
+    assert.equal(ASIS1.tenant_id, T1);
+    ASIS1 = ASIS1.id;
+  });
+
+  it('cada tenant ve solo su asistencia y no registra sobre matrículas ajenas', async () => {
+    const vistas = await comoApp(T2, S2, () => uno(db,
+      `SELECT count(*)::int AS n FROM asistencias_alumnos WHERE id = $1`, [ASIS1]));
+    assert.equal(vistas.n, 0);
+    await assert.rejects(comoApp(T1, S1, () => db.query(
+      `INSERT INTO asistencias_alumnos (matricula_id, fecha, hora_registro, estado, origen)
+       VALUES ($1, '2026-04-07', '08:00', 'PRESENTE', 'AULA_DOCENTE')`, [MAT2])), /fk_asistencias_matricula_tenant/);
+  });
+
+  it('sms_app no modifica la asistencia sin pasar por la corrección auditada', () =>
+    assert.rejects(comoApp(T1, S1, () => db.query(
+      `UPDATE asistencias_alumnos SET estado = 'PRESENTE' WHERE id = $1`, [ASIS1])), /permission denied/));
+
+  it('rechaza corrección sin motivo, sin IP, sin cambio o de otro tenant', async () => {
+    await assert.rejects(comoApp(T1, S1, () => corregir(ASIS1, 'FALTA_JUSTIFICADA', true, '  corto  ')),
+      /ATTENDANCE_REASON_REQUIRED/);
+    await assert.rejects(comoApp(T1, S1, () => corregir(ASIS1, 'FALTA_JUSTIFICADA', true, MOTIVO, null)),
+      /ATTENDANCE_IP_REQUIRED/);
+    await assert.rejects(comoApp(T1, S1, () => corregir(ASIS1, 'FALTA_INJUSTIFICADA', false, MOTIVO)),
+      /ATTENDANCE_NO_CHANGE/);
+    await assert.rejects(comoApp(T2, S2, () => corregir(ASIS1, 'FALTA_JUSTIFICADA', true, MOTIVO)),
+      /ATTENDANCE_NOT_FOUND/);
+    await assert.rejects(comoApp(T1, '', () => corregir(ASIS1, 'FALTA_JUSTIFICADA', true, MOTIVO)),
+      /ATTENDANCE_CONTEXT_REQUIRED/);
+  });
+
+  it('la corrección y su auditoría se confirman o revierten juntas', async () => {
+    // Revertida: la transacción del consumidor falla después de corregir.
+    await assert.rejects(comoApp(T1, S1, async () => {
+      await corregir(ASIS1, 'FALTA_JUSTIFICADA', true, MOTIVO);
+      throw new Error('fallo posterior del consumidor');
+    }), /fallo posterior/);
+    const sinCambios = await comoApp(T1, S1, () => uno(db, `SELECT
+      (SELECT estado::text FROM asistencias_alumnos WHERE id = $1) AS estado,
+      (SELECT count(*)::int FROM logs_auditoria WHERE accion = 'ATTENDANCE_CORRECTED') AS eventos`, [ASIS1]));
+    assert.deepEqual(sinCambios, { estado: 'FALTA_INJUSTIFICADA', eventos: 0 });
+
+    // Confirmada: estado nuevo, evento con antes/después, motivo y autor, cadena íntegra.
+    const fila = await comoApp(T1, S1, () => corregir(ASIS1, 'FALTA_JUSTIFICADA', true, MOTIVO));
+    assert.equal(fila.estado, 'FALTA_JUSTIFICADA');
+    const evento = await comoApp(T1, S1, () => uno(db,
+      `SELECT usuario_id, modulo, registro_id, payload_anterior, payload_nuevo
+       FROM logs_auditoria WHERE accion = 'ATTENDANCE_CORRECTED'`));
+    assert.equal(evento.usuario_id, S1);
+    assert.equal(evento.modulo, 'attendance');
+    assert.equal(evento.registro_id, ASIS1);
+    assert.equal(evento.payload_anterior.estado, 'FALTA_INJUSTIFICADA');
+    assert.equal(evento.payload_nuevo.estado, 'FALTA_JUSTIFICADA');
+    assert.equal(evento.payload_nuevo.justificada, true);
+    assert.equal(evento.payload_nuevo.motivo, MOTIVO);
+    const cadena = await comoApp(T1, S1, () => uno(db, `SELECT * FROM fn_verificar_cadena_auditoria()`));
+    assert.equal(cadena.cadena_integra, true);
+    const ajeno = await comoApp(T2, S2, () => uno(db,
+      `SELECT count(*)::int AS n FROM logs_auditoria WHERE accion = 'ATTENDANCE_CORRECTED'`));
+    assert.equal(ajeno.n, 0);
+    const otra = await comoApp(T2, S2, () => uno(db, `SELECT estado::text FROM asistencias_alumnos WHERE id = $1`, [ASIS2]));
+    assert.equal(otra.estado, 'PRESENTE');
+  });
+
+  it('el aforo limita matrículas activas y libera cupo al retirar', async () => {
+    const ctx = (fn) => enContexto(db, { tenant: T1, usuario: S1 }, fn);
+    const segunda = await ctx(async () => matricular(T1, A1, await persona(T1, 'Elena'), SEC1));
+    const tercera = await ctx(() => persona(T1, 'Marco'));
+    await assert.rejects(ctx(() => matricular(T1, A1, tercera, SEC1)), /SECTION_FULL/);
+    await ctx(() => db.query(
+      `UPDATE matriculas SET estado = 'RETIRADO', fecha_retiro = '2026-05-02' WHERE id = $1`, [segunda]));
+    await ctx(() => matricular(T1, A1, tercera, SEC1));
+    await assert.rejects(ctx(() => db.query(
+      `UPDATE matriculas SET estado = 'REGULAR', fecha_retiro = NULL WHERE id = $1`, [segunda])), /SECTION_FULL/);
+    // Otro tenant con el mismo código de sección no comparte ocupación.
+    const ocupacion = await enContexto(db, { tenant: T2, usuario: S2 }, () => uno(db,
+      `SELECT count(*)::int AS n FROM matriculas WHERE seccion_id = $1`, [SEC2]));
+    assert.equal(ocupacion.n, 1);
+  });
+});

@@ -8,6 +8,27 @@ Ejecutar `npm run audit:partitions` desde `database/` cada mes con `DATABASE_URL
 
 Ejecutar `npm run notifications:retain` diariamente desde `database/` con `DATABASE_URL` del propietario de migraciones. El comando elimina avisos de más de 180 días en lotes de 1000, junto con sus intentos de correo; las referencias de avisos de inasistencia se conservan con `notificacion_id` nulo. No borra la bitácora de auditoría. El despliegue debe programar y supervisar esta tarea.
 
+## Programación y supervisión (S6-07)
+
+Mientras no exista la decisión de alojamiento D-19, la referencia es `cron` en el servidor de base de datos o de tareas, con `DATABASE_URL` del propietario de migraciones en un archivo de entorno legible solo por el usuario del servicio (ruta de ejemplo: `/etc/sms/migrator.env`, permisos `0600`):
+
+```cron
+# m h dom mon dow  (UTC)
+15 3 20 * *  cd /srv/sms/database && set -a && . /etc/sms/migrator.env && npm run -s audit:partitions >> /var/log/sms/audit-partitions.log 2>&1
+40 4 *  * *  cd /srv/sms/database && set -a && . /etc/sms/migrator.env && npm run -s notifications:retain >> /var/log/sms/notifications-retain.log 2>&1
+```
+
+`GET /api/v1/health` informa `services.auditPartitions`:
+
+| Valor | Significado | HTTP | Acción |
+|---|---|---|---|
+| `OK` | Existen las particiones del mes UTC actual y del siguiente | 200 | Ninguna |
+| `MISSING_NEXT_MONTH` | Falta la partición del mes siguiente | 200 | Ejecutar `npm run audit:partitions` antes de fin de mes; alertar como aviso |
+| `MISSING_CURRENT_MONTH` | Falta la del mes en curso: toda escritura auditada falla cerrada | 503 | Incidente: ejecutar `npm run audit:partitions` de inmediato |
+| `UNKNOWN` | No se pudo consultar (PostgreSQL desconectado o error) | según el estado de la BD | Revisar la conexión |
+
+Una alerta sobre `auditPartitions != "OK"` cubre el caso en que el cron deje de ejecutarse. La prueba de integración «S6-07» retira la partición futura y comprueba los dos estados.
+
 ## Fases
 
 La cuenta pertenece a la persona y al plantel, no al año lectivo. En la Fase 1 se importan personas de la nómina, se crean solo las cuentas necesarias y se envía una invitación de un uso; cada usuario fija su clave. El archivo no lleva contraseñas. En 2027 se configura otro año con periodos y secciones, mientras Squad 2 crea la matrícula anual referida al `persona_id` existente. El Core no crea matrículas ni fija rangos numéricos CNEB sin la aprobación institucional D-16.

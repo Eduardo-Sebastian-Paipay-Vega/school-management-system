@@ -65,29 +65,13 @@ function issueTokens(user: UserPayload, sid: string, version: number, jti: strin
   return { accessToken, refreshToken };
 }
 
-const legacyUntilRaw = process.env.JWT_LEGACY_TENANT_ACCEPT_UNTIL;
-const legacyWindowMs = 7 * 24 * 60 * 60 * 1000;
-const parsedLegacyUntil = legacyUntilRaw && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(legacyUntilRaw)
-  ? Date.parse(legacyUntilRaw) : NaN;
-// Configuración ausente, inválida o demasiado extensa: los tokens legados fallan cerrados.
-const legacyUntil = Number.isFinite(parsedLegacyUntil) && parsedLegacyUntil <= Date.now() + legacyWindowMs
-  ? parsedLegacyUntil : null;
-
 function decode(token: string, secret: string, audience: string): AuthClaims {
   const claims = jwt.verify(token, secret, { algorithms: ['HS256'], issuer: 'sms-core', audience }) as
     JwtPayload & { tenant_id?: unknown; tenantId?: unknown; sid?: unknown; jti?: unknown; version?: unknown };
-  const canonical = claims.tenant_id;
-  const legacy = claims.tenantId;
-  if ((canonical !== undefined && (typeof canonical !== 'string' || !canonical)) ||
-      (legacy !== undefined && (typeof legacy !== 'string' || !legacy)) ||
-      (canonical && legacy && canonical !== legacy)) {
-    throw new Error('Claims de tenant incompatibles');
-  }
-  const now = Date.now();
-  const legacyAllowed = legacyUntil !== null && legacyUntil > now &&
-    Number.isInteger(claims.iat) && claims.iat! * 1000 <= now + 60_000 &&
-    now - claims.iat! * 1000 <= legacyWindowMs;
-  const tenantId = canonical || (legacyAllowed ? legacy : undefined);
+  // Transición S2 cerrada en S6-00: el emisor solo firma `tenant_id`; el claim heredado
+  // `tenantId` ya no se acepta, ni solo ni acompañado del canónico.
+  if (claims.tenantId !== undefined) throw new Error('Claim de tenant heredado');
+  const tenantId = claims.tenant_id;
   if (!claims.sub || typeof tenantId !== 'string' ||
       !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(tenantId) ||
       typeof claims.sid !== 'string' || typeof claims.jti !== 'string' ||

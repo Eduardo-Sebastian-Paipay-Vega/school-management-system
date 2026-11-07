@@ -194,7 +194,10 @@ Sigue estos 3 pasos para levantar el entorno completo de desarrollo en local:
 ### Paso 1: Levantar Base de Datos y Caché (Docker Compose)
 
 ```bash
-# Levantar PostgreSQL 16 (:5432), Redis 7 (:6379) y Adminer (:8080) en segundo plano
+# Primera vez: crear .env con la contraseña local de PostgreSQL (no se versiona)
+cp .env.example .env
+
+# Levantar PostgreSQL 16, Redis 7 y Adminer (:8080), publicados solo en 127.0.0.1
 docker compose up -d
 
 # Verificar que los 3 contenedores estén corriendo saludablemente
@@ -202,7 +205,7 @@ docker compose ps
 ```
 
 * **Gestor Web de Base de Datos:** Abre [http://localhost:8080](http://localhost:8080) en tu navegador.
-  * **Sistema:** PostgreSQL | **Servidor:** `postgres` | **Usuario:** `postgres` | **Contraseña:** `postgrespassword2026!` | **Base de Datos:** `school_management`
+  * **Sistema:** PostgreSQL | **Servidor:** `postgres` | **Usuario:** `postgres` | **Contraseña:** la definida en `POSTGRES_PASSWORD` de su `.env` local (ver `.env.example`) | **Base de Datos:** `school_management`
 
 ### Paso 2: Iniciar el Backend API (Node.js + TypeScript)
 

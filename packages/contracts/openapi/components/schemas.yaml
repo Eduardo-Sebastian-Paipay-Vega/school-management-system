@@ -18,14 +18,6 @@ AccessLinkRequest:
     codigoModular: { type: string, maxLength: 10 }
     token: { type: string }
     password: { type: string, format: password, minLength: 8 }
-Success:
-  type: object
-  required: [success, data, timestamp]
-  properties:
-    success: { const: true }
-    data:
-      description: DTO especifico de la operacion. Las operaciones aun no migradas conservan esta forma generica temporalmente.
-    timestamp: { type: string, format: date-time }
 Error:
   type: object
   required: [success, error, timestamp]
@@ -281,4 +273,417 @@ GuardianConsentSuccess:
       properties:
         version: { type: string, maxLength: 20 }
         text: { type: string, minLength: 100 }
+    timestamp: { type: string, format: date-time }
+# --- S6-03: DTOs concretos de school, notifications, guardians y users ---
+# Las columnas DATE de PostgreSQL se serializan hoy como instante ISO (el driver
+# pg las convierte a Date sin parser de tipo); por eso se modelan como date-time.
+Institution:
+  type: object
+  required: [id, codigo_modular, nombre, nivel_educativo, direccion, telefono, escudo_url, membrete_texto, zona_horaria, minutos_inactividad_sesion]
+  properties:
+    id: { type: string, format: uuid }
+    codigo_modular: { type: string }
+    nombre: { type: string }
+    nivel_educativo: { type: string }
+    direccion: { type: [string, 'null'] }
+    telefono: { type: [string, 'null'] }
+    escudo_url: { type: [string, 'null'], description: 'Tomado de configuracion_institucional.' }
+    membrete_texto: { type: [string, 'null'], description: 'Tomado de configuracion_institucional.' }
+    zona_horaria: { type: string }
+    minutos_inactividad_sesion: { type: integer }
+InstitutionSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data: { $ref: '#/Institution' }
+    timestamp: { type: string, format: date-time }
+Site:
+  type: object
+  required: [id, nombre, direccion, activo]
+  properties:
+    id: { type: string, format: uuid }
+    nombre: { type: string }
+    direccion: { type: [string, 'null'] }
+    activo: { type: boolean }
+SiteSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data: { $ref: '#/Site' }
+    timestamp: { type: string, format: date-time }
+SiteListSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data: { type: array, items: { $ref: '#/Site' } }
+    timestamp: { type: string, format: date-time }
+SiteCreatedSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [id, nombre]
+      properties:
+        id: { type: string, format: uuid }
+        nombre: { type: string }
+    timestamp: { type: string, format: date-time }
+AcademicYear:
+  type: object
+  required: [id, anio, fecha_inicio, fecha_fin, activo]
+  properties:
+    id: { type: string, format: uuid }
+    anio: { type: integer }
+    fecha_inicio: { type: string, format: date-time, description: 'Columna DATE serializada como instante ISO.' }
+    fecha_fin: { type: string, format: date-time, description: 'Columna DATE serializada como instante ISO.' }
+    activo: { type: boolean }
+AcademicYearListSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data: { type: array, items: { $ref: '#/AcademicYear' } }
+    timestamp: { type: string, format: date-time }
+AcademicYearCreatedSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [id, anio]
+      properties:
+        id: { type: string, format: uuid }
+        anio: { type: integer }
+    timestamp: { type: string, format: date-time }
+AcademicYearActivatedSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [id, anio, activo]
+      properties:
+        id: { type: string, format: uuid }
+        anio: { type: integer }
+        activo: { const: true }
+    timestamp: { type: string, format: date-time }
+AcademicPeriod:
+  type: object
+  required: [id, tipo, numero, fecha_inicio, fecha_fin, fecha_limite_notas, cerrado]
+  properties:
+    id: { type: string, format: uuid }
+    tipo: { type: string, enum: [BIMESTRE, TRIMESTRE] }
+    numero: { type: integer, minimum: 1, maximum: 4 }
+    fecha_inicio: { type: string, format: date-time, description: 'Columna DATE serializada como instante ISO.' }
+    fecha_fin: { type: string, format: date-time, description: 'Columna DATE serializada como instante ISO.' }
+    fecha_limite_notas: { type: string, format: date-time }
+    cerrado: { type: boolean }
+AcademicPeriodListSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data: { type: array, items: { $ref: '#/AcademicPeriod' } }
+    timestamp: { type: string, format: date-time }
+AcademicPeriodCreatedSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [id, numero]
+      properties:
+        id: { type: string, format: uuid }
+        numero: { type: integer, minimum: 1, maximum: 4 }
+    timestamp: { type: string, format: date-time }
+AcademicPeriodClosedSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [id, cerrado]
+      properties:
+        id: { type: string, format: uuid }
+        cerrado: { const: true }
+    timestamp: { type: string, format: date-time }
+NonSchoolDay:
+  type: object
+  required: [id, fecha, tipo, motivo]
+  properties:
+    id: { type: string, format: uuid }
+    fecha: { type: string, format: date-time, description: 'Columna DATE serializada como instante ISO.' }
+    tipo: { type: string, enum: [FERIADO, VACACIONES, SUSPENSION, INSTITUCIONAL] }
+    motivo: { type: string }
+NonSchoolDayListSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data: { type: array, items: { $ref: '#/NonSchoolDay' } }
+    timestamp: { type: string, format: date-time }
+NonSchoolDayCreatedSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [id, fecha]
+      properties:
+        id: { type: string, format: uuid }
+        fecha: { type: string, format: date-time, description: 'Columna DATE serializada como instante ISO.' }
+    timestamp: { type: string, format: date-time }
+Section:
+  type: object
+  required: [id, nivel, grado, seccion, aforo_maximo, sede_id, tutor_id]
+  properties:
+    id: { type: string, format: uuid }
+    nivel: { type: string, enum: [INICIAL, PRIMARIA, SECUNDARIA] }
+    grado: { type: integer, minimum: 1, maximum: 6 }
+    seccion: { type: string, minLength: 1, maxLength: 1 }
+    aforo_maximo: { type: integer, minimum: 1 }
+    sede_id: { type: [string, 'null'], format: uuid }
+    tutor_id: { type: [string, 'null'], format: uuid }
+SectionListSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data: { type: array, items: { $ref: '#/Section' } }
+    timestamp: { type: string, format: date-time }
+SectionCreatedSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [id, nivel, grado, seccion]
+      properties:
+        id: { type: string, format: uuid }
+        nivel: { type: string, enum: [INICIAL, PRIMARIA, SECUNDARIA] }
+        grado: { type: integer, minimum: 1, maximum: 6 }
+        seccion: { type: string, minLength: 1, maxLength: 1 }
+    timestamp: { type: string, format: date-time }
+GradingScale:
+  type: object
+  required: [id, nivel, modalidad, estado, aprobada_en, rangos]
+  properties:
+    id: { type: string, format: uuid }
+    nivel: { type: string, enum: [INICIAL, PRIMARIA, SECUNDARIA] }
+    modalidad: { type: string, enum: [LITERAL, DUAL_VIGESIMAL] }
+    estado: { type: string, enum: [BORRADOR, VIGENTE, REEMPLAZADA] }
+    aprobada_en: { type: [string, 'null'], format: date-time }
+    rangos:
+      type: array
+      items:
+        type: object
+        required: [nivel, min, max, descripcion]
+        properties:
+          nivel: { type: string, enum: [AD, A, B, C] }
+          min: { type: [number, 'null'], minimum: 0, maximum: 20 }
+          max: { type: [number, 'null'], minimum: 0, maximum: 20 }
+          descripcion: { type: string }
+GradingScaleListSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data: { type: array, items: { $ref: '#/GradingScale' } }
+    timestamp: { type: string, format: date-time }
+GradingScaleCreatedSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [id]
+      properties:
+        id: { type: string, format: uuid }
+    timestamp: { type: string, format: date-time }
+GradingScaleApprovedSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [id, estado]
+      properties:
+        id: { type: string, format: uuid }
+        estado: { const: VIGENTE }
+    timestamp: { type: string, format: date-time }
+Notification:
+  type: object
+  required: [id, categoria, prioridad, titulo, mensaje, enlace, leida_en, created_at]
+  properties:
+    id: { type: string, format: uuid }
+    categoria: { type: string }
+    prioridad: { type: [string, 'null'], enum: [ALTA, NORMAL, BAJA, null] }
+    titulo: { type: string }
+    mensaje: { type: string }
+    enlace: { type: [string, 'null'] }
+    leida_en: { type: [string, 'null'], format: date-time }
+    created_at: { type: [string, 'null'], format: date-time }
+NotificationListSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data: { type: array, maxItems: 100, items: { $ref: '#/Notification' } }
+    timestamp: { type: string, format: date-time }
+NotificationCreatedSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [id, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        created_at: { type: [string, 'null'], format: date-time }
+    timestamp: { type: string, format: date-time }
+UnreadCountSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [count]
+      properties:
+        count: { type: integer, minimum: 0 }
+    timestamp: { type: string, format: date-time }
+NotificationReadSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [id, leida_en]
+      properties:
+        id: { type: string, format: uuid }
+        leida_en: { type: string, format: date-time }
+    timestamp: { type: string, format: date-time }
+NotificationPreferenceListSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: array
+      items:
+        type: object
+        required: [categoria, por_correo]
+        properties:
+          categoria: { type: string }
+          por_correo: { type: [boolean, 'null'] }
+    timestamp: { type: string, format: date-time }
+NotificationPreferenceSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [categoria, porCorreo]
+      properties:
+        categoria: { type: string, pattern: '^[A-Z_]{3,40}$' }
+        porCorreo: { type: boolean }
+    timestamp: { type: string, format: date-time }
+GuardianLinkListSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: array
+      maxItems: 100
+      items:
+        type: object
+        required: [id, apoderado_id, estudiante_id, parentesco, activo, confirmado_en, apoderado, estudiante]
+        properties:
+          id: { type: string, format: uuid }
+          apoderado_id: { type: string, format: uuid }
+          estudiante_id: { type: string, format: uuid }
+          parentesco: { type: string, enum: [PADRE, MADRE, TUTOR_LEGAL] }
+          activo: { type: boolean }
+          confirmado_en: { type: [string, 'null'], format: date-time }
+          apoderado: { type: string, description: 'Nombres y apellido paterno.' }
+          estudiante: { type: string, description: 'Nombres y apellido paterno.' }
+    timestamp: { type: string, format: date-time }
+PersonSearchSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: array
+      maxItems: 30
+      items:
+        type: object
+        required: [id, nombres, apellido_paterno, apellido_materno, documento_ultimos4]
+        properties:
+          id: { type: string, format: uuid }
+          nombres: { type: string }
+          apellido_paterno: { type: string }
+          apellido_materno: { type: [string, 'null'] }
+          documento_ultimos4: { type: [string, 'null'] }
+    timestamp: { type: string, format: date-time }
+RoleListSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: array
+      items:
+        type: object
+        required: [id, codigo, nombre, descripcion, permisos]
+        properties:
+          id: { type: integer }
+          codigo:
+            type: string
+            enum: [SUPERADMIN, DIRECTIVO, COORDINADOR_ACADEMICO, SECRETARIA, DOCENTE, DOCENTE_CONTRATADO, TUTOR_AULA, PRACTICANTE, AUXILIAR, ESTUDIANTE, PORTERIA, APODERADO]
+          nombre: { type: string }
+          descripcion: { type: [string, 'null'] }
+          permisos: { type: array, items: { type: string } }
+    timestamp: { type: string, format: date-time }
+PermissionListSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: array
+      items:
+        type: object
+        required: [codigo, descripcion]
+        properties:
+          codigo: { type: string }
+          descripcion: { type: string }
+    timestamp: { type: string, format: date-time }
+RevealedDocumentSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data:
+      type: object
+      required: [tipo, documento]
+      properties:
+        tipo: { type: string, enum: [DNI, CE, PASAPORTE, PTP] }
+        documento: { type: string, description: 'Documento completo descifrado; la respuesta usa Cache-Control no-store.' }
     timestamp: { type: string, format: date-time }

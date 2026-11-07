@@ -154,6 +154,7 @@ test('S5: avisos A/B, correo verificado, preferencia obligatoria y reintento SMT
       mensaje:'Aviso ficticio de CI',prioridad})});
   const unverified=await send(accessA,a.userId,'SEGURIDAD','Solo bandeja sin verificar');
   assert.equal(unverified.status,201,JSON.stringify(unverified.body));
+  assertContract('/notifications','post',unverified);
   const noVerifiedEmail=await admin.query('SELECT id FROM envios_correo WHERE notificacion_id=$1',
     [unverified.body.data.id]);
   assert.equal(noVerifiedEmail.rowCount,0);
@@ -167,12 +168,14 @@ test('S5: avisos A/B, correo verificado, preferencia obligatoria y reintento SMT
   const marked=await call(`/notifications/${security.body.data.id}/read`,{
     method:'PATCH',headers:bearer(accessA)});
   assert.equal(marked.status,200,JSON.stringify(marked.body));
+  assertContract('/notifications/{id}/read','patch',marked);
   const afterRead=await call('/notifications/unread-count',{headers:bearer(accessA)});
   assert.equal(afterRead.body.data.count,1);
   const cross=await send(accessB,a.userId,'SEGURIDAD','Cruce B');
   assert.equal(cross.status,409,JSON.stringify(cross.body));
   const inboxB=await call('/notifications',{headers:bearer(accessB)});
   assert.equal(inboxB.status,200);
+  assertContract('/notifications','get',inboxB);
   assert.ok(!JSON.stringify(inboxB.body.data).includes('Seguridad ficticia A'));
   const pending=await admin.query(`SELECT id FROM envios_correo WHERE tenant_id=$1
     AND notificacion_id=$2`,[a.tenantId,security.body.data.id]);
@@ -194,6 +197,7 @@ test('S5: avisos A/B, correo verificado, preferencia obligatoria y reintento SMT
   const optional=await call('/notifications/preferences/RECORDATORIO',{method:'PUT',
     headers:bearer(accessA,json),body:JSON.stringify({porCorreo:false})});
   assert.equal(optional.status,200,JSON.stringify(optional.body));
+  assertContract('/notifications/preferences/{category}','put',optional);
   const noEmail=await send(accessA,a.userId,'RECORDATORIO','Solo bandeja A');
   assert.equal(noEmail.status,201,JSON.stringify(noEmail.body));
   const skipped=await admin.query('SELECT id FROM envios_correo WHERE notificacion_id=$1',[noEmail.body.data.id]);
@@ -531,6 +535,7 @@ test('S5: revocar consentimiento y desvincular corta acceso del apoderado', asyn
   const unlinked = await call(`/guardians/links/${guardianPersonId}/${studentPersonId}`, {
     method: 'DELETE', headers: bearer(accessA) });
   assert.equal(unlinked.status, 200, JSON.stringify(unlinked.body));
+  assertContract('/guardians/links/{guardianId}/{studentId}', 'delete', unlinked);
   const invalidated = await call('/guardians/students', { headers: bearer(relogin.body.data.accessToken) });
   assert.equal(invalidated.status, 401, JSON.stringify(invalidated.body));
 });
@@ -554,6 +559,7 @@ test('rutas reales rechazan ausencia de sesión y tenant discordante', async () 
   const own = await call('/school/institution', { headers: bearer(accessA) });
   assert.equal(own.status, 200, JSON.stringify(own.body));
   assert.equal(own.body.data.id, a.tenantId);
+  assertContract('/school/institution', 'get', own);
   const other = await call('/school/institution', { headers: bearer(accessB) });
   assert.equal(other.status, 200, JSON.stringify(other.body));
   assert.equal(other.body.data.id, b.tenantId);
@@ -761,6 +767,7 @@ test('S4: reasignar roles con motivo revoca sesión y no cruza tenants', async (
     headers: bearer(accessA, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ roles: ['SECRETARIA'], motivo: 'Prueba de cambio de rol' }) });
   assert.equal(changed.status, 200, JSON.stringify(changed.body));
+  assertContract('/users/{id}/roles', 'put', changed);
   const stale = await call('/users/me', { headers: bearer(old.body.data.accessToken) });
   assert.equal(stale.status, 401, JSON.stringify(stale.body));
   const fresh = await signIn();
@@ -786,6 +793,7 @@ test('S4: directorio paginado, perfil propio y último administrador protegido',
     headers: bearer(accessA, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ telefono: '999000111' }) });
   assert.equal(updated.status, 200, JSON.stringify(updated.body));
+  assertContract('/users/me', 'patch', updated);
   const refreshed = await call('/users/me', { headers: bearer(accessA) });
   assert.equal(refreshed.body.data.telefono, '999000111');
   const other = await call('/users/me', { headers: bearer(accessB) });
@@ -795,6 +803,7 @@ test('S4: directorio paginado, perfil propio y último administrador protegido',
     headers: bearer(accessA, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ nombres: 'Invitada Editada', telefono: '999222333' }) });
   assert.equal(edited.status, 200, JSON.stringify(edited.body));
+  assertContract('/users/{id}', 'patch', edited);
   const found = await call('/users?search=Invitada%20Editada', { headers: bearer(accessA) });
   assert.equal(found.body.data.count, 1);
   assert.equal(found.body.data.users[0].telefono_enmascarado, '***2333');
@@ -830,6 +839,7 @@ test('S4: año nuevo conserva cuentas, configuración aislada y D-16 bloquea esc
     headers: bearer(accessA, json), body: JSON.stringify({ membreteTexto: 'Plantel ficticio A',
       escudoUrl: 'https://example.invalid/escudo-a.png' }) });
   assert.equal(institution.status, 200, JSON.stringify(institution.body));
+  assertContract('/school/institution', 'patch', institution);
   const ownInstitution = await call('/school/institution', { headers: bearer(accessA) });
   const foreignInstitution = await call('/school/institution', { headers: bearer(accessB) });
   assert.equal(ownInstitution.body.data.membrete_texto, 'Plantel ficticio A');
@@ -838,10 +848,12 @@ test('S4: año nuevo conserva cuentas, configuración aislada y D-16 bloquea esc
   const site = await call('/school/sites', { method: 'POST', headers: bearer(accessA, json),
     body: JSON.stringify({ nombre: 'Sede ficticia A' }) });
   assert.equal(site.status, 201, JSON.stringify(site.body));
+  assertContract('/school/sites', 'post', site);
   const siteId = site.body.data.id;
   const changedSite = await call(`/school/sites/${siteId}`, { method: 'PATCH',
     headers: bearer(accessA, json), body: JSON.stringify({ nombre: 'Sede A actualizada', activo: false }) });
   assert.equal(changedSite.status, 200, JSON.stringify(changedSite.body));
+  assertContract('/school/sites/{id}', 'patch', changedSite);
   assert.equal(changedSite.body.data.activo, false);
   const beforeForeignAudit = await admin.query(`SELECT count(*)::int AS n FROM logs_auditoria
     WHERE tenant_id=$1 AND accion='UPDATE_SITE'`, [b.tenantId]);
@@ -860,6 +872,7 @@ test('S4: año nuevo conserva cuentas, configuración aislada y D-16 bloquea esc
   const yearB = await createYear(accessB);
   assert.equal(yearA.status, 201, JSON.stringify(yearA.body));
   assert.equal(yearB.status, 201, JSON.stringify(yearB.body));
+  assertContract('/school/years', 'post', yearA);
   const yearId = yearA.body.data.id;
   assert.notEqual(yearId, yearB.body.data.id);
 
@@ -867,6 +880,7 @@ test('S4: año nuevo conserva cuentas, configuración aislada y D-16 bloquea esc
     headers: bearer(accessA, json), body: JSON.stringify({ tipo: 'BIMESTRE', numero: 1,
       fechaInicio: '2027-03-01', fechaFin: '2027-05-01', fechaLimiteNotas: '2027-05-05T00:00:00.000Z' }) });
   assert.equal(period.status, 201, JSON.stringify(period.body));
+  assertContract('/school/years/{id}/periods', 'post', period);
   const duplicatePeriod = await call(`/school/years/${yearId}/periods`, { method: 'POST',
     headers: bearer(accessA, json), body: JSON.stringify({ tipo: 'BIMESTRE', numero: 2,
       fechaInicio: '2027-04-01', fechaFin: '2027-06-01', fechaLimiteNotas: '2027-06-05T00:00:00.000Z' }) });
@@ -874,11 +888,13 @@ test('S4: año nuevo conserva cuentas, configuración aislada y D-16 bloquea esc
   const foreignPeriods = await call(`/school/years/${yearId}/periods`, { headers: bearer(accessB) });
   assert.equal(foreignPeriods.status, 200);
   assert.deepEqual(foreignPeriods.body.data, []);
+  assertContract('/school/years/{id}/periods', 'get', foreignPeriods);
 
   const section = await call(`/school/years/${yearId}/sections`, { method: 'POST',
     headers: bearer(accessA, json), body: JSON.stringify({ nivel: 'PRIMARIA', grado: 1,
       seccion: 'A', aforoMaximo: 35 }) });
   assert.equal(section.status, 201, JSON.stringify(section.body));
+  assertContract('/school/years/{id}/sections', 'post', section);
   const duplicateSection = await call(`/school/years/${yearId}/sections`, { method: 'POST',
     headers: bearer(accessA, json), body: JSON.stringify({ nivel: 'PRIMARIA', grado: 1,
       seccion: 'A', aforoMaximo: 35 }) });
@@ -886,6 +902,7 @@ test('S4: año nuevo conserva cuentas, configuración aislada y D-16 bloquea esc
   const foreignSections = await call(`/school/years/${yearId}/sections`, { headers: bearer(accessB) });
   assert.equal(foreignSections.status, 200);
   assert.deepEqual(foreignSections.body.data, []);
+  assertContract('/school/years/{id}/sections', 'get', foreignSections);
 
   const numeric = await call(`/school/years/${yearId}/scales`, { method: 'POST',
     headers: bearer(accessA, json), body: JSON.stringify({ nivel: 'PRIMARIA',
@@ -896,6 +913,7 @@ test('S4: año nuevo conserva cuentas, configuración aislada y D-16 bloquea esc
         { nivel: 'C', min: 0, max: 10, descripcion: 'Solo fixture de CI' },
       ] }) });
   assert.equal(numeric.status, 201, JSON.stringify(numeric.body));
+  assertContract('/school/years/{id}/scales', 'post', numeric);
   const blocked = await call(`/school/scales/${numeric.body.data.id}/approve`, { method: 'POST',
     headers: bearer(accessA, json), body: JSON.stringify({ fuenteAprobacion: 'Referencia ficticia CI' }) });
   assert.equal(blocked.status, 409, JSON.stringify(blocked.body));
@@ -913,6 +931,7 @@ test('S4: año nuevo conserva cuentas, configuración aislada y D-16 bloquea esc
   assert.equal(firstLiteral.status, 201, JSON.stringify(firstLiteral.body));
   const firstApproved = await approve(firstLiteral.body.data.id);
   assert.equal(firstApproved.status, 200, JSON.stringify(firstApproved.body));
+  assertContract('/school/scales/{id}/approve', 'post', firstApproved);
   const secondLiteral = await literalDraft();
   assert.equal(secondLiteral.status, 201, JSON.stringify(secondLiteral.body));
   const secondApproved = await approve(secondLiteral.body.data.id);
@@ -924,6 +943,7 @@ test('S4: año nuevo conserva cuentas, configuración aislada y D-16 bloquea esc
 
   const active = await call(`/school/years/${yearId}/activate`, { method: 'POST', headers: bearer(accessA) });
   assert.equal(active.status, 200, JSON.stringify(active.body));
+  assertContract('/school/years/{id}/activate', 'post', active);
   const account = await admin.query('SELECT id FROM usuarios WHERE id=$1 AND tenant_id=$2', [a.userId, a.tenantId]);
   assert.equal(account.rowCount, 1, 'activar 2027 no recrea ni elimina cuentas');
 });
@@ -948,6 +968,82 @@ test('logout revoca inmediatamente el access token', async () => {
   const revoked = await call('/school/institution', { headers: bearer(accessB) });
   assert.equal(revoked.status, 401);
   assert.equal(revoked.body.error.code, 'UNAUTHENTICATED');
+});
+
+test('S6-00: el claim heredado tenantId ya no abre sesión, ni solo ni junto al canónico', async () => {
+  const original = jwt.decode(accessA);
+  const sign = (payload) => jwt.sign({ sid: original.sid, jti: original.jti,
+    version: original.version, ...payload }, process.env.JWT_SECRET,
+  { subject: original.sub, expiresIn: '15m', issuer: 'sms-core', audience: 'sms-web', algorithm: 'HS256' });
+  for (const payload of [{ tenantId: a.tenantId }, { tenant_id: a.tenantId, tenantId: a.tenantId }]) {
+    const response = await call('/users/me', { headers: bearer(sign(payload)) });
+    assert.equal(response.status, 401, JSON.stringify(response.body));
+    assert.equal(response.body.error.code, 'UNAUTHENTICATED');
+  }
+  const canonical = await call('/users/me', { headers: bearer(accessA) });
+  assert.equal(canonical.status, 200, JSON.stringify(canonical.body));
+});
+
+test('S6-06: matrículas concurrentes no superan el aforo de la sección', async () => {
+  const ctx = (fn) => runtime.withTenant(a.tenantId, a.userId, fn);
+  const { yearId, sectionId, students } = await ctx(async (client) => {
+    let year = await client.query('SELECT id FROM anios_lectivos WHERE tenant_id=$1 AND activo', [a.tenantId]);
+    if (!year.rowCount) {
+      year = await client.query(`INSERT INTO anios_lectivos(tenant_id,anio,fecha_inicio,fecha_fin,activo)
+        VALUES($1,2031,'2031-03-01','2031-12-20',true) RETURNING id`, [a.tenantId]);
+    }
+    const section = await client.query(`INSERT INTO grados_secciones
+      (tenant_id,anio_lectivo_id,nivel,grado,seccion,aforo_maximo)
+      VALUES($1,$2,'SECUNDARIA',5,'Z',1) RETURNING id`, [a.tenantId, year.rows[0].id]);
+    const people = [];
+    for (const name of ['Aforo Uno', 'Aforo Dos']) {
+      people.push((await client.query(`INSERT INTO personas(tenant_id,tipo_documento,nombres,apellido_paterno)
+        VALUES($1,'SIN_DOCUMENTO',$2,'Ficticio') RETURNING id`, [a.tenantId, name])).rows[0].id);
+    }
+    return { yearId: year.rows[0].id, sectionId: section.rows[0].id, students: people };
+  });
+  const enroll = (studentId, holdMs) => ctx(async (client) => {
+    await client.query(`INSERT INTO matriculas(tenant_id,anio_lectivo_id,estudiante_id,seccion_id)
+      VALUES($1,$2,$3,$4)`, [a.tenantId, yearId, studentId, sectionId]);
+    // Mantiene abierta la primera transacción: sin el bloqueo de la sección, la segunda
+    // contaría 0 matrículas confirmadas y también entraría.
+    if (holdMs) await client.query('SELECT pg_sleep($1)', [holdMs / 1000]);
+  });
+  const first = enroll(students[0], 400);
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  const results = await Promise.allSettled([first, enroll(students[1], 0)]);
+  assert.equal(results[0].status, 'fulfilled', String(results[0].reason));
+  assert.equal(results[1].status, 'rejected');
+  assert.match(String(results[1].reason?.message), /SECTION_FULL/);
+  const count = await ctx((client) => client.query(
+    'SELECT count(*)::int AS n FROM matriculas WHERE seccion_id=$1', [sectionId]));
+  assert.equal(count.rows[0].n, 1);
+});
+
+test('S6-07: /health avisa si falta la partición de auditoría del mes siguiente', async () => {
+  const month = (offset) => `(date_trunc('month', now() AT TIME ZONE 'UTC') + interval '${offset} month')::date`;
+  await admin.query(`SELECT fn_crear_particion_auditoria(${month(0)}), fn_crear_particion_auditoria(${month(1)})`);
+  const healthy = await call('/health');
+  assert.equal(healthy.status, 200, JSON.stringify(healthy.body));
+  assert.equal(healthy.body.services.auditPartitions, 'OK');
+  assertContract('/health', 'get', healthy);
+
+  const next = (await admin.query(
+    `SELECT 'logs_auditoria_' || to_char(${month(1)}, 'YYYY_MM') AS name`)).rows[0].name;
+  const rows = await admin.query(`SELECT count(*)::int AS n FROM ${next}`);
+  assert.equal(rows.rows[0].n, 0, 'La partición futura debe estar vacía para retirarla en la prueba');
+  await admin.query(`ALTER TABLE logs_auditoria DETACH PARTITION ${next}`);
+  await admin.query(`DROP TABLE ${next}`);
+  try {
+    const warning = await call('/health');
+    assert.equal(warning.status, 200, 'La partición futura ausente no saca la instancia de servicio');
+    assert.equal(warning.body.services.auditPartitions, 'MISSING_NEXT_MONTH');
+    assertContract('/health', 'get', warning);
+  } finally {
+    await admin.query(`SELECT fn_crear_particion_auditoria(${month(1)})`);
+  }
+  const restored = await call('/health');
+  assert.equal(restored.body.services.auditPartitions, 'OK');
 });
 
 test('Redis indisponible falla cerrado en petición protegida y refresh', async () => {

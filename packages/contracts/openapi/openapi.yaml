@@ -124,8 +124,6 @@ components:
       $ref: './components/schemas.yaml#/RecoveryRequest'
     AccessLinkRequest:
       $ref: './components/schemas.yaml#/AccessLinkRequest'
-    Success:
-      $ref: './components/schemas.yaml#/Success'
     Error:
       $ref: './components/schemas.yaml#/Error'
     CoreUser:
@@ -139,8 +137,6 @@ components:
     MessageSuccess:
       $ref: './components/schemas.yaml#/MessageSuccess'
   responses:
-    Success:
-      $ref: './components/responses.yaml#/Success'
     Error:
       $ref: './components/responses.yaml#/Error'
     Session:

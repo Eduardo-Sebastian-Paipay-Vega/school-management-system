@@ -1,8 +1,3 @@
-Success:
-  description: Operación completada
-  content:
-    application/json:
-      schema: { $ref: './schemas.yaml#/Success' }
 Error:
   description: Error de negocio o autorización
   content:
@@ -73,8 +68,148 @@ GuardianStudents:
   content:
     application/json:
       schema: { $ref: './schemas.yaml#/GuardianStudentsSuccess' }
+GuardianLinks:
+  description: Últimos 100 vínculos familiares del tenant, activos o revocados.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/GuardianLinkListSuccess' }
+Institution:
+  description: Datos y configuración de la institución del tenant.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/InstitutionSuccess' }
+Sites:
+  description: Sedes del tenant ordenadas por nombre.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/SiteListSuccess' }
+SiteCreated:
+  description: Sede creada.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/SiteCreatedSuccess' }
+Site:
+  description: Sede actualizada.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/SiteSuccess' }
+AcademicYears:
+  description: Años lectivos del tenant, del más reciente al más antiguo.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/AcademicYearListSuccess' }
+AcademicYearCreated:
+  description: Año lectivo creado inactivo.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/AcademicYearCreatedSuccess' }
+AcademicYearActivated:
+  description: Año lectivo activado; los demás quedan inactivos.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/AcademicYearActivatedSuccess' }
+AcademicPeriods:
+  description: Periodos del año ordenados por número.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/AcademicPeriodListSuccess' }
+AcademicPeriodCreated:
+  description: Periodo creado.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/AcademicPeriodCreatedSuccess' }
+AcademicPeriodClosed:
+  description: Periodo cerrado.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/AcademicPeriodClosedSuccess' }
+NonSchoolDays:
+  description: Días no lectivos del año ordenados por fecha.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/NonSchoolDayListSuccess' }
+NonSchoolDayCreated:
+  description: Día no lectivo registrado.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/NonSchoolDayCreatedSuccess' }
+Sections:
+  description: Grados y secciones del año.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/SectionListSuccess' }
+SectionCreated:
+  description: Sección creada.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/SectionCreatedSuccess' }
+GradingScales:
+  description: Escalas del año con sus rangos AD, A, B y C.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/GradingScaleListSuccess' }
+GradingScaleCreated:
+  description: Escala creada en borrador.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/GradingScaleCreatedSuccess' }
+GradingScaleApproved:
+  description: Escala publicada como vigente.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/GradingScaleApprovedSuccess' }
+Notifications:
+  description: Bandeja propia paginada (limit 1-100, por defecto 30).
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/NotificationListSuccess' }
+NotificationCreated:
+  description: Aviso creado para el destinatario.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/NotificationCreatedSuccess' }
+UnreadCount:
+  description: Cantidad de avisos propios sin leer.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/UnreadCountSuccess' }
+NotificationRead:
+  description: Aviso marcado como leído.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/NotificationReadSuccess' }
+NotificationPreferences:
+  description: Preferencias de correo guardadas por el usuario.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/NotificationPreferenceListSuccess' }
+NotificationPreference:
+  description: Preferencia de correo guardada.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/NotificationPreferenceSuccess' }
+PersonSearch:
+  description: Hasta 30 personas del tenant con documento enmascarado.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/PersonSearchSuccess' }
+Roles:
+  description: Roles con los permisos asignados en el tenant.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/RoleListSuccess' }
+Permissions:
+  description: Catálogo de permisos del núcleo.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/PermissionListSuccess' }
+RevealedDocument:
+  description: Documento de identidad descifrado tras registrar el motivo en auditoría.
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/RevealedDocumentSuccess' }
 Health:
-  description: Estado de PostgreSQL y Redis
+  description: Estado de PostgreSQL, Redis y particiones de auditoría
   content:
     application/json:
       schema:
@@ -83,4 +218,16 @@ Health:
         properties:
           status: { type: string, enum: [OK, DEGRADED] }
           timestamp: { type: string, format: date-time }
-          services: { type: object }
+          services:
+            type: object
+            required: [database, redis, auditPartitions]
+            properties:
+              database: { type: string, enum: [CONNECTED, DISCONNECTED] }
+              redis: { type: string, enum: [CONNECTED, DISCONNECTED] }
+              auditPartitions:
+                type: string
+                enum: [OK, MISSING_NEXT_MONTH, MISSING_CURRENT_MONTH, UNKNOWN]
+                description: >-
+                  Particiones UTC de logs_auditoria. MISSING_NEXT_MONTH es un aviso (HTTP 200);
+                  MISSING_CURRENT_MONTH implica escrituras auditadas fallando cerradas (HTTP 503).
+                  Ver docs/core/OPERACION_CORE.md.

@@ -6,7 +6,7 @@
 /guardians/students:
   get: { operationId: listLinkedStudents, description: 'Solo rol APODERADO con vínculo y consentimiento activos; requiere ficha verificadora institucional.', responses: { '200': { $ref: '../components/responses.yaml#/GuardianStudents' }, '503': { $ref: '../components/responses.yaml#/Error' } } }
 /guardians/links:
-  get: { operationId: listGuardianLinks, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  get: { operationId: listGuardianLinks, responses: { '200': { $ref: '../components/responses.yaml#/GuardianLinks' } } }
   post: { operationId: createGuardianLink, description: 'Solo vincula cuando fichas_apoderados_verificados contiene DNI hash, estudiante y parentesco activos cargados por Squad 2.', responses: { '201': { $ref: '../components/responses.yaml#/GuardianLinkCreated' }, '409': { $ref: '../components/responses.yaml#/Error' } } }
 /guardians/invitations:
   post: { operationId: inviteGuardian, responses: { '200': { $ref: '../components/responses.yaml#/Message' }, '503': { $ref: '../components/responses.yaml#/Error' } } }
@@ -14,4 +14,4 @@
   parameters:
     - { $ref: '../components/parameters.yaml#/GuardianId' }
     - { $ref: '../components/parameters.yaml#/StudentId' }
-  delete: { operationId: revokeGuardianLink, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  delete: { operationId: revokeGuardianLink, responses: { '200': { $ref: '../components/responses.yaml#/Message' } } }

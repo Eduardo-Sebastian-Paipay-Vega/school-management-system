@@ -1,37 +1,37 @@
 /school/institution:
-  get: { operationId: getInstitution, description: 'Permiso school:read.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
-  patch: { operationId: updateInstitution, description: 'Permiso school:manage.', responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  get: { operationId: getInstitution, description: 'Permiso school:read.', responses: { '200': { $ref: '../components/responses.yaml#/Institution' } } }
+  patch: { operationId: updateInstitution, description: 'Permiso school:manage.', responses: { '200': { $ref: '../components/responses.yaml#/Message' } } }
 /school/sites:
-  get: { operationId: listSites, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
-  post: { operationId: createSite, responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+  get: { operationId: listSites, responses: { '200': { $ref: '../components/responses.yaml#/Sites' } } }
+  post: { operationId: createSite, responses: { '201': { $ref: '../components/responses.yaml#/SiteCreated' } } }
 /school/sites/{id}:
   parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
-  patch: { operationId: updateSite, description: 'Solo SUPERADMIN del tenant; permite actualizar o desactivar una sede.', responses: { '200': { $ref: '../components/responses.yaml#/Success' }, '404': { $ref: '../components/responses.yaml#/Error' } } }
+  patch: { operationId: updateSite, description: 'Solo SUPERADMIN del tenant; permite actualizar o desactivar una sede.', responses: { '200': { $ref: '../components/responses.yaml#/Site' }, '404': { $ref: '../components/responses.yaml#/Error' } } }
 /school/years:
-  get: { operationId: listYears, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
-  post: { operationId: createYear, responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+  get: { operationId: listYears, responses: { '200': { $ref: '../components/responses.yaml#/AcademicYears' } } }
+  post: { operationId: createYear, responses: { '201': { $ref: '../components/responses.yaml#/AcademicYearCreated' } } }
 /school/years/{id}/activate:
   parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
-  post: { operationId: activateYear, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  post: { operationId: activateYear, responses: { '200': { $ref: '../components/responses.yaml#/AcademicYearActivated' } } }
 /school/years/{id}/periods:
   parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
-  get: { operationId: listPeriods, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
-  post: { operationId: createPeriod, responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+  get: { operationId: listPeriods, responses: { '200': { $ref: '../components/responses.yaml#/AcademicPeriods' } } }
+  post: { operationId: createPeriod, responses: { '201': { $ref: '../components/responses.yaml#/AcademicPeriodCreated' } } }
 /school/periods/{id}/close:
   parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
-  post: { operationId: closePeriod, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
+  post: { operationId: closePeriod, responses: { '200': { $ref: '../components/responses.yaml#/AcademicPeriodClosed' } } }
 /school/years/{id}/non-school-days:
   parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
-  get: { operationId: listNonSchoolDays, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
-  post: { operationId: createNonSchoolDay, responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+  get: { operationId: listNonSchoolDays, responses: { '200': { $ref: '../components/responses.yaml#/NonSchoolDays' } } }
+  post: { operationId: createNonSchoolDay, responses: { '201': { $ref: '../components/responses.yaml#/NonSchoolDayCreated' } } }
 /school/years/{id}/sections:
   parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
-  get: { operationId: listSections, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
-  post: { operationId: createSection, responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+  get: { operationId: listSections, responses: { '200': { $ref: '../components/responses.yaml#/Sections' } } }
+  post: { operationId: createSection, responses: { '201': { $ref: '../components/responses.yaml#/SectionCreated' } } }
 /school/years/{id}/scales:
   parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
-  get: { operationId: listScales, responses: { '200': { $ref: '../components/responses.yaml#/Success' } } }
-  post: { operationId: createScaleDraft, description: 'Crea AD, A, B y C en borrador; D-16 rige cualquier rango numérico.', responses: { '201': { $ref: '../components/responses.yaml#/Success' } } }
+  get: { operationId: listScales, responses: { '200': { $ref: '../components/responses.yaml#/GradingScales' } } }
+  post: { operationId: createScaleDraft, description: 'Crea AD, A, B y C en borrador; D-16 rige cualquier rango numérico.', responses: { '201': { $ref: '../components/responses.yaml#/GradingScaleCreated' } } }
 /school/scales/{id}/approve:
   parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
-  post: { operationId: approveScale, description: 'Requiere fuenteAprobacion documentada por Dirección. La modalidad DUAL_VIGESIMAL permanece bloqueada mientras D-16 esté pendiente.', responses: { '200': { $ref: '../components/responses.yaml#/Success' }, '409': { $ref: '../components/responses.yaml#/Error' } } }
+  post: { operationId: approveScale, description: 'Requiere fuenteAprobacion documentada por Dirección. La modalidad DUAL_VIGESIMAL permanece bloqueada mientras D-16 esté pendiente.', responses: { '200': { $ref: '../components/responses.yaml#/GradingScaleApproved' }, '409': { $ref: '../components/responses.yaml#/Error' } } }

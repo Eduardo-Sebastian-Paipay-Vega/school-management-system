@@ -859,14 +859,6 @@ export interface components {
             /** Format: password */
             password: string;
         };
-        Success: {
-            /** @constant */
-            success: true;
-            /** @description DTO especifico de la operacion. Las operaciones aun no migradas conservan esta forma generica temporalmente. */
-            data: unknown;
-            /** Format: date-time */
-            timestamp: string;
-        };
         Error: {
             /** @constant */
             success: false;
@@ -994,6 +986,20 @@ export interface components {
             /** Format: date-time */
             timestamp: string;
         };
+        PersonSearchSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** Format: uuid */
+                id: string;
+                nombres: string;
+                apellido_paterno: string;
+                apellido_materno: string | null;
+                documento_ultimos4: string | null;
+            }[];
+            /** Format: date-time */
+            timestamp: string;
+        };
         ImportRejectedRow: {
             line: number;
             reason: string;
@@ -1041,6 +1047,309 @@ export interface components {
             /** Format: date-time */
             timestamp: string;
         };
+        RoleListSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                id: number;
+                /** @enum {string} */
+                codigo: "SUPERADMIN" | "DIRECTIVO" | "COORDINADOR_ACADEMICO" | "SECRETARIA" | "DOCENTE" | "DOCENTE_CONTRATADO" | "TUTOR_AULA" | "PRACTICANTE" | "AUXILIAR" | "ESTUDIANTE" | "PORTERIA" | "APODERADO";
+                nombre: string;
+                descripcion: string | null;
+                permisos: string[];
+            }[];
+            /** Format: date-time */
+            timestamp: string;
+        };
+        PermissionListSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                codigo: string;
+                descripcion: string;
+            }[];
+            /** Format: date-time */
+            timestamp: string;
+        };
+        RevealedDocumentSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** @enum {string} */
+                tipo: "DNI" | "CE" | "PASAPORTE" | "PTP";
+                /** @description Documento completo descifrado; la respuesta usa Cache-Control no-store. */
+                documento: string;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        Institution: {
+            /** Format: uuid */
+            id: string;
+            codigo_modular: string;
+            nombre: string;
+            nivel_educativo: string;
+            direccion: string | null;
+            telefono: string | null;
+            /** @description Tomado de configuracion_institucional. */
+            escudo_url: string | null;
+            /** @description Tomado de configuracion_institucional. */
+            membrete_texto: string | null;
+            zona_horaria: string;
+            minutos_inactividad_sesion: number;
+        };
+        InstitutionSuccess: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Institution"];
+            /** Format: date-time */
+            timestamp: string;
+        };
+        Site: {
+            /** Format: uuid */
+            id: string;
+            nombre: string;
+            direccion: string | null;
+            activo: boolean;
+        };
+        SiteListSuccess: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Site"][];
+            /** Format: date-time */
+            timestamp: string;
+        };
+        SiteCreatedSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        SiteSuccess: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Site"];
+            /** Format: date-time */
+            timestamp: string;
+        };
+        AcademicYear: {
+            /** Format: uuid */
+            id: string;
+            anio: number;
+            /**
+             * Format: date-time
+             * @description Columna DATE serializada como instante ISO.
+             */
+            fecha_inicio: string;
+            /**
+             * Format: date-time
+             * @description Columna DATE serializada como instante ISO.
+             */
+            fecha_fin: string;
+            activo: boolean;
+        };
+        AcademicYearListSuccess: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AcademicYear"][];
+            /** Format: date-time */
+            timestamp: string;
+        };
+        AcademicYearCreatedSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** Format: uuid */
+                id: string;
+                anio: number;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        AcademicYearActivatedSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** Format: uuid */
+                id: string;
+                anio: number;
+                /** @constant */
+                activo: true;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        AcademicPeriod: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            tipo: "BIMESTRE" | "TRIMESTRE";
+            numero: number;
+            /**
+             * Format: date-time
+             * @description Columna DATE serializada como instante ISO.
+             */
+            fecha_inicio: string;
+            /**
+             * Format: date-time
+             * @description Columna DATE serializada como instante ISO.
+             */
+            fecha_fin: string;
+            /** Format: date-time */
+            fecha_limite_notas: string;
+            cerrado: boolean;
+        };
+        AcademicPeriodListSuccess: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AcademicPeriod"][];
+            /** Format: date-time */
+            timestamp: string;
+        };
+        AcademicPeriodCreatedSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** Format: uuid */
+                id: string;
+                numero: number;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        AcademicPeriodClosedSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** Format: uuid */
+                id: string;
+                /** @constant */
+                cerrado: true;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        NonSchoolDay: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * Format: date-time
+             * @description Columna DATE serializada como instante ISO.
+             */
+            fecha: string;
+            /** @enum {string} */
+            tipo: "FERIADO" | "VACACIONES" | "SUSPENSION" | "INSTITUCIONAL";
+            motivo: string;
+        };
+        NonSchoolDayListSuccess: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["NonSchoolDay"][];
+            /** Format: date-time */
+            timestamp: string;
+        };
+        NonSchoolDayCreatedSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** Format: uuid */
+                id: string;
+                /**
+                 * Format: date-time
+                 * @description Columna DATE serializada como instante ISO.
+                 */
+                fecha: string;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        Section: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            nivel: "INICIAL" | "PRIMARIA" | "SECUNDARIA";
+            grado: number;
+            seccion: string;
+            aforo_maximo: number;
+            /** Format: uuid */
+            sede_id: string | null;
+            /** Format: uuid */
+            tutor_id: string | null;
+        };
+        SectionListSuccess: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Section"][];
+            /** Format: date-time */
+            timestamp: string;
+        };
+        SectionCreatedSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                nivel: "INICIAL" | "PRIMARIA" | "SECUNDARIA";
+                grado: number;
+                seccion: string;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        GradingScale: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            nivel: "INICIAL" | "PRIMARIA" | "SECUNDARIA";
+            /** @enum {string} */
+            modalidad: "LITERAL" | "DUAL_VIGESIMAL";
+            /** @enum {string} */
+            estado: "BORRADOR" | "VIGENTE" | "REEMPLAZADA";
+            /** Format: date-time */
+            aprobada_en: string | null;
+            rangos: {
+                /** @enum {string} */
+                nivel: "AD" | "A" | "B" | "C";
+                min: number | null;
+                max: number | null;
+                descripcion: string;
+            }[];
+        };
+        GradingScaleListSuccess: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["GradingScale"][];
+            /** Format: date-time */
+            timestamp: string;
+        };
+        GradingScaleCreatedSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** Format: uuid */
+                id: string;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        GradingScaleApprovedSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** Format: uuid */
+                id: string;
+                /** @constant */
+                estado: "VIGENTE";
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
         GuardianConsentSuccess: {
             /** @constant */
             success: true;
@@ -1066,12 +1375,109 @@ export interface components {
             /** Format: date-time */
             timestamp: string;
         };
+        GuardianLinkListSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                apoderado_id: string;
+                /** Format: uuid */
+                estudiante_id: string;
+                /** @enum {string} */
+                parentesco: "PADRE" | "MADRE" | "TUTOR_LEGAL";
+                activo: boolean;
+                /** Format: date-time */
+                confirmado_en: string | null;
+                /** @description Nombres y apellido paterno. */
+                apoderado: string;
+                /** @description Nombres y apellido paterno. */
+                estudiante: string;
+            }[];
+            /** Format: date-time */
+            timestamp: string;
+        };
         GuardianLinkCreatedSuccess: {
             /** @constant */
             success: true;
             data: {
                 /** Format: uuid */
                 id: string;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        Notification: {
+            /** Format: uuid */
+            id: string;
+            categoria: string;
+            /** @enum {string|null} */
+            prioridad: "ALTA" | "NORMAL" | "BAJA" | null;
+            titulo: string;
+            mensaje: string;
+            enlace: string | null;
+            /** Format: date-time */
+            leida_en: string | null;
+            /** Format: date-time */
+            created_at: string | null;
+        };
+        NotificationListSuccess: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Notification"][];
+            /** Format: date-time */
+            timestamp: string;
+        };
+        NotificationCreatedSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                created_at: string | null;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        UnreadCountSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                count: number;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        NotificationReadSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                leida_en: string;
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        NotificationPreferenceListSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                categoria: string;
+                por_correo: boolean | null;
+            }[];
+            /** Format: date-time */
+            timestamp: string;
+        };
+        NotificationPreferenceSuccess: {
+            /** @constant */
+            success: true;
+            data: {
+                categoria: string;
+                porCorreo: boolean;
             };
             /** Format: date-time */
             timestamp: string;
@@ -1107,15 +1513,6 @@ export interface components {
         };
     };
     responses: {
-        /** @description Operación completada */
-        Success: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["Success"];
-            };
-        };
         /** @description Error de negocio o autorización */
         Error: {
             headers: {
@@ -1152,7 +1549,7 @@ export interface components {
                 "application/json": components["schemas"]["MessageSuccess"];
             };
         };
-        /** @description Estado de PostgreSQL y Redis */
+        /** @description Estado de PostgreSQL, Redis y particiones de auditoría */
         Health: {
             headers: {
                 [name: string]: unknown;
@@ -1163,7 +1560,17 @@ export interface components {
                     status: "OK" | "DEGRADED";
                     /** Format: date-time */
                     timestamp: string;
-                    services: Record<string, never>;
+                    services: {
+                        /** @enum {string} */
+                        database: "CONNECTED" | "DISCONNECTED";
+                        /** @enum {string} */
+                        redis: "CONNECTED" | "DISCONNECTED";
+                        /**
+                         * @description Particiones UTC de logs_auditoria. MISSING_NEXT_MONTH es un aviso (HTTP 200); MISSING_CURRENT_MONTH implica escrituras auditadas fallando cerradas (HTTP 503). Ver docs/core/OPERACION_CORE.md.
+                         * @enum {string}
+                         */
+                        auditPartitions: "OK" | "MISSING_NEXT_MONTH" | "MISSING_CURRENT_MONTH" | "UNKNOWN";
+                    };
                 };
             };
         };
@@ -1194,6 +1601,15 @@ export interface components {
                 "application/json": components["schemas"]["OwnProfileSuccess"];
             };
         };
+        /** @description Hasta 30 personas del tenant con documento enmascarado. */
+        PersonSearch: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["PersonSearchSuccess"];
+            };
+        };
         /** @description Validación del lote sin escritura. */
         ImportPreview: {
             headers: {
@@ -1210,6 +1626,186 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["ImportCommitSuccess"];
+            };
+        };
+        /** @description Roles con los permisos asignados en el tenant. */
+        Roles: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["RoleListSuccess"];
+            };
+        };
+        /** @description Catálogo de permisos del núcleo. */
+        Permissions: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["PermissionListSuccess"];
+            };
+        };
+        /** @description Documento de identidad descifrado tras registrar el motivo en auditoría. */
+        RevealedDocument: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["RevealedDocumentSuccess"];
+            };
+        };
+        /** @description Datos y configuración de la institución del tenant. */
+        Institution: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["InstitutionSuccess"];
+            };
+        };
+        /** @description Sedes del tenant ordenadas por nombre. */
+        Sites: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["SiteListSuccess"];
+            };
+        };
+        /** @description Sede creada. */
+        SiteCreated: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["SiteCreatedSuccess"];
+            };
+        };
+        /** @description Sede actualizada. */
+        Site: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["SiteSuccess"];
+            };
+        };
+        /** @description Años lectivos del tenant, del más reciente al más antiguo. */
+        AcademicYears: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["AcademicYearListSuccess"];
+            };
+        };
+        /** @description Año lectivo creado inactivo. */
+        AcademicYearCreated: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["AcademicYearCreatedSuccess"];
+            };
+        };
+        /** @description Año lectivo activado; los demás quedan inactivos. */
+        AcademicYearActivated: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["AcademicYearActivatedSuccess"];
+            };
+        };
+        /** @description Periodos del año ordenados por número. */
+        AcademicPeriods: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["AcademicPeriodListSuccess"];
+            };
+        };
+        /** @description Periodo creado. */
+        AcademicPeriodCreated: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["AcademicPeriodCreatedSuccess"];
+            };
+        };
+        /** @description Periodo cerrado. */
+        AcademicPeriodClosed: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["AcademicPeriodClosedSuccess"];
+            };
+        };
+        /** @description Días no lectivos del año ordenados por fecha. */
+        NonSchoolDays: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["NonSchoolDayListSuccess"];
+            };
+        };
+        /** @description Día no lectivo registrado. */
+        NonSchoolDayCreated: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["NonSchoolDayCreatedSuccess"];
+            };
+        };
+        /** @description Grados y secciones del año. */
+        Sections: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["SectionListSuccess"];
+            };
+        };
+        /** @description Sección creada. */
+        SectionCreated: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["SectionCreatedSuccess"];
+            };
+        };
+        /** @description Escalas del año con sus rangos AD, A, B y C. */
+        GradingScales: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["GradingScaleListSuccess"];
+            };
+        };
+        /** @description Escala creada en borrador. */
+        GradingScaleCreated: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["GradingScaleCreatedSuccess"];
+            };
+        };
+        /** @description Escala publicada como vigente. */
+        GradingScaleApproved: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["GradingScaleApprovedSuccess"];
             };
         };
         /** @description Texto y versión de consentimiento configurados. */
@@ -1230,6 +1826,15 @@ export interface components {
                 "application/json": components["schemas"]["GuardianStudentsSuccess"];
             };
         };
+        /** @description Últimos 100 vínculos familiares del tenant, activos o revocados. */
+        GuardianLinks: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["GuardianLinkListSuccess"];
+            };
+        };
         /** @description Vínculo familiar verificado y pendiente de aceptación. */
         GuardianLinkCreated: {
             headers: {
@@ -1237,6 +1842,60 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["GuardianLinkCreatedSuccess"];
+            };
+        };
+        /** @description Bandeja propia paginada (limit 1-100, por defecto 30). */
+        Notifications: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["NotificationListSuccess"];
+            };
+        };
+        /** @description Aviso creado para el destinatario. */
+        NotificationCreated: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["NotificationCreatedSuccess"];
+            };
+        };
+        /** @description Cantidad de avisos propios sin leer. */
+        UnreadCount: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["UnreadCountSuccess"];
+            };
+        };
+        /** @description Aviso marcado como leído. */
+        NotificationRead: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["NotificationReadSuccess"];
+            };
+        };
+        /** @description Preferencias de correo guardadas por el usuario. */
+        NotificationPreferences: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["NotificationPreferenceListSuccess"];
+            };
+        };
+        /** @description Preferencia de correo guardada. */
+        NotificationPreference: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["NotificationPreferenceSuccess"];
             };
         };
         /** @description Bitácora filtrada del tenant autenticado. */
@@ -1420,7 +2079,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Message"];
         };
     };
     changeOwnPassword: {
@@ -1432,7 +2091,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Message"];
         };
     };
     searchPersonsForGuardianLink: {
@@ -1444,7 +2103,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["PersonSearch"];
         };
     };
     previewUserImport: {
@@ -1481,7 +2140,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Roles"];
         };
     };
     listPermissions: {
@@ -1493,7 +2152,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Permissions"];
         };
     };
     updateRolePermissions: {
@@ -1507,7 +2166,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Message"];
         };
     };
     updateUser: {
@@ -1521,7 +2180,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Message"];
         };
     };
     inviteUser: {
@@ -1550,7 +2209,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Message"];
         };
     };
     reactivateUser: {
@@ -1564,7 +2223,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Message"];
         };
     };
     assignUserRoles: {
@@ -1578,7 +2237,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Message"];
         };
     };
     revealDocument: {
@@ -1592,7 +2251,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["RevealedDocument"];
         };
     };
     getInstitution: {
@@ -1604,7 +2263,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Institution"];
         };
     };
     updateInstitution: {
@@ -1616,7 +2275,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Message"];
         };
     };
     listSites: {
@@ -1628,7 +2287,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Sites"];
         };
     };
     createSite: {
@@ -1640,7 +2299,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            201: components["responses"]["Success"];
+            201: components["responses"]["SiteCreated"];
         };
     };
     updateSite: {
@@ -1654,7 +2313,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Site"];
             404: components["responses"]["Error"];
         };
     };
@@ -1667,7 +2326,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["AcademicYears"];
         };
     };
     createYear: {
@@ -1679,7 +2338,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            201: components["responses"]["Success"];
+            201: components["responses"]["AcademicYearCreated"];
         };
     };
     activateYear: {
@@ -1693,7 +2352,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["AcademicYearActivated"];
         };
     };
     listPeriods: {
@@ -1707,7 +2366,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["AcademicPeriods"];
         };
     };
     createPeriod: {
@@ -1721,7 +2380,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            201: components["responses"]["Success"];
+            201: components["responses"]["AcademicPeriodCreated"];
         };
     };
     closePeriod: {
@@ -1735,7 +2394,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["AcademicPeriodClosed"];
         };
     };
     listNonSchoolDays: {
@@ -1749,7 +2408,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["NonSchoolDays"];
         };
     };
     createNonSchoolDay: {
@@ -1763,7 +2422,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            201: components["responses"]["Success"];
+            201: components["responses"]["NonSchoolDayCreated"];
         };
     };
     listSections: {
@@ -1777,7 +2436,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Sections"];
         };
     };
     createSection: {
@@ -1791,7 +2450,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            201: components["responses"]["Success"];
+            201: components["responses"]["SectionCreated"];
         };
     };
     listScales: {
@@ -1805,7 +2464,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["GradingScales"];
         };
     };
     createScaleDraft: {
@@ -1819,7 +2478,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            201: components["responses"]["Success"];
+            201: components["responses"]["GradingScaleCreated"];
         };
     };
     approveScale: {
@@ -1833,7 +2492,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["GradingScaleApproved"];
             409: components["responses"]["Error"];
         };
     };
@@ -1899,7 +2558,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["GuardianLinks"];
         };
     };
     createGuardianLink: {
@@ -1940,7 +2599,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Message"];
         };
     };
     listNotifications: {
@@ -1952,7 +2611,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["Notifications"];
         };
     };
     sendNotification: {
@@ -1964,7 +2623,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            201: components["responses"]["Success"];
+            201: components["responses"]["NotificationCreated"];
         };
     };
     countUnreadNotifications: {
@@ -1976,7 +2635,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["UnreadCount"];
         };
     };
     markNotificationRead: {
@@ -1990,7 +2649,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["NotificationRead"];
         };
     };
     listNotificationPreferences: {
@@ -2002,7 +2661,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["NotificationPreferences"];
         };
     };
     setNotificationPreference: {
@@ -2016,7 +2675,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: components["responses"]["Success"];
+            200: components["responses"]["NotificationPreference"];
             409: components["responses"]["Error"];
         };
     };

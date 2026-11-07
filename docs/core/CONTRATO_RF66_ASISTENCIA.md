@@ -1,7 +1,7 @@
 # Contrato Core → Squad 2: corrección auditada de asistencia (RF-66) y aforo de sección (RF-12)
 
 **Origen:** Sprint 6, historias S6-04 y S6-06 de [`PLAN_IMPLEMENTACION_S6_S9.md`](PLAN_IMPLEMENTACION_S6_S9.md). **Proveedor:** Squad 1 (Core). **Consumidor:** Squad 2 (matrícula y asistencia, RF-16, RF-20–25).
-**Migraciones:** `database/migrations/20261107000200_s6_asistencia_tenant_y_correccion_auditada.sql` y `20261107000300_s6_aforo_seccion.sql`. **Pruebas:** `database/tests/migraciones.test.mjs` (bloque «S6-04 y S6-06») y `backend/tests/integration/tenant-isolation.test.cjs` (prueba «S6-06»).
+**Migraciones:** `database/migrations/20261107000200_s1_asistencia_tenant_y_correccion_auditada.sql` y `20261107000300_s1_aforo_seccion.sql`. **Pruebas:** `database/tests/migraciones.test.mjs` (bloque «S6-04 y S6-06») y `backend/tests/integration/tenant-isolation.test.cjs` (prueba «S6-06»).
 
 ## 1. Aislamiento de asistencia
 

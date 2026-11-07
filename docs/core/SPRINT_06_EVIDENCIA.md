@@ -15,7 +15,7 @@
 | S6-05 | — | Reasignada al Squad 2 según `CONTRATO_FICHA_RF15_RF75.md` (ver plan). | No aplica al Core |
 | S6-06 | `20261107000300_s1_aforo_seccion.sql`: `SECTION_FULL` con bloqueo de la fila de la sección. | `database/tests`: límite, cupo liberado al retirar, reactivación rechazada, otro tenant no comparte ocupación. Integración «S6-06»: dos matrículas concurrentes con aforo 1 → una aceptada y una `SECTION_FULL`. **Contraprueba:** sin `FOR UPDATE` la misma prueba falla (entran ambas). | Hecho en el Core; consumo pendiente del Squad 2. |
 | S6-07 | `/health` informa `services.auditPartitions` (`OK`, `MISSING_NEXT_MONTH` con 200, `MISSING_CURRENT_MONTH` con 503, `UNKNOWN`); runbook con cron y alertas en `OPERACION_CORE.md`. | Integración «S6-07»: retira la partición del mes siguiente → `MISSING_NEXT_MONTH` con 200; al recrearla → `OK`. | Hecho; esquema `Health` actualizado y validado en la prueba. |
-| S6-08 | Inspección visual autenticada con el Playwright del entorno, sin dependencia nueva en el repositorio. | En curso. | En curso |
+| S6-08 | Inspección visual autenticada con el Playwright del entorno, sin dependencia nueva en el repositorio: plantel y SUPERADMIN ficticios, activación por correo de captura, recorrido de Usuarios, alta e invitación, importación, edición, Año lectivo, Avisos, Auditoría y PDF, Roles, Apoderados, Perfil y cierre de sesión, a 375 y 1280 px (55 capturas, fuera del repositorio). | **2 defectos altos corregidos:** el tema PrimeReact quedaba anulado por el preflight de Tailwind sin capa (orden de capas en `frontend/app/css-layers.css`; activación: borde del input 0 → 1 px y botón transparente → granate; las 8 páginas del portal quedan idénticas píxel a píxel antes y después, salvo un punto animado), y la página tenía scroll horizontal a 375 px (`TabView scrollable`). Defectos medios de interfaz corregidos: error de red en inglés y prefijo «Error:». Defectos medios de validación en el backend: ver la sección siguiente. | Hecho; falta repetir la inspección autenticada tras integrar todo. |
 | S6-09 | Ensayo del *contract* sobre la copia del piloto. | Sin datos reales del piloto: la puerta sigue abierta. | Abierta |
 
 ## Verificaciones ejecutadas
@@ -39,12 +39,13 @@ Entorno local con las variables del job `core-integration`. Base nueva para la s
 
 **Contrapruebas de las guardas:** S6-01 detecta las 11 tablas sobre el esquema previo; S6-02 detecta `pool` importado con alias y `pool.connect()` nuevo; S6-06 falla sin `FOR UPDATE`.
 
-## Defectos encontrados y no corregidos (fuera del alcance de S6)
+## Defectos encontrados al derivar los DTO (corregidos en `b83ba1a`)
 
-Detectados al derivar los DTO de S6-03. Se registran para S7, sin cambiar el comportamiento en este sprint:
+1. **Fechas `DATE`.** Salían como instante ISO; ahora salen como `YYYY-MM-DD` (parser de `pg` en `config/database.ts`). Esto corrige además las validaciones `OUT_OF_YEAR` de periodos y días no lectivos, que comparaban texto con `Date` y nunca rechazaban nada. **Cambio de formato de la API.**
+2. **`GET /users/roles`** responde 500 `ROLES_ERROR` en lugar de quedar colgado. Era la única ruta sin `try/catch`.
+3. **Preferencias de aviso:** el `PUT` responde `{categoria, por_correo}`, igual que el `GET`. El cuerpo de la petición sigue siendo `{porCorreo}`. **Cambio de formato de la respuesta.**
+4. **Contrato:** el `DELETE` de vínculos declara el 404 `LINK_NOT_FOUND`.
+5. **`GET /guardians/links`** devuelve solo vínculos activos; `?estado=todos` incluye los revocados y un valor inválido da 400. Decisión basada en RF-75, que no pide historial («al desvincular o dar de baja (RF-72) pierde el acceso de inmediato»).
 
-1. Las columnas `DATE` (`fecha_inicio`, `fecha_fin`, `fecha`) salen como instante ISO (`2027-03-01T00:00:00.000Z`) porque `pg` no tiene parser para `DATE`. Con el proceso en una zona distinta de UTC, el día mostrado puede desplazarse. Corregirlo cambia el formato de la API (`YYYY-MM-DD`) y requiere coordinarlo con el frontend.
-2. `GET /users/roles` no captura errores: con Express 4, un fallo de la consulta deja la petición colgada en lugar de responder 500.
-3. `PUT /notifications/preferences/{category}` responde `porCorreo` y `GET /notifications/preferences` responde `por_correo`.
-4. `DELETE /guardians/links/{guardianId}/{studentId}` puede responder 404 `LINK_NOT_FOUND`, que el contrato no declara.
-5. `GET /guardians/links` también lista vínculos revocados (`activo: false`) con nombres, hasta 100 filas. Hay que revisar si el uso previsto lo exige.
+Cada corrección tiene una prueba «S7: …» en `tenant-isolation.test.cjs` que falla sin el cambio (comprobado revirtiendo `backend/src`: 26/31).
+

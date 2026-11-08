@@ -45,13 +45,13 @@ export default function Navbar() {
       {/* Top Banner - Institutional Identity */}
       <div className="border-b border-brand-dark bg-brand-dark text-white text-[11px]">
         <div className="content-width flex min-h-9 flex-wrap items-center justify-between gap-x-4 gap-y-1 py-1.5">
-          <div className="flex items-center gap-2 font-medium text-accent-cream truncate">
+          <div className="flex min-w-0 flex-1 items-center gap-2 font-medium text-accent-cream">
             <span className="inline-block h-2 w-2 rounded-full bg-accent-gold animate-pulse shrink-0" />
-            <span className="font-semibold truncate">Universidad Nacional de San Cristóbal de Huamanga (UNSCH)</span>
+            <span className="min-w-0 truncate font-semibold">Universidad Nacional de San Cristóbal de Huamanga (UNSCH)</span>
             <span className="hidden md:inline text-white/40">|</span>
             <span className="hidden md:inline text-white/90 shrink-0">Ayacucho, Perú · Cód. 050101</span>
           </div>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-white/80 shrink-0 text-[11px]">
+          <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-2 gap-y-1 text-[11px] text-white/80 sm:shrink-0 sm:gap-x-4">
             <a
               href="https://www.unsch.edu.pe/"
               target="_blank"
@@ -65,10 +65,10 @@ export default function Navbar() {
               <Lock size={11} className="text-accent-gold" />
               <span>Intranet</span>
             </Link>
-            <Link href="/admision" className="transition hover:text-accent-gold font-medium">
+            <Link href="/admision" className="hidden transition hover:text-accent-gold font-medium sm:inline">
               Admisión 2027
             </Link>
-            <Link href="/contacto" className="transition hover:text-accent-gold">
+            <Link href="/contacto" className="hidden transition hover:text-accent-gold sm:inline">
               Mesa de Partes
             </Link>
             <span className="hidden lg:inline-flex items-center gap-1 font-mono text-accent-gold">

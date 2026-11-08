@@ -49,4 +49,4 @@ Registrar el resultado de cada transición y sus pruebas. No ejecutar CLI desde 
 
 ## 6. Puertas antes del piloto
 
-La [matriz de 22 RF](../core/SPRINT_08_MATRIZ_ACEPTACION.md) distingue prueba técnica de aceptación. Faltan alojamiento D-19, protección de ramas, validación visual/accesibilidad, aprobación de datos y seguridad, ficha oficial RF-15 y consentimiento RF-75, decisión D-16 y contratos entre squads señalados en la matriz. El piloto real permanece en Guamán Poma de Ayala; otros planteles reales no se incorporan por este runbook.
+La [matriz de 22 RF](../core/SPRINT_08_MATRIZ_ACEPTACION.md) distingue prueba técnica de aceptación. Las protecciones de `dev` y `main` ya están configuradas con seis checks obligatorios (y una aprobación requerida en `main`). Faltan alojamiento D-19, aceptación visual/accesibilidad de la UI autenticada, aprobación de datos y seguridad, ficha oficial RF-15 y consentimiento RF-75, decisión D-16 y contratos entre squads señalados en la matriz. El piloto real permanece en Guamán Poma de Ayala; otros planteles reales no se incorporan por este runbook.

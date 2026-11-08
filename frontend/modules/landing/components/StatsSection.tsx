@@ -35,10 +35,10 @@ export default function StatsSection({ stats }: StatsSectionProps) {
               idx !== stats.length - 1 ? 'md:border-r md:border-gray-200' : ''
             }`}
           >
-            <div className="text-3xl font-black tracking-tight text-brand md:text-4xl transition-colors duration-150 hover:text-brand-dark">
+            <div className="font-heading text-3xl font-extrabold tracking-tight text-brand md:text-4xl transition-colors duration-150 hover:text-brand-dark">
               {item.number}
             </div>
-            <div className="mt-1 text-xs font-extrabold uppercase tracking-wider text-gray-800">
+            <div className="mt-1 font-display text-xs font-bold uppercase tracking-wider text-gray-800">
               {item.label}
             </div>
             <div className="mt-0.5 text-[11px] text-gray-500">{item.detail}</div>

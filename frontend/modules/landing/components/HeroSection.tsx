@@ -33,7 +33,7 @@ export default function HeroSection() {
                 className="h-full w-full object-contain"
               />
             </div>
-            <span className="text-xs font-black uppercase tracking-[.22em] text-accent-cream">
+            <span className="font-display text-xs font-bold uppercase tracking-[.22em] text-accent-cream">
               62 Años de Excelencia Académica · UNSCH Ayacucho
             </span>
           </motion.div>
@@ -43,7 +43,7 @@ export default function HeroSection() {
             initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.26, delay: shouldReduceMotion ? 0 : 0.05, ease: easeOut }}
-            className="hero-text-shadow text-4xl font-black leading-[1.08] tracking-[-0.03em] sm:text-5xl md:text-6xl"
+            className="hero-text-shadow font-heading text-4xl font-extrabold leading-[1.08] tracking-[-0.03em] sm:text-5xl md:text-6xl"
           >
             Educación de Excelencia con{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cream via-accent-gold to-white">
@@ -59,9 +59,11 @@ export default function HeroSection() {
             transition={{ duration: 0.26, delay: shouldReduceMotion ? 0 : 0.10, ease: easeOut }}
             className="mt-6 max-w-2xl text-base font-medium leading-relaxed text-accent-cream/95 md:text-lg"
           >
-            Más de 62 años formando líderes e investigadores desde Inicial hasta Secundaria en los{' '}
-            <strong className="text-white">Planteles de Aplicación Guamán Poma de Ayala</strong>,
+            Más de 62 años formando líderes e investigadores en los niveles Inicial, Primaria y Secundaria en los{' '}
+            <strong className="text-white">Planteles de Aplicación Guamán Poma de Ayala</strong>, laboratorio pedagógico de la
+            <strong className="text-white"> Facultad de Ciencias de la Educación</strong>, 
             adscritos a la histórica{' '}
+      
             <strong className="text-accent-gold">
               Universidad Nacional de San Cristóbal de Huamanga (UNSCH)
             </strong>.

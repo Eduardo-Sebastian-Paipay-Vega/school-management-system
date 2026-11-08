@@ -80,13 +80,14 @@ export default function HomePage() {
       <StatsSection stats={stats} />
 
       {/* SECTION 2: BENTO GRID ¿POR QUÉ ELEGIRNOS? PREVIEW (Server-Rendered + content-visibility) */}
-      <section className="content-width py-28 content-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <section className="bg-accent-ivory/50 border-y border-accent-cream/50 py-28 content-auto">
+        <div className="content-width">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="max-w-2xl">
-            <p className="text-xs font-bold uppercase tracking-[.25em] text-accent-gold">
+            <p className="font-display text-xs font-bold uppercase tracking-[.25em] text-accent-rouge">
               Propuesta de Valor Institucional
             </p>
-            <h2 className="mt-2 text-3xl font-black tracking-[-0.03em] text-brand-dark sm:text-4xl md:text-5xl">
+            <h2 className="mt-2 font-heading text-3xl font-bold tracking-tight text-brand-dark sm:text-4xl md:text-5xl">
               ¿Por qué elegir el Colegio Guamán Poma?
             </h2>
             <p className="mt-3 text-base text-gray-600">
@@ -96,15 +97,15 @@ export default function HomePage() {
           </div>
           <Link
             href="/por-que-elegirnos"
-            className="inline-flex shrink-0 items-center gap-2 rounded-2xl border border-brand bg-white px-6 py-3.5 text-xs font-black uppercase tracking-wider text-brand hover:bg-brand hover:text-white transition-colors duration-150 shadow-sm active:scale-[0.98]"
+            className="inline-flex shrink-0 items-center gap-2 rounded-2xl border border-brand bg-white px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-brand hover:bg-brand hover:text-white transition-colors duration-150 shadow-sm active:scale-[0.98]"
           >
             <span>Ver propuesta completa</span>
             <ArrowRight size={15} />
           </Link>
-        </div>
+          </div>
 
-        {/* Asymmetrical Bento Box */}
-        <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-12">
+          {/* Asymmetrical Bento Box */}
+          <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-12">
           {/* Card 1: 7 Cols */}
           <div className="card-hover-lift md:col-span-7 flex flex-col justify-between rounded-3xl border border-gray-200/90 bg-gradient-to-br from-white via-accent-ivory/40 to-accent-cream/20 p-8 shadow-card hover:border-brand hover:shadow-elevated">
             <div>
@@ -112,11 +113,11 @@ export default function HomePage() {
                 <div className="inline-flex rounded-2xl bg-brand/10 p-4 text-brand">
                   <Building2 size={32} strokeWidth={1.8} />
                 </div>
-                <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-[11px] font-black uppercase tracking-wider text-brand shadow-sm">
+                <span className="font-display rounded-full border border-gray-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-brand shadow-sm">
                   Acreditación UNSCH
                 </span>
               </div>
-              <h3 className="mt-6 text-2xl font-black tracking-tight text-brand-dark">
+              <h3 className="mt-6 font-heading text-2xl font-bold tracking-tight text-brand-dark">
                 Respaldo Académico Universitario
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-gray-600">
@@ -126,7 +127,7 @@ export default function HomePage() {
               </p>
             </div>
             <div className="mt-8 border-t border-gray-200/70 pt-4 flex items-center justify-between">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-accent-rouge">
+              <span className="font-display text-xs font-bold uppercase tracking-wider text-accent-rouge">
                 Supervisión y rigor universitario
               </span>
               <ArrowRight size={16} className="text-brand" />
@@ -139,7 +140,7 @@ export default function HomePage() {
               <div className="inline-flex rounded-2xl bg-accent-gold/20 p-4 text-brand-dark">
                 <Trophy size={32} strokeWidth={1.8} />
               </div>
-              <h3 className="mt-6 text-2xl font-black tracking-tight text-brand-dark">
+              <h3 className="mt-6 font-heading text-2xl font-bold tracking-tight text-brand-dark">
                 4 Losas Techadas 2026
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-gray-600">
@@ -162,7 +163,7 @@ export default function HomePage() {
               <div className="inline-flex rounded-2xl bg-brand/10 p-4 text-brand">
                 <GraduationCap size={32} strokeWidth={1.8} />
               </div>
-              <h3 className="mt-6 text-xl font-black tracking-tight text-brand-dark">
+              <h3 className="mt-6 font-heading text-xl font-bold tracking-tight text-brand-dark">
                 Preparación Pre-Universitaria Intensiva
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-gray-600">
@@ -185,7 +186,7 @@ export default function HomePage() {
               <div className="inline-flex rounded-2xl bg-accent-ivory p-4 text-brand">
                 <Microscope size={32} strokeWidth={1.8} />
               </div>
-              <h3 className="mt-6 text-xl font-black tracking-tight text-brand-dark">
+              <h3 className="mt-6 font-heading text-xl font-bold tracking-tight text-brand-dark">
                 Acceso a Laboratorios Universitarios
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-gray-600">
@@ -201,18 +202,19 @@ export default function HomePage() {
               <ArrowRight size={14} />
             </Link>
           </div>
+          </div>
         </div>
       </section>
 
       {/* SECTION 3: NIVELES EDUCATIVOS PREVIEW (Server-Rendered + content-visibility) */}
-      <section className="border-y border-gray-200 bg-accent-ivory/50 py-28 content-auto">
+      <section className="border-y border-gray-200 bg-white py-28 content-auto">
         <div className="content-width">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[.25em] text-accent-gold">
+              <p className="font-display text-xs font-bold uppercase tracking-[.25em] text-accent-rouge">
                 Educación Básica Regular
               </p>
-              <h2 className="mt-2 text-3xl font-black tracking-[-0.03em] text-brand-dark sm:text-4xl">
+              <h2 className="mt-2 font-heading text-3xl font-bold tracking-tight text-brand-dark sm:text-4xl">
                 Nuestros Tres Niveles Formativos
               </h2>
               <p className="mt-2 text-sm text-gray-600 md:text-base">
@@ -221,7 +223,7 @@ export default function HomePage() {
             </div>
             <Link
               href="/niveles"
-              className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-brand px-6 py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-md hover:bg-brand-dark active:scale-[0.98] transition-colors duration-150"
+              className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-brand px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-brand-dark active:scale-[0.98] transition-colors duration-150"
             >
               <span>Explorar los 3 niveles</span>
               <ArrowRight size={15} />
@@ -236,16 +238,16 @@ export default function HomePage() {
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="rounded-full bg-accent-ivory border border-accent-cream px-3 py-1 text-xs font-black text-brand">
+                    <span className="font-display rounded-full bg-accent-ivory border border-accent-cream px-3 py-1 text-xs font-bold text-brand">
                       {lvl.badge}
                     </span>
                     {lvl.featured && (
-                      <span className="rounded-full bg-accent-gold/20 px-3 py-1 text-[11px] font-extrabold text-brand-dark">
+                      <span className="font-display rounded-full bg-accent-gold/20 px-3 py-1 text-[11px] font-bold text-brand-dark">
                         Nivel Troncal
                       </span>
                     )}
                   </div>
-                  <h3 className="mt-4 text-2xl font-black text-brand-dark">{lvl.title}</h3>
+                  <h3 className="mt-4 font-heading text-2xl font-bold text-brand-dark">{lvl.title}</h3>
                   <p className="mt-1 text-xs font-semibold text-accent-rouge">{lvl.director}</p>
                   <p className="mt-4 text-sm leading-relaxed text-gray-600">{lvl.description}</p>
                 </div>
@@ -253,7 +255,7 @@ export default function HomePage() {
                 <div className="mt-8 border-t border-gray-100 pt-5">
                   <Link
                     href="/niveles"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-accent-ivory py-3.5 text-xs font-extrabold uppercase tracking-wider text-brand hover:bg-brand hover:text-white transition-colors duration-150 active:scale-[0.98]"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-accent-ivory py-3.5 text-xs font-bold uppercase tracking-wider text-brand hover:bg-brand hover:text-white transition-colors duration-150 active:scale-[0.98]"
                   >
                     <span>Ver Currículo y Detalles</span>
                     <ArrowRight size={14} />
@@ -266,14 +268,15 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 4: TESTIMONIAL PREVIEW (Server-Rendered + content-visibility) */}
-      <section className="content-width py-28 content-auto">
-        <div className="rounded-3xl border border-accent-cream bg-gradient-to-br from-white via-accent-ivory to-white p-8 sm:p-12 shadow-card">
+      <section className="bg-accent-ivory/50 border-y border-accent-cream/50 py-28 content-auto">
+        <div className="content-width">
+          <div className="rounded-3xl border border-accent-cream bg-gradient-to-br from-white via-accent-ivory to-white p-8 sm:p-12 shadow-card">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 text-accent-gold font-bold text-xs uppercase tracking-widest">
+            <div className="font-display inline-flex items-center gap-2 text-accent-rouge font-bold text-xs uppercase tracking-widest">
               <Quote size={20} />
               <span>Orgullo Guamampomino</span>
             </div>
-            <blockquote className="mt-4 text-xl sm:text-2xl font-black text-brand-dark leading-snug">
+            <blockquote className="mt-4 font-heading text-xl sm:text-2xl font-medium italic text-brand-dark leading-snug">
               &ldquo;Estudiar en el Guamán Poma me dio la disciplina y la base científica para ingresar en primer
               puesto a la Facultad de Ingeniería de la UNSCH. Los laboratorios y el rigor de los docentes marcan la diferencia.&rdquo;
             </blockquote>
@@ -291,6 +294,7 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
+          </div>
         </div>
       </section>
 
@@ -298,10 +302,10 @@ export default function HomePage() {
       <section className="border-t border-gray-200 bg-brand-dark py-20 text-white hero-two content-auto">
         <div className="content-width flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="max-w-2xl">
-            <span className="rounded-full bg-accent-gold/20 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-accent-gold">
+            <span className="font-display rounded-full bg-accent-gold/20 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-accent-gold">
               Convocatoria Oficial
             </span>
-            <h2 className="mt-3 text-3xl font-black text-white sm:text-4xl md:text-5xl">
+            <h2 className="mt-3 font-heading text-3xl font-bold text-white sm:text-4xl md:text-5xl">
               Admisión y Matrícula 2027
             </h2>
             <p className="mt-3 text-sm sm:text-base text-accent-cream/90 leading-relaxed">
@@ -320,13 +324,14 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 6: NOTICIAS PREVIEW (Server-Rendered + content-visibility) */}
-      <section className="content-width py-28 content-auto">
-        <div className="mb-12 flex flex-wrap items-end justify-between gap-4">
+      <section className="bg-accent-ivory/40 border-b border-accent-cream/40 py-28 content-auto">
+        <div className="content-width">
+          <div className="mb-12 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[.25em] text-accent-gold">
+            <p className="font-display text-xs font-bold uppercase tracking-[.25em] text-accent-rouge">
               Actualidad y Vida Escolar
             </p>
-            <h2 className="text-3xl font-black tracking-[-0.03em] text-brand-dark sm:text-4xl">
+            <h2 className="font-heading text-3xl font-bold tracking-tight text-brand-dark sm:text-4xl">
               Últimas Noticias del Colegio
             </h2>
           </div>
@@ -337,9 +342,9 @@ export default function HomePage() {
             <span>Ver todas las noticias</span>
             <ArrowRight size={16} />
           </Link>
-        </div>
+          </div>
 
-        <div className="grid gap-8 md:grid-cols-3">
+          <div className="grid gap-8 md:grid-cols-3">
           {homeNews.map(item => (
             <article
               key={item.title}
@@ -347,7 +352,7 @@ export default function HomePage() {
             >
               <div className="card-img relative h-48 flex items-center justify-center p-6">
                 <Building2 size={72} className="text-brand-dark/20" />
-                <div className="absolute top-4 left-4 rounded-full border border-accent-cream bg-white/95 px-3 py-1 text-[11px] font-extrabold tracking-wider text-brand shadow">
+                <div className="font-display absolute top-4 left-4 rounded-full border border-accent-cream bg-white/95 px-3 py-1 text-[11px] font-bold tracking-wider text-brand shadow">
                   {item.category}
                 </div>
                 <div className="absolute bottom-3 right-4 flex items-center gap-1.5 rounded-md bg-black/60 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur">
@@ -358,7 +363,7 @@ export default function HomePage() {
 
               <div className="flex flex-1 flex-col justify-between p-6">
                 <div>
-                  <h3 className="line-clamp-2 text-base font-extrabold leading-snug text-gray-900">
+                  <h3 className="line-clamp-2 font-heading text-base font-bold leading-snug text-gray-900">
                     {item.title}
                   </h3>
                   <p className="mt-3 line-clamp-3 text-xs leading-relaxed text-gray-600">
@@ -377,6 +382,7 @@ export default function HomePage() {
               </div>
             </article>
           ))}
+          </div>
         </div>
       </section>
     </div>

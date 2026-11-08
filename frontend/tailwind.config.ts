@@ -67,6 +67,12 @@ const config: Config = {
         card: '0 10px 35px rgba(60, 0, 0, 0.08)',
         elevated: '0 20px 40px rgba(80, 0, 0, 0.12)',
       },
+      fontFamily: {
+        sans: ['var(--font-sans)', 'system-ui', '-apple-system', 'sans-serif'],
+        heading: ['var(--font-heading)', 'var(--font-sans)', 'sans-serif'],
+        display: ['var(--font-heading)', 'var(--font-sans)', 'sans-serif'],
+        serif: ['var(--font-heading)', 'Georgia', 'serif'],
+      },
     },
   },
   plugins: [],

@@ -105,7 +105,7 @@ export default function Navbar() {
                 <span className="text-gray-300">·</span>
                 <span className="text-accent-gold">Colegio de Aplicación</span>
               </div>
-              <h1 className="text-sm sm:text-base font-black leading-tight tracking-[-0.02em] text-brand">
+              <h1 className="font-heading text-sm sm:text-base font-extrabold leading-tight tracking-tight text-brand">
                 Guamán Poma de Ayala
               </h1>
               <p className="hidden md:block text-[9.5px] font-medium text-gray-500">

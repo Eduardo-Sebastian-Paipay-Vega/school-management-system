@@ -24,14 +24,14 @@ export default function StatsSection({ stats }: StatsSectionProps) {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
         transition={{ duration: 0.25, ease: easeOut }}
-        className="grid grid-cols-2 gap-3 rounded-3xl border border-accent-cream bg-white p-6 shadow-xl md:grid-cols-4 md:p-8"
+        className="grid grid-cols-2 gap-2 rounded-3xl border border-accent-cream bg-white p-3 shadow-xl sm:gap-3 sm:p-6 md:grid-cols-4 md:p-8"
       >
         {stats.map((item, idx) => (
           <motion.div
             key={item.label}
             whileHover={shouldReduceMotion ? undefined : { y: -2 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
-            className={`p-3 text-center cursor-default ${
+            className={`min-w-0 p-2 text-center cursor-default sm:p-3 ${
               idx !== stats.length - 1 ? 'md:border-r md:border-gray-200' : ''
             }`}
           >

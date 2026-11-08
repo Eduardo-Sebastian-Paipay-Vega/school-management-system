@@ -80,7 +80,7 @@ export default function HomePage() {
       <StatsSection stats={stats} />
 
       {/* SECTION 2: BENTO GRID ¿POR QUÉ ELEGIRNOS? PREVIEW (Server-Rendered + content-visibility) */}
-      <section className="bg-accent-ivory/50 border-y border-accent-cream/50 py-28 content-auto">
+      <section className="bg-accent-ivory/50 border-y border-accent-cream/50 py-16 content-auto sm:py-20 md:py-28">
         <div className="content-width">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="max-w-2xl">
@@ -207,7 +207,7 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 3: NIVELES EDUCATIVOS PREVIEW (Server-Rendered + content-visibility) */}
-      <section className="border-y border-gray-200 bg-white py-28 content-auto">
+      <section className="border-y border-gray-200 bg-white py-16 content-auto sm:py-20 md:py-28">
         <div className="content-width">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
@@ -268,7 +268,7 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 4: TESTIMONIAL PREVIEW (Server-Rendered + content-visibility) */}
-      <section className="bg-accent-ivory/50 border-y border-accent-cream/50 py-28 content-auto">
+      <section className="bg-accent-ivory/50 border-y border-accent-cream/50 py-16 content-auto sm:py-20 md:py-28">
         <div className="content-width">
           <div className="rounded-3xl border border-accent-cream bg-gradient-to-br from-white via-accent-ivory to-white p-8 sm:p-12 shadow-card">
           <div className="max-w-3xl">
@@ -324,7 +324,7 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 6: NOTICIAS PREVIEW (Server-Rendered + content-visibility) */}
-      <section className="bg-accent-ivory/40 border-b border-accent-cream/40 py-28 content-auto">
+      <section className="bg-accent-ivory/40 border-b border-accent-cream/40 py-16 content-auto sm:py-20 md:py-28">
         <div className="content-width">
           <div className="mb-12 flex flex-wrap items-end justify-between gap-4">
           <div>

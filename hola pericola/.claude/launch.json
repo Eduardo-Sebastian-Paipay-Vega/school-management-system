@@ -1,0 +1,48 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "backend",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["BACKEND/manage.py", "runserver"],
+      "port": 8000
+    },
+    {
+      "name": "backend-venv",
+      "runtimeExecutable": "BACKEND/.venv/Scripts/python.exe",
+      "runtimeArgs": ["BACKEND/manage.py", "runserver"],
+      "port": 8000
+    },
+    {
+      "name": "jsreport",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "jsreport", "run", "start"],
+      "env": { "PORT": "5491", "extensions_chromePdf_launchOptions_executablePath": "C:/Program Files/Google/Chrome/Application/chrome.exe" },
+      "port": 5491
+    },
+    {
+      "name": "frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "frontend", "run", "start"],
+      "port": 4200
+    },
+    {
+      "name": "plataforma-backend",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["BACKEND/manage.py", "plataforma", "runserver"],
+      "port": 8002
+    },
+    {
+      "name": "plataforma-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "frontend", "exec", "--", "ng", "serve", "plataforma"],
+      "port": 4202
+    },
+    {
+      "name": "frontend-celular",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "frontend", "run", "start", "--", "--host", "0.0.0.0", "--port", "4300", "--ssl", "--proxy-config", "C:/Users/Usuario/AppData/Local/Temp/claude/C--DAAA-bi-compusur/60ef132d-642b-4c0f-aae3-86dbf1df3ae5/scratchpad/proxy.celular.cjs"],
+      "port": 4300
+    }
+  ]
+}

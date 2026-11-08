@@ -18,7 +18,7 @@ El backend necesita un proceso persistente: usa WebSocket (`/api/v1/notification
 | Entorno | Propósito | Base de datos | Migraciones | Estado |
 |---|---|---|---|---|
 | Local | Desarrollo | `docker compose up -d postgres redis` | Manual, `database/` | Disponible (requiere Docker) |
-| CI | Verificación de PR y `dev`/`main` | PGlite en memoria (solo `database/` y M8) | Automáticas sobre base vacía | `.github/workflows/ci.yml` |
+| CI | Verificación de PR y push a `dev`/`main` | PGlite para migraciones/M8; PostgreSQL 16 y Redis 7 para Core con dos tenants ficticios | Automáticas sobre base vacía y copia restaurada | `.github/workflows/ci.yml` |
 | Staging | Aceptación integrada con datos de prueba | Por definir | Manual con volcado previo | **No existe** |
 | Producción | Uso institucional | Por definir | Manual, autorizada por el líder | **No existe** |
 
@@ -85,6 +85,8 @@ Secuencia completa en [`docs/core/OPERACION_CORE.md`](../core/OPERACION_CORE.md)
 | Errores | Sobre canónico; los 500 no exponen detalle técnico (`core/http/errors.ts`) |
 | Migraciones | Paso manual con volcado previo; nunca automático en el arranque |
 | Rollback de aplicación | Redesplegar el artefacto anterior; compatible solo si la migración aplicada fue *expand* |
-| Recuperación de datos | Sin respaldo definido ni restauración probada ([05-database.md](../architecture/05-database.md) §6) |
-| Protección de ramas | Requiere permisos de administración en GitHub (D-13): exigir el workflow `CI` en `dev` y `main` |
+| Recuperación de datos | CI ensaya `pg_dump`/`pg_restore` en una copia ficticia y verifica RLS, cadena y descifrado; faltan almacenamiento, frecuencia, retención y ensayo de restauración del entorno institucional ([operación Core](../core/OPERACION_CORE.md)) |
+| Protección de ramas | **Sin configurar al corte S8**: la API de GitHub devuelve `Branch not protected` para `dev` y `main`. El workflow corre en PR/push, pero sus checks aún no son obligatorios para fusionar. El propietario debe exigir los jobs técnicos de `CI` en ambas ramas (D-13). |
 | Despliegue automático | **No se configura.** Todo despliegue requiere autorización del líder |
+
+Los [runbooks Core SaaS](runbooks-core-saas.md) cubren incidente, migración y rollback, provisión/suspensión/baja, claves y tareas periódicas. El [plan S8](../core/SPRINT_08_PLAN.md) y la [matriz de los 22 RF](../core/SPRINT_08_MATRIZ_ACEPTACION.md) separan evidencia técnica de aceptación del piloto.

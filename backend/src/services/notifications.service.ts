@@ -9,6 +9,13 @@ const key = (tenantId: string, userId: string) => `${tenantId}:${userId}`;
 
 export class NotificationService {
   private static subscriber: ReturnType<typeof redisClient.duplicate> | null = null;
+  private static async tenantIsActive(tenantId:string):Promise<boolean>{
+    return withTenant(tenantId,'',async client=>{
+      const found=await client.query(`SELECT 1 FROM instituciones
+        WHERE id=$1 AND activo IS TRUE AND estado_tenant='ACTIVO'`,[tenantId]);
+      return found.rowCount===1;
+    });
+  }
   static async startPubsub(): Promise<void> {
     if(!redisClient.isReady || this.subscriber)return;
     const subscriber=redisClient.duplicate();
@@ -51,6 +58,7 @@ export class NotificationService {
   }
 
   static async publish(tenantId: string, userId: string, event: object): Promise<void> {
+    if(!await this.tenantIsActive(tenantId))return;
     if(redisClient.isReady)await redisClient.publish(`sms:notice:${tenantId}:${userId}`,JSON.stringify(event));
     else for (const listener of listeners.get(key(tenantId,userId)) ?? []) listener(event);
   }
@@ -59,6 +67,7 @@ export class NotificationService {
     const tenants = await pool.query<{ tenant_id: string }>(
       'SELECT fn_tenants_correo_pendiente() AS tenant_id');
     for (const { tenant_id: tenantId } of tenants.rows) {
+      if(!await this.tenantIsActive(tenantId))continue;
       const jobs = await withTenant(tenantId,'',async (client) => {
         const claimed = await client.query<{ id: string; email: string | null; titulo: string; mensaje: string; intentos: number }>(
           `SELECT e.id,CASE WHEN u.email_verificado_en IS NOT NULL
@@ -78,6 +87,12 @@ export class NotificationService {
         return claimed.rows;
       });
       for (const job of jobs) {
+          if(!await this.tenantIsActive(tenantId)){
+            await withTenant(tenantId,'',client=>client.query(`UPDATE envios_correo
+              SET intentos=greatest(intentos-1,0),proximo_intento_en=now()
+              WHERE id=$1 AND tenant_id=$2 AND estado='PENDIENTE'`,[job.id,tenantId]));
+            continue;
+          }
           if (!job.email) {
             await withTenant(tenantId,'',client=>client.query("UPDATE envios_correo SET estado='FALLIDO',ultimo_error='Correo no verificado o preferencia desactivada' WHERE id=$1 AND tenant_id=$2",[job.id,tenantId]));
             continue;
@@ -100,6 +115,7 @@ export class NotificationService {
     const tenants=await pool.query<{tenant_id:string}>(
       'SELECT fn_tenants_correo_pendiente() AS tenant_id');
     for(const {tenant_id:tenantId} of tenants.rows){
+      if(!await this.tenantIsActive(tenantId))continue;
       const jobs=await withTenant(tenantId,'',async(client)=>{
         const claimed=await client.query<{id:string;usuario_id:string;email:string|null;
           titulo:string;mensaje:string;intentos:number}>(`SELECT e.id,n.usuario_id,
@@ -125,6 +141,13 @@ export class NotificationService {
       const groups=new Map<string,typeof jobs>();
       for(const job of jobs){const group=groups.get(job.usuario_id)??[];group.push(job);groups.set(job.usuario_id,group);}
       for(const group of groups.values()){
+        if(!await this.tenantIsActive(tenantId)){
+          await withTenant(tenantId,'',client=>client.query(`UPDATE envios_correo
+            SET intentos=greatest(intentos-1,0),proximo_intento_en=now()
+            WHERE tenant_id=$1 AND id=ANY($2::uuid[]) AND estado='PENDIENTE'`,
+          [tenantId,group.map(job=>job.id)]));
+          continue;
+        }
         const inactive=group.filter(job=>!job.email);
         if(inactive.length){
           await withTenant(tenantId,'',client=>client.query(`UPDATE envios_correo

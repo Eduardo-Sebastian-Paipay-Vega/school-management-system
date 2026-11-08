@@ -83,7 +83,7 @@ export default function Navbar() {
       <header className="sticky top-0 z-50 border-b border-gray-200/90 bg-white/95 shadow-sm backdrop-blur-md">
         <div className="content-width flex h-[82px] items-center justify-between gap-3">
           {/* Institution Logo & Title */}
-          <Link href="/" className="group flex items-center gap-2.5 shrink-0">
+          <Link href="/" className="group flex min-w-0 items-center gap-2 sm:gap-2.5">
             <motion.div
               whileHover={shouldReduceMotion ? undefined : { scale: 1.04 }}
               whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
@@ -99,13 +99,13 @@ export default function Navbar() {
                 className="h-full w-full object-contain filter drop-shadow-sm"
               />
             </motion.div>
-            <div className="shrink-0">
+            <div className="min-w-0">
               <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-accent-rouge">
                 <span className="rounded bg-brand/10 px-1 py-0.2 text-[9px] font-black text-brand">UNSCH</span>
                 <span className="text-gray-300">·</span>
                 <span className="text-accent-gold">Colegio de Aplicación</span>
               </div>
-              <h1 className="font-heading text-sm sm:text-base font-extrabold leading-tight tracking-tight text-brand">
+              <h1 className="truncate font-heading text-sm sm:text-base font-extrabold leading-tight tracking-tight text-brand">
                 Guamán Poma de Ayala
               </h1>
               <p className="hidden md:block text-[9.5px] font-medium text-gray-500">
@@ -115,7 +115,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden items-center gap-0.5 xl:flex">
+          <nav className="hidden items-center gap-0.5 2xl:flex">
             {navItems.map(item => {
               const active = isLinkActive(item.href);
               return (
@@ -147,12 +147,12 @@ export default function Navbar() {
           </nav>
 
           {/* Right Action CTAs */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             {/* Intranet / Iniciar Sesión Button */}
             <Link
               href="/intranet"
               className={cn(
-                'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all active:scale-[0.98] whitespace-nowrap shrink-0',
+                'hidden items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-all active:scale-[0.98] whitespace-nowrap shrink-0 sm:inline-flex',
                 pathname === '/intranet'
                   ? 'border-brand bg-brand text-white shadow-sm'
                   : 'border-gray-300 bg-white text-gray-700 hover:border-brand hover:text-brand hover:bg-accent-ivory shadow-sm'
@@ -165,7 +165,7 @@ export default function Navbar() {
             {/* Admisión 2027 Button */}
             <Link
               href="/admision"
-              className="inline-flex items-center gap-1.5 rounded-full bg-brand px-3.5 py-1.5 text-[11px] sm:text-xs font-black uppercase tracking-wider text-white shadow-md hover:bg-brand-light hover:shadow-lg active:scale-[0.98] transition-all whitespace-nowrap shrink-0"
+              className="hidden items-center gap-1.5 rounded-full bg-brand px-3.5 py-1.5 text-[11px] font-black uppercase tracking-wider text-white shadow-md hover:bg-brand-light hover:shadow-lg active:scale-[0.98] transition-all whitespace-nowrap shrink-0 sm:inline-flex"
             >
               <GraduationCap size={14} />
               <span>Admisión 2027</span>
@@ -175,8 +175,10 @@ export default function Navbar() {
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="rounded-xl border border-gray-300 p-2 text-brand transition-colors hover:bg-accent-ivory active:scale-[0.97] xl:hidden shrink-0"
-              aria-label="Abrir menú"
+              className="rounded-xl border border-gray-300 p-2 text-brand transition-colors hover:bg-accent-ivory active:scale-[0.97] 2xl:hidden shrink-0"
+              aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="landing-mobile-navigation"
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -195,7 +197,8 @@ export default function Navbar() {
                   ? { duration: 0 }
                   : { duration: 0.22, ease: [0.215, 0.61, 0.355, 1] }
               }
-              className="border-t border-gray-200 bg-white px-6 py-4 shadow-2xl xl:hidden overflow-hidden"
+              id="landing-mobile-navigation"
+              className="border-t border-gray-200 bg-white px-4 py-4 shadow-2xl 2xl:hidden overflow-hidden sm:px-6"
             >
               <div className="grid gap-1">
                 {navItems.map(item => {

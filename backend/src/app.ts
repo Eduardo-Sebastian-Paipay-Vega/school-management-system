@@ -28,7 +28,8 @@ export function createApp() {
   app.use(express.json({ limit: '10mb' }));
   app.use(cookieParser());
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-  app.use(morgan('dev'));
+  // Las URL pueden contener DNI de búsqueda o tokens de activación.
+  app.use(morgan(':method :status :response-time ms - :res[content-length]'));
 
   app.use('/api/v1', healthRoutes);
   app.use('/api/v1/auth', authRoutes);

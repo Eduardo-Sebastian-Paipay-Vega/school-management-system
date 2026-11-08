@@ -107,3 +107,16 @@ Se incorporaron las skills de ingeniería y diseño frontend procedentes de [`ve
 4. **Planificación y Revisión de Código:** [`plan-mode`](.agents/skills/plan-mode/SKILL.md) y [`code-review`](.agents/skills/code-review/SKILL.md) — Análisis arquitectónico sistémico y revisión automatizada de PRs y diffs.
 5. **Automatización y Flujos:** [`workflow`](.agents/skills/workflow/SKILL.md), [`agent-browser`](.agents/skills/agent-browser/SKILL.md), [`ai-sdk`](.agents/skills/ai-sdk/SKILL.md) y [`chat-sdk`](.agents/skills/chat-sdk/SKILL.md).
 
+## 7. Skills operativas del repositorio
+
+Se añadieron procedimientos portables en `.agents/skills/`, adaptados desde `hola pericola/` al stack y reglas de este sistema. Invocarlos explícitamente cuando el pedido corresponda:
+
+1. **Contexto del proyecto:** [`actualizar-contexto`](.agents/skills/actualizar-contexto/SKILL.md) revisa si cambios de arquitectura, módulos o convenciones requieren actualizar la documentación canónica.
+2. **Guías:** [`crear-guia-tecnica`](.agents/skills/crear-guia-tecnica/SKILL.md) documenta operación y soporte; [`crear-manual-usuario`](.agents/skills/crear-manual-usuario/SKILL.md) prepara guías no técnicas y puede convertir Markdown a Word con el script incluido.
+3. **Git:** [`resolver-conflicto-merge`](.agents/skills/resolver-conflicto-merge/SKILL.md) guía la resolución de conflictos respetando `dev` y la protección de `main`.
+4. **Interfaz React:** [`responsividad`](.agents/skills/responsividad/SKILL.md), [`mejorar-vista-fija`](.agents/skills/mejorar-vista-fija/SKILL.md) y [`resaltar-fila-abierta`](.agents/skills/resaltar-fila-abierta/SKILL.md) complementan el protocolo obligatorio PrimeReact Guardian; no reemplazan su verificación de versión/API ni sus controles.
+5. **Datos y reportes:** [`support-db`](.agents/skills/support-db/SKILL.md) consulta el esquema PostgreSQL desde migraciones; [`diccionario-datos`](.agents/skills/diccionario-datos/SKILL.md) mantiene su documentación; [`reporte-semanal-resumen`](.agents/skills/reporte-semanal-resumen/SKILL.md) reúne evidencia local de Git sin alias personales.
+6. **Operación y tablas:** [`diagnostico-staging`](.agents/skills/diagnostico-staging/SKILL.md) verifica primero si existe el entorno objetivo; [`tabla-orden-dinamico`](.agents/skills/tabla-orden-dinamico/SKILL.md) guía personalización de columnas, sujeta a trazabilidad RF/CU.
+
+No se incorporan como skills activas los procedimientos de BI-COMPUSUR que dependen de Angular, Django, Cloud Run, bases ajenas o datos personales. La carpeta fuente se conserva para referencia y no forma parte de la ruta de skills del proyecto.
+

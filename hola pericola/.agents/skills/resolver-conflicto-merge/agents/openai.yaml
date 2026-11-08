@@ -1,0 +1,7 @@
+interface:
+  display_name: "Resolver conflicto de merge"
+  short_description: "Resuelve conflictos Git con validación segura"
+  default_prompt: "Usa $resolver-conflicto-merge para resolver el conflicto Git actual de forma segura."
+
+policy:
+  allow_implicit_invocation: false

@@ -12,8 +12,8 @@ export default function HeroSection() {
   const easeOut = [0.215, 0.61, 0.355, 1] as const;
 
   return (
-    <section className="relative flex min-h-[580px] items-center overflow-hidden text-white hero-one md:min-h-[660px]">
-      <div className="content-width relative z-10 w-full py-20 fade-in">
+    <section className="relative flex min-h-[540px] items-center overflow-hidden text-white hero-one sm:min-h-[580px] md:min-h-[660px]">
+      <div className="content-width relative z-10 w-full py-14 fade-in sm:py-20">
         <div className="max-w-[760px]">
           {/* Institution Badge with Engraved Logo */}
           <motion.div
@@ -21,7 +21,7 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
             transition={{ duration: 0.24, ease: easeOut }}
-            className="mb-6 inline-flex items-center gap-3 rounded-full border border-accent-gold/60 bg-black/55 py-2 pl-2.5 pr-5 backdrop-blur-md shadow-xl select-none"
+            className="mb-6 inline-flex max-w-full items-center gap-2 rounded-full border border-accent-gold/60 bg-black/55 py-2 pl-2.5 pr-4 backdrop-blur-md shadow-xl select-none sm:gap-3 sm:pr-5"
           >
             <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-0.5 shadow-md">
               <Image
@@ -33,7 +33,7 @@ export default function HeroSection() {
                 className="h-full w-full object-contain"
               />
             </div>
-            <span className="font-display text-xs font-bold uppercase tracking-[.22em] text-accent-cream">
+            <span className="min-w-0 text-[10px] font-bold uppercase leading-snug tracking-[.12em] text-accent-cream sm:text-xs sm:tracking-[.22em]">
               62 Años de Excelencia Académica · UNSCH Ayacucho
             </span>
           </motion.div>
@@ -110,7 +110,7 @@ export default function HeroSection() {
             initial={shouldReduceMotion ? false : { opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.24, delay: shouldReduceMotion ? 0 : 0.20, ease: easeOut }}
-            className="mt-10 flex flex-wrap items-center gap-4 text-xs font-semibold text-accent-cream/90"
+            className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3 text-xs font-semibold text-accent-cream/90 sm:mt-10"
           >
             <div className="flex items-center gap-1.5 transition-transform duration-150 hover:translate-x-0.5">
               <CheckCircle2 size={16} className="text-accent-gold shrink-0" />

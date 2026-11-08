@@ -152,6 +152,9 @@ export class AuthService {
     if (!redisClient.isReady) throw new Error('AUTH_REVOCATION_UNAVAILABLE');
     const claims = decode(token, JWT_REFRESH_SECRET, 'sms-refresh');
     return withTenant(claims.tenantId, claims.sub, async (client) => {
+      const tenant = await client.query(`SELECT 1 FROM instituciones
+        WHERE id=$1 AND activo IS TRUE AND estado_tenant='ACTIVO'`, [claims.tenantId]);
+      if (!tenant.rowCount) return null;
       const session = await client.query<{ refresh_hash: string; revocada_en: Date | null;
         expira_en: Date; ultima_actividad_en: Date; version_auth: number }>(
         'SELECT * FROM sesiones_usuario WHERE id=$1 AND usuario_id=$2 FOR UPDATE', [claims.sid, claims.sub]
@@ -182,6 +185,9 @@ export class AuthService {
     if (!redisClient.isReady) throw new Error('AUTH_REVOCATION_UNAVAILABLE');
     if (await redisClient.exists(`blacklist:${claims.jti}`)) return null;
     return withTenant(claims.tenantId, claims.sub, async (client) => {
+      const tenant = await client.query(`SELECT 1 FROM instituciones
+        WHERE id=$1 AND activo IS TRUE AND estado_tenant='ACTIVO'`, [claims.tenantId]);
+      if (!tenant.rowCount) return null;
       const session = await client.query<{ revocada_en: Date | null; expira_en: Date;
         ultima_actividad_en: Date; access_jti: string; version_auth: number }>(
         'SELECT * FROM sesiones_usuario WHERE id=$1 AND usuario_id=$2', [claims.sid, claims.sub]

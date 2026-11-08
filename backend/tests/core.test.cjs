@@ -3,7 +3,8 @@ const assert = require('node:assert/strict');
 
 process.env.DOCUMENT_HMAC_KEY = 'c'.repeat(64);
 process.env.ENCRYPTION_MASTER_KEY = 'd'.repeat(64);
-const { documentHash, encryptDocument, decryptDocument, randomToken, tokenHash } =
+const { documentHash, encryptDocument, decryptDocument, encryptionKeyVersion,
+  assertIdentityKeys, randomToken, tokenHash } =
   require('../dist/core/identity-crypto');
 const { parseImportFile, importRow } = require('../dist/services/user-import.service');
 const ExcelJS = require('exceljs');
@@ -17,6 +18,37 @@ test('documento cifrado aleatorio y búsqueda determinista sin exponer DNI', () 
   assert.notEqual(documentHash('12345678'),documentHash('12345679'));
   a[30]^=1;
   assert.throws(()=>decryptDocument(a));
+});
+
+test('cifrado versionado permite recifrar sin perder datos legados', () => {
+  const legacy=encryptDocument('87654321');
+  assert.equal(encryptionKeyVersion(legacy),null);
+  const originalHash=documentHash('87654321');
+  const originalLegacyKey=process.env.ENCRYPTION_MASTER_KEY;
+  process.env.ENCRYPTION_KEYS_JSON=JSON.stringify({2:'e'.repeat(64),3:'f'.repeat(64)});
+  process.env.ENCRYPTION_ACTIVE_KEY_ID='2';
+  try{
+    assertIdentityKeys();
+    const v2=encryptDocument(decryptDocument(legacy));
+    assert.equal(encryptionKeyVersion(v2),2);
+    assert.equal(decryptDocument(v2),'87654321');
+    process.env.ENCRYPTION_ACTIVE_KEY_ID='3';
+    const v3=encryptDocument(decryptDocument(v2));
+    assert.equal(encryptionKeyVersion(v3),3);
+    assert.equal(decryptDocument(v3),'87654321');
+    assert.equal(documentHash('87654321'),originalHash);
+    delete process.env.ENCRYPTION_MASTER_KEY;
+    process.env.ENCRYPTION_KEYS_JSON=JSON.stringify({3:'f'.repeat(64)});
+    assertIdentityKeys();
+    assert.equal(decryptDocument(v3),'87654321');
+    assert.throws(()=>decryptDocument(v2),/Falta la versión/);
+    delete process.env.ENCRYPTION_KEYS_JSON;
+    assert.throws(()=>decryptDocument(v3),/Falta la versión/);
+  }finally{
+    process.env.ENCRYPTION_MASTER_KEY=originalLegacyKey;
+    delete process.env.ENCRYPTION_ACTIVE_KEY_ID;
+    delete process.env.ENCRYPTION_KEYS_JSON;
+  }
 });
 
 test('tokens aleatorios de un uso se guardan solo como SHA-256', () => {

@@ -147,6 +147,8 @@ jobs:
       JWT_REFRESH_SECRET: integration_only_refresh_secret_2026_very_long
       ENCRYPTION_MASTER_KEY: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
       DOCUMENT_HMAC_KEY: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      # La prueba de rotación deja una identidad ficticia cifrada con esta clave en la copia restaurada.
+      ENCRYPTION_KEYS_JSON: '{"2":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

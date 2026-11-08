@@ -1,6 +1,6 @@
 # Sprint 8 — Matriz de aceptación de los 22 RF del Core
 
-**Corte inicial:** código S1–S5 integrado en `dev`; S6–S8 están en ejecución. «Probado técnicamente» significa suite automatizada del Core con dos tenants ficticios; no certifica uso escolar real. Fuente: [evidencia S4](SPRINT_04_EVIDENCIA.md), [evidencia S5](SPRINT_05_EVIDENCIA.md), [contrato OpenAPI](../../packages/contracts/openapi/openapi.yaml), [SDD Squad 1](../../D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/Squad%201%20-%20Core%20y%20Seguridad/sdd_squad_1.md).
+**Corte (2026-11-08):** código S1–S5 integrado en `dev`; S6–S8 siguen en ejecución. CI Core A/B y los seis checks obligatorios pasaron en los runs [42469150736](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/actions/runs/42469150736) y [42470105251](https://github.com/Eduardo-Sebastian-Paipay-Vega/school-management-system/actions/runs/42470105251). «Probado técnicamente» significa suite automatizada del Core con dos tenants ficticios; no certifica uso escolar real ni aceptación institucional. Fuente: [evidencia S4](SPRINT_04_EVIDENCIA.md), [evidencia S5](SPRINT_05_EVIDENCIA.md), [evidencia S8](SPRINT_08_EVIDENCIA.md), [contrato OpenAPI](../../packages/contracts/openapi/openapi.yaml), [SDD Squad 1](../../D%20-%20Base%201%20-%2001092026/Fase%202/Arquitectura/Squad%201%20-%20Core%20y%20Seguridad/sdd_squad_1.md).
 
 | RF | Estado al inicio de S8 | Puerta restante para aceptación del piloto |
 |---|---|---|

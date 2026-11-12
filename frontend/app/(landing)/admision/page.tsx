@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import {
   GraduationCap,
@@ -180,8 +181,8 @@ export default function AdmisionPage() {
             {/* Official Seal Badge */}
             <div className="mt-8 flex items-center gap-4 rounded-3xl border border-accent-cream bg-accent-ivory/60 p-5 shadow-sm">
               <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white border border-gray-200 p-2 shadow-sm">
-                <img
-                  src="/emblema-unsch-grabado.png"
+                <Image
+                  src="/emblema-unsch-grabado.webp"
                   alt="Sello UNSCH"
                   width={48}
                   height={48}

@@ -13,6 +13,15 @@ export default function HeroSection() {
 
   return (
     <section className="relative flex min-h-[540px] items-center overflow-hidden text-white hero-one sm:min-h-[580px] md:min-h-[660px]">
+      <Image
+        src="/hero-pabellon.webp"
+        alt=""
+        aria-hidden="true"
+        fill
+        priority
+        sizes="100vw"
+        className="z-0 object-cover object-center"
+      />
       <div className="content-width relative z-10 w-full py-14 fade-in sm:py-20">
         <div className="max-w-[760px]">
           {/* Institution Badge with Engraved Logo */}
@@ -25,7 +34,7 @@ export default function HeroSection() {
           >
             <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-0.5 shadow-md">
               <Image
-                src="/emblema-unsch-grabado.png"
+                src="/emblema-unsch-grabado.webp"
                 alt="Escudo Oficial UNSCH Grabado"
                 width={28}
                 height={28}

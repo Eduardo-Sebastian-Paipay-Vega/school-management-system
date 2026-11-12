@@ -91,7 +91,7 @@ export default function Navbar() {
               className="relative flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-white p-1 shadow-sm group-hover:border-accent-gold transition-colors"
             >
               <Image
-                src="/emblema-unsch-grabado.png"
+                src="/emblema-unsch-grabado.webp"
                 alt="Emblema Heráldico Universitario Grabado - UNSCH"
                 width={44}
                 height={44}
@@ -105,9 +105,9 @@ export default function Navbar() {
                 <span className="text-gray-300">·</span>
                 <span className="text-accent-gold">Colegio de Aplicación</span>
               </div>
-              <h1 className="truncate font-heading text-sm sm:text-base font-extrabold leading-tight tracking-tight text-brand">
+              <p className="truncate font-heading text-sm sm:text-base font-extrabold leading-tight tracking-tight text-brand">
                 Guamán Poma de Ayala
-              </h1>
+              </p>
               <p className="hidden md:block text-[9.5px] font-medium text-gray-500">
                 Universidad Nacional de San Cristóbal de Huamanga
               </p>
@@ -152,7 +152,7 @@ export default function Navbar() {
             <Link
               href="/intranet"
               className={cn(
-                'hidden items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-all active:scale-[0.98] whitespace-nowrap shrink-0 sm:inline-flex',
+                'hidden items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-all active:scale-[0.98] whitespace-nowrap shrink-0 2xl:inline-flex',
                 pathname === '/intranet'
                   ? 'border-brand bg-brand text-white shadow-sm'
                   : 'border-gray-300 bg-white text-gray-700 hover:border-brand hover:text-brand hover:bg-accent-ivory shadow-sm'
@@ -165,7 +165,7 @@ export default function Navbar() {
             {/* Admisión 2027 Button */}
             <Link
               href="/admision"
-              className="hidden items-center gap-1.5 rounded-full bg-brand px-3.5 py-1.5 text-[11px] font-black uppercase tracking-wider text-white shadow-md hover:bg-brand-light hover:shadow-lg active:scale-[0.98] transition-all whitespace-nowrap shrink-0 sm:inline-flex"
+              className="hidden items-center gap-1.5 rounded-full bg-brand px-3.5 py-1.5 text-[11px] font-black uppercase tracking-wider text-white shadow-md hover:bg-brand-light hover:shadow-lg active:scale-[0.98] transition-all whitespace-nowrap shrink-0 2xl:inline-flex"
             >
               <GraduationCap size={14} />
               <span>Admisión 2027</span>

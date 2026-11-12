@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import {
   Quote,
@@ -235,8 +236,8 @@ export default function TestimoniosPage() {
             <div className="grid gap-8 lg:grid-cols-12 items-center">
               <div className="lg:col-span-4 flex flex-col items-center text-center">
                 <div className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-accent-gold/30 bg-white p-4 shadow-lg">
-                  <img
-                    src="/emblema-unsch-grabado.png"
+                  <Image
+                    src="/emblema-unsch-grabado.webp"
                     alt="Emblema UNSCH"
                     width={80}
                     height={80}

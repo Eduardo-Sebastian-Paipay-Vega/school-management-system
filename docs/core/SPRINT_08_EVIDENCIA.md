@@ -1,6 +1,28 @@
 # Sprint 8 — Registro de evidencia y puertas de salida
 
-**Estado:** en ejecución. S6/S7 y la preparación del ensayo S8 están integrados en `dev`; este registro no adelanta un cierre.
+**Estado al 2026-11-12:** validación técnica local reejecutada; **Sprint 8 todavía no puede cerrarse formalmente** porque falta inspeccionar la UI autenticada con servicios operativos y completar puertas institucionales. S6/S7 y la preparación del ensayo S8 están integrados en `dev`.
+
+## Revalidación local — 2026-11-11
+
+| Compuerta | Resultado observado | Estado |
+|---|---|---|
+| Base de datos | `database/npm test`: 33/33, 0 fallos. Suite con PGlite; no sustituye el ensayo de runtime PostgreSQL 16 + Redis 7. | Aprobada localmente. |
+| Backend | `backend/npm run lint`: 0 errores; `backend/npm test`: 11/11, incluye compilación TypeScript. | Aprobada localmente. |
+| Contratos | `packages/contracts/npm run lint`: contrato válido, 111 advertencias; `check:inventory`: 48 rutas y 60 operaciones; `check:generated`: tipos reproducibles. | Aprobada con advertencias registradas. |
+| Frontend | `frontend/npm run lint`: 0 errores, 59 advertencias. `frontend/npm run build`: compilación, tipos y generación de 22 páginas completados. | Aprobada; deuda de advertencias conocida. |
+| PrimeReact Guardian | Auditoría local: PrimeReact 10.9.9, 0 errores y 0 avisos. El auditor valida imports/versión, no JSX, props ni experiencia de uso. | Aprobada estáticamente. |
+| Servicios para ensayo autenticado | En este entorno no se encontró `docker`, `redis-server`, `psql` ni un servicio Redis instalado. La suite local de base usa PGlite. | Bloqueada aquí; requiere staging o entorno PostgreSQL/Redis disponible. |
+
+Esta revalidación cubre el estado de trabajo local existente; no acredita una sesión autenticada real ni se atribuye visualmente al build.
+
+## Preflight de servicios — 2026-11-12
+
+- La guía vigente confirma que staging y producción no existen y que D-19 sigue pendiente.
+- PostgreSQL responde en el puerto local configurado, pero el usuario/clave del `backend/.env` ignorado por Git fueron rechazados con SQLSTATE `28P01`. Solo se comprobó conectividad/autenticación; no se consultaron tablas ni datos.
+- Redis no responde en el puerto local configurado. No se encontró Docker ni un binario/servicio Redis local.
+- GitHub no devolvió workflow runs asociados al merge commit `bfe8132c`; por eso esta reanudación no afirma un resultado de CI más reciente que la evidencia registrada del 8/11.
+
+**Siguiente puerta técnica:** habilitar un PostgreSQL y Redis de prueba con credenciales válidas, más SMTP de captura; provisionar exclusivamente cuentas y datos ficticios; iniciar backend/frontend y guardar capturas de estados de carga, vacío, error, foco y tamaños móvil/escritorio. No reutilizar el `backend/.env` local ni datos institucionales para ese ensayo.
 
 | Control | Evidencia observada | Estado |
 |---|---|---|

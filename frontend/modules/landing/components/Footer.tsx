@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import FooterMascot from './FooterMascot';
 import {
   MapPin,
   Phone,
@@ -13,14 +14,14 @@ import {
 
 export default function Footer() {
   return (
-    <footer className="border-t-4 border-brand bg-brand-dark text-white">
+    <footer className="relative border-t-4 border-brand bg-brand-dark text-white">
       <div className="content-width grid gap-12 py-20 lg:grid-cols-12">
         {/* Col 1: Identity & Authorities */}
         <div className="lg:col-span-5">
           <div className="flex items-center gap-4">
             <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-accent-gold/40 bg-white p-2 shadow-lg">
               <Image
-                src="/emblema-unsch-grabado.png"
+                src="/emblema-unsch-grabado.webp"
                 alt="Emblema Heráldico Grabado de la UNSCH"
                 width={56}
                 height={56}
@@ -193,6 +194,8 @@ export default function Footer() {
           </div>
         </div>
       </div>
+
+      <FooterMascot />
 
       {/* Bottom copyright & attribution line */}
       <div className="border-t border-white/10 py-6">

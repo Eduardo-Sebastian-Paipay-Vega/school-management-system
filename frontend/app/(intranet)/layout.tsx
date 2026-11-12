@@ -22,7 +22,7 @@ export default function IntranetLayout({ children }: { children: React.ReactNode
             <div className="flex items-center gap-2.5">
               <div className="h-9 w-9 rounded-xl border border-gray-200 bg-white p-1 shadow-xs">
                 <img
-                  src="/emblema-unsch-grabado.png"
+                  src="/emblema-unsch-grabado.webp"
                   alt="UNSCH"
                   width={32}
                   height={32}

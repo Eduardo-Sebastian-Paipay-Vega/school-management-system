@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   description:
     'Portal oficial de los Planteles de Aplicación "Guamán Poma de Ayala" de la Universidad Nacional de San Cristóbal de Huamanga (UNSCH) en Ayacucho. Más de 62 años formando líderes en Inicial, Primaria y Secundaria.',
   icons: {
-    icon: '/emblema-unsch.png',
+    icon: '/emblema-unsch.webp',
   },
 };
 

@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
@@ -230,8 +231,8 @@ export default function Home() {
               transition={{ type: 'spring', stiffness: 260, damping: 20 }}
               className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-gray-200 bg-white p-1.5 shadow-md group-hover:border-accent-gold group-hover:shadow-lg transition-colors"
             >
-              <img
-                src="/emblema-unsch-grabado.png"
+              <Image
+                src="/emblema-unsch-grabado.webp"
                 alt="Emblema Heráldico Universitario Grabado - UNSCH"
                 width={52}
                 height={52}
@@ -333,8 +334,8 @@ export default function Home() {
               className="mb-6 inline-flex items-center gap-3 rounded-full border border-accent-gold/60 bg-black/55 py-2 pl-2.5 pr-5 backdrop-blur-md shadow-xl"
             >
               <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-0.5 shadow-md">
-                <img
-                  src="/emblema-unsch-grabado.png"
+                <Image
+                  src="/emblema-unsch-grabado.webp"
                   alt="Escudo Oficial UNSCH Grabado"
                   width={28}
                   height={28}
@@ -479,8 +480,8 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 shadow-sm">
                   <div className="flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden">
-                    <img
-                      src="/emblema-unsch-grabado.png"
+                    <Image
+                      src="/emblema-unsch-grabado.webp"
                       alt="Sello UNSCH"
                       width={20}
                       height={20}
@@ -838,8 +839,8 @@ export default function Home() {
               {/* Sello Oficial con Versión Grabada del Emblema */}
               <div className="mt-8 flex items-center gap-4 rounded-3xl border border-accent-cream bg-white p-5 shadow-sm">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-gray-200 bg-accent-ivory/50 p-1.5">
-                  <img
-                    src="/emblema-unsch-grabado.png"
+                  <Image
+                    src="/emblema-unsch-grabado.webp"
                     alt="Sello Institucional Grabado"
                     width={48}
                     height={48}
@@ -1064,8 +1065,8 @@ export default function Home() {
           <div className="lg:col-span-5">
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-accent-gold/40 bg-white p-2 shadow-lg">
-                <img
-                  src="/emblema-unsch-grabado.png"
+                <Image
+                  src="/emblema-unsch-grabado.webp"
                   alt="Emblema Heráldico Grabado de la UNSCH"
                   width={56}
                   height={56}

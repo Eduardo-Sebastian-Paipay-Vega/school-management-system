@@ -37,7 +37,7 @@ export default function LoginPage() {
               className="flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-200 bg-white p-2 shadow-md cursor-default"
             >
               <img
-                src="/emblema-unsch-grabado.png"
+                src="/emblema-unsch-grabado.webp"
                 alt="Escudo UNSCH Grabado"
                 width={44}
                 height={44}

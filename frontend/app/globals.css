@@ -146,6 +146,15 @@ input:focus-visible {
 }
 
 .hero-one {
+  background-color: var(--secondary-colors-primary-brand-dark);
+}
+
+.hero-one::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
   background-image:
     linear-gradient(
       90deg,
@@ -158,11 +167,7 @@ input:focus-visible {
       circle at 75% 35%,
       rgba(175, 136, 70, 0.35) 0%,
       transparent 55%
-    ),
-    url('/hero-pabellon.png');
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
+    );
 }
 
 .hero-two {
@@ -179,7 +184,7 @@ input:focus-visible {
       rgba(214, 211, 196, 0.3) 0%,
       transparent 45%
     ),
-    url('/hero-pabellon.png');
+    url('/hero-pabellon.webp');
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
@@ -199,8 +204,111 @@ input:focus-visible {
       rgba(175, 136, 70, 0.4) 0%,
       transparent 50%
     ),
-    url('/hero-pabellon.png');
+    url('/hero-pabellon.webp');
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+}
+
+.footer-mascot-track {
+  position: relative;
+  height: 5.75rem;
+  pointer-events: none;
+}
+
+.footer-mascot-character {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 5.25rem;
+  height: 5.25rem;
+  pointer-events: none;
+  transform: translate3d(2.625rem, 0, 0);
+}
+
+.footer-mascot-face {
+  position: absolute;
+  inset: 0;
+  transform: translateX(-50%);
+  transition: transform 160ms ease-out;
+}
+
+.footer-mascot-character[data-direction='left'] .footer-mascot-face {
+  transform: translateX(-50%) scaleX(-1);
+}
+
+.footer-mascot-sprite {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  transition: opacity 140ms ease;
+}
+
+.footer-mascot-idle {
+  background-image: url('/sprites/alpaca-idle.png');
+  background-size: 800% 100%;
+}
+
+.footer-mascot-walk {
+  background-image: url('/sprites/alpaca-caminar.webp');
+  background-position: 0 54%;
+  background-size: 800% auto;
+}
+
+.footer-mascot-jump {
+  background-image: url('/sprites/alpaca-saltar.png');
+  background-size: 800% 100%;
+}
+
+.footer-mascot-character[data-motion='idle'] .footer-mascot-idle {
+  opacity: 0.36;
+  animation: footer-mascot-idle-frames 1.3s steps(7, end) infinite;
+}
+
+.footer-mascot-character[data-motion='walk'] .footer-mascot-walk {
+  opacity: 0.44;
+  animation: footer-mascot-walk-frames 850ms steps(7, end) infinite;
+}
+
+.footer-mascot-character[data-motion='jump'] .footer-mascot-jump {
+  opacity: 0.44;
+  animation: footer-mascot-jump-frames 650ms steps(7, end) 1 forwards;
+}
+
+@keyframes footer-mascot-idle-frames {
+  from { background-position: 0 0; }
+  to { background-position: 100% 0; }
+}
+
+@keyframes footer-mascot-walk-frames {
+  from { background-position: 0 54%; }
+  to { background-position: 100% 54%; }
+}
+
+@keyframes footer-mascot-jump-frames {
+  from { background-position: 0 0; }
+  to { background-position: 100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-mascot-sprite {
+    animation: none;
+  }
+
+  .footer-mascot-idle {
+    background-position: 0 0;
+    opacity: 0.3;
+  }
+
+  .footer-mascot-walk,
+  .footer-mascot-jump {
+    opacity: 0;
+  }
+
+  .footer-mascot-face {
+    transition: none;
+    transform: translateX(-50%);
+  }
 }

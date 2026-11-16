@@ -3,9 +3,11 @@ import Footer from '@/modules/landing/components/Footer';
 
 export default function LandingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col bg-white text-gray-900 selection:bg-brand selection:text-white">
+    <div className="bbd-page min-h-screen flex flex-col bg-[#FFFCF8] text-[rgba(41,23,25,0.8)] selection:bg-[#8F1025] selection:text-white">
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main id="main" className="flex-1">
+        {children}
+      </main>
       <Footer />
     </div>
   );

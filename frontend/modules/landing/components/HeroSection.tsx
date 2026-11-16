@@ -1,141 +1,93 @@
 'use client';
 
-import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { motion, useReducedMotion } from 'framer-motion';
-import { CheckCircle2, ArrowRight, ArrowUpRight } from 'lucide-react';
 
 export default function HeroSection() {
-  const shouldReduceMotion = useReducedMotion();
+  const [scrollProgress, setScrollProgress] = useState(0);
 
-  // Easing ease-out-cubic según especificación Emil Kowalski
-  const easeOut = [0.215, 0.61, 0.355, 1] as const;
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerWidth < 992) {
+        setScrollProgress(0);
+        return;
+      }
+      const maxScroll = 600;
+      const current = Math.min(Math.max(window.scrollY, 0), maxScroll);
+      setScrollProgress(current / maxScroll);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    handleScroll();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
+
+  const scale = 1 - scrollProgress * 0.085;
+  const radius = Math.round(scrollProgress * 28);
 
   return (
-    <section className="relative flex min-h-[540px] items-center overflow-hidden text-white hero-one sm:min-h-[580px] md:min-h-[660px]">
-      <Image
-        src="/hero-pabellon.webp"
-        alt=""
-        aria-hidden="true"
-        fill
-        priority
-        sizes="100vw"
-        className="z-0 object-cover object-center"
-      />
-      <div className="content-width relative z-10 w-full py-14 fade-in sm:py-20">
-        <div className="max-w-[760px]">
-          {/* Institution Badge with Engraved Logo */}
-          <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
-            transition={{ duration: 0.24, ease: easeOut }}
-            className="mb-6 inline-flex max-w-full items-center gap-2 rounded-full border border-accent-gold/60 bg-black/55 py-2 pl-2.5 pr-4 backdrop-blur-md shadow-xl select-none sm:gap-3 sm:pr-5"
-          >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-0.5 shadow-md">
-              <Image
-                src="/emblema-unsch-grabado.webp"
-                alt="Escudo Oficial UNSCH Grabado"
-                width={28}
-                height={28}
-                priority
-                className="h-full w-full object-contain"
-              />
+    <header className="relative w-full bg-[#FFFCF8] overflow-hidden">
+      <div
+        style={{
+          transform: scrollProgress > 0 ? `scale(${scale.toFixed(4)})` : undefined,
+          borderBottomLeftRadius: scrollProgress > 0 ? `${radius}px` : undefined,
+          borderBottomRightRadius: scrollProgress > 0 ? `${radius}px` : undefined,
+        }}
+        className="relative flex min-h-[640px] sm:min-h-[700px] lg:min-h-[732px] w-full flex-col justify-end overflow-hidden transition-[border-radius] duration-150 will-change-transform"
+      >
+        {/* Background Visual Layer (.header-bg-wrap) */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/hero-pabellon.webp"
+            alt="Campus de los Planteles de Aplicación Guamán Poma de Ayala - UNSCH"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+          {/* Subtle atmospheric gradient matching reference video contrast */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-gradient-to-b from-[#290006]/20 via-[#290006]/30 to-[#290006]/75"
+          />
+        </div>
+
+        {/* Hero Foreground Content (.padding-global.is-hero -> .container-large.is--hero -> .header-content) */}
+        <div className="bbd-padding-global relative z-10 w-full">
+          <div className="mx-auto w-full max-w-[1297px] pt-32 pb-12 sm:pb-16 lg:px-8 lg:pt-16 lg:pb-24">
+            <div className="grid grid-cols-1 items-end gap-8 lg:grid-cols-[1.38fr_1fr] lg:gap-8">
+              {/* Left Column: Monumental Condensed H1 (.header-inner-top-left, 2 lines at 1440px) */}
+              <div className="flex flex-col items-start justify-end">
+                <h1 className="bbd-h1 xl:text-[82px] xl:leading-[84px] text-white drop-shadow-[0_2px_18px_rgba(41,0,6,0.45)]">
+                  <span className="lg:whitespace-nowrap">FORJANDO NUESTRO</span>
+                  <br />
+                  <span className="lg:whitespace-nowrap">PROPIO FUTURO</span>
+                </h1>
+              </div>
+
+              {/* Right Column: Dual Burgundy Eyebrow Pills + Subtitle (.header-inner-bottom-left) */}
+              <div className="flex flex-col items-start justify-start gap-6 lg:gap-8 lg:max-w-[505px]">
+                <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                  <div className="bbd-eyebrow bg-[#C32942] text-white">
+                    <span>UNSCH 1964–2026</span>
+                  </div>
+                  <div className="bbd-eyebrow bg-[#FFF5DC] text-[#4A3008]">
+                    <span>Excelencia &amp; Plan 2027</span>
+                  </div>
+                </div>
+
+                <p className="bbd-font-body text-[16px] leading-[24px] sm:text-[18px] sm:leading-[27px] font-light text-white drop-shadow-[0_1px_8px_rgba(41,0,6,0.45)]">
+                  Con una de las comunidades estudiantiles más talentosas y diversas de Ayacucho, los Planteles de Aplicación Guamán Poma de Ayala ofrecen formación integral con respaldo directo de la UNSCH.
+                </p>
+              </div>
             </div>
-            <span className="min-w-0 text-[10px] font-bold uppercase leading-snug tracking-[.12em] text-accent-cream sm:text-xs sm:tracking-[.22em]">
-              62 Años de Excelencia Académica · UNSCH Ayacucho
-            </span>
-          </motion.div>
-
-          {/* H1 Main Title with Negative Tracking */}
-          <motion.h1
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.26, delay: shouldReduceMotion ? 0 : 0.05, ease: easeOut }}
-            className="hero-text-shadow font-heading text-4xl font-extrabold leading-[1.08] tracking-[-0.03em] sm:text-5xl md:text-6xl"
-          >
-            Educación de Excelencia con{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cream via-accent-gold to-white">
-              Respaldo Universitario
-            </span>{' '}
-            en Ayacucho.
-          </motion.h1>
-
-          {/* Subtitle */}
-          <motion.p
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.26, delay: shouldReduceMotion ? 0 : 0.10, ease: easeOut }}
-            className="mt-6 max-w-2xl text-base font-medium leading-relaxed text-accent-cream/95 md:text-lg"
-          >
-            Más de 62 años formando líderes e investigadores en los niveles Inicial, Primaria y Secundaria en los{' '}
-            <strong className="text-white">Planteles de Aplicación Guamán Poma de Ayala</strong>, laboratorio pedagógico de la
-            <strong className="text-white"> Facultad de Ciencias de la Educación</strong>, 
-            adscritos a la histórica{' '}
-      
-            <strong className="text-accent-gold">
-              Universidad Nacional de San Cristóbal de Huamanga (UNSCH)
-            </strong>.
-          </motion.p>
-
-          {/* CTAs with Framer Motion spring physics & tactile tap */}
-          <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.26, delay: shouldReduceMotion ? 0 : 0.15, ease: easeOut }}
-            className="mt-8 flex flex-col gap-3.5 sm:flex-row sm:items-center"
-          >
-            <motion.div
-              whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
-              whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
-              transition={{ type: 'spring', stiffness: 450, damping: 28 }}
-            >
-              <Link
-                href="/admision"
-                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-white px-8 py-4 text-sm font-extrabold uppercase tracking-wider text-brand shadow-2xl transition-colors duration-150 hover:bg-accent-cream hover:text-brand-dark"
-              >
-                <span>Proceso de Admisión 2027</span>
-                <ArrowRight size={18} />
-              </Link>
-            </motion.div>
-
-            <motion.div
-              whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
-              whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
-              transition={{ type: 'spring', stiffness: 450, damping: 28 }}
-            >
-              <Link
-                href="/por-que-elegirnos"
-                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-white/60 bg-black/35 px-7 py-4 text-sm font-bold text-white backdrop-blur transition-colors duration-150 hover:bg-white/20 hover:border-white"
-              >
-                <span>¿Por qué elegirnos?</span>
-                <ArrowUpRight size={18} />
-              </Link>
-            </motion.div>
-          </motion.div>
-
-          {/* Highlights pill tags (Staggered subtle entrance) */}
-          <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.24, delay: shouldReduceMotion ? 0 : 0.20, ease: easeOut }}
-            className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3 text-xs font-semibold text-accent-cream/90 sm:mt-10"
-          >
-            <div className="flex items-center gap-1.5 transition-transform duration-150 hover:translate-x-0.5">
-              <CheckCircle2 size={16} className="text-accent-gold shrink-0" />
-              <span>Ingreso preferencial a la UNSCH</span>
-            </div>
-            <div className="flex items-center gap-1.5 transition-transform duration-150 hover:translate-x-0.5">
-              <CheckCircle2 size={16} className="text-accent-gold shrink-0" />
-              <span>4 Losas deportivas techadas 2026</span>
-            </div>
-            <div className="flex items-center gap-1.5 transition-transform duration-150 hover:translate-x-0.5">
-              <CheckCircle2 size={16} className="text-accent-gold shrink-0" />
-              <span>Prácticas en laboratorios científicos</span>
-            </div>
-          </motion.div>
+          </div>
         </div>
       </div>
-    </section>
+    </header>
   );
 }

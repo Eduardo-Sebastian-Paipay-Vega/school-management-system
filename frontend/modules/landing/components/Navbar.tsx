@@ -1,20 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import {
-  Menu,
-  X,
-  ArrowRight,
-  ArrowUpRight,
-  Phone,
-  GraduationCap,
-  LogIn,
-  Lock,
-} from 'lucide-react';
+import BbdButton from './BbdButton';
 import { cn } from '@/lib/utils';
 
 export const navItems = [
@@ -28,225 +18,224 @@ export const navItems = [
   { label: 'Contacto', href: '/contacto' },
 ];
 
-export default function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const pathname = usePathname();
-  const shouldReduceMotion = useReducedMotion();
+const primaryBarLinks = [
+  { label: 'Regeneración', href: '/#regen', rotation: '-2deg' },
+  { label: 'Ambición', href: '/#ambition', rotation: '1.8deg' },
+  { label: 'Ejes', href: '/#focus', rotation: '-1.5deg' },
+  { label: 'Niveles', href: '/niveles', rotation: '2deg' },
+  { label: 'Intranet', href: '/intranet', rotation: '-1.2deg' },
+];
 
-  const isLinkActive = (href: string) => {
-    if (href === '/') {
-      return pathname === '/';
-    }
-    return pathname.startsWith(href);
-  };
+const drawerLinks = [
+  { label: 'REGENERACIÓN', href: '/#regen' },
+  { label: 'AMBICIÓN', href: '/#ambition' },
+  { label: 'EJES FORMATIVOS', href: '/#focus' },
+  { label: 'ADMISIÓN 2027', href: '/admision' },
+  { label: 'INTRANET ESCOLAR', href: '/intranet' },
+];
+
+export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && menuOpen) {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [menuOpen]);
 
   return (
-    <>
-      {/* Top Banner - Institutional Identity */}
-      <div className="border-b border-brand-dark bg-brand-dark text-white text-[11px]">
-        <div className="content-width flex min-h-9 flex-wrap items-center justify-between gap-x-4 gap-y-1 py-1.5">
-          <div className="flex min-w-0 flex-1 items-center gap-2 font-medium text-accent-cream">
-            <span className="inline-block h-2 w-2 rounded-full bg-accent-gold animate-pulse shrink-0" />
-            <span className="min-w-0 truncate font-semibold">Universidad Nacional de San Cristóbal de Huamanga (UNSCH)</span>
-            <span className="hidden md:inline text-white/40">|</span>
-            <span className="hidden md:inline text-white/90 shrink-0">Ayacucho, Perú · Cód. 050101</span>
-          </div>
-          <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-2 gap-y-1 text-[11px] text-white/80 sm:shrink-0 sm:gap-x-4">
-            <a
-              href="https://www.unsch.edu.pe/"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1 transition hover:text-accent-gold"
-            >
-              <span>Portal UNSCH</span>
-              <ArrowUpRight size={11} />
-            </a>
-            <Link href="/intranet" className="flex items-center gap-1 transition hover:text-accent-gold font-medium">
-              <Lock size={11} className="text-accent-gold" />
-              <span>Intranet</span>
-            </Link>
-            <Link href="/admision" className="hidden transition hover:text-accent-gold font-medium sm:inline">
-              Admisión 2027
-            </Link>
-            <Link href="/contacto" className="hidden transition hover:text-accent-gold sm:inline">
-              Mesa de Partes
-            </Link>
-            <span className="hidden lg:inline-flex items-center gap-1 font-mono text-accent-gold">
-              <Phone size={11} />
-              (066) 312510
-            </span>
-          </div>
-        </div>
-      </div>
+    <nav
+      aria-label="Navegación principal"
+      data-twostep-nav
+      data-nav-status={menuOpen ? 'active' : 'not-active'}
+      className="fixed inset-x-0 top-0 z-50 pointer-events-none"
+    >
+      {/* Backdrop overlay when Two-Step Menu is open */}
+      <div
+        onClick={() => setMenuOpen(false)}
+        aria-hidden="true"
+        className={cn(
+          'fixed inset-0 bg-black/30 backdrop-blur-[2px] transition-opacity duration-500',
+          menuOpen ? 'opacity-100 pointer-events-auto visible' : 'opacity-0 pointer-events-none invisible'
+        )}
+      />
 
-      {/* Main Navigation Header */}
-      <header className="sticky top-0 z-50 border-b border-gray-200/90 bg-white/95 shadow-sm backdrop-blur-md">
-        <div className="content-width flex h-[82px] items-center justify-between gap-3">
-          {/* Institution Logo & Title */}
-          <Link href="/" className="group flex min-w-0 items-center gap-2 sm:gap-2.5">
-            <motion.div
-              whileHover={shouldReduceMotion ? undefined : { scale: 1.04 }}
-              whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-              className="relative flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-white p-1 shadow-sm group-hover:border-accent-gold transition-colors"
-            >
-              <Image
-                src="/emblema-unsch-grabado.webp"
-                alt="Emblema Heráldico Universitario Grabado - UNSCH"
-                width={44}
-                height={44}
-                priority
-                className="h-full w-full object-contain filter drop-shadow-sm"
-              />
-            </motion.div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-accent-rouge">
-                <span className="rounded bg-brand/10 px-1 py-0.2 text-[9px] font-black text-brand">UNSCH</span>
-                <span className="text-gray-300">·</span>
-                <span className="text-accent-gold">Colegio de Aplicación</span>
-              </div>
-              <p className="truncate font-heading text-sm sm:text-base font-extrabold leading-tight tracking-tight text-brand">
-                Guamán Poma de Ayala
-              </p>
-              <p className="hidden md:block text-[9.5px] font-medium text-gray-500">
-                Universidad Nacional de San Cristóbal de Huamanga
-              </p>
-            </div>
-          </Link>
+      {/* Floating Two-Step Bar Container */}
+      <div className="mx-auto w-full max-w-[1280px] px-3 pt-3 sm:px-5 sm:pt-5">
+        <div className="relative pointer-events-auto">
+          {/* Deep Burgundy Expandable Background (.twostep-nav__back-bg) */}
+          <div
+            className={cn(
+              ' relative overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.625,0.05,0,1)]',
+              menuOpen
+                ? 'bg-[#3A0008] rounded-[24px] p-2.5 sm:p-3 shadow-2xl'
+                : 'bg-transparent rounded-[12px] p-0'
+            )}
+          >
+            {/* Top Cream Bar (.twostep-nav__top) */}
+            <div className="relative z-10 flex min-h-[72px] sm:min-h-[80px] items-center justify-between gap-4 rounded-[12px] bg-[#FFFCF8] px-4 py-3 sm:px-6 sm:py-4 text-[#291719] shadow-[0_4px_24px_rgba(79,0,11,0.08)]">
+              {/* Brand Logo (.twostep-nav__logo) */}
+              <Link
+                href="/"
+                onClick={() => setMenuOpen(false)}
+                className="group flex items-center gap-2.5 text-[#4F000B] focus-visible:outline-2"
+              >
+                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white p-0.5 border border-[#E8D8D4]">
+                  <Image
+                    src="/emblema-unsch-grabado.webp"
+                    alt="Emblema Oficial UNSCH"
+                    width={28}
+                    height={28}
+                    priority
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+                <span className="bbd-font-display text-[20px] sm:text-[23px] leading-none tracking-[-0.02em] text-[#4F000B]">
+                  GUAMÁN POMA
+                </span>
+              </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden items-center gap-0.5 2xl:flex">
-            {navItems.map(item => {
-              const active = isLinkActive(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    'relative rounded-lg px-2 py-1.5 text-xs 2xl:px-2.5 2xl:text-[13px] font-bold transition-all duration-150 whitespace-nowrap',
-                    active
-                      ? 'text-brand font-black'
-                      : 'text-gray-700 hover:bg-accent-ivory hover:text-brand'
-                  )}
-                >
-                  {item.label}
-                  {active && (
-                    <motion.div
-                      layoutId="activeNavIndicator"
-                      className="absolute inset-x-1.5 -bottom-1 h-[2px] rounded-full bg-brand"
-                      transition={
-                        shouldReduceMotion
-                          ? { duration: 0 }
-                          : { type: 'spring', stiffness: 420, damping: 32 }
-                      }
-                    />
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Right Action CTAs */}
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-            {/* Intranet / Iniciar Sesión Button */}
-            <Link
-              href="/intranet"
-              className={cn(
-                'hidden items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-all active:scale-[0.98] whitespace-nowrap shrink-0 2xl:inline-flex',
-                pathname === '/intranet'
-                  ? 'border-brand bg-brand text-white shadow-sm'
-                  : 'border-gray-300 bg-white text-gray-700 hover:border-brand hover:text-brand hover:bg-accent-ivory shadow-sm'
-              )}
-            >
-              <LogIn size={13} className={pathname === '/intranet' ? 'text-white' : 'text-brand'} />
-              <span>Intranet</span>
-            </Link>
-
-            {/* Admisión 2027 Button */}
-            <Link
-              href="/admision"
-              className="hidden items-center gap-1.5 rounded-full bg-brand px-3.5 py-1.5 text-[11px] font-black uppercase tracking-wider text-white shadow-md hover:bg-brand-light hover:shadow-lg active:scale-[0.98] transition-all whitespace-nowrap shrink-0 2xl:inline-flex"
-            >
-              <GraduationCap size={14} />
-              <span>Admisión 2027</span>
-              <ArrowRight size={12} className="hidden sm:inline" />
-            </Link>
-
-            {/* Mobile Hamburger Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="rounded-xl border border-gray-300 p-2 text-brand transition-colors hover:bg-accent-ivory active:scale-[0.97] 2xl:hidden shrink-0"
-              aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
-              aria-expanded={mobileMenuOpen}
-              aria-controls="landing-mobile-navigation"
-            >
-              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation Drawer */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={
-                shouldReduceMotion
-                  ? { duration: 0 }
-                  : { duration: 0.22, ease: [0.215, 0.61, 0.355, 1] }
-              }
-              id="landing-mobile-navigation"
-              className="border-t border-gray-200 bg-white px-4 py-4 shadow-2xl 2xl:hidden overflow-hidden sm:px-6"
-            >
-              <div className="grid gap-1">
-                {navItems.map(item => {
-                  const active = isLinkActive(item.href);
+              {/* Center Navigation Links (.nav-menu-links) */}
+              <div className="hidden lg:flex items-center gap-1">
+                {primaryBarLinks.map((item) => {
+                  const isActive =
+                    item.href === pathname ||
+                    (item.href !== '/' && pathname.startsWith(item.href));
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={cn(
-                        'flex items-center justify-between rounded-xl px-4 py-3 text-sm font-bold transition-colors',
-                        active
-                          ? 'bg-brand/10 text-brand font-black'
-                          : 'text-gray-800 hover:bg-accent-ivory hover:text-brand'
-                      )}
+                      className="group relative inline-flex items-center justify-center px-4 py-2 font-roboto text-[16px] font-medium leading-[24px] text-[#291719]"
                     >
-                      <span>{item.label}</span>
-                      <ArrowRight size={15} className={active ? 'text-brand' : 'text-gray-400'} />
+                      <span
+                        style={{ '--rot': item.rotation } as React.CSSProperties}
+                        className={cn(
+                          'absolute inset-x-1.5 inset-y-1 rounded-full bg-[#F5EBE8] transition-transform duration-300 ease-out',
+                          isActive
+                            ? 'scale-100 rotate-[-1.5deg]'
+                            : 'scale-0 group-hover:scale-100 group-hover:rotate-[var(--rot)]'
+                        )}
+                      />
+                      <span className="relative z-10">{item.label}</span>
                     </Link>
                   );
                 })}
+              </div>
 
-                {/* Mobile CTAs: Intranet & Admisión */}
-                <div className="mt-3 grid gap-2 border-t border-gray-100 pt-3">
-                  <Link
-                    href="/intranet"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-brand/30 bg-accent-ivory py-3 text-center text-sm font-bold text-brand shadow-sm hover:bg-white transition-colors"
-                  >
-                    <LogIn size={16} />
-                    <span>Intranet / Iniciar Sesión</span>
-                  </Link>
-
-                  <Link
+              {/* Right CTA & Hamburger Toggle (.nav-btn-wrap) */}
+              <div className="flex items-center gap-2">
+                <div className="hidden lg:block">
+                  <BbdButton
+                    label="Admisión 2027"
                     href="/admision"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-center text-sm font-bold text-white shadow hover:bg-brand-dark transition-colors"
-                  >
-                    <GraduationCap size={16} />
-                    <span>Proceso de Admisión 2027</span>
-                    <ArrowRight size={16} />
-                  </Link>
+                    variant="purple"
+                  />
+                </div>
+
+                {/* Mobile / Tablet Hamburger Toggle (.twostep-nav__toggle) */}
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen((prev) => !prev)}
+                  aria-label={menuOpen ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'}
+                  aria-expanded={menuOpen}
+                  aria-controls="bbd-twostep-drawer"
+                  className="flex h-12 w-12 items-center justify-center rounded-[8px] bg-[#E8D8D4] text-[#291719] transition-colors hover:bg-[#B5A29E] lg:hidden"
+                >
+                  <div className="relative flex h-5 w-6 flex-col items-center justify-center">
+                    <span
+                      className={cn(
+                        'block h-[2px] w-5 bg-[#291719] transition-transform duration-300',
+                        menuOpen ? 'translate-y-[1px] rotate-45' : '-translate-y-[4px]'
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        'block h-[2px] w-5 bg-[#291719] transition-transform duration-300',
+                        menuOpen ? '-translate-y-[1px] -rotate-45' : 'translate-y-[4px]'
+                      )}
+                    />
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Expandable Bottom Drawer (.twostep-nav__bottom) */}
+            <div
+              id="bbd-twostep-drawer"
+              className={cn(
+                'grid transition-all duration-500 ease-[cubic-bezier(0.625,0.05,0,1)]',
+                menuOpen
+                  ? 'grid-rows-[1fr] opacity-100 pt-6 pb-3 px-2 sm:px-4'
+                  : 'grid-rows-[0fr] opacity-0 pt-0 pb-0 px-2 pointer-events-none'
+              )}
+            >
+              <div className="overflow-hidden">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 items-start">
+                  {/* Left Column: Big Condensed Links + Quick Portal Routes */}
+                  <div className="flex flex-col items-start gap-3 lg:col-span-7">
+                    {drawerLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setMenuOpen(false)}
+                        className="bbd-font-display text-[34px] sm:text-[42px] leading-[1.02] tracking-[-0.02em] text-[#F5EBE8] hover:text-[#F9A7B1] transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+
+                    <div className="mt-2">
+                      <BbdButton
+                        label="Contáctanos"
+                        href="/contacto"
+                        variant="purple"
+                        onClick={() => setMenuOpen(false)}
+                      />
+                    </div>
+
+                    {/* Secondary portal links */}
+                    <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 border-t border-white/15 pt-4 text-xs text-[#F5EBE8]/80">
+                      {navItems.map((sub) => (
+                        <Link
+                          key={sub.href}
+                          href={sub.href}
+                          onClick={() => setMenuOpen(false)}
+                          className="hover:text-[#F9A7B1] transition-colors"
+                        >
+                          {sub.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right Column: Featured Pink Card (THE PLAN FOR BRADFORD'S FUTURE adaptation) */}
+                  <div className="rounded-[16px] bg-[#F9A7B1] p-6 sm:p-7 text-[#290006] lg:col-span-5">
+                    <h2 className="bbd-font-display text-[28px] sm:text-[32px] leading-[1.02] text-[#290006]">
+                      EL PLAN EDUCATIVO GUAMÁN POMA 2027
+                    </h2>
+                    <p className="mt-4 font-roboto text-[16px] font-light leading-[24px] text-[#290006]">
+                      Conoce cómo los Planteles de Aplicación de la UNSCH impulsan la excelencia académica, la investigación científica y la formación integral en Ayacucho.
+                    </p>
+                    <div className="mt-5">
+                      <BbdButton
+                        label="Ver el plan"
+                        href="/por-que-elegirnos"
+                        variant="white"
+                        onClick={() => setMenuOpen(false)}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
-    </>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
   );
 }

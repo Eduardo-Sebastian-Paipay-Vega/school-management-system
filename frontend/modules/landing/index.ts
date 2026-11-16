@@ -1,3 +1,11 @@
-export { default as Navbar, navItems } from './components/Navbar';
-export { default as Footer } from './components/Footer';
 export { default as Home } from './components/Home';
+export { default as Navbar } from './components/Navbar';
+export { default as Footer } from './components/Footer';
+export { default as HeroSection } from './components/HeroSection';
+export { default as BentoSection } from './components/BentoSection';
+export { default as AmbitionSection } from './components/AmbitionSection';
+export { default as FocusDriversSection } from './components/FocusDriversSection';
+export { default as GameChangersSection } from './components/GameChangersSection';
+export { default as DeliveryThemesSection } from './components/DeliveryThemesSection';
+export { default as StrengthsStatsSection } from './components/StrengthsStatsSection';
+export { default as BbdButton } from './components/BbdButton';

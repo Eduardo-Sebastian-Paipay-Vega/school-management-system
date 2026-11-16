@@ -6,12 +6,12 @@
   color-scheme: light;
 
   /* Primary Brand Colors */
-  --primary-colors-primary-brand: #500000;
+  --primary-colors-primary-brand: #4F000B;
   --primary-colors-secondary-brand: #FFFFFF;
 
   /* Secondary Brand Colors */
-  --secondary-colors-primary-brand-dark: #3C0000;
-  --secondary-colors-primary-brand-light: #732F2F;
+  --secondary-colors-primary-brand-dark: #3A0008;
+  --secondary-colors-primary-brand-light: #8F1025;
   --secondary-colors-tan: #D6D3C4;
   --secondary-colors-gray-100: #F6F6F6;
   --secondary-colors-gray-200: #EAEAEA;
@@ -50,13 +50,23 @@
 
 html {
   scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE / Edge legacy */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge, Opera */
+  width: 0;
+  height: 0;
 }
 
 body {
   margin: 0;
   font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: var(--secondary-colors-gray-900);
-  background-color: #FFFFFF;
+  background-color: var(--bbd-paper-lightest);
+  overflow-x: hidden;
 }
 
 button,
@@ -310,5 +320,344 @@ input:focus-visible {
   .footer-mascot-face {
     transition: none;
     transform: translateX(-50%);
+  }
+}
+
+/* ==========================================================================
+   VARIABLES DE COLOR DEL LANDING
+   NUEVA IDENTIDAD INSTITUCIONAL — BORGOÑA
+   ========================================================================== */
+
+:root {
+  --font-roboto: 'Roboto', Arial, sans-serif;
+  --font-roboto-condensed: 'Roboto Condensed', Impact, sans-serif;
+
+  /* ========================================================================
+     01. PAPER & FONDOS NEUTROS
+     Identidad: calidez, elegancia, limpieza y legibilidad.
+     ======================================================================== */
+
+  --bbd-paper-lightest: #FFFCF8;   /* Fondo principal del sitio */
+  --bbd-paper-lighter:  #FFF7F3;   /* Fondos secundarios y superficies */
+  --bbd-paper-light:    #F5EBE8;   /* Hover de listas y elementos */
+  --bbd-paper-normal:   #E8D8D4;   /* Bordes de tarjetas y separadores */
+  --bbd-paper-dark:     #B5A29E;   /* Bordes secundarios y elementos inactivos */
+  --bbd-paper-darker:   #796763;   /* Texto secundario y metadatos */
+  --bbd-paper-darkest:  #241719;   /* Texto de máxima jerarquía */
+
+  --bbd-neutral-lightest: #F1ECEA;
+
+  --bbd-ink:            #291719;   /* Texto del menú y contenido */
+  --bbd-shade-80:       rgba(41, 23, 25, 0.80); /* Párrafos y textos */
+  --bbd-shade-25:       rgba(79, 0, 11, 0.25);  /* Sombras y superposiciones */
+
+
+  /* ========================================================================
+     02. FAMILIA PRINCIPAL — BORGOÑA INSTITUCIONAL
+     Identidad: autoridad, prestigio, pertenencia y fuerza institucional.
+     Color de origen: #4F000B
+     ======================================================================== */
+
+  --bbd-pink-darkest:   #290006;   /* Texto sobre superficies pastel */
+  --bbd-pink-darker:    #3A0008;   /* H1/H2, títulos institucionales y footer */
+  --bbd-pink-dark:      #4F000B;   /* Color institucional principal */
+  --bbd-pink-normal:    #8F1025;   /* Botones primarios y acciones principales */
+  --bbd-pink-light:     #C32942;   /* Tarjetas destacadas y acentos */
+  --bbd-pink-lighter:   #E64B63;   /* Resaltados, indicadores y elementos activos */
+  --bbd-pink-lightest:  #F47788;   /* Decoraciones y elementos gráficos */
+
+  --bbd-pink-pastel-1:  #F9A7B1;   /* Tarjetas Bento y superficies destacadas */
+  --bbd-pink-pastel-2:  #FCE0E4;   /* Fondos suaves y etiquetas */
+  --bbd-pink-stats-bg:  #FFF0F2;   /* Fondo de transición de estadísticas */
+
+
+  /* ========================================================================
+     03. FAMILIA DORADA — EXCELENCIA Y DISTINCIÓN
+     Identidad: prestigio, reconocimiento, excelencia y logros.
+     ======================================================================== */
+
+  --bbd-gold-darkest:   #4A3008;   /* Texto sobre fondos dorados */
+  --bbd-gold-darker:    #79500D;   /* Títulos y elementos destacados */
+  --bbd-gold-dark:      #A87515;   /* Acentos institucionales */
+  --bbd-gold-normal:    #D49A22;   /* Indicadores y elementos protagonistas */
+  --bbd-gold-light:     #E5B342;   /* Tarjetas y destacados */
+  --bbd-gold-lighter:   #F0CD76;   /* Decoraciones y resaltados */
+  --bbd-gold-lightest:  #F8E3A9;   /* Barras e indicadores */
+  --bbd-gold-pastel:    #FFF5DC;   /* Fondos de tarjetas y estadísticas */
+
+
+  /* ========================================================================
+     04. FAMILIA AZUL — CONOCIMIENTO Y ACADEMIA
+     Identidad: investigación, tecnología, aprendizaje y confianza.
+     ======================================================================== */
+
+  --bbd-blue-darkest:   #103354;
+  --bbd-blue-darker:    #17466F;
+  --bbd-blue-dark:      #216397;
+  --bbd-blue-normal:    #2878B9;   /* Botones y elementos académicos */
+  --bbd-blue-light:     #5099D5;   /* Tarjetas Bento y elementos visuales */
+  --bbd-blue-lighter:   #83B9E5;
+  --bbd-blue-lightest:  #B9D8F2;
+  --bbd-blue-pastel:    #E7F3FC;   /* Fondos y etiquetas académicas */
+
+
+  /* ========================================================================
+     05. FAMILIA NARANJA — INNOVACIÓN Y DINAMISMO
+     Identidad: creatividad, energía, movimiento y estadísticas.
+     ======================================================================== */
+
+  --bbd-orange-darkest: #54230C;
+  --bbd-orange-darker:  #803711;
+  --bbd-orange-dark:    #B34E19;
+  --bbd-orange-normal:  #D96522;   /* Números gigantes y estadísticas */
+  --bbd-orange-light:   #ED7B32;   /* Tarjetas y elementos destacados */
+  --bbd-orange-lighter: #F69B60;   /* Tarjetas apiladas y acentos */
+  --bbd-orange-lightest:#FBC18F;   /* Barras de progreso */
+  --bbd-orange-pastel:  #FFF0E5;   /* Subtarjetas y fondos estadísticos */
+
+
+  /* ========================================================================
+     06. FAMILIA VERDE — CRECIMIENTO Y SOSTENIBILIDAD
+     Identidad: progreso, resultados, naturaleza y desarrollo.
+     ======================================================================== */
+
+  --bbd-green-darkest:  #16432B;
+  --bbd-green-darker:   #1E5938;
+  --bbd-green-dark:     #287548;   /* Números gigantes y resultados */
+  --bbd-green-normal:   #32965C;   /* Tarjetas y elementos protagonistas */
+  --bbd-green-light:    #58B77B;   /* Elementos activos */
+  --bbd-green-lighter:  #86D39D;
+  --bbd-green-lightest: #B7EBC4;   /* Barras de progreso */
+  --bbd-green-pastel:   #EAF8EE;   /* Fondos estadísticos y superficies */
+
+  /* Motion Easings */
+  --bbd-cubic-default: cubic-bezier(0.625, 0.05, 0, 1);
+  --bbd-smooth-ease: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.bbd-page {
+  background-color: var(--bbd-paper-lightest);
+  color: var(--bbd-shade-80);
+  font-family: var(--font-roboto), Arial, sans-serif;
+  font-weight: 300;
+  overflow-x: clip;
+}
+
+.bbd-font-display {
+  font-family: var(--font-roboto-condensed), Impact, sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.bbd-font-body {
+  font-family: var(--font-roboto), Arial, sans-serif;
+}
+
+.bbd-padding-global {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+@media (min-width: 768px) {
+  .bbd-padding-global {
+    padding-inline: 36px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .bbd-padding-global {
+    padding-inline: 41px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .bbd-padding-global {
+    padding-inline: 64px;
+  }
+}
+
+/* Heading scale matching 104px at 1440px, 66.56px at 1024px, 72px at 768px, 48px at 390px */
+.bbd-h1 {
+  font-family: var(--font-roboto-condensed), Impact, sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 48px;
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+}
+
+.bbd-h2 {
+  font-family: var(--font-roboto-condensed), Impact, sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 48px;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.bbd-banner-h1 {
+  font-family: var(--font-roboto-condensed), Impact, sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 32px;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+@media (min-width: 768px) {
+  .bbd-h1 {
+    font-size: 72px;
+    line-height: 0.95;
+  }
+  .bbd-h2 {
+    font-size: 72px;
+    line-height: 1.1;
+  }
+  .bbd-banner-h1 {
+    font-size: 44px;
+    line-height: 1.18;
+  }
+}
+
+@media (min-width: 1024px) {
+  .bbd-h1 {
+    font-size: 66.56px;
+    line-height: 1;
+  }
+  .bbd-h2 {
+    font-size: 66.56px;
+    line-height: 1.15;
+  }
+  .bbd-banner-h1 {
+    font-size: 48px;
+    line-height: 1.2;
+  }
+}
+
+@media (min-width: 1280px) {
+  .bbd-h1 {
+    font-size: 104px;
+    line-height: 1;
+  }
+  .bbd-h2 {
+    font-size: 104px;
+    line-height: 1.15;
+  }
+  .bbd-banner-h1 {
+    font-size: 64px;
+    line-height: 1.2;
+  }
+}
+
+/* Reconstructed Dual-Icon Button (.button-main) */
+.bbd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  padding: 12px 14px;
+  min-height: 48px;
+  font-family: var(--font-roboto), Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: transform 0.25s var(--bbd-smooth-ease), box-shadow 0.25s ease;
+}
+
+.bbd-btn__icon-left,
+.bbd-btn__icon-right {
+  position: absolute;
+  top: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: transform 0.55s var(--bbd-smooth-ease), opacity 0.45s ease;
+}
+
+.bbd-btn__icon-left {
+  left: 8px;
+  transform: translateY(-50%) scale(0);
+  opacity: 0;
+}
+
+.bbd-btn__icon-right {
+  right: 8px;
+  transform: translateY(-50%) scale(1);
+  opacity: 1;
+}
+
+.bbd-btn__text {
+  display: block;
+  position: relative;
+  z-index: 1;
+  margin-left: 0;
+  margin-right: 36px;
+  transition: margin 0.55s var(--bbd-smooth-ease), transform 0.55s var(--bbd-smooth-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bbd-btn:hover .bbd-btn__icon-left {
+    transform: translateY(-50%) scale(1);
+    opacity: 1;
+  }
+  .bbd-btn:hover .bbd-btn__icon-right {
+    transform: translateY(-50%) scale(0);
+    opacity: 0;
+  }
+  .bbd-btn:hover .bbd-btn__text {
+    margin-left: 36px;
+    margin-right: 0;
+  }
+}
+
+/* Reconstructed Eyebrow Pill (.eyebrow-wrap) */
+.bbd-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10.5px 14px;
+  border-radius: 14px;
+  font-family: var(--font-roboto), Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  min-height: 42px;
+  white-space: nowrap;
+}
+
+/* Reconstructed Underline Hover Effect ([data-underline-link]) */
+.bbd-underline-link {
+  position: relative;
+  display: inline-block;
+}
+
+.bbd-underline-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1.5px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.55s var(--bbd-cubic-default);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bbd-underline-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
   }
 }

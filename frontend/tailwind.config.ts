@@ -72,6 +72,8 @@ const config: Config = {
         heading: ['var(--font-heading)', 'var(--font-sans)', 'sans-serif'],
         display: ['var(--font-heading)', 'var(--font-sans)', 'sans-serif'],
         serif: ['var(--font-heading)', 'Georgia', 'serif'],
+        roboto: ['var(--font-roboto)', 'Arial', 'sans-serif'],
+        condensed: ['var(--font-roboto-condensed)', 'Impact', 'sans-serif'],
       },
     },
   },

@@ -4,14 +4,14 @@ import BbdButton from './BbdButton';
 
 export default function Footer() {
   return (
-    <footer className="relative w-full bg-[#3A0008] overflow-hidden">
+    <footer className="relative w-full bg-[color:var(--color-footer)] overflow-hidden">
       {/* Top Rounded Lip from Video/Stats Section (.section-video radius 0 0 64px 64px) */}
       <div
         aria-hidden="true"
         className="h-8 sm:h-12 w-full rounded-b-[32px] sm:rounded-b-[64px] bg-[#EAF8EE]"
       />
 
-      {/* PART 1: Monumental Deep Burgundy CTA Section (.section-cta, height ~686px) */}
+      {/* PART 1: Monumental Guindo CTA Section (.section-cta, height ~686px) */}
       <section className="relative w-full overflow-hidden py-20 lg:py-[128px]">
         {/* Left Decorative Diagonal Ribbon SVG (.footer-svg-draw-wrap) */}
         <svg
@@ -48,12 +48,12 @@ export default function Footer() {
         {/* Centered CTA Foreground Content (.cta-component-main) */}
         <div className="bbd-padding-global relative z-10">
           <div className="mx-auto flex max-w-[1040px] flex-col items-center text-center gap-8">
-            <div className="bbd-eyebrow bg-[#8F1025] text-[#FCE0E4]">
+            <div className="bbd-eyebrow bg-[#7A1E30] text-[#FCE0E4]">
               <span>Cómo participar</span>
             </div>
 
             <h2 className="bbd-h1 text-[#F9A7B1]">
-              <span className="text-[#E64B63]">EL CRECIMIENTO</span> NO OCURRE
+              <span className="text-[#F8E3A9]">EL CRECIMIENTO</span> NO OCURRE
               <br />
               EN AISLAMIENTO.
             </h2>
@@ -135,14 +135,14 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Col 2: Circular Social Links (.footer-social-icons 64x64, bg #F47788) */}
+          {/* Col 2: Circular Social Links (.footer-social-icons 64x64, bg #9B2226) */}
           <div className="flex items-center md:justify-center gap-3.5">
             <a
               href="https://www.unsch.edu.pe/"
               target="_blank"
               rel="noreferrer"
               aria-label="LinkedIn / Portal Institucional UNSCH"
-              className="flex h-16 w-16 items-center justify-center rounded-full bg-[#F47788] text-[#290006] transition-transform duration-200 hover:scale-105"
+              className="flex h-16 w-16 items-center justify-center rounded-full bg-[#9B2226] text-white transition-transform duration-200 hover:scale-105"
             >
               <span className="font-roboto text-[26px] font-bold leading-none">
                 in
@@ -154,7 +154,7 @@ export default function Footer() {
               target="_blank"
               rel="noreferrer"
               aria-label="X / Canal Oficial UNSCH"
-              className="flex h-16 w-16 items-center justify-center rounded-full bg-[#F47788] text-[#290006] transition-transform duration-200 hover:scale-105"
+              className="flex h-16 w-16 items-center justify-center rounded-full bg-[#9B2226] text-white transition-transform duration-200 hover:scale-105"
             >
               <svg
                 width="26"
@@ -218,14 +218,14 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom Monumental Bleed Wordmark SVG (1425x398 in #F47788) */}
+        {/* Bottom Monumental Bleed Wordmark SVG (1425x398 in #9B2226) */}
         <div
           aria-hidden="true"
           className="w-full overflow-hidden leading-none select-none pointer-events-none -mb-3"
         >
           <svg
             viewBox="0 0 1440 370"
-            className="block w-full h-auto text-[#F47788]"
+            className="block w-full h-auto text-[#9B2226]"
             preserveAspectRatio="xMidYMax meet"
           >
             <text

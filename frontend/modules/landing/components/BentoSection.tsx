@@ -58,9 +58,9 @@ export default function BentoSection() {
             </div>
 
             {/* Card 2: Blue Plan Card with 3 Angled Booklets (.bento-card.is--2) */}
-            <div className="relative flex min-h-[480px] lg:min-h-[545px] flex-col justify-between overflow-hidden rounded-[16px] bg-[#5099D5] p-6 sm:p-8 text-white">
+            <div className="relative flex min-h-[480px] lg:min-h-[545px] flex-col justify-between overflow-hidden rounded-[16px] bg-[#9B2226] p-6 sm:p-8 text-white">
               <div className="relative z-10 flex max-w-[564px] flex-col items-start gap-5">
-                <h2 className="bbd-font-display text-[28px] sm:text-[32px] leading-[32px] text-[#E7F3FC]">
+                <h2 className="bbd-font-display text-[28px] sm:text-[32px] leading-[32px] text-[#FCE0E4]">
                   EL PLAN PARA EL FUTURO DE GUAMÁN POMA
                 </h2>
 
@@ -97,15 +97,15 @@ export default function BentoSection() {
                         <div className="bbd-font-display text-[20px] leading-none tracking-tight text-[#291719]">
                           GUAMÁN POMA
                         </div>
-                        <div className="font-roboto text-[13px] font-light tracking-tight text-[#796763]">
+                        <div className="font-roboto text-[13px] font-light tracking-tight text-[#64748B]">
                           UNSCH AYACUCHO 2025 - 2035
                         </div>
-                        <div className="font-roboto text-[8px] font-medium uppercase tracking-widest text-[#B5A29E]">
+                        <div className="font-roboto text-[8px] font-medium uppercase tracking-widest text-[#64748B]">
                           PLAN DE DESARROLLO E INFRAESTRUCTURA
                         </div>
                       </div>
                       {/* Colorful Ribbon Artwork */}
-                      <div className="relative h-full w-full bg-[#E8D8D4]">
+                      <div className="relative h-full w-full bg-[#E5E7EB]">
                         <Image
                           src="/hero-pabellon.webp"
                           alt=""
@@ -121,7 +121,7 @@ export default function BentoSection() {
                           <path
                             d="M-10 25 Q 45 5, 95 30 T 205 25 T 310 30"
                             fill="none"
-                            stroke="#5099D5"
+                            stroke="#9B2226"
                             strokeWidth="8"
                           />
                           <path
@@ -217,13 +217,13 @@ export default function BentoSection() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-[960px] overflow-hidden rounded-[16px] bg-[#FFFCF8] p-2 shadow-2xl"
+            className="relative w-full max-w-[960px] overflow-hidden rounded-[16px] bg-[#FFFFFF] p-2 shadow-2xl"
           >
             <button
               type="button"
               onClick={() => setVideoModalOpen(false)}
               aria-label="Cerrar video"
-              className="absolute right-5 top-5 z-20 flex h-12 w-12 items-center justify-center rounded-[16px] bg-[#FFFCF8] text-[#291719] shadow-md hover:bg-[#E8D8D4]"
+              className="absolute right-5 top-5 z-20 flex h-12 w-12 items-center justify-center rounded-[16px] bg-[#FFFFFF] text-[#291719] shadow-md hover:bg-[#E5E7EB]"
             >
               ✕
             </button>

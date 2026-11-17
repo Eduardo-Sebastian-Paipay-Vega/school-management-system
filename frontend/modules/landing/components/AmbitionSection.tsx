@@ -40,7 +40,7 @@ const rightColumnCards = [
     title: 'Innovación y Laboratorios',
     subtitle: 'Prácticas en facultades de la UNSCH',
     badge: 'Ciencia Experimental',
-    accent: 'from-[#103354]/85 via-black/25 to-transparent',
+    accent: 'from-[#142557]/85 via-black/25 to-transparent',
     img: '/hero-pabellon.webp',
     pos: 'object-right',
   },
@@ -96,7 +96,7 @@ export default function AmbitionSection() {
                   <span>Nuestra ambición</span>
                 </div>
 
-                <h2 className="bbd-h1 text-[#3A0008]">
+                <h2 className="bbd-h1 text-[color:var(--color-heading)]">
                   AVANZANDO
                   <br />
                   COMO COLEGIO
@@ -187,10 +187,10 @@ export default function AmbitionSection() {
                 {/* Top & Bottom Fade Overlay (.header-gradient-overlay) */}
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#FFFCF8] via-transparent to-[#FFFCF8]"
+                  className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#FFFFFF] via-transparent to-[#FFFFFF]"
                   style={{
                     backgroundImage:
-                      'linear-gradient(180deg, #FFFCF8 0%, rgba(255,252,248,0) 16%, rgba(255,252,248,0) 84%, #FFFCF8 100%)',
+                      'linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0) 16%, rgba(255,255,255,0) 84%, #FFFFFF 100%)',
                   }}
                 />
               </div>

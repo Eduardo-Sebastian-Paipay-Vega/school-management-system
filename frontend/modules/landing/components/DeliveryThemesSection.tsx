@@ -13,7 +13,7 @@ export default function DeliveryThemesSection() {
                 <span>Crecimiento</span>
               </div>
 
-              <h2 className="bbd-h2 text-[#3A0008]">
+              <h2 className="bbd-h2 text-[color:var(--color-heading)]">
                 NUESTROS 3
                 <br />
                 EJES DE
@@ -64,10 +64,10 @@ export default function DeliveryThemesSection() {
                 </p>
               </div>
 
-              {/* Card 2: PRODUCTIVITY / RENDIMIENTO (.layout-card.card--2, bg #ED7B32, color #FFF0E5, tilted) */}
-              <div className="flex min-h-[320px] w-full max-w-[448px] -rotate-2 lg:-rotate-[4deg] flex-col justify-between rounded-[24px] bg-[#ED7B32] p-8 sm:p-12 text-[#FFF0E5] shadow-lg">
+              {/* Card 2: PRODUCTIVITY / RENDIMIENTO (.layout-card.card--2, bg #ED7B32, color #54230C, tilted) */}
+              <div className="flex min-h-[320px] w-full max-w-[448px] -rotate-2 lg:-rotate-[4deg] flex-col justify-between rounded-[24px] bg-[#ED7B32] p-8 sm:p-12 text-[#54230C] shadow-lg">
                 <div className="flex items-center justify-between gap-4">
-                  <h3 className="bbd-font-display text-[32px] leading-[32px] text-[#FFF0E5]">
+                  <h3 className="bbd-font-display text-[32px] leading-[32px] text-[#54230C]">
                     EXCELENCIA
                   </h3>
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[8px] bg-[#FFF0E5] text-[#B34E19]">
@@ -87,13 +87,13 @@ export default function DeliveryThemesSection() {
                   </div>
                 </div>
 
-                <p className="mt-10 bbd-font-body text-[18px] leading-[27px] sm:text-[20px] sm:leading-[30px] font-light text-white">
+                <p className="mt-10 bbd-font-body text-[18px] leading-[27px] sm:text-[20px] sm:leading-[30px] font-light text-[#54230C]">
                   Acelerando el logro académico en áreas clave como ciencias experimentales, razonamiento matemático, comprensión lectora y tecnologías digitales.
                 </p>
               </div>
 
-              {/* Card 3: PLACE / ENTORNO (.layout-card.card--3, bg #32965C, color #EAF8EE, tilted) */}
-              <div className="flex min-h-[314px] w-full max-w-[448px] rotate-1 lg:rotate-[2deg] flex-col justify-between rounded-[24px] bg-[#32965C] p-8 sm:p-12 text-[#EAF8EE] shadow-lg">
+              {/* Card 3: PLACE / ENTORNO (.layout-card.card--3, bg #287548, color #EAF8EE, tilted) */}
+              <div className="flex min-h-[314px] w-full max-w-[448px] rotate-1 lg:rotate-[2deg] flex-col justify-between rounded-[24px] bg-[#287548] p-8 sm:p-12 text-[#EAF8EE] shadow-lg">
                 <div className="flex items-center justify-between gap-4">
                   <h3 className="bbd-font-display text-[32px] leading-[32px] text-[#EAF8EE]">
                     ENTORNO

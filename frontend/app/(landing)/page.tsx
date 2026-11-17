@@ -8,7 +8,7 @@ import StrengthsStatsSection from '@/modules/landing/components/StrengthsStatsSe
 
 export default function HomePage() {
   return (
-    <div className="bbd-page bg-[#FFFCF8]">
+    <div className="bbd-page bg-[#FFFFFF]">
       {/* SECTION 0: FULL-SCREEN HERO SECTION (.section-header) */}
       <HeroSection />
 

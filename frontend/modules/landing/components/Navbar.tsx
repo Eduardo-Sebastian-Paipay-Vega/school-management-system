@@ -68,24 +68,24 @@ export default function Navbar() {
       {/* Floating Two-Step Bar Container */}
       <div className="mx-auto w-full max-w-[1280px] px-3 pt-3 sm:px-5 sm:pt-5">
         <div className="relative pointer-events-auto">
-          {/* Deep Burgundy Expandable Background (.twostep-nav__back-bg) */}
+          {/* Guindo Expandable Background (.twostep-nav__back-bg) */}
           <div
             className={cn(
               ' relative overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.625,0.05,0,1)]',
               menuOpen
-                ? 'bg-[#3A0008] rounded-[24px] p-2.5 sm:p-3 shadow-2xl'
+                ? 'bg-[color:var(--color-navbar)] rounded-[24px] p-2.5 sm:p-3 shadow-2xl'
                 : 'bg-transparent rounded-[12px] p-0'
             )}
           >
-            {/* Top Cream Bar (.twostep-nav__top) */}
-            <div className="relative z-10 flex min-h-[72px] sm:min-h-[80px] items-center justify-between gap-4 rounded-[12px] bg-[#FFFCF8] px-4 py-3 sm:px-6 sm:py-4 text-[#291719] shadow-[0_4px_24px_rgba(79,0,11,0.08)]">
+            {/* Top Guindo Bar (.twostep-nav__top) */}
+            <div className="relative z-10 flex min-h-[72px] sm:min-h-[80px] items-center justify-between gap-4 rounded-[12px] bg-[color:var(--color-navbar)] px-4 py-3 sm:px-6 sm:py-4 text-white shadow-[0_4px_24px_rgba(79,0,11,0.2)]">
               {/* Brand Logo (.twostep-nav__logo) */}
               <Link
                 href="/"
                 onClick={() => setMenuOpen(false)}
-                className="group flex items-center gap-2.5 text-[#4F000B] focus-visible:outline-2"
+                className="group flex items-center gap-2.5 text-white focus-visible:outline-2"
               >
-                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white p-0.5 border border-[#E8D8D4]">
+                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white p-0.5 border border-[#E5E7EB]">
                   <Image
                     src="/emblema-unsch-grabado.webp"
                     alt="Emblema Oficial UNSCH"
@@ -95,7 +95,7 @@ export default function Navbar() {
                     className="h-full w-full object-contain"
                   />
                 </div>
-                <span className="bbd-font-display text-[20px] sm:text-[23px] leading-none tracking-[-0.02em] text-[#4F000B]">
+                <span className="bbd-font-display text-[20px] sm:text-[23px] leading-none tracking-[-0.02em] text-white">
                   GUAMÁN POMA
                 </span>
               </Link>
@@ -110,12 +110,12 @@ export default function Navbar() {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="group relative inline-flex items-center justify-center px-4 py-2 font-roboto text-[16px] font-medium leading-[24px] text-[#291719]"
+                      className="group relative inline-flex items-center justify-center px-4 py-2 font-roboto text-[16px] font-medium leading-[24px] text-white"
                     >
                       <span
                         style={{ '--rot': item.rotation } as React.CSSProperties}
                         className={cn(
-                          'absolute inset-x-1.5 inset-y-1 rounded-full bg-[#F5EBE8] transition-transform duration-300 ease-out',
+                          'absolute inset-x-1.5 inset-y-1 rounded-full bg-[#9B2226] transition-transform duration-300 ease-out',
                           isActive
                             ? 'scale-100 rotate-[-1.5deg]'
                             : 'scale-0 group-hover:scale-100 group-hover:rotate-[var(--rot)]'
@@ -144,18 +144,18 @@ export default function Navbar() {
                   aria-label={menuOpen ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'}
                   aria-expanded={menuOpen}
                   aria-controls="bbd-twostep-drawer"
-                  className="flex h-12 w-12 items-center justify-center rounded-[8px] bg-[#E8D8D4] text-[#291719] transition-colors hover:bg-[#B5A29E] lg:hidden"
+                  className="flex h-12 w-12 items-center justify-center rounded-[8px] bg-[#9B2226] text-white transition-colors hover:bg-[#4F000B] lg:hidden"
                 >
                   <div className="relative flex h-5 w-6 flex-col items-center justify-center">
                     <span
                       className={cn(
-                        'block h-[2px] w-5 bg-[#291719] transition-transform duration-300',
+                        'block h-[2px] w-5 bg-white transition-transform duration-300',
                         menuOpen ? 'translate-y-[1px] rotate-45' : '-translate-y-[4px]'
                       )}
                     />
                     <span
                       className={cn(
-                        'block h-[2px] w-5 bg-[#291719] transition-transform duration-300',
+                        'block h-[2px] w-5 bg-white transition-transform duration-300',
                         menuOpen ? '-translate-y-[1px] -rotate-45' : 'translate-y-[4px]'
                       )}
                     />
@@ -183,7 +183,7 @@ export default function Navbar() {
                         key={link.href}
                         href={link.href}
                         onClick={() => setMenuOpen(false)}
-                        className="bbd-font-display text-[34px] sm:text-[42px] leading-[1.02] tracking-[-0.02em] text-[#F5EBE8] hover:text-[#F9A7B1] transition-colors"
+                        className="bbd-font-display text-[34px] sm:text-[42px] leading-[1.02] tracking-[-0.02em] text-white hover:text-[#F9A7B1] transition-colors"
                       >
                         {link.label}
                       </Link>
@@ -199,7 +199,7 @@ export default function Navbar() {
                     </div>
 
                     {/* Secondary portal links */}
-                    <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 border-t border-white/15 pt-4 text-xs text-[#F5EBE8]/80">
+                    <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 border-t border-white/15 pt-4 text-xs text-white/80">
                       {navItems.map((sub) => (
                         <Link
                           key={sub.href}

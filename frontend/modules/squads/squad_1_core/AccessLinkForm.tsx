@@ -29,7 +29,7 @@ export function AccessLinkForm({purpose}:{purpose:Purpose}){
   async function submit(event:FormEvent){
     event.preventDefault();setBusy(true);setError('');setMessage('');
     try{
-      const body=purpose==='recover'?{codigoModular:codigo,identifier}:
+      const body=purpose==='recover'?(codigo.trim()?{codigoModular:codigo.trim(),identifier:identifier.trim()}:{identifier:identifier.trim()}):
         purpose==='guardian'?{codigoModular:codigo,token,password,consentimiento:consent,
           versionTexto:consentDocument?.version}:
         {codigoModular:codigo,token,password};
@@ -41,9 +41,13 @@ export function AccessLinkForm({purpose}:{purpose:Purpose}){
   return <div className="mx-auto max-w-lg rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
     <h1 className="text-2xl font-black text-brand-dark">{config[purpose].title}</h1>
     <form onSubmit={submit} className="mt-5 space-y-4">
-      <label htmlFor="codigo-link" className="block text-sm font-semibold">Código modular</label>
-      <InputText id="codigo-link" value={codigo} onChange={e=>setCodigo(e.target.value)} required className="w-full"/>
-      {purpose==='recover'?<><label htmlFor="identifier-link" className="block text-sm font-semibold">Usuario o correo</label>
+      {purpose !== 'recover' && (
+        <>
+          <label htmlFor="codigo-link" className="block text-sm font-semibold">Código modular</label>
+          <InputText id="codigo-link" value={codigo} onChange={e=>setCodigo(e.target.value)} required className="w-full"/>
+        </>
+      )}
+      {purpose==='recover'?<><label htmlFor="identifier-link" className="block text-sm font-semibold">Usuario, correo o DNI</label>
         <InputText id="identifier-link" value={identifier} onChange={e=>setIdentifier(e.target.value)} required className="w-full"/></>:
         <><label htmlFor="token-link" className="block text-sm font-semibold">Token de un solo uso</label>
           <InputText id="token-link" value={token} onChange={e=>setToken(e.target.value)} required className="w-full"/>

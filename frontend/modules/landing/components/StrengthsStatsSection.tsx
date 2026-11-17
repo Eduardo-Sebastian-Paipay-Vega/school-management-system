@@ -194,10 +194,10 @@ export default function StrengthsStatsSection() {
       style={{ backgroundColor: bgColor }}
       className="relative w-full transition-colors duration-700 ease-out"
     >
-      {/* Top Soft Gradient Transition from Paper (#FFFCF8) */}
+      {/* Top Soft Gradient Transition from Paper (#FFFFFF) */}
       <div
         aria-hidden="true"
-        className="pointer-events-none h-24 w-full bg-gradient-to-b from-[#FFFCF8] to-transparent"
+        className="pointer-events-none h-24 w-full bg-gradient-to-b from-[#FFFFFF] to-transparent"
       />
 
       {/* SUBSECTION 1: ORANGE STATS (.stats-orange) */}
@@ -210,7 +210,7 @@ export default function StrengthsStatsSection() {
                 <div className="bbd-eyebrow bg-[#FFF0E5] border border-[#FBC18F] text-[#54230C]">
                   <span>Áreas prioritarias</span>
                 </div>
-                <h2 className="bbd-h2 text-[#3A0008]">
+                <h2 className="bbd-h2 text-[color:var(--color-heading)]">
                   NUESTRAS
                   <br />
                   FORTALEZAS
@@ -241,7 +241,7 @@ export default function StrengthsStatsSection() {
                         {sector.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="bbd-eyebrow bg-[#ED7B32] text-[#FFF0E5]"
+                            className="bbd-eyebrow bg-[#803711] text-[#FFF0E5]"
                           >
                             {tag}
                           </span>
@@ -320,7 +320,7 @@ export default function StrengthsStatsSection() {
                         {sector.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="bbd-eyebrow bg-[#8F1025] text-[#FCE0E4]"
+                            className="bbd-eyebrow bg-[#7A1E30] text-[#FCE0E4]"
                           >
                             {tag}
                           </span>
@@ -361,7 +361,7 @@ export default function StrengthsStatsSection() {
                     </div>
 
                     <div className="flex flex-col items-start lg:items-center justify-center gap-4 lg:text-center">
-                      <div className="bbd-font-display text-[84px] sm:text-[104px] leading-none text-[#8F1025]">
+                      <div className="bbd-font-display text-[84px] sm:text-[104px] leading-none text-[#7A1E30]">
                         {sector.bigNumber}
                       </div>
                       <div className="bbd-font-body text-[20px] sm:text-[24px] leading-[32px] font-medium text-[#3A0008] max-w-[180px]">
@@ -397,7 +397,7 @@ export default function StrengthsStatsSection() {
                         {sector.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="bbd-eyebrow bg-[#32965C] text-[#EAF8EE]"
+                            className="bbd-eyebrow bg-[#287548] text-[#EAF8EE]"
                           >
                             {tag}
                           </span>
@@ -453,7 +453,7 @@ export default function StrengthsStatsSection() {
             {/* VIDEO SHOWCASE COMPONENT (.padding-section-medium.is--vimeo -> .video-component) */}
             <div className="mt-24 lg:mt-[128px] flex flex-col gap-12 lg:gap-16">
               <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-end">
-                <h2 className="bbd-h2 text-[#3A0008] max-w-[1100px]">
+                <h2 className="bbd-h2 text-[color:var(--color-heading)] max-w-[1100px]">
                   CONSTRUYENDO LO QUE
                   <br />
                   EL FUTURO NECESITA
@@ -517,7 +517,7 @@ export default function StrengthsStatsSection() {
                     <p className="mt-2 max-w-xl font-roboto text-base sm:text-lg font-light text-white/90">
                       4 Losas Polideportivas Techadas · Laboratorios Universitarios UNSCH · Niveles Inicial, Primaria y Secundaria en Huamanga, Ayacucho.
                     </p>
-                    <span className="mt-4 text-xs uppercase tracking-widest text-[#F47788]">
+                    <span className="mt-4 text-xs uppercase tracking-widest text-[#F9A7B1]">
                       Haz clic para pausar la vista previa
                     </span>
                   </div>

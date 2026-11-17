@@ -90,6 +90,16 @@ input:focus-visible {
   outline-offset: 3px;
 }
 
+.bbd-page nav :focus-visible,
+.bbd-page footer > section :focus-visible {
+  outline-color: var(--bbd-gold-lightest);
+}
+
+.bbd-page nav .bbd-btn,
+.bbd-page footer > section .bbd-btn {
+  box-shadow: 0 0 0 2px var(--bbd-pink-pastel-1);
+}
+
 .content-width {
   max-width: 1360px;
   margin-inline: auto;
@@ -152,7 +162,7 @@ input:focus-visible {
 .card-img {
   background-image:
     linear-gradient(135deg, rgba(80, 0, 0, 0.12), rgba(60, 0, 0, 0.35)),
-    linear-gradient(120deg, #FAF7F3, #D6D3C4 52%, #AF8846 120%);
+    linear-gradient(120deg, #F8FAFC, #E5E7EB 52%, #D49A22 120%);
 }
 
 .hero-one {
@@ -170,7 +180,7 @@ input:focus-visible {
       90deg,
       rgba(60, 0, 0, 0.94) 0%,
       rgba(80, 0, 0, 0.86) 35%,
-      rgba(115, 47, 47, 0.62) 68%,
+      rgba(122, 30, 48, 0.62) 68%,
       rgba(60, 0, 0, 0.40) 100%
     ),
     radial-gradient(
@@ -186,7 +196,7 @@ input:focus-visible {
       112deg,
       rgba(32, 0, 0, 0.95) 0%,
       rgba(80, 0, 0, 0.85) 40%,
-      rgba(149, 70, 59, 0.65) 75%,
+      rgba(122, 30, 48, 0.65) 75%,
       rgba(175, 136, 70, 0.40) 100%
     ),
     radial-gradient(
@@ -205,7 +215,7 @@ input:focus-visible {
     linear-gradient(
       115deg,
       rgba(60, 0, 0, 0.95) 0%,
-      rgba(115, 47, 47, 0.82) 45%,
+      rgba(122, 30, 48, 0.82) 45%,
       rgba(175, 136, 70, 0.55) 80%,
       rgba(60, 0, 0, 0.40) 100%
     ),
@@ -325,7 +335,7 @@ input:focus-visible {
 
 /* ==========================================================================
    VARIABLES DE COLOR DEL LANDING
-   NUEVA IDENTIDAD INSTITUCIONAL — BORGOÑA
+   IDENTIDAD INSTITUCIONAL INTEGRADA — BORGOÑA, GUINDO Y AZUL MARINO
    ========================================================================== */
 
 :root {
@@ -334,15 +344,15 @@ input:focus-visible {
 
   /* ========================================================================
      01. PAPER & FONDOS NEUTROS
-     Identidad: calidez, elegancia, limpieza y legibilidad.
+     Identidad: limpieza, elegancia, equilibrio y legibilidad.
      ======================================================================== */
 
-  --bbd-paper-lightest: #FFFCF8;   /* Fondo principal del sitio */
-  --bbd-paper-lighter:  #FFF7F3;   /* Fondos secundarios y superficies */
-  --bbd-paper-light:    #F5EBE8;   /* Hover de listas y elementos */
-  --bbd-paper-normal:   #E8D8D4;   /* Bordes de tarjetas y separadores */
+  --bbd-paper-lightest: #FFFFFF;   /* Fondo principal del sitio */
+  --bbd-paper-lighter:  #F8FAFC;   /* Fondos secundarios y superficies */
+  --bbd-paper-light:    #F1ECEA;   /* Hover de listas y elementos */
+  --bbd-paper-normal:   #E5E7EB;   /* Bordes de tarjetas y separadores */
   --bbd-paper-dark:     #B5A29E;   /* Bordes secundarios y elementos inactivos */
-  --bbd-paper-darker:   #796763;   /* Texto secundario y metadatos */
+  --bbd-paper-darker:   #64748B;   /* Texto secundario y metadatos */
   --bbd-paper-darkest:  #241719;   /* Texto de máxima jerarquía */
 
   --bbd-neutral-lightest: #F1ECEA;
@@ -351,24 +361,33 @@ input:focus-visible {
   --bbd-shade-80:       rgba(41, 23, 25, 0.80); /* Párrafos y textos */
   --bbd-shade-25:       rgba(79, 0, 11, 0.25);  /* Sombras y superposiciones */
 
+  --institutional-white: #FFFFFF;
+  --institutional-smoke: #F8FAFC;
+  --institutional-gray-light: #E5E7EB;
+  --institutional-gray: #64748B;
+  --institutional-gray-dark: #4B5563;
+
 
   /* ========================================================================
-     02. FAMILIA PRINCIPAL — BORGOÑA INSTITUCIONAL
-     Identidad: autoridad, prestigio, pertenencia y fuerza institucional.
-     Color de origen: #4F000B
+     02. FAMILIA PRINCIPAL — BORGOÑA Y GUINDO
+     Identidad: pertenencia, autoridad y prestigio académico.
      ======================================================================== */
 
   --bbd-pink-darkest:   #290006;   /* Texto sobre superficies pastel */
-  --bbd-pink-darker:    #3A0008;   /* H1/H2, títulos institucionales y footer */
+  --bbd-pink-darker:    #3A0008;   /* Superficies institucionales oscuras */
   --bbd-pink-dark:      #4F000B;   /* Color institucional principal */
-  --bbd-pink-normal:    #8F1025;   /* Botones primarios y acciones principales */
-  --bbd-pink-light:     #C32942;   /* Tarjetas destacadas y acentos */
-  --bbd-pink-lighter:   #E64B63;   /* Resaltados, indicadores y elementos activos */
-  --bbd-pink-lightest:  #F47788;   /* Decoraciones y elementos gráficos */
+  --bbd-pink-normal:    #7A1E30;   /* Botones primarios y acciones principales */
+  --bbd-pink-light:     #9B2226;   /* Etiquetas y destacados */
+  --bbd-pink-lighter:   #C32942;   /* Tarjetas destacadas y acentos */
+  --bbd-pink-lightest:  #E64B63;   /* Decoraciones y elementos gráficos */
 
   --bbd-pink-pastel-1:  #F9A7B1;   /* Tarjetas Bento y superficies destacadas */
   --bbd-pink-pastel-2:  #FCE0E4;   /* Fondos suaves y etiquetas */
   --bbd-pink-stats-bg:  #FFF0F2;   /* Fondo de transición de estadísticas */
+
+  --institutional-burgundy: #4F000B;
+  --institutional-maroon: #7A1E30;
+  --institutional-maroon-accent: #9B2226;
 
 
   /* ========================================================================
@@ -387,18 +406,20 @@ input:focus-visible {
 
 
   /* ========================================================================
-     04. FAMILIA AZUL — CONOCIMIENTO Y ACADEMIA
-     Identidad: investigación, tecnología, aprendizaje y confianza.
+     04. ALIAS DE COMPATIBILIDAD — ANTIGUA FAMILIA AZUL
+     Los nombres se conservan; el landing usa ahora tonos institucionales guindos.
      ======================================================================== */
 
-  --bbd-blue-darkest:   #103354;
-  --bbd-blue-darker:    #17466F;
-  --bbd-blue-dark:      #216397;
-  --bbd-blue-normal:    #2878B9;   /* Botones y elementos académicos */
-  --bbd-blue-light:     #5099D5;   /* Tarjetas Bento y elementos visuales */
-  --bbd-blue-lighter:   #83B9E5;
-  --bbd-blue-lightest:  #B9D8F2;
-  --bbd-blue-pastel:    #E7F3FC;   /* Fondos y etiquetas académicas */
+  --bbd-blue-darkest:   #4F000B;
+  --bbd-blue-darker:    #4F000B;
+  --bbd-blue-dark:      #7A1E30;
+  --bbd-blue-normal:    #7A1E30;
+  --bbd-blue-light:     #9B2226;
+  --bbd-blue-lighter:   #C32942;
+  --bbd-blue-lightest:  #FCE0E4;
+  --bbd-blue-pastel:    #FCE0E4;
+
+  --institutional-navy: #7A1E30;
 
 
   /* ========================================================================
@@ -430,17 +451,52 @@ input:focus-visible {
   --bbd-green-lightest: #B7EBC4;   /* Barras de progreso */
   --bbd-green-pastel:   #EAF8EE;   /* Fondos estadísticos y superficies */
 
+  /* Roles semánticos del landing. Se conservan las familias cromáticas. */
+  --color-navbar: #7A1E30;
+  --color-footer: #7A1E30;
+  --color-heading: #7A1E30;
+  --color-heading-institutional: #4F000B;
+  --color-primary: #7A1E30;
+  --color-primary-hover: #4F000B;
+  --color-accent: #9B2226;
+  --color-background: #FFFFFF;
+  --color-background-secondary: #F8FAFC;
+  --color-text-primary: #291719;
+  --color-text-secondary: #4B5563;
+  --color-text-muted: #64748B;
+  --color-border: #E5E7EB;
+
   /* Motion Easings */
   --bbd-cubic-default: cubic-bezier(0.625, 0.05, 0, 1);
   --bbd-smooth-ease: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .bbd-page {
+  /* El portal público adopta la nueva paleta sin alterar la intranet. */
+  --primary-colors-primary-brand: #7A1E30;
+  --secondary-colors-primary-brand-dark: #4F000B;
+  --secondary-colors-primary-brand-light: #9B2226;
+  --accent-colors-ivory: #F8FAFC;
+  --accent-colors-cream: #F1ECEA;
+  --accent-colors-rouge: #9B2226;
+  --accent-colors-gold: #79500D;
+  --accent-colors-cobalt: #9B2226;
   background-color: var(--bbd-paper-lightest);
   color: var(--bbd-shade-80);
   font-family: var(--font-roboto), Arial, sans-serif;
   font-weight: 300;
   overflow-x: clip;
+}
+
+.bbd-page .hero-one,
+.bbd-page .hero-two,
+.bbd-page .hero-three {
+  --secondary-colors-primary-brand-dark: #4F000B;
+  --accent-colors-gold: #F8E3A9;
+}
+
+.bbd-page :is(h1, h2, h3, h4).text-brand-dark {
+  color: var(--color-heading);
 }
 
 .bbd-font-display {

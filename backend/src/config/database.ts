@@ -63,3 +63,11 @@ export async function resolveInstitution(codigoModular: string): Promise<string 
   const result = await pool.query<{ id: string }>('SELECT fn_resolver_institucion($1) AS id', [codigoModular]);
   return result.rows[0]?.id ?? null;
 }
+
+export async function resolveInstitutionSilencioso(identifier: string, docHash?: string | null): Promise<string | null> {
+  const result = await pool.query<{ id: string }>(
+    'SELECT fn_resolver_tenant_silencioso($1, $2) AS id',
+    [identifier, docHash ?? null]
+  );
+  return result.rows[0]?.id ?? null;
+}

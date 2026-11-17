@@ -8,7 +8,7 @@ import type { CoreSessionData, CoreUser } from '@/modules/shared/api';
 export type { CoreUser } from '@/modules/shared/api';
 type SessionResult = CoreSessionData;
 type CoreSession={user:CoreUser|null; loading:boolean;
-  login:(codigoModular:string,identifier:string,password:string)=>Promise<void>;
+  login:(arg1:string,arg2:string,arg3?:string)=>Promise<void>;
   logout:()=>Promise<void>;
   request:<T>(path:string,init?:RequestInit)=>Promise<T>;
   download:(path:string,filename:string)=>Promise<void>;
@@ -40,9 +40,22 @@ export function SessionProvider({children}:{children:React.ReactNode}){
   useEffect(()=>{
     if(!loading && !user && pathname.startsWith('/intranet')) router.replace('/login');
   },[loading,user,pathname,router]);
-  const login=useCallback(async(codigoModular:string,identifier:string,password:string)=>{
+  const login=useCallback(async(arg1:string,arg2:string,arg3?:string)=>{
+    let codigoModular:string|undefined;
+    let identifier:string;
+    let password:string;
+    if(arg3!==undefined){
+      codigoModular=arg1.trim()||undefined;
+      identifier=arg2.trim();
+      password=arg3;
+    }else{
+      identifier=arg1.trim();
+      password=arg2;
+    }
+    const body:Record<string,string>={identifier,password};
+    if(codigoModular) body.codigoModular=codigoModular;
     const response=await fetch(`${API}/api/v1/auth/login`,{method:'POST',credentials:'include',
-      headers:{'Content-Type':'application/json'},body:JSON.stringify({codigoModular,identifier,password})});
+      headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const data=await parse<SessionResult>(response);
     token.current=data.accessToken;
     setUser(data.user);

@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { PoolClient } from 'pg';
-import { resolveInstitution, withTenant } from '../config/database';
+import { resolveInstitution, resolveInstitutionSilencioso, withTenant } from '../config/database';
 import { redisClient } from '../config/redis';
 import { JWT_SECRET, JWT_REFRESH_SECRET } from '../config/jwt';
 import { documentHash, randomToken, tokenHash } from '../core/identity-crypto';
@@ -46,12 +46,23 @@ async function account(client: PoolClient, userId: string): Promise<AccountRow |
   const result = await client.query<AccountRow>(
     `SELECT u.id,u.tenant_id,u.username,u.estado,u.auth_version,
             p.nombres,p.apellido_paterno,p.apellido_materno,p.email,
-            COALESCE(array_agg(DISTINCT r.codigo::text) FILTER (WHERE ur.activo AND r.codigo IS NOT NULL), ARRAY[]::text[]) AS roles,
-            COALESCE(array_agg(DISTINCT rp.permiso_codigo::text) FILTER (WHERE ur.activo AND rp.permiso_codigo IS NOT NULL), ARRAY[]::text[]) AS permissions
+            COALESCE(
+              (SELECT array_agg(DISTINCT rol_cod) FROM (
+                 SELECT r.codigo::text AS rol_cod FROM usuario_roles ur JOIN roles r ON r.id=ur.rol_id WHERE ur.usuario_id=u.id AND ur.tenant_id=u.tenant_id AND ur.activo
+                 UNION
+                 SELECT rd.codigo::text AS rol_cod FROM usuario_roles_dinamicos urd JOIN roles_dinamicos rd ON rd.id=urd.rol_dinamico_id WHERE urd.usuario_id=u.id AND urd.tenant_id=u.tenant_id AND urd.activo AND rd.activo
+              ) sub_roles),
+              ARRAY[]::text[]
+            ) AS roles,
+            COALESCE(
+              (SELECT array_agg(DISTINCT perm_cod) FROM (
+                 SELECT rp.permiso_codigo::text AS perm_cod FROM usuario_roles ur JOIN roles r ON r.id=ur.rol_id JOIN rol_permisos_core rp ON rp.tenant_id=u.tenant_id AND rp.rol_id=r.id WHERE ur.usuario_id=u.id AND ur.tenant_id=u.tenant_id AND ur.activo
+                 UNION
+                 SELECT rdp.permiso_codigo::text AS perm_cod FROM usuario_roles_dinamicos urd JOIN roles_dinamicos rd ON rd.id=urd.rol_dinamico_id JOIN rol_dinamico_permisos rdp ON rdp.tenant_id=u.tenant_id AND rdp.rol_dinamico_id=rd.id WHERE urd.usuario_id=u.id AND urd.tenant_id=u.tenant_id AND urd.activo AND rd.activo AND rdp.activo
+              ) sub_perms),
+              ARRAY[]::text[]
+            ) AS permissions
        FROM usuarios u JOIN personas p ON p.id=u.persona_id AND p.tenant_id=u.tenant_id
-       LEFT JOIN usuario_roles ur ON ur.usuario_id=u.id AND ur.tenant_id=u.tenant_id AND ur.activo
-       LEFT JOIN roles r ON r.id=ur.rol_id
-       LEFT JOIN rol_permisos_core rp ON rp.tenant_id=u.tenant_id AND rp.rol_id=r.id
       WHERE u.id=$1 GROUP BY u.id,p.id`, [userId]
   );
   return result.rows[0] ?? null;
@@ -101,11 +112,17 @@ function decode(token: string, secret: string, audience: string): AuthClaims {
 export class AuthService {
   static accessClaims(token: string): AuthClaims { return decode(token, JWT_SECRET, 'sms-web'); }
 
-  static async login(codigoModular: string, identifier: string, password: string, ip: string, userAgent: string) {
+  static async login(codigoModular: string | undefined, identifier: string, password: string, ip: string, userAgent: string) {
     if (!redisClient.isReady) throw new Error('AUTH_RATE_LIMIT_UNAVAILABLE');
-    const tenantId = await resolveInstitution(codigoModular);
-    if (!tenantId) return null;
     const normalized = identifier.trim().toLowerCase();
+    const docHash = /^\d{8}$/.test(normalized) ? documentHash(normalized) : null;
+    let tenantId: string | null = null;
+    if (codigoModular && codigoModular.trim()) {
+      tenantId = await resolveInstitution(codigoModular.trim());
+    } else {
+      tenantId = await resolveInstitutionSilencioso(normalized, docHash);
+    }
+    if (!tenantId) return null;
     const rateKeys = [`login:id:${tenantId}:${tokenHash(normalized)}`,
       `login:ip:${tenantId}:${tokenHash(ip)}`];
     for (const key of rateKeys) {
@@ -113,7 +130,6 @@ export class AuthService {
       if (attempts === 1) await redisClient.expire(key, 900);
       if (attempts > 5) throw new Error('TOO_MANY_ATTEMPTS');
     }
-    const docHash = /^\d{8}$/.test(normalized) ? documentHash(normalized) : null;
     return withTenant(tenantId, '', async (client) => {
       const result = await client.query<{ id: string }>(
         `SELECT u.id FROM usuarios u JOIN personas p ON p.id=u.persona_id AND p.tenant_id=u.tenant_id
@@ -264,15 +280,22 @@ export class AuthService {
     });
   }
 
-  static async requestRecovery(codigoModular: string, identifier: string) {
-    const tenantId = await resolveInstitution(codigoModular);
+  static async requestRecovery(codigoModular: string | undefined, identifier: string) {
+    const normalized = identifier.trim().toLowerCase();
+    const docHash = /^\d{8}$/.test(normalized) ? documentHash(normalized) : null;
+    let tenantId: string | null = null;
+    if (codigoModular && codigoModular.trim()) {
+      tenantId = await resolveInstitution(codigoModular.trim());
+    } else {
+      tenantId = await resolveInstitutionSilencioso(normalized, docHash);
+    }
     if (!tenantId) return null;
     return withTenant(tenantId, '', async (client) => {
       const found = await client.query<{ id: string; email: string }>(
         `SELECT u.id,p.email FROM usuarios u JOIN personas p ON p.id=u.persona_id
           WHERE u.tenant_id=$1 AND u.estado='ACTIVO' AND u.email_verificado_en IS NOT NULL
-            AND (lower(u.username)=$2 OR lower(p.email)=$2) AND p.email IS NOT NULL LIMIT 1`,
-        [tenantId, identifier.trim().toLowerCase()]
+            AND (lower(u.username)=$2 OR lower(p.email)=$2 OR p.documento_hash=$3) AND p.email IS NOT NULL LIMIT 1`,
+        [tenantId, normalized, docHash]
       );
       return found.rows[0] ?? null;
     });

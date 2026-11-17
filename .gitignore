@@ -47,6 +47,9 @@ out/
 # Build outputs
 /dist/
 **/dist/
+/build/
+.dart_tool/
+.flutter-plugins-dependencies
 backend/tests/integration/.openapi-bundle.json
 
 # Environment and secrets

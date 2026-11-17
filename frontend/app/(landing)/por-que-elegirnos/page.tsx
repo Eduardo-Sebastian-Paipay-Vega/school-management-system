@@ -9,14 +9,10 @@ import {
   Microscope,
   CheckCircle2,
   ArrowRight,
-  ShieldCheck,
   Sparkles,
   Users,
-  Compass,
-  Award,
   ChevronRight,
   School,
-  Clock,
 } from 'lucide-react';
 
 const reasons = [
@@ -135,9 +131,9 @@ const comparison = [
 
 export default function PorQueElegirnosPage() {
   return (
-    <div className="bg-white">
+    <div className="bg-[#FFFCF8]">
       {/* Header Banner */}
-      <section className="relative overflow-hidden bg-brand-dark py-20 text-white hero-two">
+      <section className="relative overflow-hidden bg-brand-dark pt-36 sm:pt-40 lg:pt-44 pb-20 text-white hero-two">
         <div className="content-width relative z-10">
           {/* Breadcrumbs */}
           <nav className="mb-6 flex items-center gap-2 text-xs font-semibold text-accent-cream/80">
@@ -153,7 +149,7 @@ export default function PorQueElegirnosPage() {
               <School size={14} />
               <span>Propuesta de Valor Oficial · UNSCH</span>
             </div>
-            <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-[-0.03em] leading-tight text-white">
+            <h1 className="mt-4 bbd-font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight text-white">
               ¿Por qué elegir el Colegio{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cream via-accent-gold to-white">
                 Guamán Poma de Ayala?
@@ -281,7 +277,7 @@ export default function PorQueElegirnosPage() {
               <thead className="bg-brand text-white">
                 <tr>
                   <th className="py-4 px-6 font-extrabold uppercase tracking-wider text-xs">Criterio Formativo</th>
-                  <th className="py-4 px-6 font-extrabold uppercase tracking-wider text-xs bg-brand-dark text-accent-gold">
+                  <th className="py-4 px-6 font-extrabold uppercase tracking-wider text-xs bg-brand-dark text-[#F8E3A9]">
                     Planteles Guamán Poma (UNSCH)
                   </th>
                   <th className="py-4 px-6 font-extrabold uppercase tracking-wider text-xs">

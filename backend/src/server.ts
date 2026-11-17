@@ -18,7 +18,7 @@ const startServer = async () => {
   await NotificationService.startPubsub();
 
   const app = createApp();
-  const server = app.listen(port, () => {
+  const server = app.listen(Number(port), '0.0.0.0', () => {
     console.log(`====================================================`);
     console.log(` Servidor Backend iniciado en http://localhost:${port}`);
     console.log(` Diagnóstico de salud en http://localhost:${port}/api/v1/health`);

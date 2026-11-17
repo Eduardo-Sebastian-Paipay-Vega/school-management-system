@@ -30,7 +30,7 @@ export default function HeroSection() {
   const radius = Math.round(scrollProgress * 28);
 
   return (
-    <header className="relative w-full bg-[#FFFCF8] overflow-hidden">
+    <header className="relative w-full bg-[#FFFFFF] overflow-hidden">
       <div
         style={{
           transform: scrollProgress > 0 ? `scale(${scale.toFixed(4)})` : undefined,
@@ -72,7 +72,7 @@ export default function HeroSection() {
               {/* Right Column: Dual Burgundy Eyebrow Pills + Subtitle (.header-inner-bottom-left) */}
               <div className="flex flex-col items-start justify-start gap-6 lg:gap-8 lg:max-w-[505px]">
                 <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-                  <div className="bbd-eyebrow bg-[#C32942] text-white">
+                  <div className="bbd-eyebrow bg-[color:var(--color-accent)] text-white">
                     <span>UNSCH 1964–2026</span>
                   </div>
                   <div className="bbd-eyebrow bg-[#FFF5DC] text-[#4A3008]">

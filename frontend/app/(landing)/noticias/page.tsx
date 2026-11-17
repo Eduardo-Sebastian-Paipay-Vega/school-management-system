@@ -6,17 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Calendar,
   Building2,
-  Trophy,
-  GraduationCap,
-  Sparkles,
   ChevronRight,
   ArrowRight,
   Search,
-  Tag,
-  Share2,
   X,
   FileText,
-  CheckCircle2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -114,9 +108,9 @@ export default function NoticiasPage() {
   });
 
   return (
-    <div className="bg-white">
+    <div className="bg-[#FFFCF8]">
       {/* Hero Header */}
-      <section className="relative overflow-hidden bg-brand-dark py-20 text-white hero-three">
+      <section className="relative overflow-hidden bg-brand-dark pt-36 sm:pt-40 lg:pt-44 pb-20 text-white hero-three">
         <div className="content-width relative z-10">
           <nav className="mb-6 flex items-center gap-2 text-xs font-semibold text-accent-cream/80">
             <Link href="/" className="hover:text-accent-gold transition">
@@ -131,7 +125,7 @@ export default function NoticiasPage() {
               <FileText size={14} />
               <span>Prensa y Actualidad Institucional</span>
             </div>
-            <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-[-0.03em] leading-tight text-white">
+            <h1 className="mt-4 bbd-font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight text-white">
               Noticias y{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cream via-accent-gold to-white">
                 Comunicados Oficiales

@@ -397,4 +397,226 @@ router.put('/:id/roles', requirePermission('users:assign-roles'), async (req: Au
   }
 });
 
+const dynamicAmbitoEnum = z.enum([
+  'DIRECTIVO', 'ADMINISTRATIVO', 'PEDAGOGICO', 'TUTORIA', 'BIENESTAR', 'FAMILIAR', 'ESTUDIANTIL', 'OPERATIVO'
+]);
+
+// ---------------------------------------------------------------------------
+// Gestión de Roles Dinámicos Creados por el Plantel (no impuestos)
+// ---------------------------------------------------------------------------
+router.get('/dynamic-roles', requirePermission('roles:read'), async (req: AuthenticatedRequest, res) => {
+  try {
+    const data = await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
+      const result = await client.query(`
+        SELECT rd.id, rd.codigo, rd.nombre, rd.ambito_silencioso, rd.prioridad_distincion,
+               rd.descripcion, rd.activo, rd.created_at,
+               COALESCE(array_agg(rdp.permiso_codigo) FILTER (WHERE rdp.activo AND rdp.permiso_codigo IS NOT NULL), ARRAY[]::varchar[]) AS permisos
+          FROM roles_dinamicos rd
+          LEFT JOIN rol_dinamico_permisos rdp ON rdp.rol_dinamico_id = rd.id AND rdp.tenant_id = rd.tenant_id
+         WHERE rd.tenant_id = $1
+         GROUP BY rd.id
+         ORDER BY rd.prioridad_distincion ASC, rd.nombre ASC
+      `, [req.user!.tenantId]);
+      return result.rows;
+    });
+    ok(res, data);
+  } catch {
+    fail(res, 500, 'DYNAMIC_ROLES_ERROR', 'No se pudieron listar los roles dinámicos.');
+  }
+});
+
+router.post('/dynamic-roles', requirePermission('roles:manage'), async (req: AuthenticatedRequest, res) => {
+  const schema = z.object({
+    codigo: z.string().min(2).max(60).regex(/^[A-Z0-9_]+$/, 'El código debe estar en mayúsculas y guiones bajos'),
+    nombre: z.string().min(2).max(100),
+    ambitoSilencioso: dynamicAmbitoEnum.default('ADMINISTRATIVO'),
+    prioridadDistincion: z.number().int().min(1).max(100).default(50),
+    descripcion: z.string().max(500).optional(),
+    permisos: z.array(z.string().min(1).max(80)).optional().default([]),
+  });
+  const parsed = schema.safeParse(req.body);
+  if (!parsed.success) {
+    fail(res, 400, 'VALIDATION_FAILED', 'Datos de rol dinámico inválidos.');
+    return;
+  }
+  try {
+    const created = await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
+      const ins = await client.query(`
+        INSERT INTO roles_dinamicos (tenant_id, codigo, nombre, ambito_silencioso, prioridad_distincion, descripcion, created_by)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING id, codigo, nombre, ambito_silencioso, prioridad_distincion, descripcion, activo, created_at
+      `, [
+        req.user!.tenantId,
+        parsed.data.codigo,
+        parsed.data.nombre,
+        parsed.data.ambitoSilencioso,
+        parsed.data.prioridadDistincion,
+        parsed.data.descripcion ?? null,
+        req.user!.id
+      ]);
+      const rol = ins.rows[0];
+      for (const p of parsed.data.permisos) {
+        await client.query(`
+          INSERT INTO rol_dinamico_permisos (tenant_id, rol_dinamico_id, permiso_codigo, activo)
+          VALUES ($1, $2, $3, true)
+          ON CONFLICT (tenant_id, rol_dinamico_id, permiso_codigo) DO UPDATE SET activo = true
+        `, [req.user!.tenantId, rol.id, p]);
+      }
+      await AuditService.record({
+        tenantId: req.user!.tenantId,
+        usuarioId: req.user!.id,
+        accion: 'CREATE_DYNAMIC_ROLE',
+        entidad: 'roles_dinamicos',
+        entidadId: rol.id,
+        datosNuevos: parsed.data,
+        ipOrigen: req.ip
+      }, client);
+      return { ...rol, permisos: parsed.data.permisos };
+    });
+    ok(res, created, 201);
+  } catch (cause: any) {
+    if (cause?.code === '23505') {
+      fail(res, 409, 'ROLE_CODE_EXISTS', 'Ya existe un rol dinámico con ese código en esta institución.');
+      return;
+    }
+    fail(res, 500, 'DYNAMIC_ROLE_CREATE_ERROR', 'No se pudo crear el rol dinámico.');
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Gestión de Permisos Dinámicos Propios del Plantel
+// ---------------------------------------------------------------------------
+router.get('/dynamic-permissions', requirePermission('roles:read'), async (req: AuthenticatedRequest, res) => {
+  try {
+    const data = await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
+      const result = await client.query(`
+        SELECT id, codigo, nombre, modulo, ambito_silencioso, descripcion, activo, created_at
+          FROM permisos_dinamicos
+         WHERE tenant_id = $1
+         ORDER BY modulo ASC, codigo ASC
+      `, [req.user!.tenantId]);
+      return result.rows;
+    });
+    ok(res, data);
+  } catch {
+    fail(res, 500, 'DYNAMIC_PERMISSIONS_ERROR', 'No se pudieron consultar los permisos dinámicos.');
+  }
+});
+
+router.post('/dynamic-permissions', requirePermission('roles:manage'), async (req: AuthenticatedRequest, res) => {
+  const schema = z.object({
+    codigo: z.string().min(2).max(80).regex(/^[a-z0-9_:-]+$/, 'El código debe tener formato slug (ej. biblioteca:prestar)'),
+    nombre: z.string().min(2).max(120),
+    modulo: z.string().min(2).max(60),
+    ambitoSilencioso: dynamicAmbitoEnum.default('OPERATIVO'),
+    descripcion: z.string().max(500).optional(),
+  });
+  const parsed = schema.safeParse(req.body);
+  if (!parsed.success) {
+    fail(res, 400, 'VALIDATION_FAILED', 'Datos de permiso dinámico inválidos.');
+    return;
+  }
+  try {
+    const created = await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
+      const ins = await client.query(`
+        INSERT INTO permisos_dinamicos (tenant_id, codigo, nombre, modulo, ambito_silencioso, descripcion, created_by)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING id, codigo, nombre, modulo, ambito_silencioso, descripcion, activo, created_at
+      `, [
+        req.user!.tenantId,
+        parsed.data.codigo,
+        parsed.data.nombre,
+        parsed.data.modulo,
+        parsed.data.ambitoSilencioso,
+        parsed.data.descripcion ?? null,
+        req.user!.id
+      ]);
+      const perm = ins.rows[0];
+      await AuditService.record({
+        tenantId: req.user!.tenantId,
+        usuarioId: req.user!.id,
+        accion: 'CREATE_DYNAMIC_PERMISSION',
+        entidad: 'permisos_dinamicos',
+        entidadId: perm.id,
+        datosNuevos: parsed.data,
+        ipOrigen: req.ip
+      }, client);
+      return perm;
+    });
+    ok(res, created, 201);
+  } catch (cause: any) {
+    if (cause?.code === '23505') {
+      fail(res, 409, 'PERMISSION_EXISTS', 'Ya existe un permiso con ese código.');
+      return;
+    }
+    fail(res, 500, 'DYNAMIC_PERMISSION_CREATE_ERROR', 'No se pudo crear el permiso dinámico.');
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Asignación de Roles Dinámicos al Usuario con Recálculo de Ámbito Silencioso
+// ---------------------------------------------------------------------------
+router.post('/:id/dynamic-roles', requirePermission('users:assign-roles'), async (req: AuthenticatedRequest, res) => {
+  const schema = z.object({
+    roles: z.array(z.string().min(1)),
+    motivo: z.string().min(3).max(500)
+  });
+  const parsed = schema.safeParse(req.body);
+  if (!parsed.success) {
+    fail(res, 400, 'VALIDATION_FAILED', 'Lista de roles dinámicos y motivo requeridos.');
+    return;
+  }
+  try {
+    await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
+      const userCheck = await client.query('SELECT id FROM usuarios WHERE id = $1 AND tenant_id = $2', [req.params.id, req.user!.tenantId]);
+      if (!userCheck.rowCount) throw new Error('USER_NOT_FOUND');
+
+      const foundRoles = await client.query<{ id: string; codigo: string; ambito_silencioso: string; prioridad_distincion: number }>(`
+        SELECT id, codigo, ambito_silencioso, prioridad_distincion
+          FROM roles_dinamicos
+         WHERE tenant_id = $1 AND (codigo = ANY($2::text[]) OR id::text = ANY($2::text[]))
+      `, [req.user!.tenantId, parsed.data.roles]);
+
+      await client.query(`
+        UPDATE usuario_roles_dinamicos
+           SET activo = false
+         WHERE tenant_id = $1 AND usuario_id = $2 AND activo
+      `, [req.user!.tenantId, req.params.id]);
+
+      for (const r of foundRoles.rows) {
+        await client.query(`
+          INSERT INTO usuario_roles_dinamicos (tenant_id, usuario_id, rol_dinamico_id, activo)
+          VALUES ($1, $2, $3, true)
+          ON CONFLICT (tenant_id, usuario_id, rol_dinamico_id) DO UPDATE SET activo = true
+        `, [req.user!.tenantId, req.params.id, r.id]);
+      }
+
+      // Distinción silenciosa automática: seleccionar el ámbito de mayor prioridad
+      if (foundRoles.rows.length > 0) {
+        const sorted = [...foundRoles.rows].sort((a, b) => a.prioridad_distincion - b.prioridad_distincion);
+        const topAmbito = sorted[0].ambito_silencioso;
+        await client.query(`
+          UPDATE usuarios SET ambito_silencioso = $1, auth_version = auth_version + 1 WHERE id = $2
+        `, [topAmbito, req.params.id]);
+      }
+
+      await client.query('UPDATE sesiones_usuario SET revocada_en = now() WHERE usuario_id = $1 AND revocada_en IS NULL', [req.params.id]);
+
+      await AuditService.record({
+        tenantId: req.user!.tenantId,
+        usuarioId: req.user!.id,
+        accion: 'ASSIGN_DYNAMIC_ROLES',
+        entidad: 'usuario_roles_dinamicos',
+        entidadId: req.params.id,
+        datosNuevos: { roles: parsed.data.roles, asignados: foundRoles.rows.map((x) => x.codigo), motivo: parsed.data.motivo },
+        ipOrigen: req.ip
+      }, client);
+    });
+    ok(res, { message: 'Roles dinámicos asignados con éxito.' });
+  } catch (cause) {
+    const code = cause instanceof Error ? cause.message : 'DYNAMIC_ROLE_ASSIGN_ERROR';
+    fail(res, code === 'USER_NOT_FOUND' ? 404 : 500, code, 'No se pudieron asignar los roles dinámicos.');
+  }
+});
+
 export default router;

@@ -5,7 +5,7 @@ import type { components, paths } from 'school-contracts';
 export type CoreUser = components['schemas']['CoreUser'];
 export type CoreSessionData = paths['/auth/login']['post']['responses'][200]['content']['application/json']['data'];
 
-export const API_BASE_URL = (process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:3001').replace(/\/$/, '');
+export const API_BASE_URL = (process.env.NEXT_PUBLIC_CORE_API_URL ?? '').replace(/\/$/, '');
 
 export function apiUrl(path: string): string {
   return `${API_BASE_URL}/api/v1${path}`;

@@ -1,5 +1,5 @@
-import { pool, withTenant } from '../config/database';
-import { documentHash, encryptDocument, randomToken, tokenHash } from '../core/identity-crypto';
+import { withTenant } from '../config/database';
+import { documentHash, encryptDocument, randomToken } from '../core/identity-crypto';
 
 const TENANT_ID = 'ac5f0d3a-4bf5-428c-bcd0-0742cabc82c5'; // Guamán Poma de Ayala
 const ADMIN_ID = '7a7dae05-091a-49dd-9b16-4a35b2039fc3';  // admin.gpa
@@ -22,7 +22,7 @@ export async function seedAcademicData() {
   console.log('--- Iniciando Seed Académico 2026 para Guamán Poma en Supabase ---');
   await withTenant(TENANT_ID, ADMIN_ID, async (client) => {
     // 1. Sede Principal
-    let sedeRes = await client.query<{ id: string }>('SELECT id FROM sedes WHERE tenant_id = $1 LIMIT 1', [TENANT_ID]);
+    const sedeRes = await client.query<{ id: string }>('SELECT id FROM sedes WHERE tenant_id = $1 LIMIT 1', [TENANT_ID]);
     let sedeId: string;
     if (sedeRes.rows.length === 0) {
       const insSede = await client.query<{ id: string }>(`
@@ -38,7 +38,7 @@ export async function seedAcademicData() {
     }
 
     // 2. Año Lectivo 2026
-    let anioRes = await client.query<{ id: string }>(
+    const anioRes = await client.query<{ id: string }>(
       'SELECT id FROM anios_lectivos WHERE tenant_id = $1 AND anio = 2026', [TENANT_ID]
     );
     let anioId: string;
@@ -82,14 +82,13 @@ export async function seedAcademicData() {
     console.log('✓ 4 Bimestres configurados. Periodo activo:', primerPeriodoId);
 
     // 4. Grado y Sección: Secundaria 3° B
-    let seccionId: string;
     const secRes = await client.query<{ id: string }>(`
       INSERT INTO grados_secciones (tenant_id, anio_lectivo_id, sede_id, nivel, grado, seccion, aforo_maximo, tutor_id, created_by)
       VALUES ($1, $2, $3, 'SECUNDARIA', 3, 'B', 35, $4, $5)
       ON CONFLICT (tenant_id, anio_lectivo_id, nivel, grado, seccion) DO UPDATE SET aforo_maximo = 35
       RETURNING id
     `, [TENANT_ID, anioId, sedeId, DOCENTE_ID, ADMIN_ID]);
-    seccionId = secRes.rows[0].id;
+    const seccionId = secRes.rows[0].id;
     console.log('✓ Sección Secundaria 3° B configurada:', seccionId);
 
     // 5. Cursos CNEB y Competencias

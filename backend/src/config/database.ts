@@ -15,6 +15,7 @@ export const pool = new Pool({
   user: dbUser,
   password: dbPassword,
   database: process.env.DB_NAME || 'school_management',
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000,

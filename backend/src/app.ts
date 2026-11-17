@@ -10,6 +10,13 @@ import usersRoutes from './routes/users.routes';
 import schoolRoutes from './routes/school.routes';
 import guardiansRoutes from './routes/guardians.routes';
 import notificationsRoutes from './routes/notifications.routes';
+import academicsRoutes from './routes/academics.routes';
+import attendanceRoutes from './routes/attendance.routes';
+import curriculumRoutes from './routes/curriculum.routes';
+import gradesRoutes from './routes/grades.routes';
+import analyticsRoutes from './routes/analytics.routes';
+import documentsRoutes from './routes/documents.routes';
+import portalRoutes, { publicPortalRouter } from './routes/portal.routes';
 import { errorHandler, notFoundHandler, OriginDeniedError } from './core/http/errors';
 
 /** HTTP composition without database, Redis, WebSocket or worker startup. */
@@ -38,6 +45,14 @@ export function createApp() {
   app.use('/api/v1/school', schoolRoutes);
   app.use('/api/v1/guardians', guardiansRoutes);
   app.use('/api/v1/notifications', notificationsRoutes);
+  app.use('/api/v1/academics', academicsRoutes);
+  app.use('/api/v1/attendance', attendanceRoutes);
+  app.use('/api/v1/curriculum', curriculumRoutes);
+  app.use('/api/v1/grades', gradesRoutes);
+  app.use('/api/v1/analytics', analyticsRoutes);
+  app.use('/api/v1/documents', documentsRoutes);
+  app.use('/api/v1/public', publicPortalRouter);
+  app.use('/api/v1/portal', portalRoutes);
 
   app.get('/', (_req, res) => {
     res.json({

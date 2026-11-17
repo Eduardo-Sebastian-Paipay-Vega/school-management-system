@@ -26,9 +26,9 @@ const drivers: DriverItem[] = [
       'El orgullo de más de 62 años de historia guamampomina vive en cada aula, fortaleciendo la identidad ayacuchana, el arte y los valores de una comunidad educativa abierta al mundo.',
     pillText: 'La cultura es nuestro latido',
     bg: 'bg-[#4F000B]',
-    titleColor: 'text-[#F47788]',
+    titleColor: 'text-[#F9A7B1]',
     bodyColor: 'text-white',
-    pillBg: 'bg-[#8F1025]',
+    pillBg: 'bg-[#7A1E30]',
     pillColor: 'text-[#FCE0E4]',
     badge: '62° Aniversario UNSCH',
     caption: 'Danza, música y patrimonio huamanguino',
@@ -39,11 +39,11 @@ const drivers: DriverItem[] = [
     description:
       'Formar a nuestros estudiantes con las competencias científicas, lectoras y digitales del mañana despierta su vocación y les brinda las herramientas para liderar en la universidad.',
     pillText: 'Nuestra fuerza es nuestra gente',
-    bg: 'bg-[#5099D5]',
-    titleColor: 'text-[#E7F3FC]',
-    bodyColor: 'text-[#E7F3FC]',
-    pillBg: 'bg-[#17466F]',
-    pillColor: 'text-[#E7F3FC]',
+    bg: 'bg-[#9B2226]',
+    titleColor: 'text-[#FCE0E4]',
+    bodyColor: 'text-[#FCE0E4]',
+    pillBg: 'bg-[#4F000B]',
+    pillColor: 'text-[#FCE0E4]',
     badge: 'Currículo CNEB + UNSCH',
     caption: 'Pensamiento crítico y aprendizaje activo',
   },
@@ -54,8 +54,8 @@ const drivers: DriverItem[] = [
       'El acceso directo a los laboratorios de física, química y biología de la UNSCH conecta el aprendizaje escolar con la investigación experimental universitaria desde temprana edad.',
     pillText: 'La ciencia define nuestro futuro',
     bg: 'bg-[#ED7B32]',
-    titleColor: 'text-[#FFF0E5]',
-    bodyColor: 'text-[#FFF0E5]',
+    titleColor: 'text-[#54230C]',
+    bodyColor: 'text-[#54230C]',
     pillBg: 'bg-[#803711]',
     pillColor: 'text-[#FFF0E5]',
     badge: 'Laboratorios Universitarios',
@@ -67,7 +67,7 @@ const drivers: DriverItem[] = [
     description:
       'Desde las 4 nuevas losas deportivas techadas hasta la modernización de aulas en Inicial, Primaria y Secundaria, transformamos nuestros espacios para el bienestar estudiantil.',
     pillText: 'El plantel se transforma rápido',
-    bg: 'bg-[#32965C]',
+    bg: 'bg-[#287548]',
     titleColor: 'text-[#EAF8EE]',
     bodyColor: 'text-[#EAF8EE]',
     pillBg: 'bg-[#1E5938]',
@@ -87,10 +87,10 @@ export default function FocusDriversSection() {
           <div className="flex flex-col gap-12 lg:gap-16">
             {/* Section Heading (.section-heading-wrap) */}
             <div className="flex flex-col items-start gap-6">
-              <div className="bbd-eyebrow bg-[#E7F3FC] text-[#103354]">
+              <div className="bbd-eyebrow bg-[#FCE0E4] text-[#4F000B]">
                 <span>Enfoque central</span>
               </div>
-              <h2 className="bbd-h2 text-[#3A0008]">
+              <h2 className="bbd-h2 text-[color:var(--color-heading)]">
                 NUESTROS 4 IMPULSORES
               </h2>
             </div>
@@ -285,7 +285,7 @@ export default function FocusDriversSection() {
                       )
                     }
                     aria-label="Anterior impulsor"
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(79,0,11,0.25)] bg-white text-[#291719] hover:bg-[#E8D8D4]"
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(79,0,11,0.25)] bg-white text-[#291719] hover:bg-[#E5E7EB]"
                   >
                     ←
                   </button>
@@ -295,7 +295,7 @@ export default function FocusDriversSection() {
                       setActiveIndex((prev) => (prev + 1) % drivers.length)
                     }
                     aria-label="Siguiente impulsor"
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(79,0,11,0.25)] bg-white text-[#291719] hover:bg-[#E8D8D4]"
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(79,0,11,0.25)] bg-white text-[#291719] hover:bg-[#E5E7EB]"
                   >
                     →
                   </button>

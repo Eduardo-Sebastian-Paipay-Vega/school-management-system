@@ -277,7 +277,7 @@ export default function PorQueElegirnosPage() {
               <thead className="bg-brand text-white">
                 <tr>
                   <th className="py-4 px-6 font-extrabold uppercase tracking-wider text-xs">Criterio Formativo</th>
-                  <th className="py-4 px-6 font-extrabold uppercase tracking-wider text-xs bg-brand-dark text-accent-gold">
+                  <th className="py-4 px-6 font-extrabold uppercase tracking-wider text-xs bg-brand-dark text-[#F8E3A9]">
                     Planteles Guamán Poma (UNSCH)
                   </th>
                   <th className="py-4 px-6 font-extrabold uppercase tracking-wider text-xs">

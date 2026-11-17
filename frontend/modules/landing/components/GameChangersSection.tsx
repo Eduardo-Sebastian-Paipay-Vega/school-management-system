@@ -28,7 +28,7 @@ const gameChangers: GameChangerItem[] = [
     description:
       'El vínculo académico directo con la Universidad Nacional de San Cristóbal de Huamanga permite que nuestros estudiantes realicen prácticas experimentales en laboratorios de física, química y biología molecular.',
     badge: 'Rigor Científico',
-    accentBg: 'from-[#5099D5]/80 to-[#103354]/90',
+    accentBg: 'from-[#5099D5]/80 to-[#142557]/90',
   },
   {
     id: 'mass-transit',
@@ -52,7 +52,7 @@ const gameChangers: GameChangerItem[] = [
     description:
       'En los cinco años de secundaria potenciamos el pensamiento analítico, el debate académico y la preparación preuniversitaria intensiva, logrando altos índices de ingreso directo a las carreras de la UNSCH.',
     badge: '1° a 5° Secundaria',
-    accentBg: 'from-[#8F1025]/80 to-[#290006]/90',
+    accentBg: 'from-[#7A1E30]/80 to-[#290006]/90',
   },
   {
     id: 'hospital-rebuild',
@@ -60,7 +60,7 @@ const gameChangers: GameChangerItem[] = [
     description:
       'Transformación digital integral con control de asistencia mediante código QR en tiempo real, planilla docente ágil alineada al CNEB, analítica académica 360° y emisión de libretas electrónicas verificables.',
     badge: 'Innovación Tecnológica',
-    accentBg: 'from-[#2878B9]/80 to-[#103354]/90',
+    accentBg: 'from-[#315BB5]/80 to-[#142557]/90',
   },
   {
     id: 'hydrogen-programme',
@@ -87,7 +87,7 @@ export default function GameChangersSection() {
                 <div className="bbd-eyebrow bg-[#FFF5DC] text-[#4A3008]">
                   <span>Grandes proyectos</span>
                 </div>
-                <h2 className="bbd-h2 text-[#3A0008]">
+                <h2 className="bbd-h2 text-[color:var(--color-heading)]">
                   LOS 7 GRANDES
                   <br />
                   CAMBIOS CLAVE

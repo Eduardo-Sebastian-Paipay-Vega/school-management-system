@@ -23,36 +23,21 @@
 <!-- PROJECT-HEALTH:START -->
 ## 📊 ESTADO ACTUAL DEL PROYECTO
 
-### 251 / 1000 — EN DESARROLLO
+### Corte técnico: 16 de noviembre de 2026 — EN DESARROLLO
 
-**Avance verificado:** █████░░░░░░░░░░░░░░░ 25.1% de la rúbrica
+**Cobertura técnica parcial:** 32 de 89 RF (**36,0 %**). Esta proporción mide RF con código en Core o en el servicio M8; no mide terminación integral ni aceptación institucional.
 
 | Indicador | Resultado |
 |---|---|
-| RF | 0 aceptados / 89 inventariados |
-| RF probados o aceptados | 0 / 89 |
-| Bloqueadores abiertos | 0 |
-| Inventario del alcance | complete |
-| Última auditoría | 2026-10-22 |
-| Rama / commit | dev / d566f4dc |
+| RF con código y contrato en Core | 21 / 89 |
+| RF con servicio M8 | 11 / 89 |
+| RF aceptados para el piloto | 0 / 89 |
+| Pruebas M8 ejecutadas en este corte | 16 / 16 correctas |
+| Rama / commit remoto sincronizado | `dev` / `bdd2fe6` |
 
-**Detalle por área (máximo 1000):**
+La rúbrica anterior de **251/1000 (25,1 %)** corresponde al commit `d566f4dc` del 22 de octubre y no se ha recalculado para el código actual. El Core aún requiere ensayo autenticado y validaciones institucionales; M8 aún requiere integración con el gateway y frontend. El portal recibió cambios visuales en los commits recientes, sin que ello constituya aceptación de RF.
 
-| Área | Puntos | Máximo |
-|---|---:|---:|
-| Requisitos funcionales | 64 | 400 |
-| Requisitos no funcionales | 22 | 100 |
-| Calidad y pruebas | 69 | 150 |
-| Integraciones y E2E | 18 | 100 |
-| Seguridad e integridad | 39 | 100 |
-| Arquitectura y datos | 21 | 70 |
-| Operación y despliegue | 13 | 50 |
-| Documentación y consistencia | 7 | 30 |
-
-_Esta nota refleja evidencias del snapshot auditado, no una certificación ni una autorización de despliegue._
-_Los requisitos pendientes deben permanecer visibles en el informe; no se asignan puntos sin evidencia._
-
-[Ver auditoría completa](docs/project-health/ESTADO_PROYECTO.md)
+[Ver corte y método de cálculo](docs/project-health/AVANCE_2026-11-16.md) · [Ver auditoría histórica](docs/project-health/ESTADO_PROYECTO.md)
 <!-- PROJECT-HEALTH:END -->
 
 ## 📌 Descripción del Proyecto

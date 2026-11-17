@@ -19,20 +19,20 @@ const variantClasses: Record<
   { button: string; iconCircle: string }
 > = {
   purple: {
-    button: 'bg-[#8F1025] text-[#FCE0E4]',
-    iconCircle: 'bg-[#FCE0E4] text-[#8F1025]',
+    button: 'bg-[color:var(--color-primary)] text-[#FCE0E4] hover:bg-[color:var(--color-primary-hover)]',
+    iconCircle: 'bg-[#FCE0E4] text-[#7A1E30]',
   },
   white: {
     button: 'bg-white text-[#290006]',
-    iconCircle: 'bg-[#C32942] text-white',
+    iconCircle: 'bg-[color:var(--color-accent)] text-white',
   },
   orange: {
     button: 'bg-white text-[#54230C]',
-    iconCircle: 'bg-[#ED7B32] text-[#FFF0E5]',
+    iconCircle: 'bg-[#ED7B32] text-[#54230C]',
   },
   green: {
-    button: 'bg-[#32965C] text-[#EAF8EE]',
-    iconCircle: 'bg-[#EAF8EE] text-[#32965C]',
+    button: 'bg-[#287548] text-[#EAF8EE]',
+    iconCircle: 'bg-[#EAF8EE] text-[#287548]',
   },
 };
 

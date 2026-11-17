@@ -120,3 +120,25 @@ Se añadieron procedimientos portables en `.agents/skills/`, adaptados desde `ho
 
 No se incorporan como skills activas los procedimientos de BI-COMPUSUR que dependen de Angular, Django, Cloud Run, bases ajenas o datos personales. La carpeta fuente se conserva para referencia y no forma parte de la ruta de skills del proyecto.
 
+---
+
+## 8. Control Interno de Versiones y Cambios con SDD (Regla Permanente)
+
+> [!IMPORTANT]
+> **Aplicación permanente (Prioridad Alta):** Todo cambio importante en cualquier módulo del sistema debe registrarse en [`SDD_VERSIONES/`](SDD_VERSIONES/README.md), vinculado a los archivos reales del repositorio y al historial de Git. La norma operativa completa, plantillas y convenciones residen exclusivamente en [`SDD_VERSIONES/README.md`](SDD_VERSIONES/README.md).
+
+1. **Procedimiento obligatorio para cada cambio importante (Pasos 1–7):**
+   - **Paso 1 (Identificar):** Ubicar el módulo real en [`SDD_VERSIONES/MAPA_MODULOS.md`](SDD_VERSIONES/MAPA_MODULOS.md), sus RF/CU y archivos reales afectados.
+   - **Paso 2 (Especificar):** Crear `SDD_VERSIONES/MODULOS/<modulo>/<ID_CAMBIO>/SPEC.md` (`SDD-YYYY-NNN`) usando [`SDD_VERSIONES/PLANTILLAS/SPEC.md`](SDD_VERSIONES/PLANTILLAS/SPEC.md).
+   - **Paso 3 (Planificar):** Documentar `PLAN.md` y `TASKS.md` (dependencias, riesgos, pruebas previstas y estrategia segura de reversión en Git).
+   - **Paso 4 (Implementar):** Editar únicamente los archivos originales del proyecto, sin duplicar código ni crear copias paralelas.
+   - **Paso 5 (Verificar):** Ejecutar pruebas/compilación reales (`npm run lint`, `npm run build`, `npm test`, etc.) y registrar solo resultados observados en `TESTING.md`.
+   - **Paso 6 (Registrar):** Documentar en `IMPLEMENTACION.md` los archivos afectados, decisiones y referencias Git.
+   - **Paso 7 (Versionar):** Actualizar [`SDD_VERSIONES/CHANGELOG.md`](SDD_VERSIONES/CHANGELOG.md), [`SDD_VERSIONES/TRAZABILIDAD.md`](SDD_VERSIONES/TRAZABILIDAD.md), [`SDD_VERSIONES/VERSIONES.md`](SDD_VERSIONES/VERSIONES.md) y el `README.md` del módulo.
+2. **Excepciones:** No crear versión documental completa para correcciones ortográficas menores, comentarios sin impacto, formateo simple o archivos temporales de desarrollo. Para correcciones urgentes, aplicar la corrección y registrar el expediente SDD inmediatamente después señalando la excepción.
+3. **Reglas de integridad y seguridad:**
+   - Historial acumulativo y solo de adición: prohibido borrar o sobrescribir expedientes o entradas previas.
+   - **Git** es el mecanismo de recuperación de código; prohibido ejecutar automáticamente `git reset --hard`, force push o eliminación de ramas, y prohibido crear commits, tags o releases publicados sin autorización y evidencia real.
+   - Prohibido incluir secretos, credenciales o datos personales reales en documentos SDD, o afirmar pruebas no ejecutadas.
+
+

@@ -145,7 +145,7 @@ export default function ServiciosPage() {
   return (
     <div className="bg-[#FFFCF8]">
       {/* Hero Header */}
-      <section className="relative overflow-hidden bg-brand-dark py-20 text-white hero-three">
+      <section className="relative overflow-hidden bg-brand-dark pt-36 sm:pt-40 lg:pt-44 pb-20 text-white hero-three">
         <div className="content-width relative z-10">
           <nav className="mb-6 flex items-center gap-2 text-xs font-semibold text-accent-cream/80">
             <Link href="/" className="hover:text-accent-gold transition">

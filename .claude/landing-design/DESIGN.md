@@ -89,6 +89,9 @@
 3. **Botón Interactivo BbdButton:** Microinteracción bidireccional donde la flecha derecha desaparece y emerge la izquierda con traslación simultánea del texto.
 4. **Underline Animado:** Enlaces de texto con pseudo-elemento `::after` escalable (`transform: scaleX(1)`) de izquierda a derecha.
 5. **Transiciones Curvas de Sección:** Separación entre bloques con bordes curvos cóncavos y convexos de 32px a 64px para eliminar cortes horizontales rígidos.
+6. **Regla de Despeje de Cabecera Flotante (Floating Header Clearance Rule):** Dado que la barra de navegación institucional (`Navbar.tsx`) es flotante y fija (`fixed top-0 inset-x-0`) con una altura de ~100px, cualquier subpágina, hero header o banner superior que contenga breadcrumbs, badges o títulos H1 debe reservar obligatoriamente un padding superior de `pt-36 sm:pt-40 lg:pt-44` (144px a 176px). Está estrictamente prohibido usar `py-20` (80px) en la primera sección bajo navegación fija para garantizar que la barra nunca tape el contenido.
+7. **Navegación Total y Rutas Activas:** Todas las rutas públicas (`/`, `/por-que-elegirnos`, `/niveles`, `/servicios`, `/noticias`, `/testimonios`, `/contacto`, `/admision`, `/login`) deben estar integradas tanto en la barra superior como en el drawer monumental, con enlaces activos y botones de redirección directos.
+8. **Identidad Aplicada al 100% en Acceso Institucional (`/login`):** La pantalla de login y el layout de intranet adoptan la paleta borgoña (`#4F000B`, `#8F1025`), el fondo de papel marfil (`#FFFCF8`), la tipografía display `Roboto Condensed` y el emblema oficial UNSCH, manteniendo la continuidad estética entre el portal web y el sistema escolar.
 
 ---
 

@@ -63,3 +63,11 @@ Cada elemento de diseño del SDD debe contar con su identificador cruzado:
 * Endpoint: `VERBO /ruta`
 * Tabla SQL: `nombre_tabla`
 * Componente Next.js: `NombreComponente`
+
+---
+
+## 6. Control Interno de Cambios y Versiones (SDD_VERSIONES)
+
+* Los SDD estructurales de cada Squad (IEEE 1016) permanecen en `D - Base 1 - 01092026/Fase 2/Arquitectura/Squad X - [Nombre]/sdd_[squad].md`.
+* El **registro evolutivo, cronológico y versionado de cada cambio importante** (`SDD-YYYY-NNN`) se rige por la norma central en [`SDD_VERSIONES/README.md`](../../SDD_VERSIONES/README.md) y `AGENTS.md` § 8.
+

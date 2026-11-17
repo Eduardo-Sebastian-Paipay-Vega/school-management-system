@@ -508,11 +508,13 @@ router.get('/records', async (req: AuthenticatedRequest, res) => {
         `SELECT aa.id, aa.matricula_id, aa.fecha::text, aa.hora_registro::text,
                 aa.estado, aa.origen, aa.justificada, aa.observacion,
                 p.id AS estudiante_id, p.nombres, p.apellido_paterno, p.apellido_materno,
-                gs.id AS seccion_id, gs.nivel, gs.grado, gs.seccion
+                gs.id AS seccion_id, gs.nivel, gs.grado, gs.seccion,
+                ce.codigo_qr_token
            FROM asistencias_alumnos aa
            JOIN matriculas m ON m.id = aa.matricula_id
            JOIN personas p ON p.id = m.estudiante_id AND p.tenant_id = m.tenant_id
            JOIN grados_secciones gs ON gs.id = m.seccion_id AND gs.tenant_id = m.tenant_id
+           LEFT JOIN carnes_escolares ce ON ce.estudiante_id = p.id AND ce.activo = true
           WHERE m.tenant_id = $1
             AND ($2::uuid IS NULL OR m.seccion_id = $2::uuid)
             AND ($3::date IS NULL OR aa.fecha = $3::date)

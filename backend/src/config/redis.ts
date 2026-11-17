@@ -29,6 +29,7 @@ export const connectRedis = async (): Promise<void> => {
       const fallback = redisClient as unknown as Record<string, unknown>;
       Object.defineProperty(fallback, 'isReady', { get: () => true, configurable: true });
       fallback.get = async (k: string) => memoryStore.get(k) ?? null;
+      fallback.exists = async (k: string) => (memoryStore.has(k) ? 1 : 0);
       fallback.set = async (k: string, v: string) => {
         memoryStore.set(k, String(v));
         return 'OK';

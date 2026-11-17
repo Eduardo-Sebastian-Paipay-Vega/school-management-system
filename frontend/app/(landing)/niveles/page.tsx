@@ -8,16 +8,9 @@ import {
   BookOpen,
   CheckCircle2,
   Clock,
-  UserCheck,
   Sparkles,
-  Microscope,
-  Palette,
-  Trophy,
   ArrowRight,
   ChevronRight,
-  Compass,
-  Smile,
-  ShieldCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -130,7 +123,7 @@ export default function NivelesPage() {
   const selectedLevel = levelsData.find(l => l.id === activeTab) || levelsData[0];
 
   return (
-    <div className="bg-white">
+    <div className="bg-[#FFFCF8]">
       {/* Hero Header */}
       <section className="relative overflow-hidden bg-brand-dark py-20 text-white hero-one">
         <div className="content-width relative z-10">
@@ -147,7 +140,7 @@ export default function NivelesPage() {
               <GraduationCap size={14} />
               <span>Educación Básica Regular Completa</span>
             </div>
-            <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-[-0.03em] leading-tight text-white">
+            <h1 className="mt-4 bbd-font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight text-white">
               Niveles Educativos del{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cream via-accent-gold to-white">
                 Guamán Poma

@@ -12,26 +12,34 @@ export const navItems = [
   { label: '¿Por qué elegirnos?', href: '/por-que-elegirnos' },
   { label: 'Niveles', href: '/niveles' },
   { label: 'Servicios', href: '/servicios' },
-  { label: 'Testimonios', href: '/testimonios' },
-  { label: 'Admisión 2027', href: '/admision' },
   { label: 'Noticias', href: '/noticias' },
+  { label: 'Testimonios', href: '/testimonios' },
   { label: 'Contacto', href: '/contacto' },
+  { label: 'Admisión 2027', href: '/admision' },
+  { label: 'Intranet', href: '/login' },
 ];
 
 const primaryBarLinks = [
-  { label: 'Regeneración', href: '/#regen', rotation: '-2deg' },
-  { label: 'Ambición', href: '/#ambition', rotation: '1.8deg' },
-  { label: 'Ejes', href: '/#focus', rotation: '-1.5deg' },
-  { label: 'Niveles', href: '/niveles', rotation: '2deg' },
-  { label: 'Intranet', href: '/intranet', rotation: '-1.2deg' },
+  { label: 'Inicio', href: '/', rotation: '-1.5deg' },
+  { label: 'Propuesta', href: '/por-que-elegirnos', rotation: '1.2deg' },
+  { label: 'Niveles', href: '/niveles', rotation: '-1.8deg' },
+  { label: 'Servicios', href: '/servicios', rotation: '1.5deg' },
+  { label: 'Noticias', href: '/noticias', rotation: '-1.2deg' },
+  { label: 'Testimonios', href: '/testimonios', rotation: '1.8deg' },
+  { label: 'Contacto', href: '/contacto', rotation: '-2deg' },
+  { label: 'Intranet', href: '/login', rotation: '2deg' },
 ];
 
 const drawerLinks = [
-  { label: 'REGENERACIÓN', href: '/#regen' },
-  { label: 'AMBICIÓN', href: '/#ambition' },
-  { label: 'EJES FORMATIVOS', href: '/#focus' },
-  { label: 'ADMISIÓN 2027', href: '/admision' },
-  { label: 'INTRANET ESCOLAR', href: '/intranet' },
+  { label: 'INICIO', href: '/' },
+  { label: '¿POR QUÉ ELEGIRNOS?', href: '/por-que-elegirnos' },
+  { label: 'NIVELES EDUCATIVOS', href: '/niveles' },
+  { label: 'SERVICIOS E INFRAESTRUCTURA', href: '/servicios' },
+  { label: 'NOTICIAS Y COMUNICADOS', href: '/noticias' },
+  { label: 'TESTIMONIOS Y COMUNIDAD', href: '/testimonios' },
+  { label: 'MESA DE PARTES Y CONTACTO', href: '/contacto' },
+  { label: 'ADMISIÓN OFICIAL 2027', href: '/admision' },
+  { label: 'INTRANET INSTITUCIONAL', href: '/login' },
 ];
 
 export default function Navbar() {
@@ -101,7 +109,7 @@ export default function Navbar() {
               </Link>
 
               {/* Center Navigation Links (.nav-menu-links) */}
-              <div className="hidden lg:flex items-center gap-1">
+              <div className="hidden xl:flex items-center gap-0.5">
                 {primaryBarLinks.map((item) => {
                   const isActive =
                     item.href === pathname ||
@@ -110,12 +118,12 @@ export default function Navbar() {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="group relative inline-flex items-center justify-center px-4 py-2 font-roboto text-[16px] font-medium leading-[24px] text-[#291719]"
+                      className="group relative inline-flex items-center justify-center px-2.5 py-1.5 font-roboto text-[14px] 2xl:text-[15px] font-medium leading-[22px] text-[#291719]"
                     >
                       <span
                         style={{ '--rot': item.rotation } as React.CSSProperties}
                         className={cn(
-                          'absolute inset-x-1.5 inset-y-1 rounded-full bg-[#F5EBE8] transition-transform duration-300 ease-out',
+                          'absolute inset-x-1 inset-y-0.5 rounded-full bg-[#F5EBE8] transition-transform duration-300 ease-out',
                           isActive
                             ? 'scale-100 rotate-[-1.5deg]'
                             : 'scale-0 group-hover:scale-100 group-hover:rotate-[var(--rot)]'
@@ -129,7 +137,7 @@ export default function Navbar() {
 
               {/* Right CTA & Hamburger Toggle (.nav-btn-wrap) */}
               <div className="flex items-center gap-2">
-                <div className="hidden lg:block">
+                <div className="hidden sm:block">
                   <BbdButton
                     label="Admisión 2027"
                     href="/admision"
@@ -144,7 +152,7 @@ export default function Navbar() {
                   aria-label={menuOpen ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'}
                   aria-expanded={menuOpen}
                   aria-controls="bbd-twostep-drawer"
-                  className="flex h-12 w-12 items-center justify-center rounded-[8px] bg-[#E8D8D4] text-[#291719] transition-colors hover:bg-[#B5A29E] lg:hidden"
+                  className="flex h-12 w-12 items-center justify-center rounded-[8px] bg-[#E8D8D4] text-[#291719] transition-colors hover:bg-[#B5A29E] xl:hidden"
                 >
                   <div className="relative flex h-5 w-6 flex-col items-center justify-center">
                     <span
@@ -189,11 +197,17 @@ export default function Navbar() {
                       </Link>
                     ))}
 
-                    <div className="mt-2">
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
                       <BbdButton
-                        label="Contáctanos"
-                        href="/contacto"
+                        label="Admisión 2027"
+                        href="/admision"
                         variant="purple"
+                        onClick={() => setMenuOpen(false)}
+                      />
+                      <BbdButton
+                        label="Mesa de Partes"
+                        href="/contacto"
+                        variant="white"
                         onClick={() => setMenuOpen(false)}
                       />
                     </div>
@@ -221,11 +235,17 @@ export default function Navbar() {
                     <p className="mt-4 font-roboto text-[16px] font-light leading-[24px] text-[#290006]">
                       Conoce cómo los Planteles de Aplicación de la UNSCH impulsan la excelencia académica, la investigación científica y la formación integral en Ayacucho.
                     </p>
-                    <div className="mt-5">
+                    <div className="mt-5 flex flex-wrap items-center gap-3">
                       <BbdButton
                         label="Ver el plan"
                         href="/por-que-elegirnos"
                         variant="white"
+                        onClick={() => setMenuOpen(false)}
+                      />
+                      <BbdButton
+                        label="Acceso Intranet"
+                        href="/login"
+                        variant="purple"
                         onClick={() => setMenuOpen(false)}
                       />
                     </div>

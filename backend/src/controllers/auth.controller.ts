@@ -12,7 +12,7 @@ type MeData = components['schemas']['MeSuccess']['data'];
 
 const password = z.string().min(8).refine((value) => Buffer.byteLength(value, 'utf8') <= 72)
   .refine((value) => /[A-Za-z]/.test(value) && /\d/.test(value));
-const loginSchema = z.object({ codigoModular: z.string().min(1).max(10),
+const loginSchema = z.object({ codigoModular: z.string().min(1).max(10).optional(),
   identifier: z.string().min(3).max(254), password: z.string().min(1) });
 const linkSchema = z.object({ codigoModular: z.string().min(1).max(10),
   token: z.string().min(32).max(128), password });
@@ -86,7 +86,7 @@ export class AuthController {
   }
 
   static async forgot(req: AuthenticatedRequest, res: Response): Promise<void> {
-    const parsed = z.object({ codigoModular: z.string().min(1).max(10),
+    const parsed = z.object({ codigoModular: z.string().min(1).max(10).optional(),
       identifier: z.string().min(3).max(254) }).safeParse(req.body);
     if (!parsed.success) { error(res, 400, 'VALIDATION_FAILED', 'Solicitud inválida.'); return; }
     if (!redisClient.isReady) { error(res, 503, 'AUTH_UNAVAILABLE', 'Servicio temporalmente no disponible.'); return; }
@@ -101,11 +101,14 @@ export class AuthController {
     try {
       const user = await AuthService.requestRecovery(parsed.data.codigoModular, parsed.data.identifier);
       if (user) {
-        const tenant = await (await import('../config/database')).resolveInstitution(parsed.data.codigoModular);
+        const { resolveInstitution, resolveInstitutionSilencioso } = await import('../config/database');
+        const tenant = parsed.data.codigoModular
+          ? await resolveInstitution(parsed.data.codigoModular)
+          : await resolveInstitutionSilencioso(parsed.data.identifier);
         if (tenant) {
           const token = await AuthService.createAccessLink(tenant, user.id, user.id, 'RECUPERACION');
           try {
-            await sendAccessLink(user.email, parsed.data.codigoModular, token, 'RECUPERACION');
+            await sendAccessLink(user.email, parsed.data.codigoModular || '0425892', token, 'RECUPERACION');
           } catch (cause) {
             await AuthService.invalidateAccessLink(tenant, user.id, user.id, 'RECUPERACION', token);
             throw cause;

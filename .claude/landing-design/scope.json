@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "baseUrl": "http://localhost:3000",
+  "referenceRoute": "/",
+  "publicRoutes": [
+    "/",
+    "/niveles",
+    "/admision",
+    "/servicios",
+    "/por-que-elegirnos",
+    "/noticias",
+    "/testimonios",
+    "/contacto"
+  ],
+  "allowedSourcePaths": [
+    "frontend/app/(landing)/",
+    "frontend/modules/landing/"
+  ],
+  "protectedSourcePaths": [
+    "backend/",
+    "database/",
+    "frontend/app/(intranet)/",
+    "frontend/modules/squads/",
+    "frontend/modules/shared/"
+  ],
+  "excludedRoutes": [
+    "/intranet",
+    "/login",
+    "/activar-cuenta",
+    "/activar-apoderado",
+    "/recuperar-clave",
+    "/restablecer-clave",
+    "/api"
+  ],
+  "viewports": [
+    { "name": "desktop", "width": 1440, "height": 900 },
+    { "name": "tablet", "width": 768, "height": 1024 },
+    { "name": "mobile", "width": 390, "height": 844 }
+  ]
+}

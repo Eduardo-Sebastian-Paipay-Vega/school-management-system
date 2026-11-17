@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import {
   MapPin,
   Phone,
@@ -11,16 +10,11 @@ import {
   Send,
   Building2,
   ChevronRight,
-  ArrowRight,
   ArrowUpRight,
-  ShieldCheck,
   CheckCircle2,
   FileText,
   UserCheck,
-  AlertCircle,
-  HelpCircle,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 export default function ContactoPage() {
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -44,7 +38,7 @@ export default function ContactoPage() {
   };
 
   return (
-    <div className="bg-white">
+    <div className="bg-[#FFFCF8]">
       {/* Hero Header */}
       <section className="relative overflow-hidden bg-brand-dark py-20 text-white hero-one">
         <div className="content-width relative z-10">
@@ -61,7 +55,7 @@ export default function ContactoPage() {
               <Building2 size={14} />
               <span>Atención al Ciudadano y Comunidad Educativa</span>
             </div>
-            <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-[-0.03em] leading-tight text-white">
+            <h1 className="mt-4 bbd-font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight text-white">
               Contacto y{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cream via-accent-gold to-white">
                 Mesa de Partes

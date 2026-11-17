@@ -6,17 +6,11 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import {
   Quote,
-  Star,
-  GraduationCap,
   Users,
   Award,
   ChevronRight,
-  ArrowRight,
-  Heart,
-  Building2,
   CheckCircle2,
   Send,
-  Sparkles,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -119,7 +113,7 @@ export default function TestimoniosPage() {
   };
 
   return (
-    <div className="bg-white">
+    <div className="bg-[#FFFCF8]">
       {/* Hero Header */}
       <section className="relative overflow-hidden bg-brand-dark py-20 text-white hero-two">
         <div className="content-width relative z-10">
@@ -136,7 +130,7 @@ export default function TestimoniosPage() {
               <Users size={14} />
               <span>Voz de la Comunidad Guamampomina</span>
             </div>
-            <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-[-0.03em] leading-tight text-white">
+            <h1 className="mt-4 bbd-font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight text-white">
               Testimonios y{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cream via-accent-gold to-white">
                 Casos de Éxito

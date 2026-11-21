@@ -49,3 +49,20 @@ Entorno local con las variables del job `core-integration`. Base nueva para la s
 
 Cada corrección tiene una prueba «S7: …» en `tenant-isolation.test.cjs` que falla sin el cambio (comprobado revirtiendo `backend/src`: 26/31).
 
+
+## Entregables del Squad 2 sobre los contratos del Sprint 6 (`c9c23c6`)
+
+| Entregable | Permiso y roles | Prueba |
+|---|---|---|
+| `PATCH /api/v1/attendance/{id}/correction` (RF-22, RF-66) | `attendance:correct`: SUPERADMIN, COORDINADOR_ACADEMICO, AUXILIAR | `squad2.test.cjs`: corrección con auditoría visible en `/audit/logs`, 400 por motivo corto, 404 de otro tenant, 403 de DOCENTE, 409 sin cambio |
+| `POST /api/v1/enrollments` (RF-16, RF-12) | `enrollments:create`: SUPERADMIN, SECRETARIA, COORDINADOR_ACADEMICO | Alta correcta, 409 `SECTION_FULL` con secciones alternativas, 409 duplicado, 404 sección o estudiante de otro tenant |
+| `POST /api/v1/enrollments/guardian-records` y `/{id}/revoke` (RF-15 → RF-75) | `guardian-records:publish`: SUPERADMIN, DIRECTIVO | Publicar → Core acepta `/guardians/links` → invitación y activación → revocar → acceso cortado. SECRETARIA recibe 403 |
+
+**Separación de funciones:** SECRETARIA queda fuera de `guardian-records:publish` porque ya vincula con `guardians:manage`. El contrato RF-15 → RF-75 exige que quien vincula no fabrique la fuente que acredita el vínculo.
+
+**Decisiones abiertas para el líder:**
+1. `fuente_ficha_id` lo envía el cliente hasta que exista la tabla de la ficha RF-15. Cuando exista, la función de publicación debe validar la fuente.
+2. RF-16 pide la «condición» de matrícula (Promovido, Repitente, Traslado), pero `matriculas` no tiene esa columna.
+3. `uq_estudiante_anio` cuenta también las matrículas retiradas, lo que es más estricto que «una matrícula activa por año» (RN-ACD-03).
+4. La revocación de una ficha exige un motivo de 10 a 500 caracteres; el contrato no lo pedía.
+5. Faltan los adjuntos y el plazo de 72 h hábiles de RF-22 (RN-AST-04).

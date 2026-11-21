@@ -1,0 +1,131 @@
+# --- Squad 2: asistencia (RF-22 sobre RF-66), matrícula (RF-16) y filiación verificada (RF-15 -> RF-75) ---
+# Las fechas DATE se devuelven como 'YYYY-MM-DD' (el servidor las formatea en SQL).
+EstadoAsistencia:
+  type: string
+  enum: [PRESENTE, TARDANZA_JUSTIFICADA, TARDANZA_INJUSTIFICADA, FALTA_JUSTIFICADA, FALTA_INJUSTIFICADA]
+Parentesco:
+  type: string
+  enum: [PADRE, MADRE, TUTOR_LEGAL]
+AttendanceCorrectionRequest:
+  type: object
+  additionalProperties: false
+  required: [estado, justificada, motivo]
+  properties:
+    estado: { $ref: '#/EstadoAsistencia' }
+    justificada: { type: boolean }
+    motivo:
+      type: string
+      minLength: 10
+      maxLength: 500
+      description: 'Entre 10 y 500 caracteres tras recortar espacios. Se guarda en payload_nuevo del evento ATTENDANCE_CORRECTED.'
+AttendanceRecord:
+  type: object
+  additionalProperties: false
+  required: [id, matriculaId, fecha, estado, justificada]
+  properties:
+    id: { type: string, format: uuid }
+    matriculaId: { type: string, format: uuid }
+    fecha: { type: string, format: date }
+    estado: { $ref: '#/EstadoAsistencia' }
+    justificada: { type: boolean }
+AttendanceCorrectedSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data: { $ref: '#/AttendanceRecord' }
+    timestamp: { type: string, format: date-time }
+EnrollmentCreateRequest:
+  type: object
+  additionalProperties: false
+  required: [estudianteId, seccionId]
+  properties:
+    estudianteId: { type: string, format: uuid, description: 'Persona Core del tenant (personas.id).' }
+    seccionId: { type: string, format: uuid, description: 'Sección del tenant; el año lectivo se toma de la sección.' }
+    estado:
+      type: string
+      enum: [REGULAR, EXTEMPORANEA]
+      default: REGULAR
+      description: 'RF-16: matrícula regular o extemporánea.'
+Enrollment:
+  type: object
+  additionalProperties: false
+  required: [id, estudianteId, seccionId, anioLectivoId, estado, fechaMatricula, vacantesDisponibles]
+  properties:
+    id: { type: string, format: uuid }
+    estudianteId: { type: string, format: uuid }
+    seccionId: { type: string, format: uuid }
+    anioLectivoId: { type: string, format: uuid }
+    estado: { type: string, enum: [REGULAR, EXTEMPORANEA] }
+    fechaMatricula: { type: string, format: date }
+    vacantesDisponibles: { type: integer, minimum: 0, description: 'Vacantes de la sección tras esta matrícula.' }
+EnrollmentCreatedSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data: { $ref: '#/Enrollment' }
+    timestamp: { type: string, format: date-time }
+SectionAlternative:
+  type: object
+  additionalProperties: false
+  required: [id, seccion, vacantesDisponibles]
+  properties:
+    id: { type: string, format: uuid }
+    seccion: { type: string, minLength: 1, maxLength: 1 }
+    vacantesDisponibles: { type: integer, minimum: 1 }
+EnrollmentConflictError:
+  type: object
+  required: [success, error, timestamp]
+  properties:
+    success: { const: false }
+    error:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string, enum: [SECTION_FULL, ENROLLMENT_DUPLICATE] }
+        message: { type: string }
+        details:
+          type: object
+          required: [alternativas]
+          description: 'Solo con SECTION_FULL: otras secciones del mismo año, nivel y grado con vacantes (RF-16, excepción 3a).'
+          properties:
+            alternativas: { type: array, items: { $ref: '#/SectionAlternative' } }
+    timestamp: { type: string, format: date-time }
+GuardianRecordPublishRequest:
+  type: object
+  additionalProperties: false
+  required: [fuenteFichaId, estudianteId, apoderadoDni, parentesco]
+  properties:
+    fuenteFichaId: { type: string, format: uuid, description: 'Registro de origen de la ficha RF-15, para conciliación y revocación.' }
+    estudianteId: { type: string, format: uuid, description: 'Persona Core del estudiante.' }
+    apoderadoDni:
+      type: string
+      pattern: '^[0-9]{8}$'
+      writeOnly: true
+      description: 'DNI verificado del apoderado. El servidor solo guarda su HMAC (documentHash); nunca lo almacena ni lo devuelve.'
+    parentesco: { $ref: '#/Parentesco' }
+GuardianRecordRevokeRequest:
+  type: object
+  additionalProperties: false
+  required: [motivo]
+  properties:
+    motivo: { type: string, minLength: 10, maxLength: 500 }
+GuardianRecord:
+  type: object
+  additionalProperties: false
+  required: [id, fuenteFichaId, estudianteId, parentesco, verificadoEn, revocadoEn]
+  properties:
+    id: { type: string, format: uuid }
+    fuenteFichaId: { type: string, format: uuid }
+    estudianteId: { type: string, format: uuid }
+    parentesco: { $ref: '#/Parentesco' }
+    verificadoEn: { type: string, format: date-time }
+    revocadoEn: { type: [string, 'null'], format: date-time }
+GuardianRecordSuccess:
+  type: object
+  required: [success, data, timestamp]
+  properties:
+    success: { const: true }
+    data: { $ref: '#/GuardianRecord' }
+    timestamp: { type: string, format: date-time }

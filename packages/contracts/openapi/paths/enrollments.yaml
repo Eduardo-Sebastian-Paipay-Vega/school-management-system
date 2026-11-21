@@ -1,0 +1,89 @@
+/enrollments:
+  post:
+    operationId: createEnrollment
+    summary: Matricular a un estudiante en una sección (RF-16)
+    description: >-
+      Permiso enrollments:create. Crea una fila en matriculas para una persona del tenant y una
+      sección del tenant; el año lectivo es el de la sección. Una matrícula por estudiante y año
+      (RN-ACD-03, uq_estudiante_anio). El aforo lo valida trg_matriculas_aforo. Se audita
+      ENROLLMENT_CREATED (módulo academics) en la misma transacción. Errores: 400
+      VALIDATION_FAILED; 404 SECTION_NOT_FOUND (inexistente o de otro tenant) o STUDENT_NOT_FOUND;
+      409 SECTION_FULL (con secciones alternativas) o ENROLLMENT_DUPLICATE.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/squad2.yaml#/EnrollmentCreateRequest' }
+    responses:
+      '201':
+        description: Matrícula registrada.
+        content:
+          application/json:
+            schema: { $ref: '../components/squad2.yaml#/EnrollmentCreatedSuccess' }
+      '400': { $ref: '../components/responses.yaml#/Error' }
+      '401': { $ref: '../components/responses.yaml#/Error' }
+      '403': { $ref: '../components/responses.yaml#/Error' }
+      '404': { $ref: '../components/responses.yaml#/Error' }
+      '409':
+        description: Sección sin vacantes o estudiante ya matriculado en el año.
+        content:
+          application/json:
+            schema: { $ref: '../components/squad2.yaml#/EnrollmentConflictError' }
+      '500': { $ref: '../components/responses.yaml#/Error' }
+/enrollments/guardian-records:
+  post:
+    operationId: publishGuardianRecord
+    summary: Publicar la filiación verificada de la ficha del estudiante (RF-15 -> RF-75)
+    description: >-
+      Permiso guardian-records:publish. Ejecuta fn_publicar_ficha_apoderado(): inserta en
+      fichas_apoderados_verificados el HMAC del DNI (documentHash, nunca el DNI), el estudiante,
+      el parentesco y verificado_en, y audita GUARDIAN_RECORD_PUBLISHED (módulo academics) en la
+      misma transacción. Core exige esta fila en /guardians/links, invitación, activación y cada
+      consulta del apoderado. Errores: 400 VALIDATION_FAILED; 404 STUDENT_NOT_FOUND
+      (inexistente o de otro tenant); 409 GUARDIAN_RECORD_DUPLICATE (misma filiación vigente).
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/squad2.yaml#/GuardianRecordPublishRequest' }
+    responses:
+      '201':
+        description: Filiación publicada.
+        content:
+          application/json:
+            schema: { $ref: '../components/squad2.yaml#/GuardianRecordSuccess' }
+      '400': { $ref: '../components/responses.yaml#/Error' }
+      '401': { $ref: '../components/responses.yaml#/Error' }
+      '403': { $ref: '../components/responses.yaml#/Error' }
+      '404': { $ref: '../components/responses.yaml#/Error' }
+      '409': { $ref: '../components/responses.yaml#/Error' }
+      '500': { $ref: '../components/responses.yaml#/Error' }
+/enrollments/guardian-records/{id}/revoke:
+  parameters:
+    - { name: id, in: path, required: true, description: 'fichas_apoderados_verificados.id', schema: { type: string, format: uuid } }
+  post:
+    operationId: revokeGuardianRecord
+    summary: Revocar una filiación verificada (corrección de la ficha)
+    description: >-
+      Permiso guardian-records:publish. Ejecuta fn_revocar_ficha_apoderado(): marca revocado_en
+      (la fila no se reutiliza; una corrección publica una fila nueva) y audita
+      GUARDIAN_RECORD_REVOKED con el motivo. El apoderado pierde el acceso en su siguiente
+      consulta. Errores: 400 VALIDATION_FAILED o GUARDIAN_RECORD_REASON_REQUIRED; 404
+      GUARDIAN_RECORD_NOT_FOUND (inexistente o de otro tenant); 409 GUARDIAN_RECORD_ALREADY_REVOKED.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/squad2.yaml#/GuardianRecordRevokeRequest' }
+    responses:
+      '200':
+        description: Filiación revocada.
+        content:
+          application/json:
+            schema: { $ref: '../components/squad2.yaml#/GuardianRecordSuccess' }
+      '400': { $ref: '../components/responses.yaml#/Error' }
+      '401': { $ref: '../components/responses.yaml#/Error' }
+      '403': { $ref: '../components/responses.yaml#/Error' }
+      '404': { $ref: '../components/responses.yaml#/Error' }
+      '409': { $ref: '../components/responses.yaml#/Error' }
+      '500': { $ref: '../components/responses.yaml#/Error' }

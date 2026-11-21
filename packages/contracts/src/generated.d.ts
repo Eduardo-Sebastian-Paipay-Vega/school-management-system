@@ -841,6 +841,92 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/attendance/{id}/correction": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description asistencias_alumnos.id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Corregir o justificar una asistencia con motivo auditado (RF-22, RF-66)
+         * @description Permiso attendance:correct. Ejecuta fn_corregir_asistencia() dentro de la transacción del tenant del JWT: actualiza estado y justificación y escribe ATTENDANCE_CORRECTED (módulo attendance) en la cadena de auditoría, visible en GET /audit/logs. Una asistencia de otro tenant responde 404, igual que una inexistente. Errores: 400 VALIDATION_FAILED, ATTENDANCE_VALUE_REQUIRED o ATTENDANCE_REASON_REQUIRED; 404 ATTENDANCE_NOT_FOUND; 409 ATTENDANCE_NO_CHANGE; 500 INTERNAL_ERROR (contexto o IP ausentes, sin detalle técnico).
+         */
+        patch: operations["correctAttendance"];
+        trace?: never;
+    };
+    "/enrollments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Matricular a un estudiante en una sección (RF-16)
+         * @description Permiso enrollments:create. Crea una fila en matriculas para una persona del tenant y una sección del tenant; el año lectivo es el de la sección. Una matrícula por estudiante y año (RN-ACD-03, uq_estudiante_anio). El aforo lo valida trg_matriculas_aforo. Se audita ENROLLMENT_CREATED (módulo academics) en la misma transacción. Errores: 400 VALIDATION_FAILED; 404 SECTION_NOT_FOUND (inexistente o de otro tenant) o STUDENT_NOT_FOUND; 409 SECTION_FULL (con secciones alternativas) o ENROLLMENT_DUPLICATE.
+         */
+        post: operations["createEnrollment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/enrollments/guardian-records": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publicar la filiación verificada de la ficha del estudiante (RF-15 -> RF-75)
+         * @description Permiso guardian-records:publish. Ejecuta fn_publicar_ficha_apoderado(): inserta en fichas_apoderados_verificados el HMAC del DNI (documentHash, nunca el DNI), el estudiante, el parentesco y verificado_en, y audita GUARDIAN_RECORD_PUBLISHED (módulo academics) en la misma transacción. Core exige esta fila en /guardians/links, invitación, activación y cada consulta del apoderado. Errores: 400 VALIDATION_FAILED; 404 STUDENT_NOT_FOUND (inexistente o de otro tenant); 409 GUARDIAN_RECORD_DUPLICATE (misma filiación vigente).
+         */
+        post: operations["publishGuardianRecord"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/enrollments/guardian-records/{id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description fichas_apoderados_verificados.id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Revocar una filiación verificada (corrección de la ficha)
+         * @description Permiso guardian-records:publish. Ejecuta fn_revocar_ficha_apoderado(): marca revocado_en (la fila no se reutiliza; una corrección publica una fila nueva) y audita GUARDIAN_RECORD_REVOKED con el motivo. El apoderado pierde el acceso en su siguiente consulta. Errores: 400 VALIDATION_FAILED o GUARDIAN_RECORD_REASON_REQUIRED; 404 GUARDIAN_RECORD_NOT_FOUND (inexistente o de otro tenant); 409 GUARDIAN_RECORD_ALREADY_REVOKED.
+         */
+        post: operations["revokeGuardianRecord"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -932,6 +1018,133 @@ export interface components {
             data: {
                 message: string;
             };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        /** @enum {string} */
+        EstadoAsistencia: "PRESENTE" | "TARDANZA_JUSTIFICADA" | "TARDANZA_INJUSTIFICADA" | "FALTA_JUSTIFICADA" | "FALTA_INJUSTIFICADA";
+        /** @enum {string} */
+        Parentesco: "PADRE" | "MADRE" | "TUTOR_LEGAL";
+        AttendanceCorrectionRequest: {
+            estado: components["schemas"]["EstadoAsistencia"];
+            justificada: boolean;
+            /** @description Entre 10 y 500 caracteres tras recortar espacios. Se guarda en payload_nuevo del evento ATTENDANCE_CORRECTED. */
+            motivo: string;
+        };
+        AttendanceRecord: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            matriculaId: string;
+            /** Format: date */
+            fecha: string;
+            estado: components["schemas"]["EstadoAsistencia"];
+            justificada: boolean;
+        };
+        AttendanceCorrectedSuccess: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AttendanceRecord"];
+            /** Format: date-time */
+            timestamp: string;
+        };
+        EnrollmentCreateRequest: {
+            /**
+             * Format: uuid
+             * @description Persona Core del tenant (personas.id).
+             */
+            estudianteId: string;
+            /**
+             * Format: uuid
+             * @description Sección del tenant; el año lectivo se toma de la sección.
+             */
+            seccionId: string;
+            /**
+             * @description RF-16: matrícula regular o extemporánea.
+             * @default REGULAR
+             * @enum {string}
+             */
+            estado: "REGULAR" | "EXTEMPORANEA";
+        };
+        Enrollment: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            estudianteId: string;
+            /** Format: uuid */
+            seccionId: string;
+            /** Format: uuid */
+            anioLectivoId: string;
+            /** @enum {string} */
+            estado: "REGULAR" | "EXTEMPORANEA";
+            /** Format: date */
+            fechaMatricula: string;
+            /** @description Vacantes de la sección tras esta matrícula. */
+            vacantesDisponibles: number;
+        };
+        EnrollmentCreatedSuccess: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Enrollment"];
+            /** Format: date-time */
+            timestamp: string;
+        };
+        SectionAlternative: {
+            /** Format: uuid */
+            id: string;
+            seccion: string;
+            vacantesDisponibles: number;
+        };
+        EnrollmentConflictError: {
+            /** @constant */
+            success: false;
+            error: {
+                /** @enum {string} */
+                code: "SECTION_FULL" | "ENROLLMENT_DUPLICATE";
+                message: string;
+                /** @description Solo con SECTION_FULL: otras secciones del mismo año, nivel y grado con vacantes (RF-16, excepción 3a). */
+                details?: {
+                    alternativas: components["schemas"]["SectionAlternative"][];
+                };
+            };
+            /** Format: date-time */
+            timestamp: string;
+        };
+        GuardianRecordPublishRequest: {
+            /**
+             * Format: uuid
+             * @description Registro de origen de la ficha RF-15, para conciliación y revocación.
+             */
+            fuenteFichaId: string;
+            /**
+             * Format: uuid
+             * @description Persona Core del estudiante.
+             */
+            estudianteId: string;
+            /** @description DNI verificado del apoderado. El servidor solo guarda su HMAC (documentHash); nunca lo almacena ni lo devuelve. */
+            apoderadoDni: string;
+            parentesco: components["schemas"]["Parentesco"];
+        };
+        GuardianRecordRevokeRequest: {
+            motivo: string;
+        };
+        GuardianRecord: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            fuenteFichaId: string;
+            /** Format: uuid */
+            estudianteId: string;
+            parentesco: components["schemas"]["Parentesco"];
+            /** Format: date-time */
+            verificadoEn: string;
+            /** Format: date-time */
+            revocadoEn: string | null;
+        };
+        GuardianRecordSuccess: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["GuardianRecord"];
             /** Format: date-time */
             timestamp: string;
         };
@@ -2743,6 +2956,140 @@ export interface operations {
         responses: {
             200: components["responses"]["Health"];
             503: components["responses"]["Health"];
+        };
+    };
+    correctAttendance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description asistencias_alumnos.id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AttendanceCorrectionRequest"];
+            };
+        };
+        responses: {
+            /** @description Asistencia corregida. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttendanceCorrectedSuccess"];
+                };
+            };
+            400: components["responses"]["Error"];
+            401: components["responses"]["Error"];
+            403: components["responses"]["Error"];
+            404: components["responses"]["Error"];
+            409: components["responses"]["Error"];
+            500: components["responses"]["Error"];
+        };
+    };
+    createEnrollment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EnrollmentCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Matrícula registrada. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnrollmentCreatedSuccess"];
+                };
+            };
+            400: components["responses"]["Error"];
+            401: components["responses"]["Error"];
+            403: components["responses"]["Error"];
+            404: components["responses"]["Error"];
+            /** @description Sección sin vacantes o estudiante ya matriculado en el año. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnrollmentConflictError"];
+                };
+            };
+            500: components["responses"]["Error"];
+        };
+    };
+    publishGuardianRecord: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GuardianRecordPublishRequest"];
+            };
+        };
+        responses: {
+            /** @description Filiación publicada. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuardianRecordSuccess"];
+                };
+            };
+            400: components["responses"]["Error"];
+            401: components["responses"]["Error"];
+            403: components["responses"]["Error"];
+            404: components["responses"]["Error"];
+            409: components["responses"]["Error"];
+            500: components["responses"]["Error"];
+        };
+    };
+    revokeGuardianRecord: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description fichas_apoderados_verificados.id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GuardianRecordRevokeRequest"];
+            };
+        };
+        responses: {
+            /** @description Filiación revocada. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuardianRecordSuccess"];
+                };
+            };
+            400: components["responses"]["Error"];
+            401: components["responses"]["Error"];
+            403: components["responses"]["Error"];
+            404: components["responses"]["Error"];
+            409: components["responses"]["Error"];
+            500: components["responses"]["Error"];
         };
     };
 }

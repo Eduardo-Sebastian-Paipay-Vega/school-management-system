@@ -10,6 +10,8 @@ import usersRoutes from './routes/users.routes';
 import schoolRoutes from './routes/school.routes';
 import guardiansRoutes from './routes/guardians.routes';
 import notificationsRoutes from './routes/notifications.routes';
+import { attendanceRoutes } from './modules/attendance';
+import { enrollmentsRoutes } from './modules/academics';
 import { errorHandler, notFoundHandler, OriginDeniedError } from './core/http/errors';
 
 /** HTTP composition without database, Redis, WebSocket or worker startup. */
@@ -37,6 +39,9 @@ export function createApp() {
   app.use('/api/v1/school', schoolRoutes);
   app.use('/api/v1/guardians', guardiansRoutes);
   app.use('/api/v1/notifications', notificationsRoutes);
+  // Módulos de squad (docs/architecture/04-backend.md §4).
+  app.use('/api/v1/attendance', attendanceRoutes);
+  app.use('/api/v1/enrollments', enrollmentsRoutes);
 
   app.get('/', (_req, res) => {
     res.json({

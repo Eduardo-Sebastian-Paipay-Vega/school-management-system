@@ -57,3 +57,8 @@ SELECT * FROM fn_corregir_asistencia(
 ## 5. Tablas heredadas sin tenant
 
 `asistencias_practicantes`, `calificaciones`, `evaluaciones`, `conclusiones_descriptivas`, `carnes_escolares`, `expedientes_adjuntos`, `expedientes_movimientos`, `metricas_impacto_ssu` y `noticias_galeria` no son accesibles para `sms_app` desde `20261107000100`. El squad dueño (2 para practicantes y carnés, 3 para las tablas de notas heredadas, 4 para métricas, 5 para expedientes y noticias) recupera el acceso con una migración que agregue `tenant_id`, FK compuesta, RLS y los `GRANT` mínimos. La prueba «S6-01» de `database/tests` rechaza cualquier tabla accesible sin RLS que no sea un catálogo global.
+
+## 6. Estado del consumidor (Squad 2, 2026-11-07)
+
+- Endpoint publicado: `PATCH /api/v1/attendance/{id}/correction` (`backend/src/modules/attendance/`, contrato `packages/contracts/openapi/paths/attendance.yaml`), con el permiso `attendance:correct` de `20261107001000_s2_permisos_asistencia_matricula.sql`. Llama a la función en la cláusula `FROM` y mapea la tabla de §3 (400/404/409; contexto o IP ausentes → 500 `INTERNAL_ERROR` sin detalle).
+- Prueba conjunta en `/audit/logs`: `backend/tests/integration/squad2.test.cjs`. Pendiente: adjuntos y plazo de 72 horas hábiles de RF-22 (RN-AST-04), que la función actual no modela.

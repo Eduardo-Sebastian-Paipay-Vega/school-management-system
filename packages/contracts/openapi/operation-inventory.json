@@ -154,5 +154,17 @@
   ],
   "/health": [
     "health"
+  ],
+  "/attendance/{id}/correction": [
+    "correctAttendance"
+  ],
+  "/enrollments": [
+    "createEnrollment"
+  ],
+  "/enrollments/guardian-records": [
+    "publishGuardianRecord"
+  ],
+  "/enrollments/guardian-records/{id}/revoke": [
+    "revokeGuardianRecord"
   ]
 }

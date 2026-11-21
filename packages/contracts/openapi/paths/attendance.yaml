@@ -1,0 +1,30 @@
+/attendance/{id}/correction:
+  parameters:
+    - { name: id, in: path, required: true, description: 'asistencias_alumnos.id', schema: { type: string, format: uuid } }
+  patch:
+    operationId: correctAttendance
+    summary: Corregir o justificar una asistencia con motivo auditado (RF-22, RF-66)
+    description: >-
+      Permiso attendance:correct. Ejecuta fn_corregir_asistencia() dentro de la transacción del
+      tenant del JWT: actualiza estado y justificación y escribe ATTENDANCE_CORRECTED (módulo
+      attendance) en la cadena de auditoría, visible en GET /audit/logs. Una asistencia de otro
+      tenant responde 404, igual que una inexistente. Errores: 400 VALIDATION_FAILED,
+      ATTENDANCE_VALUE_REQUIRED o ATTENDANCE_REASON_REQUIRED; 404 ATTENDANCE_NOT_FOUND;
+      409 ATTENDANCE_NO_CHANGE; 500 INTERNAL_ERROR (contexto o IP ausentes, sin detalle técnico).
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/squad2.yaml#/AttendanceCorrectionRequest' }
+    responses:
+      '200':
+        description: Asistencia corregida.
+        content:
+          application/json:
+            schema: { $ref: '../components/squad2.yaml#/AttendanceCorrectedSuccess' }
+      '400': { $ref: '../components/responses.yaml#/Error' }
+      '401': { $ref: '../components/responses.yaml#/Error' }
+      '403': { $ref: '../components/responses.yaml#/Error' }
+      '404': { $ref: '../components/responses.yaml#/Error' }
+      '409': { $ref: '../components/responses.yaml#/Error' }
+      '500': { $ref: '../components/responses.yaml#/Error' }

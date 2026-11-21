@@ -104,6 +104,14 @@ paths:
     $ref: './paths/audit.yaml#/~1audit~1export.pdf'
   /health:
     $ref: './paths/health.yaml#/~1health'
+  /attendance/{id}/correction:
+    $ref: './paths/attendance.yaml#/~1attendance~1{id}~1correction'
+  /enrollments:
+    $ref: './paths/enrollments.yaml#/~1enrollments'
+  /enrollments/guardian-records:
+    $ref: './paths/enrollments.yaml#/~1enrollments~1guardian-records'
+  /enrollments/guardian-records/{id}/revoke:
+    $ref: './paths/enrollments.yaml#/~1enrollments~1guardian-records~1{id}~1revoke'
 components:
   parameters:
     Id:
@@ -136,6 +144,34 @@ components:
       $ref: './components/schemas.yaml#/MeSuccess'
     MessageSuccess:
       $ref: './components/schemas.yaml#/MessageSuccess'
+    EstadoAsistencia:
+      $ref: './components/squad2.yaml#/EstadoAsistencia'
+    Parentesco:
+      $ref: './components/squad2.yaml#/Parentesco'
+    AttendanceCorrectionRequest:
+      $ref: './components/squad2.yaml#/AttendanceCorrectionRequest'
+    AttendanceRecord:
+      $ref: './components/squad2.yaml#/AttendanceRecord'
+    AttendanceCorrectedSuccess:
+      $ref: './components/squad2.yaml#/AttendanceCorrectedSuccess'
+    EnrollmentCreateRequest:
+      $ref: './components/squad2.yaml#/EnrollmentCreateRequest'
+    Enrollment:
+      $ref: './components/squad2.yaml#/Enrollment'
+    EnrollmentCreatedSuccess:
+      $ref: './components/squad2.yaml#/EnrollmentCreatedSuccess'
+    SectionAlternative:
+      $ref: './components/squad2.yaml#/SectionAlternative'
+    EnrollmentConflictError:
+      $ref: './components/squad2.yaml#/EnrollmentConflictError'
+    GuardianRecordPublishRequest:
+      $ref: './components/squad2.yaml#/GuardianRecordPublishRequest'
+    GuardianRecordRevokeRequest:
+      $ref: './components/squad2.yaml#/GuardianRecordRevokeRequest'
+    GuardianRecord:
+      $ref: './components/squad2.yaml#/GuardianRecord'
+    GuardianRecordSuccess:
+      $ref: './components/squad2.yaml#/GuardianRecordSuccess'
   responses:
     Error:
       $ref: './components/responses.yaml#/Error'

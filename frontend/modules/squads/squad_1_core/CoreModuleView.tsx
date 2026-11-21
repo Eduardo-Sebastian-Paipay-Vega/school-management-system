@@ -7,6 +7,9 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
+import { Password } from 'primereact/password';
+import { Dropdown } from 'primereact/dropdown';
+import { InputTextarea } from 'primereact/inputtextarea';
 import { useCoreSession } from './SessionProvider';
 
 type DirectoryUser={id:string;username:string;estado:string;nombres:string;apellido_paterno:string;
@@ -188,11 +191,10 @@ function UsersPanel(){
           onChange={event=>setNewUser(current=>({...current,documento:event.target.value}))}/></label>
         <label className="text-sm">Correo<InputText className="mt-1 w-full" type="email" value={newUser.email}
           onChange={event=>setNewUser(current=>({...current,email:event.target.value}))}/></label>
-        <label className="text-sm">Rol<select className="mt-1 w-full rounded-lg border border-gray-300 p-2" value={newUser.rol}
-          onChange={event=>setNewUser(current=>({...current,rol:event.target.value}))}>
-          <option value="">Seleccione un rol</option>{roles?.filter(role=>role.codigo!=='SUPERADMIN'||user.roles.includes('SUPERADMIN'))
-            .map(role=><option key={role.codigo} value={role.codigo}>{role.nombre}</option>)}
-        </select></label>
+        <label className="text-sm">Rol<Dropdown className="mt-1 w-full" value={newUser.rol} placeholder="Seleccione un rol"
+          options={roles?.filter(role=>role.codigo!=='SUPERADMIN'||user.roles.includes('SUPERADMIN'))??[]}
+          optionLabel="nombre" optionValue="codigo" emptyMessage="No hay roles disponibles."
+          onChange={event=>setNewUser(current=>({...current,rol:String(event.value??'')}))}/></label>
       </div>
       <Button label="Crear cuenta pendiente" className="mt-3" disabled={!!action||!newUser.nombres.trim()||
         !newUser.apellidoPaterno.trim()||!/^\d{8}$/.test(newUser.documento)||!newUser.email||!newUser.rol}
@@ -473,7 +475,7 @@ function NoticesPanel(){
       <label htmlFor="notice-title" className="mt-3 block text-sm">Título</label>
       <InputText id="notice-title" value={title} onChange={e=>setTitle(e.target.value)} className="w-full"/>
       <label htmlFor="notice-message" className="mt-3 block text-sm">Mensaje</label>
-      <textarea id="notice-message" value={body} onChange={e=>setBody(e.target.value)} className="w-full rounded border p-2" rows={3}/>
+      <InputTextarea id="notice-message" value={body} onChange={e=>setBody(e.target.value)} className="w-full" rows={3}/>
       <Button label="Enviar aviso" className="mt-3" disabled={!recipient||!title||!body} onClick={()=>void send()}/>
     </section>}{message&&<p role="status" className="mt-3 text-sm">{message}</p>}</div>;
 }
@@ -646,11 +648,11 @@ function ProfilePanel(){
       onClick={()=>void saveProfile()}/>
     <h3 className="pt-3 font-bold">Cambiar contraseña</h3>
     <label htmlFor="current-key" className="block">Clave actual</label>
-    <input id="current-key" type="password" autoComplete="current-password" value={current}
-      onChange={e=>setCurrent(e.target.value)} className="w-full rounded border p-2"/>
+    <Password inputId="current-key" autoComplete="current-password" value={current} feedback={false} toggleMask
+      onChange={e=>setCurrent(e.target.value)} className="w-full [&_.p-icon-field]:w-full" inputClassName="w-full"/>
     <label htmlFor="new-key" className="block">Nueva clave</label>
-    <input id="new-key" type="password" autoComplete="new-password" value={next}
-      onChange={e=>setNext(e.target.value)} className="w-full rounded border p-2"/>
+    <Password inputId="new-key" autoComplete="new-password" value={next} feedback={false} toggleMask
+      onChange={e=>setNext(e.target.value)} className="w-full [&_.p-icon-field]:w-full" inputClassName="w-full"/>
     <p className="text-xs text-gray-600">Mínimo 8 caracteres, una letra y un número. Cerrará todas sus sesiones.</p>
     <Button label="Cambiar clave" disabled={!current||!next} onClick={()=>void save()}/>
     {message&&<p role="status">{message}</p>}

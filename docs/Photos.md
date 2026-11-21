@@ -3,8 +3,9 @@
 **Proyecto:** Plataforma Web Institucional (Proceso de admisión 2027)  
 **Institución:** Planteles de Aplicación Guamán Poma de Ayala (PAGPA)  
 **Niveles educativos:** Inicial, Primaria y Secundaria  
-**Fecha de corte:** 20 de noviembre de 2026 (America/Lima)  
-**Base visual disponible:** carpeta `docs/Archivos_PAGPA` y subcarpeta `docs/Archivos_PAGPA/Videos`
+**Fecha de corte:** 20 de noviembre de 2026  
+**Base visual disponible:** carpeta `docs/Archivos_PAGPA` y subcarpeta `docs/Archivos_PAGPA/Videos`  
+**Repositorio compartido:** [Google Drive — Imágenes y videos PAGPA](https://drive.google.com/drive/folders/1yq-V7GN4UyBjWTvHMaD1SQ60EgI_7aZa?usp=sharing). Utilizarlo como fuente de descarga y respaldo de los activos originales.
 
 ## 1. Cómo utilizar este catálogo
 
@@ -287,11 +288,9 @@ Los videos pueden abrirse directamente desde el enlace correspondiente. Para la 
 **Nivel:** Institucional
 
 * [Video horizontal — entrada](Archivos_PAGPA/Videos/Horizontal_Entrada_Planteles_GuamanPoma.mp4)
-* [Video vertical — entrada](Archivos_PAGPA/Videos/Vertical_Entrada_Planteles_GuamanPoma.mp4)
-* [Video vertical — entrada principal](Archivos_PAGPA/Videos/Vertical_Entrada_Principal_1.mp4)
 
 **Subtítulo:** Bienvenida visual al ingreso principal del plantel.  
-**Descripción:** Recorridos horizontales y verticales que muestran la fachada, el acceso y la recepción institucional.
+**Descripción:** Recorridos horizontales que muestran la fachada, el acceso y la recepción institucional.
 
 ### VID-02 — Vista general del plantel
 
@@ -308,8 +307,6 @@ Los videos pueden abrirse directamente desde el enlace correspondiente. Para la 
 
 * [Video horizontal — losa principal](Archivos_PAGPA/Videos/Horizontal_Losa_Principal.mp4)
 * [Video horizontal — losa principal 2](Archivos_PAGPA/Videos/Horizontal_Losa_Principal2.mp4)
-* [Video vertical — losa principal](Archivos_PAGPA/Videos/Vertical_Losa_Principal.mp4)
-* [Video vertical — losa panorámica](Archivos_PAGPA/Videos/Vertical_Losa_Principal_Panorama.mp4)
 
 **Subtítulo:** Recorrido por la infraestructura deportiva principal.
 
@@ -318,7 +315,6 @@ Los videos pueden abrirse directamente desde el enlace correspondiente. Para la 
 **Nivel:** Secundaria
 
 * [Video horizontal — losa y Secundaria](Archivos_PAGPA/Videos/Horizontal_Losa_Principal_y_Secundaria.mp4)
-* [Video vertical — losa y Secundaria](Archivos_PAGPA/Videos/Vertical_Losa_Principal_y_Secundaria.mp4)
 
 **Subtítulo:** Conexión visual entre el patio deportivo y el nivel secundario.
 
@@ -327,7 +323,6 @@ Los videos pueden abrirse directamente desde el enlace correspondiente. Para la 
 **Nivel:** Primaria y Secundaria
 
 * [Video horizontal — losa de fútbol](Archivos_PAGPA/Videos/Horizontal_Losa_Deportiva_Futbol.mp4)
-* [Video vertical — losa de fútbol](Archivos_PAGPA/Videos/Vertical_Losa_Deportiva_Futbol2.mp4)
 
 **Subtítulo:** Práctica deportiva en una losa reglamentada y techada.
 
@@ -339,13 +334,14 @@ Los videos pueden abrirse directamente desde el enlace correspondiente. Para la 
 
 **Subtítulo:** Áreas verdes y convivencia en el entorno de Secundaria.
 
-### VID-07 — Áreas verdes generales
+### VID-07 — Actividades recreativas con estudiantes
 
-**Nivel:** Institucional
+**Nivel:** Inicial, Primaria y Secundaria
 
-* [Video vertical — áreas verdes](Archivos_PAGPA/Videos/Vertical_Areas_Verdes.mp4)
+* [Video horizontal — actividades recreativas](Archivos_PAGPA/Videos/Horizontal_Actividades_Recreativas.mp4)
 
-**Subtítulo:** Vegetación y jardines dentro del campus.
+**Subtítulo:** Participación estudiantil en actividades recreativas y deportivas.  
+**Descripción:** Muestra la interacción de estudiantes en el patio principal durante diversas dinámicas grupales.
 
 ### VID-08 — Actividades de Primaria
 
@@ -368,34 +364,3 @@ Los videos pueden abrirse directamente desde el enlace correspondiente. Para la 
 | Medio ambiente | Áreas verdes del plantel |
 | Videos de admisión | Entrada, vista general, losa principal y actividades |
 
-## 10. Ejemplo de incrustación
-
-### Imagen
-
-```html
-<img
-  src="/Archivos_PAGPA/Vista_general_Panorama1.jpg"
-  alt="Vista panorámica general del campus de los Planteles PAGPA"
-/>
-```
-
-### Video
-
-```html
-<video controls preload="metadata" poster="/Archivos_PAGPA/Vista_general_Panorama1.jpg">
-  <source src="/Archivos_PAGPA/Videos/Horizontal_Vista_General_Planteles_GuamanPoma.mp4" type="video/mp4" />
-  Tu navegador no admite la reproducción de video.
-</video>
-```
-
-## 11. Lista de verificación antes de publicar
-
-* [ ] Las rutas coinciden con los nombres reales de los archivos.
-* [ ] Las imágenes se han optimizado para web, preferentemente en `.webp`.
-* [ ] Los videos tienen una versión horizontal y otra vertical cuando corresponda.
-* [ ] Las etiquetas `alt` describen lo visible sin inferencias innecesarias.
-* [ ] Las escenas con menores cuentan con autorización institucional de uso de imagen.
-* [ ] Se respeta la secuencia **Inicial, Primaria y Secundaria**.
-* [ ] El título, subtítulo y contexto corresponden al plano publicado.
-* [ ] Los videos incluyen portada, controles y subtítulos cuando haya contenido hablado.
-* [ ] Se elimina cualquier metadato o información sensible antes de subir los activos.

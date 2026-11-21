@@ -56,3 +56,6 @@ backend/tests/integration/.openapi-bundle.json
 **/.env
 **/.env.*
 !.env.example
+
+# Worktrees temporales de agentes de Claude Code (copias del repositorio, no se versionan)
+.claude/worktrees/

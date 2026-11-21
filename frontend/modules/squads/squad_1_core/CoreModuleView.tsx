@@ -463,7 +463,7 @@ function NoticesPanel(){
     {user?.permissions.includes('notifications:send')&&<section className="mt-5 rounded-xl border p-4">
       <h3 className="font-bold">Enviar aviso</h3>
       <div className="mt-3 flex gap-2"><InputText value={search} onChange={e=>setSearch(e.target.value)}
-        placeholder="Buscar destinatario" aria-label="Buscar destinatario"/>
+        placeholder="Buscar destinatario" aria-label="Buscar destinatario" className="min-w-0 flex-1"/>
         <Button label="Buscar" outlined disabled={search.length<2} onClick={()=>void findRecipients()}/></div>
       <label className="mt-3 block text-sm">Destinatario<select className="block w-full rounded border p-2" value={recipient}
         onChange={e=>setRecipient(e.target.value)}><option value="">Seleccione</option>

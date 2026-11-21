@@ -49,7 +49,7 @@ export default function IntranetLayout({ children }: { children: React.ReactNode
       </header>
 
       {/* Main Intranet Content */}
-      <main className="flex-1 content-width py-8"><SessionGate>{children}</SessionGate></main>
+      <main className="w-full min-w-0 flex-1 content-width py-8"><SessionGate>{children}</SessionGate></main>
 
       {/* Footer */}
       <footer className="border-t border-gray-200 bg-white py-4 text-center text-xs text-gray-500">

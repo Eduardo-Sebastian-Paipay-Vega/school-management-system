@@ -5,6 +5,7 @@ import { withTenant } from '../config/database';
 import { documentHash, encryptDocument } from '../core/identity-crypto';
 import { importRow, ImportRow } from './user-import.service';
 import { AuditService } from './audit.service';
+import { issueMessages } from '../core/validation';
 
 export type ValidatedRow = { line: number; row: ImportRow; personId?: string;
   status: 'NUEVO' | 'ACTUALIZADO' | 'SIN_CAMBIOS' };
@@ -41,7 +42,7 @@ export async function previewUsers(tenantId: string, actorId: string, actorRoles
       const line = index + 2;
       const result = importRow.safeParse(raw);
       if (!result.success) {
-        rejected.push({ line, reason: result.error.issues.map((x) => x.message).join('; ') });
+        rejected.push({ line, reason: issueMessages(result.error) });
         continue;
       }
       const row = result.data;
@@ -126,19 +127,79 @@ async function upsertRow(client: PoolClient, tenantId: string, row: ImportRow, a
   let userId: string | undefined;
   if (row.rol) {
     const found = await client.query<{ id: string }>('SELECT id FROM usuarios WHERE persona_id=$1', [personId]);
-    userId = found.rows[0]?.id;
-    if (!userId) {
-      const username = row.username || `u_${crypto.randomBytes(8).toString('hex')}`;
-      const created = await client.query<{ id: string }>(`INSERT INTO usuarios
-        (tenant_id,persona_id,username,password_hash,estado)
-        VALUES($1,$2,$3,crypt(gen_random_uuid()::text,gen_salt('bf',12)),'PENDIENTE_CAMBIO_CLAVE')
-        RETURNING id`, [tenantId,personId,username]);
-      userId = created.rows[0].id;
-      await client.query(`INSERT INTO usuario_roles(tenant_id,usuario_id,rol_id)
-        SELECT $1,$2,id FROM roles WHERE codigo::text=$3`, [tenantId,userId,row.rol]);
-    }
+    userId = found.rows[0]?.id ?? await createPendingAccount(client, tenantId, personId!, row);
   }
   return { personId, userId };
+}
+
+/** Cuenta PENDIENTE_CAMBIO_CLAVE sin contraseña conocida y con su rol inicial (RF-05, pasos 2 y 3). */
+async function createPendingAccount(client: PoolClient, tenantId: string, personId: string, row: ImportRow) {
+  const username = row.username || `u_${crypto.randomBytes(8).toString('hex')}`;
+  const created = await client.query<{ id: string }>(`INSERT INTO usuarios
+    (tenant_id,persona_id,username,password_hash,estado)
+    VALUES($1,$2,$3,crypt(gen_random_uuid()::text,gen_salt('bf',12)),'PENDIENTE_CAMBIO_CLAVE')
+    RETURNING id`, [tenantId,personId,username]);
+  await client.query(`INSERT INTO usuario_roles(tenant_id,usuario_id,rol_id)
+    SELECT $1,$2,id FROM roles WHERE codigo::text=$3`, [tenantId,created.rows[0].id,row.rol]);
+  return created.rows[0].id;
+}
+
+/** Conflicto de identidad en el alta individual; `code` es el código estable del sobre. */
+export class IdentityConflictError extends Error {
+  constructor(readonly code: 'USER_EXISTS' | 'PERSON_EXISTS' | 'EMAIL_EXISTS', message: string) {
+    super(message);
+    this.name = 'IdentityConflictError';
+  }
+}
+
+/**
+ * Alta individual (POST /users, RF-05 y CU-USR-01). A diferencia de la importación masiva,
+ * que es idempotente y actualiza la persona, aquí un DNI o correo ya registrado no se
+ * sobrescribe: «Dado un DNI ya existente en el sistema, cuando el administrador intenta
+ * registrarlo nuevamente, el sistema detiene el proceso y alerta sobre la duplicidad».
+ * Solo se «vincula» (RF-05, paso 2) una persona existente sin cuenta cuando se pide un rol
+ * y su correo registrado está vacío o coincide; no se modifican sus datos personales.
+ */
+export async function createUser(tenantId: string, actorId: string, actorRoles: string[], raw: unknown, ip: string) {
+  const preview = await previewUsers(tenantId, actorId, actorRoles, [raw]);
+  if (preview.rejected.length) return { rejected: preview.rejected[0].reason };
+  const row = preview.valid[0].row;
+  return withTenant(tenantId, actorId, async (client) => {
+    const existing = await findPerson(client, tenantId, row);
+    if (row.email) {
+      const sameEmail = await client.query<{ id: string }>(
+        'SELECT id FROM personas WHERE tenant_id=$1 AND lower(email)=lower($2) AND ($3::uuid IS NULL OR id<>$3) LIMIT 1',
+        [tenantId, row.email, existing?.id ?? null]);
+      if (sameEmail.rowCount) throw new IdentityConflictError('EMAIL_EXISTS',
+        'El correo ya pertenece a otra persona de la institución.');
+    }
+    let personId: string;
+    let userId: string | undefined;
+    let linked = false;
+    if (existing) {
+      if (await existingAccount(client, existing.id)) throw new IdentityConflictError('USER_EXISTS',
+        'La persona ya tiene una cuenta en la institución. Búsquela en el directorio en lugar de registrarla otra vez.');
+      if (!row.rol) throw new IdentityConflictError('PERSON_EXISTS',
+        'La persona ya está registrada en la institución.');
+      if (existing.email && existing.email.toLowerCase() !== row.email!.toLowerCase()) {
+        throw new IdentityConflictError('PERSON_EXISTS',
+          'La persona ya está registrada con otro correo. Verifique el correo antes de crear la cuenta.');
+      }
+      await client.query(`UPDATE personas SET email=coalesce(email,$1),telefono=coalesce(telefono,$2)
+        WHERE id=$3`, [row.email, row.telefono ?? null, existing.id]);
+      personId = existing.id;
+      linked = true;
+    } else {
+      personId = (await upsertRow(client, tenantId, row, actorRoles)).personId!;
+    }
+    if (row.rol) {
+      const found = await client.query<{ id: string }>('SELECT id FROM usuarios WHERE persona_id=$1', [personId]);
+      userId = found.rows[0]?.id ?? await createPendingAccount(client, tenantId, personId, row);
+    }
+    await AuditService.record({ tenantId, usuarioId: actorId, accion: 'CREATE_USER', entidad: 'personas',
+      entidadId: personId, datosNuevos: { rol: row.rol ?? null, cuenta: !!userId, vinculada: linked }, ipOrigen: ip }, client);
+    return { line: preview.valid[0].line, personId, userId };
+  });
 }
 
 export async function commitUsers(tenantId: string, actorId: string, actorRoles: string[], rawRows: unknown[], ip: string) {

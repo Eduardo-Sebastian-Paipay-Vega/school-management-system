@@ -1,6 +1,11 @@
 /school/institution:
   get: { operationId: getInstitution, description: 'Permiso school:read.', responses: { '200': { $ref: '../components/responses.yaml#/Institution' } } }
-  patch: { operationId: updateInstitution, description: 'Permiso school:manage.', responses: { '200': { $ref: '../components/responses.yaml#/Message' } } }
+  patch:
+    operationId: updateInstitution
+    description: 'Permiso school:manage. escudoUrl solo admite https://; telefono sigue el patrón de UpdateOwnProfileRequest; en ambos, cadena vacía o null borra el valor. 400 VALIDATION_FAILED con el motivo en español.'
+    responses:
+      '200': { $ref: '../components/responses.yaml#/Message' }
+      '400': { $ref: '../components/responses.yaml#/Error' }
 /school/sites:
   get: { operationId: listSites, responses: { '200': { $ref: '../components/responses.yaml#/Sites' } } }
   post: { operationId: createSite, responses: { '201': { $ref: '../components/responses.yaml#/SiteCreated' } } }

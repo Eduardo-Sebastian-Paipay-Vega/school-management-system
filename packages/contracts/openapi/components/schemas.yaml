@@ -17,7 +17,23 @@ AccessLinkRequest:
   properties:
     codigoModular: { type: string, maxLength: 10 }
     token: { type: string }
-    password: { type: string, format: password, minLength: 8 }
+    password:
+      type: string
+      format: password
+      minLength: 8
+      description: 'Política (RF-03): al menos 8 caracteres, letras y números, hasta 72 bytes UTF-8. Si no se cumple, 400 VALIDATION_FAILED con el mensaje «La contraseña debe tener al menos 8 caracteres, incluir letras y números, y no superar 72 bytes.»'
+UpdateOwnProfileRequest:
+  type: object
+  properties:
+    telefono:
+      type: [string, 'null']
+      maxLength: 20
+      pattern: '^(|\s*\+?\d[\d -]*\d\s*)$'
+      description: 'Dígitos con + inicial opcional, espacios o guiones; 6 a 15 dígitos. Cadena vacía o null borra el teléfono.'
+    fotoUrl:
+      type: [string, 'null']
+      maxLength: 1000
+      description: 'Solo URL https://. Cadena vacía o null borra la foto.'
 Error:
   type: object
   required: [success, error, timestamp]

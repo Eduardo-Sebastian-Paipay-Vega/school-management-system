@@ -1,11 +1,38 @@
 /users:
   get: { operationId: listUsers, description: 'Permiso users:read.', responses: { '200': { $ref: '../components/responses.yaml#/UserDirectory' } } }
-  post: { operationId: createUser, description: 'Permiso users:manage y rol SUPERADMIN o DIRECTIVO.', responses: { '201': { $ref: '../components/responses.yaml#/UserCreated' } } }
+  post:
+    operationId: createUser
+    description: >-
+      Permiso users:manage y rol SUPERADMIN o DIRECTIVO. Alta individual (RF-05): las celdas o campos
+      opcionales vacíos se tratan como ausentes. No sobrescribe una persona existente: 409 USER_EXISTS si
+      el DNI/código SIAGIE ya tiene cuenta, PERSON_EXISTS si la persona existe sin cuenta y no se pide rol
+      o su correo registrado es distinto, EMAIL_EXISTS si el correo pertenece a otra persona. Una persona
+      existente sin cuenta y con el mismo correo (o sin correo) se vincula a la cuenta nueva sin cambiar
+      sus datos. 400 VALIDATION_FAILED con el motivo en español.
+    responses:
+      '201': { $ref: '../components/responses.yaml#/UserCreated' }
+      '400': { $ref: '../components/responses.yaml#/Error' }
+      '409': { $ref: '../components/responses.yaml#/Error' }
 /users/me:
   get: { operationId: getOwnUser, responses: { '200': { $ref: '../components/responses.yaml#/OwnProfile' } } }
-  patch: { operationId: updateOwnProfile, responses: { '200': { $ref: '../components/responses.yaml#/Message' } } }
+  patch:
+    operationId: updateOwnProfile
+    description: 'RF-09. Campo ausente: sin cambios; cadena vacía o null: borra el valor. 400 VALIDATION_FAILED con el motivo en español.'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas.yaml#/UpdateOwnProfileRequest' }
+    responses:
+      '200': { $ref: '../components/responses.yaml#/Message' }
+      '400': { $ref: '../components/responses.yaml#/Error' }
 /users/me/change-password:
-  post: { operationId: changeOwnPassword, responses: { '200': { $ref: '../components/responses.yaml#/Message' } } }
+  post:
+    operationId: changeOwnPassword
+    description: 'La contraseña nueva sigue la política de AccessLinkRequest; si no la cumple, 400 VALIDATION_FAILED con el mensaje de la política. 400 INVALID_PASSWORD si la actual no coincide.'
+    responses:
+      '200': { $ref: '../components/responses.yaml#/Message' }
+      '400': { $ref: '../components/responses.yaml#/Error' }
 /users/persons:
   get: { operationId: searchPersonsForGuardianLink, description: 'Permiso guardians:manage.', responses: { '200': { $ref: '../components/responses.yaml#/PersonSearch' } } }
 /users/import/preview:
@@ -21,7 +48,12 @@
   put: { operationId: updateRolePermissions, description: 'Permiso roles:manage; motivo obligatorio.', responses: { '200': { $ref: '../components/responses.yaml#/Message' } } }
 /users/{id}:
   parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
-  patch: { operationId: updateUser, description: 'Permiso users:manage; el cambio de correo deja la cuenta pendiente.', responses: { '200': { $ref: '../components/responses.yaml#/Message' } } }
+  patch:
+    operationId: updateUser
+    description: 'Permiso users:manage; el cambio de correo deja la cuenta pendiente. telefono sigue el patrón de UpdateOwnProfileRequest; cadena vacía o null lo borra. 400 VALIDATION_FAILED con el motivo en español.'
+    responses:
+      '200': { $ref: '../components/responses.yaml#/Message' }
+      '400': { $ref: '../components/responses.yaml#/Error' }
 /users/{id}/invite:
   parameters: [{ $ref: '../components/parameters.yaml#/Id' }]
   post: { operationId: inviteUser, description: 'Envía enlace de activación a una cuenta pendiente. Permiso users:manage.', responses: { '200': { $ref: '../components/responses.yaml#/Message' }, '503': { $ref: '../components/responses.yaml#/Error' } } }

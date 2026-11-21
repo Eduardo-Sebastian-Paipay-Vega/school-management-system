@@ -4,6 +4,7 @@ import { AuthenticatedRequest, authenticateJwt } from '../middlewares/auth.middl
 import { requirePermission, requireRoles } from '../middlewares/rbac.middleware';
 import { withTenant } from '../config/database';
 import { AuditService } from '../services/audit.service';
+import { clearable, httpsUrlSchema, issueMessages, phoneSchema } from '../core/validation';
 
 const router = Router();
 router.use(authenticateJwt);
@@ -44,18 +45,18 @@ router.get('/institution', async (req: AuthenticatedRequest, res) => {
 
 router.patch('/institution', requireRoles(['SUPERADMIN', 'DIRECTIVO']), async (req: AuthenticatedRequest, res) => {
   const parsed = z.object({ nombre: z.string().min(1).max(150).optional(),
-    direccion: z.string().max(500).optional(), telefono: z.string().max(20).optional(),
-    membreteTexto: z.string().max(2000).optional(), escudoUrl: z.string().url().max(1000).optional() }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Parámetros inválidos.'); return; }
+    direccion: z.string().max(500).optional(), telefono: clearable(phoneSchema),
+    membreteTexto: z.string().max(2000).optional(), escudoUrl: clearable(httpsUrlSchema) }).safeParse(req.body);
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', issueMessages(parsed.error)); return; }
   try {
     await mutate(req, async (client) => {
       const d = parsed.data;
       await client.query(`UPDATE instituciones SET nombre=coalesce($1,nombre),direccion=coalesce($2,direccion),
-        telefono=coalesce($3,telefono) WHERE id=$4`,
-      [d.nombre ?? null,d.direccion ?? null,d.telefono ?? null,req.user!.tenantId]);
+        telefono=CASE WHEN $3 THEN $4 ELSE telefono END WHERE id=$5`,
+      [d.nombre ?? null,d.direccion ?? null,d.telefono !== undefined,d.telefono ?? null,req.user!.tenantId]);
       await client.query(`UPDATE configuracion_institucional SET membrete_texto=coalesce($1,membrete_texto),
-        escudo_url=coalesce($2,escudo_url) WHERE tenant_id=$3`,
-      [d.membreteTexto ?? null,d.escudoUrl ?? null,req.user!.tenantId]);
+        escudo_url=CASE WHEN $2 THEN $3 ELSE escudo_url END WHERE tenant_id=$4`,
+      [d.membreteTexto ?? null,d.escudoUrl !== undefined,d.escudoUrl ?? null,req.user!.tenantId]);
     }, 'UPDATE_INSTITUTION', 'configuracion_institucional', parsed.data);
     ok(res, { message: 'Institución actualizada.' });
   } catch { fail(res, 500, 'SCHOOL_ERROR', 'No se pudo actualizar la institución.'); }

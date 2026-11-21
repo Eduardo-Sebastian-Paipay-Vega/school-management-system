@@ -2,18 +2,23 @@ import { Readable } from 'stream';
 import ExcelJS from 'exceljs';
 import yauzl from 'yauzl';
 import { z } from 'zod';
+import { blankAsAbsent, phoneSchema } from '../core/validation';
+
+// Una celda vacía (o un campo JSON con solo espacios) equivale a un dato ausente: así
+// los opcionales no se validan como texto vacío y los obligatorios informan que faltan.
+const text = <T extends z.ZodType>(schema: T) => z.preprocess(blankAsAbsent, schema);
 
 export const importRow = z.object({
-  tipoDocumento: z.enum(['DNI', 'CE', 'PASAPORTE', 'PTP', 'SIN_DOCUMENTO']).default('DNI'),
-  documento: z.string().trim().optional(),
-  codigoSiagie: z.string().trim().max(20).optional(),
-  nombres: z.string().trim().min(1).max(100),
-  apellidoPaterno: z.string().trim().min(1).max(100),
-  apellidoMaterno: z.string().trim().max(100).optional(),
-  email: z.string().email().max(254).optional(),
-  telefono: z.string().trim().max(20).optional(),
-  username: z.string().trim().max(50).optional(),
-  rol: z.string().trim().max(40).optional(),
+  tipoDocumento: text(z.enum(['DNI', 'CE', 'PASAPORTE', 'PTP', 'SIN_DOCUMENTO']).default('DNI')),
+  documento: text(z.string().trim().optional()),
+  codigoSiagie: text(z.string().trim().max(20).optional()),
+  nombres: text(z.string().trim().min(1).max(100)),
+  apellidoPaterno: text(z.string().trim().min(1).max(100)),
+  apellidoMaterno: text(z.string().trim().max(100).optional()),
+  email: text(z.string().trim().email().max(254).optional()),
+  telefono: text(phoneSchema.optional()),
+  username: text(z.string().trim().max(50).optional()),
+  rol: text(z.string().trim().max(40).optional()),
 }).superRefine((row, ctx) => {
   if (row.tipoDocumento === 'DNI' && !/^\d{8}$/.test(row.documento ?? '')) {
     ctx.addIssue({ code: 'custom', message: 'DNI inválido', path: ['documento'] });
@@ -72,7 +77,10 @@ export async function parseImportFile(filename: string, base64: string): Promise
     await workbook.xlsx.load(buffer as unknown as Parameters<typeof workbook.xlsx.load>[0]);
     sheet = workbook.worksheets[0];
   } else if (filename.toLowerCase().endsWith('.csv')) {
-    sheet = await workbook.csv.read(Readable.from([buffer]));
+    // Sin `map`, ExcelJS convierte cada celda a número o fecha: «  » llega como 0 y un
+    // DNI «01234567» pierde el cero. El padrón se lee como texto, tal como se escribió.
+    sheet = await workbook.csv.read(Readable.from([buffer]),
+      { map: (value: string) => (value === '' ? null : value) });
   } else {
     throw new Error('Formato permitido: CSV o XLSX.');
   }

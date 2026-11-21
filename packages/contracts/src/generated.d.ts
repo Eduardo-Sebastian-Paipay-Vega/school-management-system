@@ -128,7 +128,7 @@ export interface paths {
         /** @description Permiso users:read. */
         get: operations["listUsers"];
         put?: never;
-        /** @description Permiso users:manage y rol SUPERADMIN o DIRECTIVO. */
+        /** @description Permiso users:manage y rol SUPERADMIN o DIRECTIVO. Alta individual (RF-05): las celdas o campos opcionales vacíos se tratan como ausentes. No sobrescribe una persona existente: 409 USER_EXISTS si el DNI/código SIAGIE ya tiene cuenta, PERSON_EXISTS si la persona existe sin cuenta y no se pide rol o su correo registrado es distinto, EMAIL_EXISTS si el correo pertenece a otra persona. Una persona existente sin cuenta y con el mismo correo (o sin correo) se vincula a la cuenta nueva sin cambiar sus datos. 400 VALIDATION_FAILED con el motivo en español. */
         post: operations["createUser"];
         delete?: never;
         options?: never;
@@ -149,6 +149,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        /** @description RF-09. Campo ausente: sin cambios; cadena vacía o null: borra el valor. 400 VALIDATION_FAILED con el motivo en español. */
         patch: operations["updateOwnProfile"];
         trace?: never;
     };
@@ -161,6 +162,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** @description La contraseña nueva sigue la política de AccessLinkRequest; si no la cumple, 400 VALIDATION_FAILED con el mensaje de la política. 400 INVALID_PASSWORD si la actual no coincide. */
         post: operations["changeOwnPassword"];
         delete?: never;
         options?: never;
@@ -287,7 +289,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** @description Permiso users:manage; el cambio de correo deja la cuenta pendiente. */
+        /** @description Permiso users:manage; el cambio de correo deja la cuenta pendiente. telefono sigue el patrón de UpdateOwnProfileRequest; cadena vacía o null lo borra. 400 VALIDATION_FAILED con el motivo en español. */
         patch: operations["updateUser"];
         trace?: never;
     };
@@ -400,7 +402,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** @description Permiso school:manage. */
+        /** @description Permiso school:manage. escudoUrl solo admite https://; telefono sigue el patrón de UpdateOwnProfileRequest; en ambos, cadena vacía o null borra el valor. 400 VALIDATION_FAILED con el motivo en español. */
         patch: operations["updateInstitution"];
         trace?: never;
     };
@@ -944,7 +946,10 @@ export interface components {
         AccessLinkRequest: {
             codigoModular: string;
             token: string;
-            /** Format: password */
+            /**
+             * Format: password
+             * @description Política (RF-03): al menos 8 caracteres, letras y números, hasta 72 bytes UTF-8. Si no se cumple, 400 VALIDATION_FAILED con el mensaje «La contraseña debe tener al menos 8 caracteres, incluir letras y números, y no superar 72 bytes.»
+             */
             password: string;
         };
         Error: {
@@ -1200,6 +1205,12 @@ export interface components {
             };
             /** Format: date-time */
             timestamp: string;
+        };
+        UpdateOwnProfileRequest: {
+            /** @description Dígitos con + inicial opcional, espacios o guiones; 6 a 15 dígitos. Cadena vacía o null borra el teléfono. */
+            telefono?: string | null;
+            /** @description Solo URL https://. Cadena vacía o null borra la foto. */
+            fotoUrl?: string | null;
         };
         PersonSearchSuccess: {
             /** @constant */
@@ -2272,6 +2283,8 @@ export interface operations {
         requestBody?: never;
         responses: {
             201: components["responses"]["UserCreated"];
+            400: components["responses"]["Error"];
+            409: components["responses"]["Error"];
         };
     };
     getOwnUser: {
@@ -2293,9 +2306,14 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateOwnProfileRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["Message"];
+            400: components["responses"]["Error"];
         };
     };
     changeOwnPassword: {
@@ -2308,6 +2326,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["Message"];
+            400: components["responses"]["Error"];
         };
     };
     searchPersonsForGuardianLink: {
@@ -2397,6 +2416,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["Message"];
+            400: components["responses"]["Error"];
         };
     };
     inviteUser: {
@@ -2492,6 +2512,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["Message"];
+            400: components["responses"]["Error"];
         };
     };
     listSites: {

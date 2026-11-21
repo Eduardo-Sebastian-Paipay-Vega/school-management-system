@@ -1159,6 +1159,138 @@ test('S7: vínculos familiares listan solo activos salvo estado=todos y DELETE r
   assert.equal(again.body.data.find((row) => row.apoderado_id === guardianPersonId)?.activo, true);
 });
 
+function jsonCall(token, body, method = 'POST') {
+  return { method, headers: bearer(token, { 'Content-Type': 'application/json' }), body: JSON.stringify(body) };
+}
+
+test('V1/V6: celda de correo vacía es dato ausente y los errores de zod llegan en español', async () => {
+  const s = Date.now().toString().slice(-7);
+  const csv = 'tipo_documento,dni,nombres,apellido_paterno,email,telefono,rol\n' +
+    `DNI,${s}1,Sin,Cuenta,,,\nDNI,${s}2,Con,Rol,,,DOCENTE\n`;
+  const preview = await call('/users/import/preview', jsonCall(accessA,
+    { filename: 'padron.csv', contentBase64: Buffer.from(csv).toString('base64') }));
+  assert.equal(preview.status, 200, JSON.stringify(preview.body));
+  assertContract('/users/import/preview', 'post', preview);
+  assert.equal(preview.body.data.summary.nuevos, 1, JSON.stringify(preview.body.data));
+  assert.deepEqual(preview.body.data.rejected, [{ line: 3, reason: 'Correo requerido para activar la cuenta' }]);
+  const blankEmail = await call('/users', jsonCall(accessA, { tipoDocumento: 'DNI', documento: `${s}3`,
+    nombres: 'Persona', apellidoPaterno: 'Sin Correo', email: '', telefono: ' ' }));
+  assert.equal(blankEmail.status, 201, JSON.stringify(blankEmail.body));
+  const badEmail = await call('/users', jsonCall(accessA, { tipoDocumento: 'DNI', documento: `${s}4`,
+    nombres: 'Persona', apellidoPaterno: 'Ficticia', email: 'no-es-correo', rol: 'DOCENTE' }));
+  assert.equal(badEmail.status, 400, JSON.stringify(badEmail.body));
+  assertContract('/users', 'post', badEmail);
+  assert.equal(badEmail.body.error.code, 'VALIDATION_FAILED');
+  assert.equal(badEmail.body.error.message, 'Correo electrónico: no es un correo electrónico válido.');
+  const badBody = await call('/users/import/preview', jsonCall(accessA, { rows: [] }));
+  assert.equal(badBody.status, 400, JSON.stringify(badBody.body));
+  assert.ok(!/Invalid|too_small|\[/.test(badBody.body.error.message), badBody.body.error.message);
+});
+
+test('V2/V3: teléfono y URL de imagen se validan; vacío borra el valor', async () => {
+  for (const body of [{ telefono: 'abc' }, { fotoUrl: 'javascript:alert(1)' }, { fotoUrl: 'http://example.org/a.png' }]) {
+    const rejected = await call('/users/me', jsonCall(accessA, body, 'PATCH'));
+    assert.equal(rejected.status, 400, JSON.stringify(rejected.body));
+    assertContract('/users/me', 'patch', rejected);
+    assert.equal(rejected.body.error.code, 'VALIDATION_FAILED');
+  }
+  const phone = await call('/users/me', jsonCall(accessA, { telefono: 'abc' }, 'PATCH'));
+  assert.equal(phone.body.error.message,
+    'El teléfono solo admite dígitos, un «+» inicial, espacios o guiones (6 a 15 dígitos).');
+  const saved = await call('/users/me', jsonCall(accessA,
+    { telefono: '+51 966-123-456', fotoUrl: 'https://cdn.example.invalid/foto.png' }, 'PATCH'));
+  assert.equal(saved.status, 200, JSON.stringify(saved.body));
+  let profile = await call('/users/me', { headers: bearer(accessA) });
+  assert.equal(profile.body.data.telefono, '+51 966-123-456');
+  assert.equal(profile.body.data.foto_url, 'https://cdn.example.invalid/foto.png');
+  const keep = await call('/users/me', jsonCall(accessA, {}, 'PATCH'));
+  assert.equal(keep.status, 200, JSON.stringify(keep.body));
+  profile = await call('/users/me', { headers: bearer(accessA) });
+  assert.equal(profile.body.data.foto_url, 'https://cdn.example.invalid/foto.png', 'campo ausente no cambia');
+  const cleared = await call('/users/me', jsonCall(accessA, { telefono: '', fotoUrl: '' }, 'PATCH'));
+  assert.equal(cleared.status, 200, JSON.stringify(cleared.body));
+  profile = await call('/users/me', { headers: bearer(accessA) });
+  assertContract('/users/me', 'get', profile);
+  assert.equal(profile.body.data.telefono, null);
+  assert.equal(profile.body.data.foto_url, null);
+
+  const edit = await call(`/users/${invitedUserId}`, jsonCall(accessA, { telefono: 'abc' }, 'PATCH'));
+  assert.equal(edit.status, 400, JSON.stringify(edit.body));
+  assertContract('/users/{id}', 'patch', edit);
+  const stored = await admin.query(`SELECT p.telefono FROM usuarios u
+    JOIN personas p ON p.id=u.persona_id WHERE u.id=$1`, [invitedUserId]);
+  assert.notEqual(stored.rows[0].telefono, 'abc');
+  const school = await call('/school/institution', jsonCall(accessA, { escudoUrl: 'javascript:alert(1)' }, 'PATCH'));
+  assert.equal(school.status, 400, JSON.stringify(school.body));
+  assertContract('/school/institution', 'patch', school);
+  const schoolPhone = await call('/school/institution', jsonCall(accessA, { telefono: 'abc' }, 'PATCH'));
+  assert.equal(schoolPhone.status, 400, JSON.stringify(schoolPhone.body));
+  const crest = await admin.query('SELECT escudo_url FROM configuracion_institucional WHERE tenant_id=$1', [a.tenantId]);
+  assert.notEqual(crest.rows[0].escudo_url, 'javascript:alert(1)');
+});
+
+test('V4: el alta individual no sobrescribe una persona ni una cuenta existentes', async () => {
+  const s = Date.now().toString().slice(-7);
+  const person = (end, extra = {}) => ({ tipoDocumento: 'DNI', documento: `${s}${end}`,
+    nombres: 'Alta', apellidoPaterno: 'Individual', ...extra });
+  const first = await call('/users', jsonCall(accessA, person(1, { email: `alta-${s}@example.invalid`, rol: 'DOCENTE' })));
+  assert.equal(first.status, 201, JSON.stringify(first.body));
+  const again = await call('/users', jsonCall(accessA,
+    person(1, { nombres: 'Otra', email: `otra-${s}@example.invalid`, rol: 'DOCENTE' })));
+  assert.equal(again.status, 409, JSON.stringify(again.body));
+  assertContract('/users', 'post', again);
+  assert.equal(again.body.error.code, 'USER_EXISTS');
+  const kept = await admin.query('SELECT nombres,email FROM personas WHERE id=$1', [first.body.data.personId]);
+  assert.deepEqual(kept.rows[0], { nombres: 'Alta', email: `alta-${s}@example.invalid` });
+
+  const sharedEmail = await call('/users', jsonCall(accessA,
+    person(2, { email: `alta-${s}@example.invalid`, rol: 'DOCENTE' })));
+  assert.equal(sharedEmail.status, 409, JSON.stringify(sharedEmail.body));
+  assert.equal(sharedEmail.body.error.code, 'EMAIL_EXISTS');
+
+  const bare = await call('/users', jsonCall(accessA, person(3, { email: `previa-${s}@example.invalid` })));
+  assert.equal(bare.status, 201, JSON.stringify(bare.body));
+  assert.equal(bare.body.data.userId, undefined);
+  const duplicated = await call('/users', jsonCall(accessA, person(3)));
+  assert.equal(duplicated.status, 409, JSON.stringify(duplicated.body));
+  assert.equal(duplicated.body.error.code, 'PERSON_EXISTS');
+  const otherEmail = await call('/users', jsonCall(accessA,
+    person(3, { email: `distinto-${s}@example.invalid`, rol: 'DOCENTE' })));
+  assert.equal(otherEmail.status, 409, JSON.stringify(otherEmail.body));
+  assert.equal(otherEmail.body.error.code, 'PERSON_EXISTS');
+  const linked = await call('/users', jsonCall(accessA, person(3, { nombres: 'No Sobrescribe',
+    email: `PREVIA-${s}@example.invalid`, rol: 'DOCENTE' })));
+  assert.equal(linked.status, 201, JSON.stringify(linked.body));
+  assertContract('/users', 'post', linked);
+  assert.equal(linked.body.data.personId, bare.body.data.personId);
+  assert.ok(linked.body.data.userId);
+  const linkedPerson = await admin.query('SELECT nombres,email FROM personas WHERE id=$1', [bare.body.data.personId]);
+  assert.deepEqual(linkedPerson.rows[0], { nombres: 'Alta', email: `previa-${s}@example.invalid` });
+  const people = await admin.query('SELECT count(*)::int AS n FROM personas WHERE tenant_id=$1 AND documento_hash=$2',
+    [a.tenantId, documentHash(`${s}3`)]);
+  assert.equal(people.rows[0].n, 1);
+});
+
+test('V5: contraseña fuera de política devuelve el mensaje de la política', async () => {
+  const policy = 'La contraseña debe tener al menos 8 caracteres, incluir letras y números, y no superar 72 bytes.';
+  for (const path of ['/auth/activate', '/auth/reset-password']) {
+    const weak = await call(path, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codigoModular: a.code, token: 'x'.repeat(43), password: 'solotexto' }) });
+    assert.equal(weak.status, 400, JSON.stringify(weak.body));
+    assertContract(path, 'post', weak);
+    assert.equal(weak.body.error.code, 'VALIDATION_FAILED');
+    assert.equal(weak.body.error.message, policy);
+    const badToken = await call(path, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codigoModular: a.code, token: 'corto', password: PASSWORD }) });
+    assert.equal(badToken.body.error.message, 'Datos inválidos.');
+  }
+  const change = await call('/users/me/change-password', jsonCall(accessA, { actual: PASSWORD, nueva: '12345678' }));
+  assert.equal(change.status, 400, JSON.stringify(change.body));
+  assertContract('/users/me/change-password', 'post', change);
+  assert.equal(change.body.error.code, 'VALIDATION_FAILED');
+  assert.equal(change.body.error.message, policy);
+});
+
 test('Redis indisponible falla cerrado en petición protegida y refresh', async () => {
   await redisClient.quit();
   const protectedRoute = await call('/school/institution', { headers: bearer(accessA) });

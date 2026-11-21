@@ -5,17 +5,16 @@ import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import { sendAccessLink } from '../services/mail.service';
 import { redisClient } from '../config/redis';
 import { tokenHash } from '../core/identity-crypto';
+import { messageFor, passwordSchema } from '../core/validation';
 import type { components } from 'school-contracts';
 
 type SessionData = components['schemas']['SessionData'];
 type MeData = components['schemas']['MeSuccess']['data'];
 
-const password = z.string().min(8).refine((value) => Buffer.byteLength(value, 'utf8') <= 72)
-  .refine((value) => /[A-Za-z]/.test(value) && /\d/.test(value));
 const loginSchema = z.object({ codigoModular: z.string().min(1).max(10),
   identifier: z.string().min(3).max(254), password: z.string().min(1) });
 const linkSchema = z.object({ codigoModular: z.string().min(1).max(10),
-  token: z.string().min(32).max(128), password });
+  token: z.string().min(32).max(128), password: passwordSchema });
 const ipOf = (req: AuthenticatedRequest) => req.ip ?? req.socket.remoteAddress ?? '127.0.0.1';
 
 function cookie(res: Response, value: string) {
@@ -120,7 +119,9 @@ export class AuthController {
 
   static async reset(req: AuthenticatedRequest, res: Response): Promise<void> {
     const parsed = linkSchema.safeParse(req.body);
-    if (!parsed.success) { error(res, 400, 'VALIDATION_FAILED', 'Datos inválidos.'); return; }
+    if (!parsed.success) {
+      error(res, 400, 'VALIDATION_FAILED', messageFor(parsed.error, ['password'], 'Datos inválidos.')); return;
+    }
     try {
       const applied = await AuthService.consumeAccessLink(parsed.data.codigoModular, parsed.data.token,
         parsed.data.password, 'RECUPERACION', ipOf(req));
@@ -131,7 +132,9 @@ export class AuthController {
 
   static async activate(req: AuthenticatedRequest, res: Response): Promise<void> {
     const parsed = linkSchema.safeParse(req.body);
-    if (!parsed.success) { error(res, 400, 'VALIDATION_FAILED', 'Datos inválidos.'); return; }
+    if (!parsed.success) {
+      error(res, 400, 'VALIDATION_FAILED', messageFor(parsed.error, ['password'], 'Datos inválidos.')); return;
+    }
     try {
       const applied = await AuthService.consumeAccessLink(parsed.data.codigoModular, parsed.data.token,
         parsed.data.password, 'ACTIVACION', ipOf(req));

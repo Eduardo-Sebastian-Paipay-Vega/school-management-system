@@ -7,8 +7,9 @@ import { decryptDocument, documentHash } from '../core/identity-crypto';
 import { AuditService } from '../services/audit.service';
 import { AuthService } from '../services/auth.service';
 import { sendAccessLink } from '../services/mail.service';
-import { commitUsers, previewUsers, userInput } from '../services/users.service';
+import { commitUsers, createUser, IdentityConflictError, previewUsers, userInput } from '../services/users.service';
 import { parseImportFile } from '../services/user-import.service';
+import { clearable, httpsUrlSchema, issueMessages, passwordSchema, phoneSchema } from '../core/validation';
 
 const router = Router();
 router.use(authenticateJwt);
@@ -19,7 +20,9 @@ const ok = (res: import('express').Response, data: unknown, status = 200) =>
   res.status(status).json({ success: true, data, timestamp: now() });
 
 async function rowsFromRequest(body: unknown) {
-  const parsed = userInput.parse(body);
+  const result = userInput.safeParse(body);
+  if (!result.success) throw new Error(issueMessages(result.error));
+  const parsed = result.data;
   if (parsed.rows) return parsed.rows;
   if (parsed.filename && parsed.contentBase64) return parseImportFile(parsed.filename, parsed.contentBase64);
   throw new Error('Adjunte filas o un archivo CSV/XLSX.');
@@ -137,14 +140,17 @@ router.post('/:id/document', requirePermission('users:unmask'), async (req: Auth
 });
 
 router.patch('/me', async (req: AuthenticatedRequest, res) => {
-  const parsed = z.object({ telefono: z.string().max(20).optional(), fotoUrl: z.string().url().max(1000).optional() }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Datos de perfil inválidos.'); return; }
+  // RF-09: número telefónico y foto de perfil. Campo ausente = sin cambios; texto vacío = borrar (null).
+  const parsed = z.object({ telefono: clearable(phoneSchema), fotoUrl: clearable(httpsUrlSchema) }).safeParse(req.body);
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', issueMessages(parsed.error)); return; }
   try {
     await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
       const old = await client.query('SELECT telefono,foto_url FROM personas WHERE id=(SELECT persona_id FROM usuarios WHERE id=$1)', [req.user!.id]);
-      await client.query(`UPDATE personas SET telefono=coalesce($1,telefono),foto_url=coalesce($2,foto_url)
-        WHERE id=(SELECT persona_id FROM usuarios WHERE id=$3)`,
-        [parsed.data.telefono ?? null, parsed.data.fotoUrl ?? null, req.user!.id]);
+      await client.query(`UPDATE personas SET telefono=CASE WHEN $1 THEN $2 ELSE telefono END,
+        foto_url=CASE WHEN $3 THEN $4 ELSE foto_url END
+        WHERE id=(SELECT persona_id FROM usuarios WHERE id=$5)`,
+        [parsed.data.telefono !== undefined, parsed.data.telefono ?? null,
+          parsed.data.fotoUrl !== undefined, parsed.data.fotoUrl ?? null, req.user!.id]);
       await AuditService.record({ tenantId: req.user!.tenantId, usuarioId: req.user!.id,
         accion: 'UPDATE_PROFILE', entidad: 'personas', entidadId: req.user!.id,
         datosAnteriores: old.rows[0] ?? null, datosNuevos: parsed.data, ipOrigen: req.ip }, client);
@@ -154,9 +160,8 @@ router.patch('/me', async (req: AuthenticatedRequest, res) => {
 });
 
 router.post('/me/change-password', async (req: AuthenticatedRequest, res) => {
-  const parsed = z.object({ actual: z.string().min(1), nueva: z.string().min(8).max(72)
-    .refine((x) => /[A-Za-z]/.test(x) && /\d/.test(x)) }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Contraseña nueva inválida.'); return; }
+  const parsed = z.object({ actual: z.string().min(1), nueva: passwordSchema }).safeParse(req.body);
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', issueMessages(parsed.error)); return; }
   try {
     const changed = await withTenant(req.user!.tenantId, req.user!.id, async (client) => {
       const result = await client.query(`UPDATE usuarios SET password_hash=crypt($1,gen_salt('bf',12)),auth_version=auth_version+1
@@ -233,10 +238,13 @@ router.post('/import/commit', requirePermission('users:import'), async (req: Aut
 
 router.post('/', requirePermission('users:manage'), requireRoles(['SUPERADMIN', 'DIRECTIVO']), async (req: AuthenticatedRequest, res) => {
   try {
-    const result = await commitUsers(req.user!.tenantId, req.user!.id, req.user!.roles, [req.body], req.ip ?? '127.0.0.1');
-    if (result.rechazados.length) { fail(res, 400, 'VALIDATION_FAILED', result.rechazados[0].reason); return; }
-    ok(res, result.registros[0], 201);
-  } catch (cause) { fail(res, 409, 'USER_CREATE_FAILED', cause instanceof Error ? cause.message : 'No se pudo crear.'); }
+    const result = await createUser(req.user!.tenantId, req.user!.id, req.user!.roles, req.body, req.ip ?? '127.0.0.1');
+    if ('rejected' in result) { fail(res, 400, 'VALIDATION_FAILED', result.rejected); return; }
+    ok(res, result, 201);
+  } catch (cause) {
+    if (cause instanceof IdentityConflictError) { fail(res, 409, cause.code, cause.message); return; }
+    fail(res, 409, 'USER_CREATE_FAILED', cause instanceof Error ? cause.message : 'No se pudo crear.');
+  }
 });
 
 router.post('/:id/invite', requirePermission('users:manage'), requireRoles(['SUPERADMIN', 'DIRECTIVO']), async (req: AuthenticatedRequest, res) => {
@@ -264,9 +272,9 @@ router.post('/:id/invite', requirePermission('users:manage'), requireRoles(['SUP
 router.patch('/:id', requirePermission('users:manage'), requireRoles(['SUPERADMIN', 'DIRECTIVO']), async (req: AuthenticatedRequest, res) => {
   const parsed = z.object({ nombres: z.string().min(1).max(100).optional(),
     apellidoPaterno: z.string().min(1).max(100).optional(),
-    apellidoMaterno: z.string().max(100).optional(), email: z.string().email().max(254).optional(),
-    telefono: z.string().max(20).optional() }).safeParse(req.body);
-  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', 'Datos inválidos.'); return; }
+    apellidoMaterno: z.string().max(100).optional(), email: z.string().trim().email().max(254).optional(),
+    telefono: clearable(phoneSchema) }).safeParse(req.body);
+  if (!parsed.success) { fail(res, 400, 'VALIDATION_FAILED', issueMessages(parsed.error)); return; }
   if (parsed.data.email && !req.user!.roles.includes('SUPERADMIN')) {
     fail(res, 403, 'EMAIL_PROTECTED', 'Solo Administración TI puede cambiar el correo de acceso.'); return;
   }
@@ -285,8 +293,9 @@ router.patch('/:id', requirePermission('users:manage'), requireRoles(['SUPERADMI
       if (emailChanged && targetIsAdmin) throw new Error('PROTECTED_ADMIN_EMAIL');
       await client.query(`UPDATE personas SET nombres=coalesce($1,nombres),
         apellido_paterno=coalesce($2,apellido_paterno),apellido_materno=coalesce($3,apellido_materno),
-        email=coalesce($4,email),telefono=coalesce($5,telefono) WHERE id=$6`,
-      [d.nombres ?? null,d.apellidoPaterno ?? null,d.apellidoMaterno ?? null,d.email ?? null,d.telefono ?? null,old.rows[0].id]);
+        email=coalesce($4,email),telefono=CASE WHEN $5 THEN $6 ELSE telefono END WHERE id=$7`,
+      [d.nombres ?? null,d.apellidoPaterno ?? null,d.apellidoMaterno ?? null,d.email ?? null,
+        d.telefono !== undefined,d.telefono ?? null,old.rows[0].id]);
       if (emailChanged) {
         await client.query(`UPDATE usuarios SET estado='PENDIENTE_CAMBIO_CLAVE',
           email_verificado_en=NULL,auth_version=auth_version+1 WHERE id=$1`, [req.params.id]);

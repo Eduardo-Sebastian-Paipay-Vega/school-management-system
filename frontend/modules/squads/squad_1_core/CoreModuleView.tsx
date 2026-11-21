@@ -355,7 +355,7 @@ function SchoolPanel(){
   async function updateInstitution(){
     setMessage('');try{await request('/school/institution',{method:'PATCH',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({nombre:schoolName,direccion:address,telefono:phone,membreteTexto:letterhead,
-        escudoUrl:crest||undefined})});
+        escudoUrl:crest})}); // '' borra el escudo
       setMessage('Datos institucionales actualizados.');await reloadInstitution();}
     catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo guardar.');}
   }
@@ -622,7 +622,7 @@ function ProfilePanel(){
   async function saveProfile(){
     setSaving(true);setMessage('');
     try{await request('/users/me',{method:'PATCH',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({telefono:phone,fotoUrl:photo||undefined})});
+      body:JSON.stringify({telefono:phone,fotoUrl:photo})}); // '' borra la foto
       await profile.reload();setMessage('Perfil actualizado.');}
     catch(cause){setMessage(cause instanceof Error?cause.message:'No se pudo actualizar el perfil.');}
     finally{setSaving(false);}
